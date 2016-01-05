@@ -1,7 +1,6 @@
 package team037;
 
 import battlecode.common.*;
-import battlecode.common.GameConstants;
 import team037.Units.*;
 
 import java.util.Random;
