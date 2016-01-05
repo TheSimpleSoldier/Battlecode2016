@@ -33,7 +33,7 @@ public class BaseArchon extends Unit
     // maybe spawn a unit?
     public boolean carryOutAbility() throws GameActionException
     {
-        if (rc.getTeamParts() > RobotType.SOLDIER.partCost)
+        if (rc.hasBuildRequirements(RobotType.SOLDIER) && rc.getCoreDelay() < 1)
         {
             for (int i = dirs.length; --i>=0; )
             {
