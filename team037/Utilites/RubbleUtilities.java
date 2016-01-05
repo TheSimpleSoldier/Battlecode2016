@@ -19,7 +19,7 @@ public class RubbleUtilities
 
     public static int calculateClearActionsToReduceBelow100(double rubble) {
         if (rubble < 100) {
-            return 0
+            return 0;
         } else {
             return Math.max(calculateClearActionsToReduceToZero(rubble) - 8, 1);
         }
@@ -27,9 +27,9 @@ public class RubbleUtilities
 
     public static int calculateClearActionsToReduceBelow50(double rubble) {
         if (rubble < 50) {
-            return 0
+            return 0;
         } else {
-            return Math.max(calculateClearActionsToReduceToZero(rubble) - 4, 1)
+            return Math.max(calculateClearActionsToReduceToZero(rubble) - 4, 1);
         }
     }
 }
