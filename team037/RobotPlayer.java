@@ -61,10 +61,8 @@ public class RobotPlayer
                 unit.collectData();
                 unit.handleMessages();
 
-                if (unit.fight());
-                else if (unit.fightZombies());
-                else if (unit.carryOutAbility());
-                else if (unit.takeNextStep());
+                // default is fight, fightZombie, carryOutAbility, takeNextStep
+                unit.act();
 
                 unit = unit.getNewStrategy(unit);
             }
