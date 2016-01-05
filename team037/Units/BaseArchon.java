@@ -17,7 +17,12 @@ public class BaseArchon extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
+        return false;
+    }
+
+    public boolean fightZombies() throws GameActionException
+    {
+        return false;
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException
@@ -28,6 +33,16 @@ public class BaseArchon extends Unit
     // maybe spawn a unit?
     public boolean carryOutAbility() throws GameActionException
     {
+        if (rc.getTeamParts() > RobotType.SOLDIER.partCost)
+        {
+            for (int i = dirs.length; --i>=0; )
+            {
+                if (rc.canBuild(dirs[i], RobotType.SOLDIER))
+                {
+                    rc.build(dirs[i], RobotType.SOLDIER);
+                }
+            }
+        }
         return false;
     }
 }

@@ -62,6 +62,7 @@ public class RobotPlayer
                 unit.handleMessages();
 
                 if (unit.fight());
+                else if (unit.fightZombies());
                 else if (unit.carryOutAbility());
                 else if (unit.takeNextStep());
 

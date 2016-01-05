@@ -18,7 +18,12 @@ public class BaseTTM extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
+        return false;
+    }
+
+    public boolean fightZombies() throws GameActionException
+    {
+        return false;
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException

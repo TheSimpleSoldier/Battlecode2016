@@ -14,6 +14,8 @@ public abstract class Unit
     public static RobotInfo[] nearByAllies;
     public static RobotInfo[] enemies;
     public static RobotInfo[] allies;
+    public static RobotInfo[] nearByZombies;
+    public static RobotInfo[] zombies;
     public static MapLocation target;
     public static Direction[] dirs;
     public static FightMicro fightMicro;
@@ -40,6 +42,7 @@ public abstract class Unit
     // abstract methods that all units will need to implement
     public abstract boolean takeNextStep() throws GameActionException;
     public abstract boolean fight() throws GameActionException;
+    public abstract boolean fightZombies() throws GameActionException;
 
     // additional methods with default behavior
     public  void handleMessages() throws GameActionException
@@ -64,5 +67,8 @@ public abstract class Unit
 
         enemies = rc.senseNearbyRobots(sightRange, opponent);
         allies = rc.senseNearbyRobots(sightRange, us);
+
+        nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
+        zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
     }
 }

@@ -20,6 +20,11 @@ public class BaseGaurd extends Unit
         return fightMicro.basicFightMicro(nearByEnemies);
     }
 
+    public boolean fightZombies() throws GameActionException
+    {
+        return fightMicro.basicFightMicro(nearByZombies);
+    }
+
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
         return current;
