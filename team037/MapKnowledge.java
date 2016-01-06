@@ -5,6 +5,7 @@ import team037.DataStructures.AppendOnlyMapLocationSet;
 import team037.Utilites.MapUtils;
 
 public class MapKnowledge {
+    public static final int MAP_ADD = 16100;
 
     // robot's knowledge of the map where MapLocation(x, y)
     public int minX = Integer.MIN_VALUE;
@@ -55,7 +56,42 @@ public class MapKnowledge {
     public int[] packForMessage() {
         int[] packed = new int[6];
 
-        //TODO: this!
+        if (minX != Integer.MIN_VALUE && maxX != Integer.MAX_VALUE) {
+            packed[0] = 3;
+            packed[1] = minX + MAP_ADD;
+            packed[2] = maxX - minX;
+        } else if (minX != Integer.MIN_VALUE) {
+            packed[0] = 2;
+            packed[1] = minX + MAP_ADD;
+            packed[2] = 0;
+        } else if (maxX != Integer.MIN_VALUE) {
+            packed[0] = 1;
+            packed[1] = maxX + MAP_ADD;
+            packed[2] = 0;
+        } else {
+            packed[0] = 0;
+            packed[1] = 0;
+            packed[2] = 0;
+        }
+
+
+        if (minY != Integer.MIN_VALUE && maxY != Integer.MAX_VALUE) {
+            packed[4] = 3;
+            packed[5] = minY + MAP_ADD;
+            packed[6] = maxY - minY;
+        } else if (minX != Integer.MIN_VALUE) {
+            packed[4] = 2;
+            packed[5] = minY + MAP_ADD;
+            packed[6] = 0;
+        } else if (maxX != Integer.MIN_VALUE) {
+            packed[4] = 1;
+            packed[5] = maxY + MAP_ADD;
+            packed[6] = 0;
+        } else {
+            packed[4] = 0;
+            packed[5] = 0;
+            packed[6] = 0;
+        }
 
         return packed;
     }
