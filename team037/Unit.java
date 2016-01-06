@@ -51,6 +51,16 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         Communication[] communications = communicator.processCommunications();
+        /*
+         * Sample communication creation
+        Communication communication = new Communication();
+        communication.type = CommunicationType.DEN;
+        communication.id = 120;
+        communication.bType = RobotType.ZOMBIEDEN;
+        communication.x = 68;
+        communication.y = 52;
+        communicator.sendCommunication(100, communication);
+         */
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException
