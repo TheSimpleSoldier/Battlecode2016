@@ -7,6 +7,20 @@ import team037.Enums.CommunicationType;
 /**
  * Created by joshua on 1/5/16.
  * Holds information on what a communication is saying
+ *
+ * for i type communications the following need to be filled out:
+ *     type
+ *     id
+ *     btype
+ *     x
+ *     y
+ *
+ * for c type communication the following need to be filled out:
+ *     type
+ *     id
+ *     btype
+ *     stype
+ *     ntype
  */
 public class Communication
 {
