@@ -38,11 +38,20 @@ public class CommunicationUtilities
         switch(CommunicationType.values()[opcode])
         {
             case DEN:
-                communication.type = CommunicationType.DEN;
             case ENEMY:
-                communication.type = CommunicationType.ENEMY;
             case PARTS:
-                communication.type = CommunicationType.PARTS;
+                switch(CommunicationType.values()[opcode])
+                {
+                    case DEN:
+                        communication.type = CommunicationType.DEN;
+                        break;
+                    case ENEMY:
+                        communication.type = CommunicationType.ENEMY;
+                        break;
+                    case PARTS:
+                        communication.type = CommunicationType.PARTS;
+                        break;
+                }
                 int id = message[0] << (opcodeSize + 1);
                 communication.id = id >>> (32 - idSize);
                 int type = message[0] << (opcodeSize + idSize + 1);
@@ -134,14 +143,23 @@ public class CommunicationUtilities
         switch(communication.type)
         {
             case DEN:
-                String type = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.DEN));
-                first += ("0000" + type).substring(type.length());
             case ENEMY:
-                String type2 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.ENEMY));
-                first += ("0000" + type2).substring(type2.length());
             case PARTS:
-                String type3 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.PARTS));
-                first += ("0000" + type3).substring(type3.length());
+                switch(communication.type)
+                {
+                    case DEN:
+                        String type = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.DEN));
+                        first += ("0000" + type).substring(type.length());
+                        break;
+                    case ENEMY:
+                        String type2 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.ENEMY));
+                        first += ("0000" + type2).substring(type2.length());
+                        break;
+                    case PARTS:
+                        String type3 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.PARTS));
+                        first += ("0000" + type3).substring(type3.length());
+                        break;
+                }
                 String id = Integer.toBinaryString(communication.id);
                 first += ("000000000000000" + id).substring(id.length());
                 switch(communication.bType)

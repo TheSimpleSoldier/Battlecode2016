@@ -1,7 +1,6 @@
 package team037;
 
 import battlecode.common.*;
-import team037.Enums.CommunicationType;
 import team037.Utilites.Communication;
 
 public abstract class Unit
@@ -52,18 +51,6 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         Communication[] communications = communicator.processCommunications();
-        for(int k = 0; k < communications.length; k++)
-        {
-            communications[k].print();
-            System.out.println();
-        }
-        Communication communication = new Communication();
-        communication.type = CommunicationType.DEN;
-        communication.id = 120;
-        communication.x = 58;
-        communication.y = 62;
-        communication.bType = RobotType.ZOMBIEDEN;
-        communicator.sendCommunication(1000, communication);
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException
