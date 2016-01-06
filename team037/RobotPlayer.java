@@ -19,7 +19,8 @@ public class RobotPlayer
 
         if (type == RobotType.ARCHON)
         {
-            unit = new BaseArchon(rc);
+            //unit = new BaseArchon(rc);
+            unit = new AlphaArchon(rc);
         }
         else if (type == RobotType.GUARD)
         {
