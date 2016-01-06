@@ -311,7 +311,7 @@ public class CommunicationUtilities
     private static final String ZEROS = "00000000000000000000000000000000000000000000000000000000";
     private static final String PADDING = "10000000000000000000000000000000000000000000000000000";
     private static final int MAX_VALUES = 30; // need string to start with 1
-    private static int[] packInts(CommunicationType type, int[] values) {
+    public static int[] packInts(CommunicationType type, int[] values) {
 
         int[] lengths = CommTypeToSpacing.getSpacingArrayFromCommType(type);
         assert values.length == lengths.length;
@@ -328,11 +328,11 @@ public class CommunicationUtilities
 
         for (int i = 0; i < values.length; i++) {
             String temp = Integer.toBinaryString(values[i]);
-            if (usedFirst + values[i] <= MAX_VALUES) {
-                usedFirst += values[i];
+            if (usedFirst + lengths[i] <= MAX_VALUES) {
+                usedFirst += lengths[i];
                 first += (ZEROS + temp).substring(ZEROS.length() + temp.length() - lengths[i]);
-            } else if (usedSecond + values[i] <= MAX_VALUES) {
-                usedSecond += values[i];
+            } else if (usedSecond + lengths[i] <= MAX_VALUES) {
+                usedSecond += lengths[i];
                 second += (ZEROS + temp).substring(ZEROS.length() + temp.length() - lengths[i]);
             } else {
                 System.out.println("Oh noes! Couldn't pack in all the ints!");
@@ -352,7 +352,7 @@ public class CommunicationUtilities
     }
 
 
-    private static int[] unpackInts(CommunicationType type, int[] message) {
+    public static int[] unpackInts(CommunicationType type, int[] message) {
         // first figure out what values go in the first line
         int[] spacing = CommTypeToSpacing.getSpacingArrayFromCommType(type);
 
@@ -373,7 +373,7 @@ public class CommunicationUtilities
         }
 
         int[] results = new int[spacing.length];
-        int idx = 31 - usedFirst;
+        int idx = 31 - usedFirst + 4;
         String first = Integer.toBinaryString(message[0]);
         String second = Integer.toBinaryString(message[1]);
         for (int i = 0; i < spacing.length; i++) {

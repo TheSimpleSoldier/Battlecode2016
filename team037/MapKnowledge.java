@@ -56,7 +56,7 @@ public class MapKnowledge {
     public int[] packForMessage() {
         int[] packed = new int[6];
 
-        if (minX != Integer.MIN_VALUE && maxX != Integer.MAX_VALUE) {
+        if (minX != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE) {
             packed[0] = 3;
             packed[1] = minX + MAP_ADD;
             packed[2] = maxX - minX;
@@ -75,22 +75,22 @@ public class MapKnowledge {
         }
 
 
-        if (minY != Integer.MIN_VALUE && maxY != Integer.MAX_VALUE) {
-            packed[4] = 3;
-            packed[5] = minY + MAP_ADD;
-            packed[6] = maxY - minY;
+        if (minY != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE) {
+            packed[3] = 3;
+            packed[4] = minY + MAP_ADD;
+            packed[5] = maxY - minY;
         } else if (minY != Integer.MIN_VALUE) {
-            packed[4] = 2;
-            packed[5] = minY + MAP_ADD;
-            packed[6] = 0;
+            packed[3] = 2;
+            packed[4] = minY + MAP_ADD;
+            packed[5] = 0;
         } else if (maxY != Integer.MIN_VALUE) {
-            packed[4] = 1;
-            packed[5] = maxY + MAP_ADD;
-            packed[6] = 0;
+            packed[3] = 1;
+            packed[4] = maxY + MAP_ADD;
+            packed[5] = 0;
         } else {
+            packed[3] = 0;
             packed[4] = 0;
             packed[5] = 0;
-            packed[6] = 0;
         }
 
         return packed;
@@ -110,14 +110,14 @@ public class MapKnowledge {
             // we know nothing! (jon snow)
         } else if (widthBit == 1) {
             // we only have a endcoord
-            maxX = xCoord;
+            maxX = xCoord - MAP_ADD;
         } else if (widthBit == 2) {
             // we only have the startcoord
-            minX = xCoord;
+            minX = xCoord - MAP_ADD;
         } else if (widthBit == 3) {
             // we have both
-            minX = xCoord;
-            maxX = xCoord + width;
+            minX = xCoord - MAP_ADD;
+            maxX = xCoord - MAP_ADD + width;
         } else {
             System.out.println("control bit borked! in MapKnowledge");
         }
@@ -127,13 +127,13 @@ public class MapKnowledge {
             // w know nothing! (jon snow)
         } else if (heightBit == 1) {
             // we only have the endcoord
-            maxY = yCoord;
+            maxY = yCoord - MAP_ADD;
         } else if (heightBit == 2) {
             // we only have the start coord
-            minY = yCoord;
+            minY = yCoord - MAP_ADD;
         } else if (heightBit == 3) {
-            minY = yCoord;
-            maxY = yCoord + height;
+            minY = yCoord - MAP_ADD;
+            maxY = yCoord - MAP_ADD + height;
         } else {
             System.out.println("control bit borked! in MapKnowledge");
         }
