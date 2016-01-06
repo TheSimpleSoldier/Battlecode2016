@@ -10,7 +10,7 @@ import team037.Utilites.AppendOnlyMapLocationArray;
 
 import java.lang.Override;
 
-public class AlphaArchon extends Unit
+public class AlphaArchon extends BaseArchon
 {
     SlugNavigator move;
     AppendOnlyMapLocationArray parts;
@@ -37,33 +37,18 @@ public class AlphaArchon extends Unit
         return nextParts;
     }
 
-    public boolean takeNextStep() throws GameActionException
-    {
-        return navigator.takeNextStep();
-    }
-
-    public boolean fight() throws GameActionException
-    {
-        return false;
-    }
-
-    public boolean fightZombies() throws GameActionException
-    {
-        return false;
-    }
-
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
         return current;
     }
-
 
     @Override
     public boolean act() throws GameActionException {
         if (!rc.isCoreReady()) {
             return false;
         }
-        if(rc.getLocation().equals(move.getTarget())) {
+        if (carryOutAbility());
+        else if(rc.getLocation().equals(move.getTarget())) {
             move.setTarget(getNextPartLocation());
         }
         move.takeNextStep();
