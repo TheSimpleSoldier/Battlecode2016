@@ -357,7 +357,7 @@ public class CommunicationUtilities
         int[] spacing = CommTypeToSpacing.getSpacingArrayFromCommType(type);
 
         int countFirst = 0;
-        int usedFirst = 0;
+        int usedFirst = 4; // since we know we have the message info in first
         int countSecond = 0;
         int usedSecond = 0;
         for (int i = 0; i < spacing.length; i++) {
