@@ -130,6 +130,46 @@ public class CommunicationUtilities
         return communication;
     }
 
+    public static Communication readSimpleCommunication(Signal signal, int round)
+    {
+        Communication communication = new Communication();
+        communication.id = signal.getRobotID();
+        MapLocation loc = signal.getLocation();
+        communication.x = loc.x;
+        communication.y = loc.y;
+
+        switch(round % 10)
+        {
+            case 0:
+            case 1:
+                communication.type = CommunicationType.ENEMY;
+                communication.bType = RobotType.ARCHON;
+                break;
+            case 2:
+            case 3:
+                communication.type = CommunicationType.ENEMY;
+                communication.bType = RobotType.SOLDIER;
+                break;
+            case 4:
+            case 5:
+                communication.type = CommunicationType.ENEMY;
+                communication.bType = RobotType.STANDARDZOMBIE;
+                break;
+            case 6:
+            case 7:
+                communication.type = CommunicationType.DEN;
+                communication.bType = RobotType.ZOMBIEDEN;
+                break;
+            case 8:
+            case 9:
+                communication.type = CommunicationType.PARTS;
+                communication.bType = RobotType.SOLDIER;
+                break;
+        }
+
+        return communication;
+    }
+
     public static int[] createCommunication(Communication communication)
     {
         /*
@@ -236,5 +276,46 @@ public class CommunicationUtilities
                 message[1] = Bots.toInt(communication.nType);
         }
         return message;
+    }
+
+    public static boolean shouldCommunicateSimple(Communication communication, int round)
+    {
+        if(communication.type == CommunicationType.ENEMY && communication.bType == RobotType.ARCHON)
+        {
+            if(round % 10 == 0)
+            {
+                return true;
+            }
+        }
+        else if(communication.type == CommunicationType.ENEMY && communication.bType == RobotType.SOLDIER)
+        {
+            if(round % 10 == 2)
+            {
+                return true;
+            }
+        }
+        else if(communication.type == CommunicationType.ENEMY && communication.bType == RobotType.STANDARDZOMBIE)
+        {
+            if(round % 10 == 4)
+            {
+                return true;
+            }
+        }
+        else if(communication.type == CommunicationType.DEN && communication.bType == RobotType.ZOMBIEDEN)
+        {
+            if(round % 10 == 6)
+            {
+                return true;
+            }
+        }
+        else if(communication.type == CommunicationType.PARTS && communication.bType == RobotType.SOLDIER)
+        {
+            if(round % 10 == 8)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
