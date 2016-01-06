@@ -29,15 +29,6 @@ public class Navigator
     // This method returns true if we moved and false otherwise
     public boolean takeNextStep() throws GameActionException
     {
-        if (!rc.isCoreReady())
-        {
-            return false;
-        }
-
-        // TODO: Implement this
-        if (Navigation.move(target)) {
-        }
-
-        return false;
+        return Navigation.move(target);
     }
 }
