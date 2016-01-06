@@ -56,7 +56,7 @@ public class MapKnowledge {
     public int[] packForMessage() {
         int[] packed = new int[6];
 
-        if (minX != Integer.MIN_VALUE && maxX != Integer.MAX_VALUE) {
+        if (minX != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE) {
             packed[0] = 3;
             packed[1] = minX + MAP_ADD;
             packed[2] = maxX - minX;
@@ -75,7 +75,7 @@ public class MapKnowledge {
         }
 
 
-        if (minY != Integer.MIN_VALUE && maxY != Integer.MAX_VALUE) {
+        if (minY != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE) {
             packed[3] = 3;
             packed[4] = minY + MAP_ADD;
             packed[5] = maxY - minY;
