@@ -22,7 +22,7 @@ public class MapUtils
         MapLocation current = rc.getLocation();
 
         if (rc.onTheMap(current.add(d, radius))) {
-            return -1;
+            return Integer.MIN_VALUE;
         }
 
         radius -= 1;

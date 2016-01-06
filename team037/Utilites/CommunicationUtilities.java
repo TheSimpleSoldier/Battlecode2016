@@ -275,8 +275,56 @@ public class CommunicationUtilities
                 first += ("0000" + btype).substring(btype.length());
                 message[0] = Integer.parseInt(first, 2);
                 message[1] = Bots.toInt(communication.nType);
+            case MAP_BOUNDS:
+                int[] values = new int[] {
+                        CommunicationType.toInt(CommunicationType.MAP_BOUNDS),
+                        communication.coords[0], // type  (start + width || end)
+                        communication.coords[1], // one   (coord)
+                        communication.coords[2], // two   (optional width)
+                        communication.coords[3], // type  (start + height || end)
+                        communication.coords[4], // one   (coord)
+                        communication.coords[5] // two   (optional height)
+                    };
+                int[] lengths = new int[] { 4, 2, 15, 7, 2, 15, 7 };
+                message = packInts(values, lengths);
+
         }
         return message;
+    }
+
+    private static final String ZEROS = "00000000000000000000000000000000000000000000000000000000";
+    private static final String PADDING = "10000000000000000000000000000000000000000000000000000";
+    private static int[] packInts(int[] values, int[] lengths) {
+        assert values.length == lengths.length;
+        int MAX_VALUES = 30;  // need the string to start with 1
+        String first = "";
+        String second = "";
+        int usedFirst = 0;
+        int usedSecond = 0;
+
+        for (int i = 0; i < values.length; i++) {
+            String temp = Integer.toBinaryString(values[i]);
+            if (usedFirst + values[i] <= MAX_VALUES) {
+                usedFirst += values[i];
+                first += (ZEROS + temp).substring(ZEROS.length() + temp.length() - lengths[i]);
+            } else if (usedSecond + values[i] <= MAX_VALUES) {
+                usedSecond += values[i];
+                second += (ZEROS + temp).substring(ZEROS.length() + temp.length() - lengths[i]);
+            } else {
+                System.out.println("Oh noes! Couldn't pack in all the ints!");
+                System.out.println(i);
+                System.out.println(values.length);
+                System.out.println(values[i]);
+                System.out.println(lengths[i]);
+            }
+        }
+        first = (PADDING + first).substring(PADDING.length() + first.length() - 31);
+        second = (PADDING + second).substring(PADDING.length() + second.length() - 31);
+
+        return new int[] {
+                Integer.parseInt(first, 2),
+                Integer.parseInt(second, 2)
+        };
     }
 
     public static boolean shouldCommunicateSimple(Communication communication, int round)

@@ -7,10 +7,10 @@ import team037.Utilites.MapUtils;
 public class MapKnowledge {
 
     // robot's knowledge of the map where MapLocation(x, y)
-    public int minX = -1;
-    public int maxX = -1;
-    public int minY = -1;
-    public int maxY = -1;
+    public int minX = Integer.MIN_VALUE;
+    public int maxX = Integer.MIN_VALUE;
+    public int minY = Integer.MIN_VALUE;
+    public int maxY = Integer.MIN_VALUE;
 
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
@@ -36,18 +36,68 @@ public class MapKnowledge {
     /**
      * In addition to reading in info from the comm, this should be called regularly
      */
-    public void updateEdges(RobotController rc) throws GameActionException {
-        if (minY == -1) {
+    public void senseAndUpdateEdges(RobotController rc) throws GameActionException {
+        if (minY == Integer.MIN_VALUE) {
             minY = MapUtils.senseEdge(rc, Direction.NORTH);
         }
-        if (maxY == -1) {
+        if (maxY == Integer.MIN_VALUE) {
             maxY = MapUtils.senseEdge(rc, Direction.SOUTH);
         }
-        if (minX == -1) {
+        if (minX == Integer.MIN_VALUE) {
             minX = MapUtils.senseEdge(rc, Direction.EAST);
         }
-        if (maxX == -1) {
+        if (maxX == Integer.MIN_VALUE) {
             maxX = MapUtils.senseEdge(rc, Direction.WEST);
+        }
+    }
+
+
+    /**
+     * P IIII BB COOOOOOOOOOOORD WIIIDTH BB
+     * 1   4   2        15          7    2   = 31
+     * PPPPPPPPP COOOOOOOOOOOORD HEEIGHT
+     *     9            15          7         = 31
+     * @param message
+     */
+    public void updateEdgesFromMessage(int[] message) {
+        String one = Integer.toBinaryString(message[0]);
+        String two = Integer.toBinaryString(message[1]);
+
+        String widthBit = one.substring(4, 6);
+        int xCoord = Integer.parseInt(one.substring(6, 21), 2);
+        int width = Integer.parseInt(one.substring(21, 28), 2);
+
+        String heightBit = one.substring(28);
+        int yCoord = Integer.parseInt(two.substring(8, 25), 2);
+        int height = Integer.parseInt(two.substring(25), 2);
+
+
+        if (widthBit.equals("00")) {
+            // we know nothing! (jon snow)
+        } else if (widthBit.equals("01")) {
+            // we only have a endcoord
+            maxX = xCoord;
+        } else if (widthBit.equals("10")) {
+            // we only have the startcoord
+            minX = xCoord;
+        } else {
+            // we have both
+            minX = xCoord;
+            maxX = xCoord + width;
+        }
+
+
+        if (heightBit.equals("00")) {
+            // w know nothing! (jon snow)
+        } else if (heightBit.equals("01")) {
+            // we only have the endcoord
+            maxY = yCoord;
+        } else if (heightBit.equals("10")) {
+            // we only have the start coord
+            minY = yCoord;
+        } else {
+            minY = yCoord;
+            maxY = yCoord + height;
         }
     }
 
