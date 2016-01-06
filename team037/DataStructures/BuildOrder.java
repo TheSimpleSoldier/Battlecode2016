@@ -1,4 +1,4 @@
-package team037;
+package team037.DataStructures;
 
 import team037.Enums.Bots;
 

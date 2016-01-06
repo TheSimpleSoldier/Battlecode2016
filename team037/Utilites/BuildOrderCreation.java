@@ -1,6 +1,6 @@
 package team037.Utilites;
 
-import team037.BuildOrder;
+import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 
 /**

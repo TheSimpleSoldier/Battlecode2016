@@ -3,7 +3,7 @@ package team037.Units;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
-import team037.BuildOrder;
+import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
