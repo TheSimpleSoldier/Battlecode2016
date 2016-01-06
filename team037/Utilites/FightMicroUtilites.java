@@ -11,7 +11,7 @@ public class FightMicroUtilites
     {
         RobotInfo weakest = nearByEnemies[nearByEnemies.length - 1];
 
-        for (int i = nearByEnemies.length-1; --i > 0; )
+        for (int i = nearByEnemies.length-1; --i >= 0; )
         {
             if (nearByEnemies[i] == null)
             {
@@ -28,6 +28,9 @@ public class FightMicroUtilites
 
     public static Direction getDir(RobotController rc, MapLocation target)
     {
+        if (target == null)
+            return Direction.NONE;
+
         return rc.getLocation().directionTo(target);
     }
 

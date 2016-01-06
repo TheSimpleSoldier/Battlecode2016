@@ -42,6 +42,10 @@ public class RobotPlayer
         {
             unit = new BaseTTM(rc);
         }
+        else if (type == RobotType.VIPER)
+        {
+            unit = new BaseViper(rc);
+        }
 
         // initial update to strategy
         try
