@@ -1,14 +1,11 @@
 package team037.Units;
 
-import battlecode.common.*;
-import battlecode.common.Direction;
 import battlecode.common.GameActionException;
-import team037.Unit;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import team037.DataStructures.AppendOnlyMapLocationArray;
 import team037.SlugNavigator;
 import team037.Utilites.PartsUtilities;
-import team037.Utilites.AppendOnlyMapLocationArray;
-
-import java.lang.Override;
 
 public class AlphaArchon extends BaseArchon
 {
@@ -35,11 +32,6 @@ public class AlphaArchon extends BaseArchon
         MapLocation nextParts = parts.array[partsIdx];
         partsIdx += 1;
         return nextParts;
-    }
-
-    public Unit getNewStrategy(Unit current) throws GameActionException
-    {
-        return current;
     }
 
     @Override
