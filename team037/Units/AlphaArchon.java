@@ -1,12 +1,11 @@
 package team037.Units;
 
 import battlecode.common.*;
-import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import team037.Unit;
 import team037.SlugNavigator;
 import team037.Utilites.PartsUtilities;
-import team037.Utilites.AppendOnlyMapLocationArray;
+import team037.DataStructures.AppendOnlyMapLocationArray;
 
 import java.lang.Override;
 
