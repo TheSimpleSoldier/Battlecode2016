@@ -104,8 +104,8 @@ public class CommunicationUtilities
                 locY = locY >>> (32 - locationSize);
                 communication.y = locY - 16100 + locationoffset;
                 break;
-            case MISSION:
-                communication.type = CommunicationType.MISSION;
+            case CHANGEMISSION:
+                communication.type = CommunicationType.CHANGEMISSION;
                 int id2 = message[0] << (opcodeSize + 1);
                 communication.id = id2 >>> (32 - idSize);
                 int type2 = message[0] << (opcodeSize + idSize + 1);
@@ -123,7 +123,7 @@ public class CommunicationUtilities
     {
         Communication communication = new Communication();
 
-        communication.type = CommunicationType.ENEMYL;
+        communication.type = CommunicationType.OENEMY;
         communication.id = signal.getRobotID();
         MapLocation loc = signal.getLocation();
         communication.x = loc.x;
@@ -174,11 +174,6 @@ public class CommunicationUtilities
 
     public static int[] createCommunication(Communication communication)
     {
-        /*
-        * c-type(change mission)
-            * first int- opcode, id(0 if doesn't matter), type, bot
-            * second int- new bot
-            * */
         int[] message = new int[2];
         String first = "";
         String second = "";
@@ -252,8 +247,8 @@ public class CommunicationUtilities
                 message[0] = Integer.parseInt(first, 2);
                 message[1] = Integer.parseInt(second, 2);
                 break;
-            case MISSION:
-                String type4 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.MISSION));
+            case CHANGEMISSION:
+                String type4 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.CHANGEMISSION));
                 first += ("0000" + type4).substring(type4.length());
                 String id2 = Integer.toBinaryString(communication.id);
                 first += ("000000000000000" + id2).substring(id2.length());

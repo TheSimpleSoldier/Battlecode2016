@@ -11,7 +11,8 @@ package team037.Enums;
  */
 public enum CommunicationType
 {
-    DEN, PARTS, ENEMY, ENEMYL, MISSION, MAP_BOUNDS, MAP_DENS;
+    DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, INITIALMISSION, MAP_BOUNDS, MAP_DENS,
+    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS;
 
     public static int toInt(CommunicationType type)
     {
@@ -23,14 +24,26 @@ public enum CommunicationType
                 return 1;
             case ENEMY:
                 return 2;
-            case ENEMYL:
+            case OENEMY:
                 return 3;
-            case MISSION:
+            case CHANGEMISSION:
                 return 4;
-            case MAP_BOUNDS:
+            case INITIALMISSION:
                 return 5;
-            case MAP_DENS:
+            case MAP_BOUNDS:
                 return 6;
+            case MAP_DENS:
+                return 7;
+            case SARCHON:
+                return 8;
+            case SENEMY:
+                return 9;
+            case SZOMBIE:
+                return 10;
+            case SDEN:
+                return 11;
+            case SPARTS:
+                return 12;
         }
         return -1;
     }
