@@ -1,4 +1,4 @@
-package team037.Utilites;
+package team037.DataStructures;
 
 import battlecode.common.RobotType;
 import team037.Enums.Bots;

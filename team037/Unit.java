@@ -1,7 +1,7 @@
 package team037;
 
 import battlecode.common.*;
-import team037.Utilites.Communication;
+import team037.DataStructures.Communication;
 
 public abstract class Unit
 {

@@ -3,6 +3,7 @@ package team037.Utilites;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 import battlecode.common.Signal;
+import team037.DataStructures.Communication;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 
