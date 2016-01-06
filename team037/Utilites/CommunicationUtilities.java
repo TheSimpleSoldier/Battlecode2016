@@ -318,8 +318,8 @@ public class CommunicationUtilities
                 System.out.println(lengths[i]);
             }
         }
-        first = (PADDING + first).substring(PADDING.length() + first.length() - 31);
-        second = (PADDING + second).substring(PADDING.length() + second.length() - 31);
+        first = PADDING.substring(0, 31 - first.length()) + first;
+        second = PADDING.substring(0, 31 - second.length()) + second;
 
         return new int[] {
                 Integer.parseInt(first, 2),

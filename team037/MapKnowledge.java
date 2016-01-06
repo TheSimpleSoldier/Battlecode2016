@@ -57,6 +57,11 @@ public class MapKnowledge {
      * 1   4   2        15          7    2   = 31
      * PPPPPPPPP COOOOOOOOOOOORD HEEIGHT
      *     9            15          7         = 31
+     *
+     * using substring it is zero based index
+     *          first idx is the start (inclusive)
+     *          seoncd idx is the end (exclusive)
+     *
      * @param message
      */
     public void updateEdgesFromMessage(int[] message) {
