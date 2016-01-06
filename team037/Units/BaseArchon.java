@@ -3,6 +3,7 @@ package team037.Units;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
+import battlecode.common.MapLocation;
 import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 import team037.Unit;
@@ -25,6 +26,10 @@ public class BaseArchon extends Unit
 
     public boolean takeNextStep() throws GameActionException
     {
+        if (navigator.getTarget() == null) {
+            MapLocation currentLoc = rc.getLocation();
+            navigator.setTarget(new MapLocation(currentLoc.x, currentLoc.y + 17));
+        }
         return navigator.takeNextStep();
     }
 
