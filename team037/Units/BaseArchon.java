@@ -26,10 +26,10 @@ public class BaseArchon extends Unit
 
     public boolean takeNextStep() throws GameActionException
     {
-        if (navigator.getTarget() == null) {
-            MapLocation currentLoc = rc.getLocation();
-            navigator.setTarget(new MapLocation(currentLoc.x, currentLoc.y + 17));
-        }
+//        if (navigator.getTarget() == null) {
+//            MapLocation currentLoc = rc.getLocation();
+//            navigator.setTarget(new MapLocation(currentLoc.x, currentLoc.y + 17));
+//        }
         return navigator.takeNextStep();
     }
 
