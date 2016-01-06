@@ -79,11 +79,11 @@ public class MapKnowledge {
             packed[4] = 3;
             packed[5] = minY + MAP_ADD;
             packed[6] = maxY - minY;
-        } else if (minX != Integer.MIN_VALUE) {
+        } else if (minY != Integer.MIN_VALUE) {
             packed[4] = 2;
             packed[5] = minY + MAP_ADD;
             packed[6] = 0;
-        } else if (maxX != Integer.MIN_VALUE) {
+        } else if (maxY != Integer.MIN_VALUE) {
             packed[4] = 1;
             packed[5] = maxY + MAP_ADD;
             packed[6] = 0;
