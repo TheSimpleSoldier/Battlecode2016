@@ -1,15 +1,21 @@
 package team037.Units;
 
 import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
 import team037.Unit;
+import team037.SlugNavigator;
+import team037.Utilites.PartsUtilities;
 
 import java.lang.Override;
 
 public class AlphaArchon extends Unit
 {
+    SlugNavigator move;
     public AlphaArchon(RobotController rc)
     {
         super(rc);
+        move = new SlugNavigator(rc);
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -32,9 +38,13 @@ public class AlphaArchon extends Unit
         return current;
     }
 
+
     @Override
-    public boolean act() {
-        // do stuff!
+    public boolean act() throws GameActionException {
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+        move.takeNextStep();
         return true;
     }
 
