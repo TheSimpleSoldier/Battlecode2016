@@ -1,8 +1,9 @@
-package team037.Utilites;
+package team037.DataStructures;
 
 import battlecode.common.*;
 
-public class AppendOnlyMapLocationArray{
+public class AppendOnlyMapLocationArray {
+
     public MapLocation[] array;
     public int length;
 
@@ -23,6 +24,14 @@ public class AppendOnlyMapLocationArray{
             }
         }
         return false;
+    }
+
+    public MapLocation[] toDenseMapLocationArray() {
+        MapLocation[] result = new MapLocation[length];
+        for (int i = length - 1; i >= 0; i++ ) {
+            result[i] = array[i];
+        }
+        return result;
     }
 }
 

@@ -3,7 +3,7 @@ package team037.Utilites;
 import battlecode.common.*;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotController;
-import team037.Utilites.AppendOnlyMapLocationArray;
+import team037.DataStructures.AppendOnlyMapLocationArray;
 
 
 public class PartsUtilities
