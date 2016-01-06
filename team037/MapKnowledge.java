@@ -52,57 +52,54 @@ public class MapKnowledge {
     }
 
 
-    /**
-     * P IIII BB COOOOOOOOOOOORD WIIIDTH BB
-     * 1   4   2        15          7    2   = 31
-     * PPPPPPPPP COOOOOOOOOOOORD HEEIGHT
-     *     9            15          7         = 31
-     *
-     * using substring it is zero based index
-     *          first idx is the start (inclusive)
-     *          seoncd idx is the end (exclusive)
-     *
-     * @param message
-     */
-    public void updateEdgesFromMessage(int[] message) {
-        String one = Integer.toBinaryString(message[0]);
-        String two = Integer.toBinaryString(message[1]);
+    public int[] packForMessage() {
+        int[] packed = new int[6];
 
-        String widthBit = one.substring(4, 6);
-        int xCoord = Integer.parseInt(one.substring(6, 21), 2);
-        int width = Integer.parseInt(one.substring(21, 28), 2);
+        //TODO: this!
 
-        String heightBit = one.substring(28);
-        int yCoord = Integer.parseInt(two.substring(8, 25), 2);
-        int height = Integer.parseInt(two.substring(25), 2);
+        return packed;
+    }
+
+    public void updateEdgesFromMessage(int[] results) {
+        int widthBit = results[0];
+        int xCoord = results[1];
+        int width = results[2];
+
+        int heightBit = results[3];
+        int yCoord = results[4];
+        int height = results[5];
 
 
-        if (widthBit.equals("00")) {
+        if (widthBit == 0) {
             // we know nothing! (jon snow)
-        } else if (widthBit.equals("01")) {
+        } else if (widthBit == 1) {
             // we only have a endcoord
             maxX = xCoord;
-        } else if (widthBit.equals("10")) {
+        } else if (widthBit == 2) {
             // we only have the startcoord
             minX = xCoord;
-        } else {
+        } else if (widthBit == 3) {
             // we have both
             minX = xCoord;
             maxX = xCoord + width;
+        } else {
+            System.out.println("control bit borked! in MapKnowledge");
         }
 
 
-        if (heightBit.equals("00")) {
+        if (heightBit == 0) {
             // w know nothing! (jon snow)
-        } else if (heightBit.equals("01")) {
+        } else if (heightBit == 1) {
             // we only have the endcoord
             maxY = yCoord;
-        } else if (heightBit.equals("10")) {
+        } else if (heightBit == 2) {
             // we only have the start coord
             minY = yCoord;
-        } else {
+        } else if (heightBit == 3) {
             minY = yCoord;
             maxY = yCoord + height;
+        } else {
+            System.out.println("control bit borked! in MapKnowledge");
         }
     }
 

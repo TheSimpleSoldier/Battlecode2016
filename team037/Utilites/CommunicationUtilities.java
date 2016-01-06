@@ -3,6 +3,7 @@ package team037.Utilites;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 import battlecode.common.Signal;
+import team037.DataStructures.CommTypeToSpacing;
 import team037.DataStructures.Communication;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
@@ -300,17 +301,8 @@ public class CommunicationUtilities
                 message[0] = Integer.parseInt(first, 2);
                 message[1] = Bots.toInt(communication.nType);
             case MAP_BOUNDS:
-                int[] values = new int[] {
-                        CommunicationType.toInt(CommunicationType.MAP_BOUNDS),
-                        communication.coords[0], // type  (start + width || end)
-                        communication.coords[1], // one   (coord)
-                        communication.coords[2], // two   (optional width)
-                        communication.coords[3], // type  (start + height || end)
-                        communication.coords[4], // one   (coord)
-                        communication.coords[5] // two   (optional height)
-                    };
-                int[] lengths = new int[] { 4, 2, 15, 7, 2, 15, 7 };
-                message = packInts(values, lengths);
+                int[] values = communication.ints;
+                message = packInts(CommunicationType.MAP_BOUNDS, values);
 
         }
         return message;
@@ -318,13 +310,21 @@ public class CommunicationUtilities
 
     private static final String ZEROS = "00000000000000000000000000000000000000000000000000000000";
     private static final String PADDING = "10000000000000000000000000000000000000000000000000000";
-    private static int[] packInts(int[] values, int[] lengths) {
+    private static final int MAX_VALUES = 30; // need string to start with 1
+    private static int[] packInts(CommunicationType type, int[] values) {
+
+        int[] lengths = CommTypeToSpacing.getSpacingArrayFromCommType(type);
         assert values.length == lengths.length;
-        int MAX_VALUES = 30;  // need the string to start with 1
+
         String first = "";
         String second = "";
         int usedFirst = 0;
         int usedSecond = 0;
+
+        // add the message type first
+        String mtype = Integer.toBinaryString(CommunicationType.toInt(type));
+        first += ("0000" + mtype).substring(mtype.length());
+        usedFirst += 4;
 
         for (int i = 0; i < values.length; i++) {
             String temp = Integer.toBinaryString(values[i]);
@@ -350,6 +350,52 @@ public class CommunicationUtilities
                 Integer.parseInt(second, 2)
         };
     }
+
+
+    private static int[] unpackInts(CommunicationType type, int[] message) {
+        // first figure out what values go in the first line
+        int[] spacing = CommTypeToSpacing.getSpacingArrayFromCommType(type);
+
+        int countFirst = 0;
+        int usedFirst = 0;
+        int countSecond = 0;
+        int usedSecond = 0;
+        for (int i = 0; i < spacing.length; i++) {
+            if (spacing[i] + usedFirst <= MAX_VALUES) {
+                countFirst += 1;
+                usedFirst += spacing[i];
+            } else if (spacing[i] + usedSecond <= MAX_VALUES) {
+                countSecond += 1;
+                usedSecond += spacing[i];
+            } else {
+                System.out.println("Too many values to unpack!");
+            }
+        }
+
+        int[] results = new int[spacing.length];
+        int idx = 31 - usedFirst;
+        String first = Integer.toBinaryString(message[0]);
+        String second = Integer.toBinaryString(message[1]);
+        for (int i = 0; i < spacing.length; i++) {
+            if (countFirst > 0) {
+                countFirst -= 1;
+                results[i] = Integer.parseInt(first.substring(idx, idx + spacing[i]), 2);
+                idx += spacing[i];
+                if (countFirst == 0) {
+                    idx = 31 - usedSecond;
+                }
+            } else if (countSecond > 0) {
+                countSecond -= 1;
+                results[i] = Integer.parseInt(second.substring(idx, idx + spacing[i]), 2);
+                idx += spacing[i];
+            } else {
+                System.out.println("too many values to unpack!");
+            }
+        }
+
+        return results;
+    }
+
 
     public static boolean shouldCommunicateSimple(Communication communication, int round)
     {
