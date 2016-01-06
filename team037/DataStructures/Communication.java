@@ -31,6 +31,8 @@ public class Communication
     public Bots nType;             //The type to turn in to
     public int x;                  //X location
     public int y;                  //y location
+    public int[] ints;             // list of integers
+
 
     public void print()
     {
@@ -42,3 +44,5 @@ public class Communication
         System.out.println("loc: (" + x + ", " + y + ")");
     }
 }
+
+

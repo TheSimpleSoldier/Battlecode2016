@@ -11,7 +11,7 @@ package team037.Enums;
  */
 public enum CommunicationType
 {
-    DEN, PARTS, ENEMY, ENEMYL, MISSION;
+    DEN, PARTS, ENEMY, ENEMYL, MISSION, MAP_BOUNDS, MAP_DENS;
 
     public static int toInt(CommunicationType type)
     {
@@ -27,6 +27,10 @@ public enum CommunicationType
                 return 3;
             case MISSION:
                 return 4;
+            case MAP_BOUNDS:
+                return 5;
+            case MAP_DENS:
+                return 6;
         }
         return -1;
     }
