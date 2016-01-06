@@ -42,6 +42,15 @@ public abstract class Unit
         communicator = new Communicator(rc);
     }
 
+    public boolean act() throws GameActionException {
+        if (fight());
+        else if (fightZombies());
+        else if (carryOutAbility());
+        else if (takeNextStep());
+
+        return true;
+    }
+
     // abstract methods that all units will need to implement
     public abstract boolean takeNextStep() throws GameActionException;
     public abstract boolean fight() throws GameActionException;
