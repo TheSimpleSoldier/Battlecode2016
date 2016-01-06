@@ -207,28 +207,40 @@ public class CommunicationUtilities
                 {
                     case ARCHON:
                         first += "0000";
+                        break;
                     case BIGZOMBIE:
                         first += "0001";
+                        break;
                     case FASTZOMBIE:
                         first += "0010";
+                        break;
                     case GUARD:
                         first += "0011";
+                        break;
                     case RANGEDZOMBIE:
                         first += "0100";
+                        break;
                     case SCOUT:
                         first += "0101";
+                        break;
                     case SOLDIER:
                         first += "0110";
+                        break;
                     case STANDARDZOMBIE:
                         first += "0111";
+                        break;
                     case TTM:
                         first += "1000";
+                        break;
                     case TURRET:
                         first += "1001";
+                        break;
                     case VIPER:
                         first += "1010";
+                        break;
                     case ZOMBIEDEN:
                         first += "1011";
+                        break;
                 }
                 first += "00000000";
                 String x = Integer.toBinaryString(communication.x + 16100 - locationoffset);
@@ -248,28 +260,40 @@ public class CommunicationUtilities
                 {
                     case ARCHON:
                         first += "0000";
+                        break;
                     case BIGZOMBIE:
                         first += "0001";
+                        break;
                     case FASTZOMBIE:
                         first += "0010";
+                        break;
                     case GUARD:
                         first += "0011";
+                        break;
                     case RANGEDZOMBIE:
                         first += "0100";
+                        break;
                     case SCOUT:
                         first += "0101";
+                        break;
                     case SOLDIER:
                         first += "0110";
+                        break;
                     case STANDARDZOMBIE:
                         first += "0111";
+                        break;
                     case TTM:
                         first += "1000";
+                        break;
                     case TURRET:
                         first += "1001";
+                        break;
                     case VIPER:
                         first += "1010";
+                        break;
                     case ZOMBIEDEN:
                         first += "1011";
+                        break;
                 }
                 String btype = Integer.toBinaryString(Bots.toInt(communication.sType));
                 first += ("0000" + btype).substring(btype.length());
