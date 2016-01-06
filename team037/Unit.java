@@ -1,6 +1,8 @@
 package team037;
 
 import battlecode.common.*;
+import team037.Enums.CommunicationType;
+import team037.Utilites.Communication;
 
 public abstract class Unit
 {
@@ -20,6 +22,7 @@ public abstract class Unit
     public static Direction[] dirs;
     public static FightMicro fightMicro;
     public static Navigator navigator;
+    public static Communicator communicator;
 
     public Unit()
     {
@@ -37,6 +40,7 @@ public abstract class Unit
         dirs = Direction.values();
         fightMicro = new FightMicro(rc);
         navigator = new Navigator(rc);
+        communicator = new Communicator(rc);
     }
 
     // abstract methods that all units will need to implement
@@ -45,9 +49,21 @@ public abstract class Unit
     public abstract boolean fightZombies() throws GameActionException;
 
     // additional methods with default behavior
-    public  void handleMessages() throws GameActionException
+    public void handleMessages() throws GameActionException
     {
-        // default to do nothing
+        Communication[] communications = communicator.processCommunications();
+        for(int k = 0; k < communications.length; k++)
+        {
+            communications[k].print();
+            System.out.println();
+        }
+        Communication communication = new Communication();
+        communication.type = CommunicationType.DEN;
+        communication.id = 120;
+        communication.x = 58;
+        communication.y = 62;
+        communication.bType = RobotType.ZOMBIEDEN;
+        communicator.sendCommunication(1000, communication);
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException

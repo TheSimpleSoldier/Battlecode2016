@@ -17,4 +17,14 @@ public class Communication
     public Bots nType;             //The type to turn in to
     public int x;                  //X location
     public int y;                  //y location
+
+    public void print()
+    {
+        System.out.println("op: " + type.toString());
+        System.out.println("id: " + id);
+        System.out.println("bot type: " + bType);
+        System.out.println("start type: " + sType);
+        System.out.println("new type: " + nType);
+        System.out.println("loc: (" + x + ", " + y + ")");
+    }
 }
