@@ -104,7 +104,7 @@ public abstract class Unit
 
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
-        if(nextBot != null)
+        if(nextBot != null && nextBot != thisBot)
         {
             Unit toReturn = Bots.returnUnit(nextBot, rc);
             thisBot = nextBot;
