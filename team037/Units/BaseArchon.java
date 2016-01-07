@@ -1,9 +1,6 @@
 package team037.Units;
 
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 import team037.Unit;
@@ -48,9 +45,33 @@ public class BaseArchon extends Unit
         return current;
     }
 
-    // maybe spawn a unit?
+    // maybe spawn a unit or repair a damaged unit
     public boolean carryOutAbility() throws GameActionException
     {
+        if (nearByAllies.length > 0)
+        {
+            double weakestHealth = 9999;
+            RobotInfo weakest = null;
+
+            for (int i = nearByAllies.length; --i>=0; )
+            {
+                double health = nearByAllies[i].health;
+                if (health < nearByAllies[i].maxHealth)
+                {
+                    if (health < weakestHealth)
+                    {
+                        weakestHealth = health;
+                        weakest = nearByAllies[i];
+                    }
+                }
+            }
+
+            if (weakest != null)
+            {
+                rc.repair(weakest.location);
+            }
+        }
+
         if(rc.hasBuildRequirements(nextType) && rc.getCoreDelay() < 1)
         {
             for (int i = dirs.length; --i>=0; )
