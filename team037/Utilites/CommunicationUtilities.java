@@ -1,7 +1,6 @@
 package team037.Utilites;
 
 import battlecode.common.MapLocation;
-import battlecode.common.RobotType;
 import battlecode.common.Signal;
 import team037.DataStructures.CommTypeToSpacing;
 import team037.DataStructures.Communication;
@@ -11,123 +10,100 @@ import team037.Enums.CommunicationType;
 /**
  * Created by joshua on 1/5/16.
  * Translates between messages and communications
- *
- * message formats:
- * i-type(info)
- * first int- opcode, id, type
- * second int- location x, location y
- *
- * c-type(change mission)
- * first int- opcode, id(0 if doesn't matter), type, bot
- * second int- new bot
  */
 public class CommunicationUtilities
 {
-    static int opcodeSize = 4;
-    static int locationSize = 15;
-    static int idSize = 15;
-    static int botSize = 8;
-    static int typeSize = 4;
-
-    static int locationoffset = 53;
-
     public static Communication readCommunication(Signal signal)
     {
         Communication communication = new Communication();
         int[] message = signal.getMessage();
-        int opcode = message[0] >>> (31 - opcodeSize);
-
-        switch(CommunicationType.values()[opcode])
+        communication.opcode = CommunicationType.fromInt(extractVal(message[0], 1, CommTypeToSpacing.opcodeSize));
+        switch(communication.opcode)
         {
+            //i-format
             case DEN:
-            case ENEMY:
             case PARTS:
-                switch(CommunicationType.values()[opcode])
-                {
-                    case DEN:
-                        communication.type = CommunicationType.DEN;
-                        break;
-                    case ENEMY:
-                        communication.type = CommunicationType.ENEMY;
-                        break;
-                    case PARTS:
-                        communication.type = CommunicationType.PARTS;
-                        break;
-                }
-                int id = message[0] << (opcodeSize + 1);
-                communication.id = id >>> (32 - idSize);
-                int type = message[0] << (opcodeSize + idSize + 1);
-                type = type >>> (32 - typeSize);
-                switch(type)
-                {
-                    case 0:
-                        communication.bType = RobotType.ARCHON;
-                        break;
-                    case 1:
-                        communication.bType = RobotType.BIGZOMBIE;
-                        break;
-                    case 2:
-                        communication.bType = RobotType.FASTZOMBIE;
-                        break;
-                    case 3:
-                        communication.bType = RobotType.GUARD;
-                        break;
-                    case 4:
-                        communication.bType = RobotType.RANGEDZOMBIE;
-                        break;
-                    case 5:
-                        communication.bType = RobotType.SCOUT;
-                        break;
-                    case 6:
-                        communication.bType = RobotType.SOLDIER;
-                        break;
-                    case 7:
-                        communication.bType = RobotType.STANDARDZOMBIE;
-                        break;
-                    case 8:
-                        communication.bType = RobotType.TTM;
-                        break;
-                    case 9:
-                        communication.bType = RobotType.TURRET;
-                        break;
-                    case 10:
-                        communication.bType = RobotType.VIPER;
-                        break;
-                    case 11:
-                        communication.bType = RobotType.ZOMBIEDEN;
-                        break;
-                }
-                communication.bType = RobotType.values()[type >>> (32 - typeSize)];
-                int locX = message[1] >>> (31 - locationSize);
-                communication.x = locX - 16100 + locationoffset;
-                int locY = message[1] << (locationSize + 1);
-                locY = locY >>> (32 - locationSize);
-                communication.y = locY - 16100 + locationoffset;
+            case OENEMY:
+            case SARCHON:
+            case SENEMY:
+            case SZOMBIE:
+            case SDEN:
+            case SPARTS:
+                int[] values = unpack(message, CommTypeToSpacing.I_FORMAT_SPACING);
+                communication.val1 = values[0];
+                communication.loc1X = values[1];
+                communication.loc1Y = values[2];
                 break;
-            case MISSION:
-                communication.type = CommunicationType.MISSION;
-                int id2 = message[0] << (opcodeSize + 1);
-                communication.id = id2 >>> (32 - idSize);
-                int type2 = message[0] << (opcodeSize + idSize + 1);
-                communication.bType = RobotType.values()[type2 >>> (32 - typeSize)];
-                int bot = message[0] << (opcodeSize + idSize + typeSize + 1);
-                communication.sType = Bots.values()[bot >>> (32 - botSize)];
-                communication.nType = Bots.values()[message[1]];
+            //bi-format
+            case ENEMY:
+                values = unpack(message, CommTypeToSpacing.BI_FORMAT_SPACING);
+                communication.val1 = values[0];
+                communication.rType1 = Utilities.typeFromInt(values[1]);
+                communication.loc1X = values[2];
+                communication.loc1Y = values[3];
                 break;
+            //cm-format
+            case CHANGEMISSION:
+                values = unpack(message, CommTypeToSpacing.CM_FORMAT_SPACING);
+                communication.val1 = values[0];
+                communication.bType1 = Bots.fromInt(values[1]);
+                communication.bType2 = Bots.fromInt(values[2]);
+                break;
+            //im-format
+            case INITIALMISSION:
+                values = unpack(message, CommTypeToSpacing.IM_FORMAT_SPACING);
+                communication.val1 = values[0];
+                communication.bType1 = Bots.fromInt(values[1]);
+                break;
+            //mk-format
+            case MAP_BOUNDS:
+                values = unpack(message, CommTypeToSpacing.MK_FORMAT_SPACING);
+                communication.val1 = values[0];
+                communication.loc1X = values[1];
+                communication.val2 = values[2];
+                communication.val3 = values[3];
+                communication.loc1Y = values[4];
+                communication.val4 = values[5];
         }
 
         return communication;
+    }
+
+    private static int[] unpack(int[] message, int[] lengths)
+    {
+        int[] toReturn = new int[lengths.length];
+        int current = message[0];
+        int loc = 5;
+        for(int k = 0; k < lengths.length; k++)
+        {
+            if(loc + lengths[k] > 32)
+            {
+                current = message[1];
+                loc = 0;
+            }
+
+            toReturn[k] = extractVal(current, loc, lengths[k]);
+            loc += lengths[k];
+        }
+
+        return toReturn;
+    }
+
+    private static int extractVal(int val, int start, int length)
+    {
+        val = val << (start);
+        return val >>> (32 - length);
     }
 
     public static Communication readEnemyCommunication(Signal signal)
     {
         Communication communication = new Communication();
 
-        communication.type = CommunicationType.ENEMYL;
-        communication.id = signal.getRobotID();
+        communication.opcode = CommunicationType.OENEMY;
+        communication.val1 = signal.getRobotID();
         MapLocation loc = signal.getLocation();
-        communication.x = loc.x;
-        communication.y = loc.y;
+        communication.loc1X = loc.x;
+        communication.loc1Y = loc.y;
 
         return communication;
     }
@@ -135,37 +111,32 @@ public class CommunicationUtilities
     public static Communication readSimpleCommunication(Signal signal, int round)
     {
         Communication communication = new Communication();
-        communication.id = signal.getRobotID();
+        communication.val1 = signal.getRobotID();
         MapLocation loc = signal.getLocation();
-        communication.x = loc.x;
-        communication.y = loc.y;
+        communication.loc1X = loc.x;
+        communication.loc1Y = loc.y;
 
         switch(round % 10)
         {
             case 0:
             case 1:
-                communication.type = CommunicationType.ENEMY;
-                communication.bType = RobotType.ARCHON;
+                communication.opcode = CommunicationType.SARCHON;
                 break;
             case 2:
             case 3:
-                communication.type = CommunicationType.ENEMY;
-                communication.bType = RobotType.SOLDIER;
+                communication.opcode = CommunicationType.SENEMY;
                 break;
             case 4:
             case 5:
-                communication.type = CommunicationType.ENEMY;
-                communication.bType = RobotType.STANDARDZOMBIE;
+                communication.opcode = CommunicationType.SZOMBIE;
                 break;
             case 6:
             case 7:
-                communication.type = CommunicationType.DEN;
-                communication.bType = RobotType.ZOMBIEDEN;
+                communication.opcode = CommunicationType.SDEN;
                 break;
             case 8:
             case 9:
-                communication.type = CommunicationType.PARTS;
-                communication.bType = RobotType.SOLDIER;
+                communication.opcode = CommunicationType.SPARTS;
                 break;
         }
 
@@ -174,260 +145,123 @@ public class CommunicationUtilities
 
     public static int[] createCommunication(Communication communication)
     {
-        /*
-        * c-type(change mission)
-            * first int- opcode, id(0 if doesn't matter), type, bot
-            * second int- new bot
-            * */
-        int[] message = new int[2];
-        String first = "";
-        String second = "";
-        switch(communication.type)
-        {
-            case DEN:
-            case ENEMY:
-            case PARTS:
-                switch(communication.type)
-                {
-                    case DEN:
-                        String type = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.DEN));
-                        first += ("0000" + type).substring(type.length());
-                        break;
-                    case ENEMY:
-                        String type2 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.ENEMY));
-                        first += ("0000" + type2).substring(type2.length());
-                        break;
-                    case PARTS:
-                        String type3 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.PARTS));
-                        first += ("0000" + type3).substring(type3.length());
-                        break;
-                }
-                String id = Integer.toBinaryString(communication.id);
-                first += ("000000000000000" + id).substring(id.length());
-                switch(communication.bType)
-                {
-                    case ARCHON:
-                        first += "0000";
-                        break;
-                    case BIGZOMBIE:
-                        first += "0001";
-                        break;
-                    case FASTZOMBIE:
-                        first += "0010";
-                        break;
-                    case GUARD:
-                        first += "0011";
-                        break;
-                    case RANGEDZOMBIE:
-                        first += "0100";
-                        break;
-                    case SCOUT:
-                        first += "0101";
-                        break;
-                    case SOLDIER:
-                        first += "0110";
-                        break;
-                    case STANDARDZOMBIE:
-                        first += "0111";
-                        break;
-                    case TTM:
-                        first += "1000";
-                        break;
-                    case TURRET:
-                        first += "1001";
-                        break;
-                    case VIPER:
-                        first += "1010";
-                        break;
-                    case ZOMBIEDEN:
-                        first += "1011";
-                        break;
-                }
-                first += "00000000";
-                String x = Integer.toBinaryString(communication.x + 16100 - locationoffset);
-                second += ("000000000000000" + x).substring(x.length());
-                String y = Integer.toBinaryString(communication.y + 16100 - locationoffset);
-                second += ("000000000000000" + y).substring(y.length());
-                second += "0";
-                message[0] = Integer.parseInt(first, 2);
-                message[1] = Integer.parseInt(second, 2);
-                break;
-            case MISSION:
-                String type4 = Integer.toBinaryString(CommunicationType.toInt(CommunicationType.MISSION));
-                first += ("0000" + type4).substring(type4.length());
-                String id2 = Integer.toBinaryString(communication.id);
-                first += ("000000000000000" + id2).substring(id2.length());
-                switch(communication.bType)
-                {
-                    case ARCHON:
-                        first += "0000";
-                        break;
-                    case BIGZOMBIE:
-                        first += "0001";
-                        break;
-                    case FASTZOMBIE:
-                        first += "0010";
-                        break;
-                    case GUARD:
-                        first += "0011";
-                        break;
-                    case RANGEDZOMBIE:
-                        first += "0100";
-                        break;
-                    case SCOUT:
-                        first += "0101";
-                        break;
-                    case SOLDIER:
-                        first += "0110";
-                        break;
-                    case STANDARDZOMBIE:
-                        first += "0111";
-                        break;
-                    case TTM:
-                        first += "1000";
-                        break;
-                    case TURRET:
-                        first += "1001";
-                        break;
-                    case VIPER:
-                        first += "1010";
-                        break;
-                    case ZOMBIEDEN:
-                        first += "1011";
-                        break;
-                }
-                String btype = Integer.toBinaryString(Bots.toInt(communication.sType));
-                first += ("0000" + btype).substring(btype.length());
-                message[0] = Integer.parseInt(first, 2);
-                message[1] = Bots.toInt(communication.nType);
-            case MAP_BOUNDS:
-                int[] values = communication.ints;
-                message = packInts(CommunicationType.MAP_BOUNDS, values);
+        int[] message = null;
 
+        switch(communication.opcode)
+        {
+            //i-format
+            case DEN:
+            case PARTS:
+            case OENEMY:
+            case SARCHON:
+            case SENEMY:
+            case SZOMBIE:
+            case SDEN:
+            case SPARTS:
+                int[] values = {
+                communication.val1, communication.loc1X, communication.loc1Y};
+                message = pack(communication.opcode, values, CommTypeToSpacing.I_FORMAT_SPACING);
+                break;
+            //bi-format
+            case ENEMY:
+                int[] values2 = {
+                communication.val1, Utilities.intFromType(communication.rType1),
+                communication.loc1X, communication.loc1Y};
+                message = pack(communication.opcode, values2, CommTypeToSpacing.BI_FORMAT_SPACING);
+                break;
+            //cm-format
+            case CHANGEMISSION:
+                int[] values3 = {
+                communication.val1, Bots.toInt(communication.bType1),
+                Bots.toInt(communication.bType2)};
+                message = pack(communication.opcode, values3, CommTypeToSpacing.CM_FORMAT_SPACING);
+                break;
+            //im-format
+            case INITIALMISSION:
+                int[] values4 = {
+                communication.val1, Bots.toInt(communication.bType1)};
+                message = pack(communication.opcode, values4, CommTypeToSpacing.IM_FORMAT_SPACING);
+                break;
+            //mk-format
+            case MAP_BOUNDS:
+                int[] values5 = {
+                communication.val1, communication.loc1X, communication.val2,
+                communication.val3, communication.loc1Y, communication.val4};
+                message = pack(communication.opcode, values5, CommTypeToSpacing.MK_FORMAT_SPACING);
         }
+
         return message;
     }
 
-    private static final String ZEROS = "00000000000000000000000000000000000000000000000000000000";
-    private static final String PADDING = "10000000000000000000000000000000000000000000000000000";
-    private static final int MAX_VALUES = 30; // need string to start with 1
-    public static int[] packInts(CommunicationType type, int[] values) {
-
-        int[] lengths = CommTypeToSpacing.getSpacingArrayFromCommType(type);
-        assert values.length == lengths.length;
-
-        String first = "";
-        String second = "";
-        int usedFirst = 0;
-        int usedSecond = 0;
-
-        // add the message type first
-        String mtype = Integer.toBinaryString(CommunicationType.toInt(type));
-        first += ("0000" + mtype).substring(mtype.length());
-        usedFirst += 4;
-
-        for (int i = 0; i < values.length; i++) {
-            String temp = Integer.toBinaryString(values[i]);
-            if (usedFirst + lengths[i] <= MAX_VALUES) {
-                usedFirst += lengths[i];
-                first += (ZEROS + temp).substring(ZEROS.length() + temp.length() - lengths[i]);
-            } else if (usedSecond + lengths[i] <= MAX_VALUES) {
-                usedSecond += lengths[i];
-                second += (ZEROS + temp).substring(ZEROS.length() + temp.length() - lengths[i]);
-            } else {
-                System.out.println("Oh noes! Couldn't pack in all the ints!");
-                System.out.println(i);
-                System.out.println(values.length);
-                System.out.println(values[i]);
-                System.out.println(lengths[i]);
+    private static int[] pack(CommunicationType opcode, int[] values, int[] lengths)
+    {
+        int[] message = new int[2];
+        String current = "";
+        current += createVal(CommunicationType.toInt(opcode), CommTypeToSpacing.opcodeSize);
+        for(int k = 0; k < values.length; k++)
+        {
+            if(current.length() + lengths[k] > 31)
+            {
+                String buffer = new String(new char[31 - current.length()]).replace('\0', '0');
+                current += buffer;
+                message[0] = Integer.parseInt(current, 2);
+                current = "";
             }
-        }
-        first = PADDING.substring(0, 31 - first.length()) + first;
-        second = PADDING.substring(0, 31 - second.length()) + second;
 
-        return new int[] {
-                Integer.parseInt(first, 2),
-                Integer.parseInt(second, 2)
-        };
+            current += createVal(values[k], lengths[k]);
+        }
+        String buffer = new String(new char[31 - current.length()]).replace('\0', '0');
+        current += buffer;
+        if(message[0] == 0)
+        {
+            message[0] = Integer.parseInt(current + buffer, 2);
+        }
+        else
+        {
+            message[1] = Integer.parseInt(current + buffer, 2);
+        }
+
+        return message;
     }
 
-
-    public static int[] unpackInts(CommunicationType type, int[] message) {
-        // first figure out what values go in the first line
-        int[] spacing = CommTypeToSpacing.getSpacingArrayFromCommType(type);
-
-        int countFirst = 0;
-        int usedFirst = 4; // since we know we have the message info in first
-        int countSecond = 0;
-        int usedSecond = 0;
-        for (int i = 0; i < spacing.length; i++) {
-            if (spacing[i] + usedFirst <= MAX_VALUES) {
-                countFirst += 1;
-                usedFirst += spacing[i];
-            } else if (spacing[i] + usedSecond <= MAX_VALUES) {
-                countSecond += 1;
-                usedSecond += spacing[i];
-            } else {
-                System.out.println("Too many values to unpack!");
-            }
-        }
-
-        int[] results = new int[spacing.length];
-        int idx = 31 - usedFirst + 4;
-        String first = Integer.toBinaryString(message[0]);
-        String second = Integer.toBinaryString(message[1]);
-        for (int i = 0; i < spacing.length; i++) {
-            if (countFirst > 0) {
-                countFirst -= 1;
-                results[i] = Integer.parseInt(first.substring(idx, idx + spacing[i]), 2);
-                idx += spacing[i];
-                if (countFirst == 0) {
-                    idx = 31 - usedSecond;
-                }
-            } else if (countSecond > 0) {
-                countSecond -= 1;
-                results[i] = Integer.parseInt(second.substring(idx, idx + spacing[i]), 2);
-                idx += spacing[i];
-            } else {
-                System.out.println("too many values to unpack!");
-            }
-        }
-
-        return results;
+    private static String createVal(int val, int length)
+    {
+        String str = Integer.toBinaryString(val);
+        String buffer = new String(new char[length]).replace('\0', '0');
+        return (buffer + str).substring(str.length());
     }
-
 
     public static boolean shouldCommunicateSimple(Communication communication, int round)
     {
-        if(communication.type == CommunicationType.ENEMY && communication.bType == RobotType.ARCHON)
+        if(communication.opcode == CommunicationType.SARCHON)
         {
             if(round % 10 == 0)
             {
                 return true;
             }
         }
-        else if(communication.type == CommunicationType.ENEMY && communication.bType == RobotType.SOLDIER)
+        else if(communication.opcode == CommunicationType.SENEMY)
         {
             if(round % 10 == 2)
             {
                 return true;
             }
         }
-        else if(communication.type == CommunicationType.ENEMY && communication.bType == RobotType.STANDARDZOMBIE)
+        else if(communication.opcode == CommunicationType.SZOMBIE)
         {
             if(round % 10 == 4)
             {
                 return true;
             }
         }
-        else if(communication.type == CommunicationType.DEN && communication.bType == RobotType.ZOMBIEDEN)
+        else if(communication.opcode == CommunicationType.SDEN)
         {
             if(round % 10 == 6)
             {
                 return true;
             }
         }
-        else if(communication.type == CommunicationType.PARTS && communication.bType == RobotType.SOLDIER)
+        else if(communication.opcode == CommunicationType.SPARTS)
         {
             if(round % 10 == 8)
             {

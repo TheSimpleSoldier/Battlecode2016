@@ -5,6 +5,7 @@ import team037.DataStructures.Communication;
 
 public abstract class Unit
 {
+    public static int turnCreated;
     public static RobotController rc;
     public static int range;
     public static RobotType type;
@@ -23,6 +24,10 @@ public abstract class Unit
     public static Navigator navigator;
     public static Communicator communicator;
 
+    public MapLocation locationLastTurn;
+    public MapLocation previousLocation;
+    public MapLocation currentLocation;
+
     public Unit()
     {
         // default constructor
@@ -40,6 +45,10 @@ public abstract class Unit
         fightMicro = new FightMicro(rc);
         navigator = new Navigator(rc);
         communicator = new Communicator(rc);
+        turnCreated = rc.getRoundNum();
+        locationLastTurn = rc.getLocation();
+        previousLocation = locationLastTurn;
+        currentLocation = locationLastTurn;
     }
 
     public boolean act() throws GameActionException {
@@ -60,14 +69,17 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         Communication[] communications = communicator.processCommunications();
+        for(int k = 0; k < communications.length; k++)
+        {
+            communications[k].printAll();
+        }
         /*
          * Sample communication creation
         Communication communication = new Communication();
-        communication.type = CommunicationType.DEN;
-        communication.id = 120;
-        communication.bType = RobotType.ZOMBIEDEN;
-        communication.x = 68;
-        communication.y = 52;
+        communication.opcode = CommunicationType.DEN;
+        communication.val1 = 120;
+        communication.loc1X = 68;
+        communication.loc1Y = 52;
         communicator.sendCommunication(100, communication);
          */
     }
@@ -84,6 +96,7 @@ public abstract class Unit
 
     public void collectData() throws GameActionException
     {
+
         nearByEnemies = rc.senseNearbyRobots(range, opponent);
         nearByAllies = rc.senseNearbyRobots(range, us);
 
@@ -92,5 +105,12 @@ public abstract class Unit
 
         nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
+
+        MapLocation newLoc = rc.getLocation();
+        locationLastTurn = currentLocation;
+        if (!newLoc.equals(currentLocation)) {
+            previousLocation = currentLocation;
+        }
+        currentLocation = newLoc;
     }
 }
