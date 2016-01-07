@@ -9,17 +9,18 @@ import team037.Utilites.PartsUtilities;
 
 public class AlphaArchon extends BaseArchon
 {
-    SlugNavigator move;
+//    SlugNavigator move;
     AppendOnlyMapLocationArray parts;
     int partsIdx;
 
     public AlphaArchon(RobotController rc)
     {
         super(rc);
-        move = new SlugNavigator(rc);
+//        move = new SlugNavigator(rc);
         parts = PartsUtilities.findPartsICanSenseNotImpassible(rc);
         partsIdx = 0;
-        move.setTarget(getNextPartLocation());
+        navigator.setTarget(getNextPartLocation());
+//        move.setTarget(getNextPartLocation());
     }
 
     private MapLocation getNextPartLocation() {
@@ -36,14 +37,13 @@ public class AlphaArchon extends BaseArchon
 
     @Override
     public boolean act() throws GameActionException {
-        if (!rc.isCoreReady()) {
-            return false;
+        if (rc.isCoreReady() && carryOutAbility()) {
+            return true;
         }
-        if (carryOutAbility());
-        else if(rc.getLocation().equals(move.getTarget())) {
-            move.setTarget(getNextPartLocation());
+        if(rc.getLocation().equals(navigator.getTarget())) {
+            navigator.setTarget(getNextPartLocation());
         }
-        move.takeNextStep();
-        return true;
+
+        return navigator.takeNextStep();
     }
 }

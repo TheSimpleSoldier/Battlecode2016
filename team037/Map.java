@@ -4,9 +4,7 @@ package team037;
  * Created by davej on 1/5/2016.
  */
 
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 
 public class Map {
 
@@ -14,9 +12,8 @@ public class Map {
     public long[][] mapX;   // Row-major storage of the map.
     public final int originX, originY;  // Origin in real coordinates.
     static RobotController rc;
-    static RobotType ground = RobotType.ARCHON;
-    static final int yOffset = 1024;
-    static final int xOffset = 2048;
+    static int[] perimeter, knight;
+    static int radiusSq;
 
     /**
      * Constructor.
@@ -24,6 +21,51 @@ public class Map {
      */
     public Map(RobotController in_rc) {
         rc = in_rc;
+
+        switch(rc.getType().sensorRadiusSquared) {
+            case 53:
+                // Scout
+            case 35:
+                // Archon
+                radiusSq = RobotType.ARCHON.sensorRadiusSquared;
+                knight = new int[] {
+                        9,11,13,24,
+                        36,58,80,90,
+                        99,97,95,84,
+                        72,50,28,18,
+                        41,31,33,45,
+                        67,77,75,63,
+                        42,43,44,53,54,55,64,65,66
+                };
+                perimeter = new int[] {
+                        0,1,2,3,4,5,6,14,15,25,
+                        26,37,48,59,70,81,92,91,101,100,
+                        108,107,106,105,104,103,102,94,93,83,
+                        82,71,60,49,38,27,16,17,7,8,
+                        42,43,44,53,54,55,64,65,66
+                };
+                break;
+            default:
+                // 24 (all other units)
+                radiusSq = RobotType.SOLDIER.sensorRadiusSquared;
+                knight = new int[] {
+                        0,2,4,11,
+                        20,38,56,63,
+                        68,66,64,57,
+                        48,30,12,5,
+                        23,15,17,27,
+                        45,53,51,41,
+                        24,25,26,33,34,35,42,43,44
+                };
+                perimeter = new int[] {
+                        0,1,2,3,4,10,11,19,
+                        20,29,28,47,56,55,63,62,
+                        68,67,66,65,64,58,57,49,
+                        48,39,30,21,12,13,5,6
+                };
+
+                break;
+        }
         MapLocation hqLocation = rc.getLocation();
         originX = hqLocation.x;
         originY = hqLocation.y;
@@ -72,28 +114,204 @@ public class Map {
         return new MapLocation(location[0]-128+originX,location[1]-128+originY);
     }
 
-    public void scanRange(int x, int y, int range) {
-        int maxX = x + range;
-        int maxY = y + range;
+    public void scan(MapLocation currentLoc) {
+        try {
+            switch (Clock.getBytecodesLeft() / 1000) {
+                case 0:
+                    break;
+                case 1:
+                case 2:
+                    scanImmediateVicinity(currentLoc);
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    scanPerimeter(currentLoc);
+                    break;
+                case 6:
+                case 7:
+                    scanKnight(currentLoc);
+                    break;
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    scanRange(currentLoc, RobotType.SOLDIER.sensorRadiusSquared);
+                    break;
+                default:
+                    scanRange(currentLoc, radiusSq);
+                    break;
+            }
+        } catch (GameActionException e) {}
+    }
 
-        x -= range + 1;
-        y -= range + 1;
+    private void scanPerimeter(MapLocation currentLoc) throws GameActionException {
+        // ((((mapX[i][(j) / 64] >>> (63 - (j % 64))) & 1L) == 1) && (((mapY[j][(i) / 64] >>> (63 - (i % 64))) & 1L) == 1))
+        double rubble = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+//        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, rc.getType().sensorRadiusSquared);
+        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, radiusSq);
 
-        for (int i = y; i++ < maxY;) {
-            // ((((mapX[i][(j) / 64] >>> (63 - (j % 64))) & 1L) == 1) && (((mapY[j][(i) / 64] >>> (63 - (i % 64))) & 1L) == 1))
-            int yIndex = i / 64;
-            long yValue = 1L << (63 - (i % 64));
-            for (int j = x; j++ < maxX;) {
-                MapLocation location = arrayToMap(j,i);
-                if (rc.canSenseLocation(location)) {
-                    if (rc.senseRubble(location) > 100) {
-                        mapX[i][j/64] |= 1L << (63 - (j%64));
-                        mapY[j][yIndex] |= yValue;
-                    } else {
-                        mapX[i][j/64] &= ~(1L << (63 - (j%64)));
-                        mapY[j][yIndex] &= ~yValue;
-                    }
-                }
+        for (int i = perimeter.length; --i >= 0;) {
+
+            MapLocation location = locations[perimeter[i]];
+
+            int x = location.x-originX+128;
+            int y = location.y-originY+128;
+
+            if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+                mapX[y][x/64] |= 1L << (63 - (x%64));
+                mapY[x][y/64] |= 1L << (63 - (y%64));
+            } else {
+                mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+                mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+            }
+        }
+    }
+
+    private void scanKnight(MapLocation currentLoc) throws GameActionException {
+        // ((((mapX[i][(j) / 64] >>> (63 - (j % 64))) & 1L) == 1) && (((mapY[j][(i) / 64] >>> (63 - (i % 64))) & 1L) == 1))
+        double rubble = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+//        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, rc.getType().sensorRadiusSquared);
+        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, radiusSq);
+
+        for (int i = knight.length; --i >= 0;) {
+
+            MapLocation location = locations[knight[i]];
+
+            int x = location.x-originX+128;
+            int y = location.y-originY+128;
+
+            if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+                mapX[y][x/64] |= 1L << (63 - (x%64));
+                mapY[x][y/64] |= 1L << (63 - (y%64));
+            } else {
+                mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+                mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+            }
+        }
+    }
+
+    private void scanImmediateVicinity(MapLocation currentLoc) throws GameActionException {
+
+        MapLocation location = currentLoc;
+        double rubble = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+        int currentX = location.x-originX+128;
+        int currentY = location.y-originY+128;
+        int x = currentX;
+        int y = currentY;
+
+        if (rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        Direction direction = Direction.NORTH;
+        location = currentLoc.add(direction);
+        y = currentY-1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.NORTH_EAST;
+        location = currentLoc.add(direction);
+        x = currentX+1;
+        y = currentY-1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.EAST;
+        location = currentLoc.add(direction);
+        x = currentX+1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.SOUTH_EAST;
+        location = currentLoc.add(direction);
+        x = currentX+1;
+        y = currentY+1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.SOUTH;
+        location = currentLoc.add(direction);
+        y = currentY+1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.SOUTH_WEST;
+        location = currentLoc.add(direction);
+        x = currentX-1;
+        y = currentY+1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.WEST;
+        location = currentLoc.add(direction);
+        x = currentX-1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+        direction = Direction.NORTH_WEST;
+        location = currentLoc.add(direction);
+        x = currentX-1;
+        y = currentY-1;
+        if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+            mapX[y][x/64] |= 1L << (63 - (x%64));
+            mapY[x][y/64] |= 1L << (63 - (y%64));
+        } else {
+            mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+            mapY[x][y/64] &= ~(1L << (63 - (y%64)));
+        }
+    }
+
+    private void scanRange(MapLocation currentLoc, int radiusSq) throws GameActionException {
+        // ((((mapX[i][(j) / 64] >>> (63 - (j % 64))) & 1L) == 1) && (((mapY[j][(i) / 64] >>> (63 - (i % 64))) & 1L) == 1))
+        double rubble = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+//        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, rc.getType().sensorRadiusSquared);
+        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, radiusSq);
+
+        for (int i = locations.length; --i >= 0;) {
+
+            MapLocation location = locations[i];
+
+            int x = location.x-originX+128;
+            int y = location.y-originY+128;
+
+            if (!rc.onTheMap(location) || rc.senseRubble(location) > rubble) {
+                mapX[y][x/64] |= 1L << (63 - (x%64));
+                mapY[x][y/64] |= 1L << (63 - (y%64));
+            } else {
+                mapX[y][x/64] &= ~(1L << (63 - (x%64)));
+                mapY[x][y/64] &= ~(1L << (63 - (y%64)));
             }
         }
     }
