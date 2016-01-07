@@ -2,6 +2,7 @@ package team037;
 
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
+import team037.DataStructures.Communication;
 import team037.Utilites.MapUtils;
 
 public class MapKnowledge {
@@ -53,57 +54,57 @@ public class MapKnowledge {
     }
 
 
-    public int[] packForMessage() {
-        int[] packed = new int[6];
+    public Communication packForMessage() {
+        Communication communication = new Communication();
 
         if (minX != Integer.MIN_VALUE && maxX != Integer.MAX_VALUE) {
-            packed[0] = 3;
-            packed[1] = minX + MAP_ADD;
-            packed[2] = maxX - minX;
+            communication.val1 = 3;
+            communication.loc1X = minX + MAP_ADD;
+            communication.val2 = maxX - minX;
         } else if (minX != Integer.MIN_VALUE) {
-            packed[0] = 2;
-            packed[1] = minX + MAP_ADD;
-            packed[2] = 0;
+            communication.val1 = 2;
+            communication.loc1X = minX + MAP_ADD;
+            communication.val2 = 0;
         } else if (maxX != Integer.MIN_VALUE) {
-            packed[0] = 1;
-            packed[1] = maxX + MAP_ADD;
-            packed[2] = 0;
+            communication.val1 = 1;
+            communication.loc1X = maxX + MAP_ADD;
+            communication.val2 = 0;
         } else {
-            packed[0] = 0;
-            packed[1] = 0;
-            packed[2] = 0;
+            communication.val1 = 0;
+            communication.loc1X = 0;
+            communication.val2 = 0;
         }
 
 
         if (minY != Integer.MIN_VALUE && maxY != Integer.MAX_VALUE) {
-            packed[4] = 3;
-            packed[5] = minY + MAP_ADD;
-            packed[6] = maxY - minY;
+            communication.val2 = 3;
+            communication.loc1Y = minY + MAP_ADD;
+            communication.val4 = maxY - minY;
         } else if (minY != Integer.MIN_VALUE) {
-            packed[4] = 2;
-            packed[5] = minY + MAP_ADD;
-            packed[6] = 0;
+            communication.val2 = 2;
+            communication.loc1Y = minY + MAP_ADD;
+            communication.val4 = 0;
         } else if (maxY != Integer.MIN_VALUE) {
-            packed[4] = 1;
-            packed[5] = maxY + MAP_ADD;
-            packed[6] = 0;
+            communication.val2 = 1;
+            communication.loc1Y = maxY + MAP_ADD;
+            communication.val4 = 0;
         } else {
-            packed[4] = 0;
-            packed[5] = 0;
-            packed[6] = 0;
+            communication.val2 = 0;
+            communication.loc1Y = 0;
+            communication.val4 = 0;
         }
 
-        return packed;
+        return communication;
     }
 
-    public void updateEdgesFromMessage(int[] results) {
-        int widthBit = results[0];
-        int xCoord = results[1];
-        int width = results[2];
+    public void updateEdgesFromMessage(Communication communication) {
+        int widthBit = communication.val1;
+        int xCoord = communication.loc1X;
+        int width = communication.val2;
 
-        int heightBit = results[3];
-        int yCoord = results[4];
-        int height = results[5];
+        int heightBit = communication.val3;
+        int yCoord = communication.loc1Y;
+        int height = communication.val4;
 
 
         if (widthBit == 0) {

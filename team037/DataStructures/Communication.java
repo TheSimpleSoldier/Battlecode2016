@@ -30,6 +30,15 @@ import team037.Enums.CommunicationType;
  *   opcode is the specific opcode
  *   val1 is the id(0 for blanket to all base bots)
  *   bType1 is what bot to change to
+ *
+ * mk-format(map bounds)
+ *   opcode is the specific opcode
+ *   val1 is the width indicator
+ *   loc1x is the x coordinate
+ *   val2 is the width
+ *   val3 is the height indicator
+ *   loc1y is the y coordinate
+ *   val4 is the height
  */
 public class Communication
 {

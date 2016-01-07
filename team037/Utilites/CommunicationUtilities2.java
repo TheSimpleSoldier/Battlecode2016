@@ -55,6 +55,15 @@ public class CommunicationUtilities2
                 communication.val1 = values[0];
                 communication.bType1 = Bots.fromInt(values[1]);
                 break;
+            //mk-format
+            case MAP_BOUNDS:
+                values = unpack(message, CommTypeToSpacing.MK_FORMAT_SPACING);
+                communication.val1 = values[0];
+                communication.loc1X = values[1];
+                communication.val2 = values[2];
+                communication.val3 = values[3];
+                communication.loc1Y = values[4];
+                communication.val4 = values[5];
         }
 
         return communication;
@@ -173,6 +182,12 @@ public class CommunicationUtilities2
                 communication.val1, Bots.toInt(communication.bType1)};
                 message = pack(values4, CommTypeToSpacing.IM_FORMAT_SPACING);
                 break;
+            //mk-format
+            case MAP_BOUNDS:
+                int[] values5 = {CommunicationType.toInt(communication.opcode),
+                communication.val1, communication.loc1X, communication.val2,
+                communication.val3, communication.loc1Y, communication.val4};
+                message = pack(values5, CommTypeToSpacing.MK_FORMAT_SPACING);
         }
 
         return message;

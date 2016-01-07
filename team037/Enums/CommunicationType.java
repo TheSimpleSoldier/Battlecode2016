@@ -2,12 +2,6 @@ package team037.Enums;
 
 /**
  * Created by joshua on 1/5/16.
- *
- * Den is for den locations
- * Parts is for part location and quantities
- * Enemy is for full enemy info
- * Enemyl is for enemy info minus type
- * Mission is for mission changes
  */
 public enum CommunicationType
 {
