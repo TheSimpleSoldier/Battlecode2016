@@ -45,10 +45,10 @@ public class MapKnowledge {
             maxY = MapUtils.senseEdge(rc, Direction.SOUTH);
         }
         if (minX == Integer.MIN_VALUE) {
-            minX = MapUtils.senseEdge(rc, Direction.EAST);
+            minX = MapUtils.senseEdge(rc, Direction.WEST);
         }
         if (maxX == Integer.MIN_VALUE) {
-            maxX = MapUtils.senseEdge(rc, Direction.WEST);
+            maxX = MapUtils.senseEdge(rc, Direction.EAST);
         }
     }
 
@@ -96,6 +96,23 @@ public class MapKnowledge {
         return packed;
     }
 
+    public void setValueInDirection(int val, Direction d) {
+        switch (d) {
+            case NORTH:
+                minY = val;
+                break;
+            case SOUTH:
+                maxY = val;
+                break;
+            case WEST:
+                minX = val;
+                break;
+            case EAST:
+                maxX = val;
+                break;
+        }
+    }
+
     public void updateEdgesFromMessage(int[] results) {
         int widthBit = results[0];
         int xCoord = results[1];
@@ -137,6 +154,11 @@ public class MapKnowledge {
         } else {
             System.out.println("control bit borked! in MapKnowledge");
         }
+    }
+
+
+    public boolean mapBoundaryComplete() {
+        return minX != Integer.MIN_VALUE && minY != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
     }
 
 

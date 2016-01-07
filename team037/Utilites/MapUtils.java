@@ -26,7 +26,7 @@ public class MapUtils
         }
 
         radius -= 1;
-        while(rc.onTheMap(current.add(d, radius))) {
+        while(!rc.onTheMap(current.add(d, radius))) {
             radius -= 1;
         }
 

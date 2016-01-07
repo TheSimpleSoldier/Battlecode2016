@@ -41,7 +41,10 @@ public class AlphaArchon extends BaseArchon
         }
         if (carryOutAbility());
         else if(rc.getLocation().equals(move.getTarget())) {
-            move.setTarget(getNextPartLocation());
+            MapLocation next = getNextPartLocation();
+            if (next != null) {
+                move.setTarget(getNextPartLocation());
+            }
         }
         move.takeNextStep();
         return true;
