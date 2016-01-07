@@ -20,6 +20,7 @@ public class AlphaArchon extends BaseArchon
         parts = PartsUtilities.findPartsICanSenseNotImpassible(rc);
         partsIdx = 0;
         move.setTarget(getNextPartLocation());
+
     }
 
     private MapLocation getNextPartLocation() {

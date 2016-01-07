@@ -5,7 +5,9 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import battlecode.common.MapLocation;
 import team037.DataStructures.BuildOrder;
+import team037.DataStructures.Communication;
 import team037.Enums.Bots;
+import team037.Enums.CommunicationType;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
 import team037.Utilites.Utilities;
@@ -43,11 +45,6 @@ public class BaseArchon extends Unit
         return false;
     }
 
-    public Unit getNewStrategy(Unit current) throws GameActionException
-    {
-        return current;
-    }
-
     // maybe spawn a unit?
     public boolean carryOutAbility() throws GameActionException
     {
@@ -59,6 +56,12 @@ public class BaseArchon extends Unit
                 if (rc.canBuild(dirs[i], nextType))
                 {
                     rc.build(dirs[i], nextType);
+                    int id = rc.senseRobotAtLocation(rc.getLocation().add(dirs[i])).ID;
+                    Communication communication = new Communication();
+                    communication.opcode = CommunicationType.INITIALMISSION;
+                    communication.val1 = id;
+                    communication.bType1 = nextBot;
+                    communicator.sendCommunication(2, communication);
                     nextBot = buildOrder.nextBot();
                     nextType = Utilities.typeFromBot(nextBot);
                     return true;

@@ -6,7 +6,8 @@ package team037.Enums;
  */
 public enum Bots
 {
-    BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON;
+    BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
+    SCOUTINGSCOUT;
 
     public static int toInt(Bots type)
     {
@@ -28,6 +29,8 @@ public enum Bots
                 return 6;
             case ALPHAARCHON:
                 return 7;
+            case SCOUTINGSCOUT:
+                return 8;
         }
         return -1;
     }
@@ -52,6 +55,8 @@ public enum Bots
                 return BASEVIPER;
             case 7:
                 return ALPHAARCHON;
+            case 8:
+                return SCOUTINGSCOUT;
         }
 
         return null;

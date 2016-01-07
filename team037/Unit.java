@@ -2,6 +2,9 @@ package team037;
 
 import battlecode.common.*;
 import team037.DataStructures.Communication;
+import team037.Enums.Bots;
+import team037.Enums.CommunicationType;
+import team037.Units.*;
 
 public abstract class Unit
 {
@@ -23,6 +26,8 @@ public abstract class Unit
     public static FightMicro fightMicro;
     public static Navigator navigator;
     public static Communicator communicator;
+    public static Bots nextBot = null;
+    public static Bots thisBot= null;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -71,7 +76,21 @@ public abstract class Unit
         Communication[] communications = communicator.processCommunications();
         for(int k = 0; k < communications.length; k++)
         {
-            communications[k].printAll();
+            if(communications[k].opcode == CommunicationType.INITIALMISSION &&
+               communications[k].val1 == rc.getID())
+            {
+                System.out.println("getting message");
+                nextBot = communications[k].bType1;
+            }
+
+            if(communications[k].opcode == CommunicationType.CHANGEMISSION)
+            {
+                if(communications[k].val1 == rc.getID() ||
+                   (communications[k].val1 == 0 && communications[k].bType1 == thisBot))
+                {
+                    nextBot = communications[k].bType2;
+                }
+            }
         }
         /*
          * Sample communication creation
@@ -86,6 +105,49 @@ public abstract class Unit
 
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
+        if(nextBot != null)
+        {
+            switch(nextBot)
+            {
+                case ALPHAARCHON:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new AlphaArchon(rc);
+                case BASEARCHON:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseArchon(rc);
+                case BASEGAURD:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseGaurd(rc);
+                case BASESCOUT:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseScout(rc);
+                case SCOUTINGSCOUT:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new ScoutingScout(rc);
+                case BASESOLDIER:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseSoldier(rc);
+                case BASETTM:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseTTM(rc);
+                case BASETURRET:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseTurret(rc);
+                case BASEVIPER:
+                    thisBot = nextBot;
+                    nextBot = null;
+                    return new BaseViper(rc);
+            }
+        }
+
         return current;
     }
 

@@ -17,6 +17,7 @@ public class ScoutingScout extends BaseScout {
     public ScoutingScout(RobotController rc)  {
         super(rc);
         move = new FlyingNavigator(rc);
+        rc.setIndicatorString(2, "Scouting");
     }
 
     @Override

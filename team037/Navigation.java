@@ -20,7 +20,6 @@ package team037;
  */
 
 import battlecode.common.*;
-import team037.JumpPoint;
 
 public class Navigation {
 
@@ -185,6 +184,11 @@ public class Navigation {
     public static boolean move(MapLocation goal) throws GameActionException {
         MapLocation currentLoc = rc.getLocation();
         boolean moved;
+
+        if (goal == null)
+        {
+            return false;
+        }
 
         if (!searching) {
             if (rc.isCoreReady()) {

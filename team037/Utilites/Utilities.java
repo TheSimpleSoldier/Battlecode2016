@@ -18,6 +18,7 @@ public class Utilities
             case BASEGAURD:
                 return RobotType.GUARD;
             case BASESCOUT:
+            case SCOUTINGSCOUT:
                 return RobotType.SCOUT;
             case BASESOLDIER:
                 return RobotType.SOLDIER;

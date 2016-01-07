@@ -12,10 +12,11 @@ public class BuildOrderCreation
     {
         Bots[][] buildOrder = {
                 {Bots.BASESCOUT, Bots.BASESOLDIER},
+                {Bots.SCOUTINGSCOUT, Bots.BASESOLDIER},
                 {Bots.BASEVIPER, Bots.BASESOLDIER},
-                {Bots.BASESOLDIER}
+                {Bots.BASESOLDIER, null}
         };
-        int[] times = {2, 3, 1000};
+        int[] times = {2, 1, 3, 1000};
 
         return new BuildOrder(buildOrder, times);
     }

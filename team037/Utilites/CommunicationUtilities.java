@@ -214,11 +214,11 @@ public class CommunicationUtilities
         current += buffer;
         if(message[0] == 0)
         {
-            message[0] = Integer.parseInt(current + buffer, 2);
+            message[0] = Integer.parseInt(current, 2);
         }
         else
         {
-            message[1] = Integer.parseInt(current + buffer, 2);
+            message[1] = Integer.parseInt(current, 2);
         }
 
         return message;
