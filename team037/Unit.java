@@ -4,7 +4,6 @@ import battlecode.common.*;
 import team037.DataStructures.Communication;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
-import team037.Units.*;
 
 public abstract class Unit
 {
@@ -107,45 +106,10 @@ public abstract class Unit
     {
         if(nextBot != null)
         {
-            switch(nextBot)
-            {
-                case ALPHAARCHON:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new AlphaArchon(rc);
-                case BASEARCHON:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseArchon(rc);
-                case BASEGAURD:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseGaurd(rc);
-                case BASESCOUT:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseScout(rc);
-                case SCOUTINGSCOUT:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new ScoutingScout(rc);
-                case BASESOLDIER:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseSoldier(rc);
-                case BASETTM:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseTTM(rc);
-                case BASETURRET:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseTurret(rc);
-                case BASEVIPER:
-                    thisBot = nextBot;
-                    nextBot = null;
-                    return new BaseViper(rc);
-            }
+            Unit toReturn = Bots.returnUnit(nextBot, rc);
+            thisBot = nextBot;
+            nextBot = null;
+            return toReturn;
         }
 
         return current;

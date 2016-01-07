@@ -7,7 +7,6 @@ import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
-import team037.Utilites.Utilities;
 
 public class BaseArchon extends Unit
 {
@@ -20,7 +19,7 @@ public class BaseArchon extends Unit
         super(rc);
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
-        nextType = Utilities.typeFromBot(nextBot);
+        nextType = Bots.typeFromBot(nextBot);
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -83,7 +82,7 @@ public class BaseArchon extends Unit
                     communication.bType1 = nextBot;
                     communicator.sendCommunication(2, communication);
                     nextBot = buildOrder.nextBot();
-                    nextType = Utilities.typeFromBot(nextBot);
+                    nextType = Bots.typeFromBot(nextBot);
                     return true;
                 }
             }

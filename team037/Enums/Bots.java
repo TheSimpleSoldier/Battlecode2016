@@ -1,5 +1,10 @@
 package team037.Enums;
 
+import battlecode.common.RobotController;
+import battlecode.common.RobotType;
+import team037.Unit;
+import team037.Units.*;
+
 /**
  * Created by joshua on 1/5/16.
  * One of each type of unit
@@ -57,6 +62,57 @@ public enum Bots
                 return ALPHAARCHON;
             case 8:
                 return SCOUTINGSCOUT;
+        }
+
+        return null;
+    }
+
+    public static RobotType typeFromBot(Bots bot)
+    {
+        switch(bot)
+        {
+            case ALPHAARCHON:
+            case BASEARCHON:
+                return RobotType.ARCHON;
+            case BASEGAURD:
+                return RobotType.GUARD;
+            case BASESCOUT:
+            case SCOUTINGSCOUT:
+                return RobotType.SCOUT;
+            case BASESOLDIER:
+                return RobotType.SOLDIER;
+            case BASETTM:
+                return RobotType.TTM;
+            case BASETURRET:
+                return RobotType.TURRET;
+            case BASEVIPER:
+                return RobotType.VIPER;
+        }
+        return null;
+    }
+
+    public static Unit returnUnit(Bots bot, RobotController rc)
+    {
+        switch(bot)
+        {
+            case ALPHAARCHON:
+                return new AlphaArchon(rc);
+            case BASEARCHON:
+                return new BaseArchon(rc);
+            case BASEGAURD:
+                return new BaseGaurd(rc);
+            case BASESCOUT:
+                return new BaseScout(rc);
+            case SCOUTINGSCOUT:
+                return new ScoutingScout(rc);
+            case BASESOLDIER:
+                return new BaseSoldier(rc);
+            case BASETTM:
+                return new BaseTTM(rc);
+            case BASETURRET:
+                return new BaseTurret(rc);
+            case BASEVIPER:
+                return new BaseViper(rc);
         }
 
         return null;
