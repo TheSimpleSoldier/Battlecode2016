@@ -34,7 +34,7 @@ public class FightMicroUtilites
         return rc.getLocation().directionTo(target);
     }
 
-    public static void moveDir(RobotController rc, Direction dir) throws GameActionException
+    public static void moveDir(RobotController rc, Direction dir, boolean clearRubble) throws GameActionException
     {
         if (rc.isCoreReady())
         {
