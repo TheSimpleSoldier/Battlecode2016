@@ -68,6 +68,10 @@ public class SlugNavigator extends Navigator
             return false;
         }
 
+        if (target == null) {
+            return false;
+        }
+
         MapLocation currentLocation = rc.getLocation();
         if (currentLocation.equals(target)) {
             return false;

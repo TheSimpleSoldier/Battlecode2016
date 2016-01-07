@@ -46,10 +46,10 @@ public class MapKnowledge {
             maxY = MapUtils.senseEdge(rc, Direction.SOUTH);
         }
         if (minX == Integer.MIN_VALUE) {
-            minX = MapUtils.senseEdge(rc, Direction.EAST);
+            minX = MapUtils.senseEdge(rc, Direction.WEST);
         }
         if (maxX == Integer.MIN_VALUE) {
-            maxX = MapUtils.senseEdge(rc, Direction.WEST);
+            maxX = MapUtils.senseEdge(rc, Direction.EAST);
         }
     }
 
@@ -57,7 +57,7 @@ public class MapKnowledge {
     public Communication packForMessage() {
         Communication communication = new Communication();
 
-        if (minX != Integer.MIN_VALUE && maxX != Integer.MAX_VALUE) {
+        if (minX != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE) {
             communication.val1 = 3;
             communication.loc1X = minX + MAP_ADD;
             communication.val2 = maxX - minX;
@@ -76,7 +76,7 @@ public class MapKnowledge {
         }
 
 
-        if (minY != Integer.MIN_VALUE && maxY != Integer.MAX_VALUE) {
+        if (minY != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE) {
             communication.val2 = 3;
             communication.loc1Y = minY + MAP_ADD;
             communication.val4 = maxY - minY;
@@ -97,6 +97,23 @@ public class MapKnowledge {
         return communication;
     }
 
+    public void setValueInDirection(int val, Direction d) {
+        switch (d) {
+            case NORTH:
+                minY = val;
+                break;
+            case SOUTH:
+                maxY = val;
+                break;
+            case WEST:
+                minX = val;
+                break;
+            case EAST:
+                maxX = val;
+                break;
+        }
+    }
+
     public void updateEdgesFromMessage(Communication communication) {
         int widthBit = communication.val1;
         int xCoord = communication.loc1X;
@@ -111,14 +128,14 @@ public class MapKnowledge {
             // we know nothing! (jon snow)
         } else if (widthBit == 1) {
             // we only have a endcoord
-            maxX = xCoord;
+            maxX = xCoord - MAP_ADD;
         } else if (widthBit == 2) {
             // we only have the startcoord
-            minX = xCoord;
+            minX = xCoord - MAP_ADD;
         } else if (widthBit == 3) {
             // we have both
-            minX = xCoord;
-            maxX = xCoord + width;
+            minX = xCoord - MAP_ADD;
+            maxX = xCoord - MAP_ADD + width;
         } else {
             System.out.println("control bit borked! in MapKnowledge");
         }
@@ -128,16 +145,21 @@ public class MapKnowledge {
             // w know nothing! (jon snow)
         } else if (heightBit == 1) {
             // we only have the endcoord
-            maxY = yCoord;
+            maxY = yCoord - MAP_ADD;
         } else if (heightBit == 2) {
             // we only have the start coord
-            minY = yCoord;
+            minY = yCoord - MAP_ADD;
         } else if (heightBit == 3) {
-            minY = yCoord;
-            maxY = yCoord + height;
+            minY = yCoord - MAP_ADD;
+            maxY = yCoord - MAP_ADD + height;
         } else {
             System.out.println("control bit borked! in MapKnowledge");
         }
+    }
+
+
+    public boolean mapBoundaryComplete() {
+        return minX != Integer.MIN_VALUE && minY != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
     }
 
 

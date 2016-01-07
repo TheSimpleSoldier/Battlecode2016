@@ -5,6 +5,7 @@ import team037.DataStructures.Communication;
 
 public abstract class Unit
 {
+    public static int turnCreated;
     public static RobotController rc;
     public static int range;
     public static RobotType type;
@@ -23,6 +24,10 @@ public abstract class Unit
     public static Navigator navigator;
     public static Communicator communicator;
 
+    public MapLocation locationLastTurn;
+    public MapLocation previousLocation;
+    public MapLocation currentLocation;
+
     public Unit()
     {
         // default constructor
@@ -40,6 +45,10 @@ public abstract class Unit
         fightMicro = new FightMicro(rc);
         navigator = new Navigator(rc);
         communicator = new Communicator(rc);
+        turnCreated = rc.getRoundNum();
+        locationLastTurn = rc.getLocation();
+        previousLocation = locationLastTurn;
+        currentLocation = locationLastTurn;
     }
 
     public boolean act() throws GameActionException {
@@ -87,6 +96,7 @@ public abstract class Unit
 
     public void collectData() throws GameActionException
     {
+
         nearByEnemies = rc.senseNearbyRobots(range, opponent);
         nearByAllies = rc.senseNearbyRobots(range, us);
 
@@ -95,5 +105,12 @@ public abstract class Unit
 
         nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
+
+        MapLocation newLoc = rc.getLocation();
+        locationLastTurn = currentLocation;
+        if (!newLoc.equals(currentLocation)) {
+            previousLocation = currentLocation;
+        }
+        currentLocation = newLoc;
     }
 }
