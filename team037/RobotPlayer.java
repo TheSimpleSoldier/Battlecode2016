@@ -28,7 +28,8 @@ public class RobotPlayer
         }
         else if (type == RobotType.SCOUT)
         {
-            unit = new BaseScout(rc);
+            //unit = new BaseScout(rc);
+            unit = new ScoutingScout(rc);
         }
         else if (type == RobotType.SOLDIER)
         {
