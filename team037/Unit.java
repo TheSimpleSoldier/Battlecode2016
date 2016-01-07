@@ -107,8 +107,8 @@ public abstract class Unit
         if(nextBot != null && nextBot != thisBot)
         {
             Unit toReturn = Bots.returnUnit(nextBot, rc);
-            thisBot = nextBot;
-            nextBot = null;
+            toReturn.thisBot = nextBot;
+            toReturn.nextBot = null;
             return toReturn;
         }
 
