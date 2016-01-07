@@ -69,10 +69,22 @@ public class Communication
         System.out.println("val2: " + val2);
         System.out.println("val3: " + val3);
         System.out.println("val4: " + val4);
-        System.out.println("rtype1: " + rType1.toString());
-        System.out.println("rtype2: " + rType2.toString());
-        System.out.println("btype1: " + bType1.toString());
-        System.out.println("btype2: " + bType2.toString());
+        if(rType1 != null)
+        {
+            System.out.println("rtype1: " + rType1.toString());
+        }
+        if(rType2 != null)
+        {
+            System.out.println("rtype2: " + rType2.toString());
+        }
+        if(bType1 != null)
+        {
+            System.out.println("btype1: " + bType1.toString());
+        }
+        if(bType2 != null)
+        {
+            System.out.println("btype2: " + bType2.toString());
+        }
         System.out.println("loc1: (" + loc1X + ", " + loc1Y + ")");
         System.out.println("loc2: (" + loc2X + ", " + loc2Y + ")");
     }

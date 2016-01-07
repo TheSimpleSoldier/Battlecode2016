@@ -60,14 +60,17 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         Communication[] communications = communicator.processCommunications();
+        for(int k = 0; k < communications.length; k++)
+        {
+            communications[k].printAll();
+        }
         /*
          * Sample communication creation
         Communication communication = new Communication();
-        communication.type = CommunicationType.DEN;
-        communication.id = 120;
-        communication.bType = RobotType.ZOMBIEDEN;
-        communication.x = 68;
-        communication.y = 52;
+        communication.opcode = CommunicationType.DEN;
+        communication.val1 = 120;
+        communication.loc1X = 68;
+        communication.loc1Y = 52;
         communicator.sendCommunication(100, communication);
          */
     }

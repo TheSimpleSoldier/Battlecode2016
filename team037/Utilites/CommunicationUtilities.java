@@ -11,7 +11,7 @@ import team037.Enums.CommunicationType;
  * Created by joshua on 1/5/16.
  * Translates between messages and communications
  */
-public class CommunicationUtilities2
+public class CommunicationUtilities
 {
     public static Communication readCommunication(Signal signal)
     {
@@ -158,58 +158,68 @@ public class CommunicationUtilities2
             case SZOMBIE:
             case SDEN:
             case SPARTS:
-                int[] values = {CommunicationType.toInt(communication.opcode),
+                int[] values = {
                 communication.val1, communication.loc1X, communication.loc1Y};
-                message = pack(values, CommTypeToSpacing.I_FORMAT_SPACING);
+                message = pack(communication.opcode, values, CommTypeToSpacing.I_FORMAT_SPACING);
                 break;
             //bi-format
             case ENEMY:
-                int[] values2 = {CommunicationType.toInt(communication.opcode),
+                int[] values2 = {
                 communication.val1, Utilities.intFromType(communication.rType1),
                 communication.loc1X, communication.loc1Y};
-                message = pack(values2, CommTypeToSpacing.BI_FORMAT_SPACING);
+                message = pack(communication.opcode, values2, CommTypeToSpacing.BI_FORMAT_SPACING);
                 break;
             //cm-format
             case CHANGEMISSION:
-                int[] values3 = {CommunicationType.toInt(communication.opcode),
+                int[] values3 = {
                 communication.val1, Bots.toInt(communication.bType1),
                 Bots.toInt(communication.bType2)};
-                message = pack(values3, CommTypeToSpacing.CM_FORMAT_SPACING);
+                message = pack(communication.opcode, values3, CommTypeToSpacing.CM_FORMAT_SPACING);
                 break;
             //im-format
             case INITIALMISSION:
-                int[] values4 = {CommunicationType.toInt(communication.opcode),
+                int[] values4 = {
                 communication.val1, Bots.toInt(communication.bType1)};
-                message = pack(values4, CommTypeToSpacing.IM_FORMAT_SPACING);
+                message = pack(communication.opcode, values4, CommTypeToSpacing.IM_FORMAT_SPACING);
                 break;
             //mk-format
             case MAP_BOUNDS:
-                int[] values5 = {CommunicationType.toInt(communication.opcode),
+                int[] values5 = {
                 communication.val1, communication.loc1X, communication.val2,
                 communication.val3, communication.loc1Y, communication.val4};
-                message = pack(values5, CommTypeToSpacing.MK_FORMAT_SPACING);
+                message = pack(communication.opcode, values5, CommTypeToSpacing.MK_FORMAT_SPACING);
         }
 
         return message;
     }
 
-    private static int[] pack(int[] values, int[] lenghts)
+    private static int[] pack(CommunicationType opcode, int[] values, int[] lengths)
     {
         int[] message = new int[2];
         String current = "";
+        current += createVal(CommunicationType.toInt(opcode), CommTypeToSpacing.opcodeSize);
         for(int k = 0; k < values.length; k++)
         {
-            if(current.length() + lenghts[k] > 31)
+            if(current.length() + lengths[k] > 31)
             {
                 String buffer = new String(new char[31 - current.length()]).replace('\0', '0');
-                message[0] = Integer.parseInt(current + buffer, 2);
+                current += buffer;
+                message[0] = Integer.parseInt(current, 2);
                 current = "";
             }
 
-            current += createVal(values[k], lenghts[k]);
+            current += createVal(values[k], lengths[k]);
         }
         String buffer = new String(new char[31 - current.length()]).replace('\0', '0');
-        message[1] = Integer.parseInt(current + buffer, 2);
+        current += buffer;
+        if(message[0] == 0)
+        {
+            message[0] = Integer.parseInt(current + buffer, 2);
+        }
+        else
+        {
+            message[1] = Integer.parseInt(current + buffer, 2);
+        }
 
         return message;
     }
@@ -218,7 +228,7 @@ public class CommunicationUtilities2
     {
         String str = Integer.toBinaryString(val);
         String buffer = new String(new char[length]).replace('\0', '0');
-        return (buffer + str).substring(length);
+        return (buffer + str).substring(str.length());
     }
 
     public static boolean shouldCommunicateSimple(Communication communication, int round)
