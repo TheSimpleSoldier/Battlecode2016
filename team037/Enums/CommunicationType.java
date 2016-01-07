@@ -47,4 +47,38 @@ public enum CommunicationType
         }
         return -1;
     }
+
+    public static CommunicationType fromInt(int val)
+    {
+        switch(val)
+        {
+            case 0:
+                return DEN;
+            case 1:
+                return PARTS;
+            case 2:
+                return ENEMY;
+            case 3:
+                return OENEMY;
+            case 4:
+                return CHANGEMISSION;
+            case 5:
+                return INITIALMISSION;
+            case 6:
+                return MAP_BOUNDS;
+            case 7:
+                return MAP_DENS;
+            case 8:
+                return SARCHON;
+            case 9:
+                return SENEMY;
+            case 10:
+                return SZOMBIE;
+            case 11:
+                return SDEN;
+            case 12:
+                return SPARTS;
+        }
+        return null;
+    }
 }

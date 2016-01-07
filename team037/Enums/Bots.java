@@ -31,4 +31,29 @@ public enum Bots
         }
         return -1;
     }
+
+    public static Bots fromInt(int value)
+    {
+        switch(value)
+        {
+            case 0:
+                return BASEARCHON;
+            case 1:
+                return BASEGAURD;
+            case 2:
+                return BASESCOUT;
+            case 3:
+                return BASESOLDIER;
+            case 4:
+                return BASETTM;
+            case 5:
+                return BASETURRET;
+            case 6:
+                return BASEVIPER;
+            case 7:
+                return ALPHAARCHON;
+        }
+
+        return null;
+    }
 }
