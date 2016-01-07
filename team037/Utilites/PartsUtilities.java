@@ -31,6 +31,13 @@ public class PartsUtilities
                 }
             }
         }
+
+        RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);
+
+        for (int i = neutralBots.length; --i>=0; ) {
+            parts.add(neutralBots[i].location);
+        }
+
         return parts;
     }
 
