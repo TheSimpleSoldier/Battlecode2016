@@ -1,11 +1,13 @@
 package team037.Enums;
 
+import team037.Messages.*;
+
 /**
  * Created by joshua on 1/5/16.
  */
 public enum CommunicationType
 {
-    DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, INITIALMISSION, MAP_BOUNDS, MAP_DENS,
+    DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
     SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS;
 
     public static int toInt(CommunicationType type)
@@ -22,22 +24,18 @@ public enum CommunicationType
                 return 3;
             case CHANGEMISSION:
                 return 4;
-            case INITIALMISSION:
-                return 5;
             case MAP_BOUNDS:
-                return 6;
-            case MAP_DENS:
-                return 7;
+                return 5;
             case SARCHON:
-                return 8;
+                return 6;
             case SENEMY:
-                return 9;
+                return 7;
             case SZOMBIE:
-                return 10;
+                return 8;
             case SDEN:
-                return 11;
+                return 9;
             case SPARTS:
-                return 12;
+                return 10;
         }
         return -1;
     }
@@ -57,22 +55,48 @@ public enum CommunicationType
             case 4:
                 return CHANGEMISSION;
             case 5:
-                return INITIALMISSION;
-            case 6:
                 return MAP_BOUNDS;
-            case 7:
-                return MAP_DENS;
-            case 8:
+            case 6:
                 return SARCHON;
-            case 9:
+            case 7:
                 return SENEMY;
-            case 10:
+            case 8:
                 return SZOMBIE;
-            case 11:
+            case 9:
                 return SDEN;
-            case 12:
+            case 10:
                 return SPARTS;
         }
+        return null;
+    }
+
+    public static Communication getCommunication(CommunicationType opcode)
+    {
+        switch(opcode)
+        {
+            //BotInfoCommunication
+            case DEN:
+            case ENEMY:
+                return new BotInfoCommunication();
+            //SimpleBotInfoCommunication
+            case OENEMY:
+            case SARCHON:
+            case SENEMY:
+            case SPARTS:
+            case SZOMBIE:
+            case SDEN:
+                return new SimpleBotInfoCommunication();
+            //PartsCommunication
+            case PARTS:
+                return new PartsCommunication();
+            //MissionCommunication
+            case CHANGEMISSION:
+                return new MissionCommunication();
+            //MapBoundsCommunication
+            case MAP_BOUNDS:
+                return new MapBoundsCommunication();
+        }
+
         return null;
     }
 }
