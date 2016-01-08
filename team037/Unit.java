@@ -23,6 +23,7 @@ public abstract class Unit
     public static FightMicro fightMicro;
     public static Navigator navigator;
     public static Communicator communicator;
+    public static int id;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -37,6 +38,7 @@ public abstract class Unit
     {
         rc = robotController;
         type = rc.getType();
+        id = rc.getID();
         range = type.attackRadiusSquared;
         sightRange = type.sensorRadiusSquared;
         us = rc.getTeam();
