@@ -4,7 +4,6 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import team037.DataStructures.AppendOnlyMapLocationArray;
-import team037.SlugNavigator;
 import team037.Utilites.PartsUtilities;
 
 public class AlphaArchon extends BaseArchon
@@ -17,7 +16,7 @@ public class AlphaArchon extends BaseArchon
     {
         super(rc);
 //        move = new SlugNavigator(rc);
-        parts = PartsUtilities.findPartsICanSenseNotImpassible(rc);
+        parts = PartsUtilities.findPartsAndNeutralsICanSenseNotImpassible(rc);
         partsIdx = 0;
         navigator.setTarget(getNextPartLocation());
 //        move.setTarget(getNextPartLocation());
@@ -25,7 +24,7 @@ public class AlphaArchon extends BaseArchon
 
     private MapLocation getNextPartLocation() {
         if (partsIdx >= parts.length) {
-            parts = PartsUtilities.findPartsICanSenseNotImpassible(rc);
+            parts = PartsUtilities.findPartsAndNeutralsICanSenseNotImpassible(rc);
         }
         if (parts.length == 0) {
             return null;
