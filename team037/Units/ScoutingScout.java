@@ -3,6 +3,7 @@ package team037.Units;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
+import battlecode.common.RobotType;
 import team037.FlyingNavigator;
 import team037.MapKnowledge;
 import team037.Utilites.MapUtils;
@@ -21,8 +22,23 @@ public class ScoutingScout extends BaseScout {
 
     @Override
     public boolean act() throws GameActionException {
-        if(discoverEdges()) {
+        if (fight());
+        else if (fightZombies());
+        else if(discoverEdges()) {
             return true;
+        }
+        else if (discoverEnemyArchons());
+        return false;
+    }
+
+    private boolean discoverEnemyArchons() throws GameActionException
+    {
+        for (int i = enemies.length; --i>=0; )
+        {
+            if (enemies[i].type == RobotType.ARCHON)
+            {
+
+            }
         }
         return false;
     }
