@@ -1,9 +1,6 @@
 package team037.Units;
 
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
@@ -16,6 +13,7 @@ public class BaseArchon extends Unit
     private BuildOrder buildOrder;
     Bots nextBot;
     RobotType nextType;
+    RobotInfo[] neutralBots;
 
     public BaseArchon(RobotController rc)
     {
@@ -30,41 +28,60 @@ public class BaseArchon extends Unit
         return navigator.takeNextStep();
     }
 
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+        neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
+    }
+
     public boolean fight() throws GameActionException
     {
-        return false;
+        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean fightZombies() throws GameActionException
     {
+        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+    }
+
+    public boolean healNearbyAllies() throws GameActionException {
+        // precondition
+        if (nearByAllies.length == 0) {
+            return false;
+        }
+
+        double weakestHealth = 9999;
+        RobotInfo weakest = null;
+
+        for (int i = nearByAllies.length; --i>=0; )
+        {
+            double health = nearByAllies[i].health;
+            if (health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) < RobotType.ARCHON.attackRadiusSquared)
+            {
+                if (health < weakestHealth)
+                {
+                    weakestHealth = health;
+                    weakest = nearByAllies[i];
+                }
+            }
+        }
+
+        if (weakest != null)
+        {
+            rc.repair(weakest.location);
+            return true;
+        }
         return false;
     }
 
     // maybe spawn a unit or repair a damaged unit
     public boolean carryOutAbility() throws GameActionException
     {
-        if (nearByAllies.length > 0)
+        healNearbyAllies();
+
+        if (neutralBots.length > 0)
         {
-            double weakestHealth = 9999;
-            RobotInfo weakest = null;
-
-            for (int i = nearByAllies.length; --i>=0; )
-            {
-                double health = nearByAllies[i].health;
-                if (health < nearByAllies[i].maxHealth)
-                {
-                    if (health < weakestHealth)
-                    {
-                        weakestHealth = health;
-                        weakest = nearByAllies[i];
-                    }
-                }
-            }
-
-            if (weakest != null)
-            {
-                rc.repair(weakest.location);
-            }
+            rc.activate(neutralBots[0].location);
         }
 
         if(rc.hasBuildRequirements(nextType) && rc.getCoreDelay() < 1)

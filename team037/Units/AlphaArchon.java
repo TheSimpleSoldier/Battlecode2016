@@ -16,7 +16,7 @@ public class AlphaArchon extends BaseArchon
     {
         super(rc);
 //        move = new SlugNavigator(rc);
-        parts = PartsUtilities.findPartsICanSenseNotImpassible(rc);
+        parts = PartsUtilities.findPartsAndNeutralsICanSenseNotImpassible(rc);
         partsIdx = 0;
         navigator.setTarget(getNextPartLocation());
 //        move.setTarget(getNextPartLocation());
@@ -24,7 +24,7 @@ public class AlphaArchon extends BaseArchon
 
     private MapLocation getNextPartLocation() {
         if (partsIdx >= parts.length) {
-            parts = PartsUtilities.findPartsICanSenseNotImpassible(rc);
+            parts = PartsUtilities.findPartsAndNeutralsICanSenseNotImpassible(rc);
         }
         if (parts.length == 0) {
             return null;
@@ -39,6 +39,9 @@ public class AlphaArchon extends BaseArchon
         if (rc.isCoreReady() && carryOutAbility()) {
             return true;
         }
+        if (fight());
+        else if (fightZombies());
+        else if (carryOutAbility());
         if(rc.getLocation().equals(navigator.getTarget())) {
             navigator.setTarget(getNextPartLocation());
         }

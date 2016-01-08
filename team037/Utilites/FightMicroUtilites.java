@@ -11,7 +11,7 @@ public class FightMicroUtilites
     {
         RobotInfo weakest = nearByEnemies[nearByEnemies.length - 1];
 
-        for (int i = nearByEnemies.length-1; --i > 0; )
+        for (int i = nearByEnemies.length-1; --i >= 0; )
         {
             if (nearByEnemies[i] == null)
             {
@@ -28,10 +28,13 @@ public class FightMicroUtilites
 
     public static Direction getDir(RobotController rc, MapLocation target)
     {
+        if (target == null)
+            return Direction.NONE;
+
         return rc.getLocation().directionTo(target);
     }
 
-    public static void moveDir(RobotController rc, Direction dir) throws GameActionException
+    public static void moveDir(RobotController rc, Direction dir, boolean clearRubble) throws GameActionException
     {
         if (rc.isCoreReady())
         {
@@ -46,6 +49,18 @@ public class FightMicroUtilites
             else if (rc.canMove(dir.rotateRight()))
             {
                 rc.move(dir.rotateRight());
+            }
+            else if (clearRubble && rc.senseRubble(rc.getLocation().add(dir)) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                rc.clearRubble(dir);
+            }
+            else if (clearRubble && rc.senseRubble(rc.getLocation().add(dir.rotateLeft())) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                rc.clearRubble(dir.rotateLeft());
+            }
+            else if (clearRubble && rc.senseRubble(rc.getLocation().add(dir.rotateRight())) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                rc.clearRubble(dir.rotateRight());
             }
         }
     }

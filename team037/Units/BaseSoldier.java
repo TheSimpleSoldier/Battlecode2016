@@ -12,6 +12,11 @@ public class BaseSoldier extends Unit
 
     public boolean takeNextStep() throws GameActionException
     {
+        if (target == null || rc.getLocation() == target)
+        {
+            target = rc.getLocation().add(dirs[(int) (Math.random() * 8)], 5);
+            navigator.setTarget(target);
+        }
         return navigator.takeNextStep();
     }
 
@@ -22,7 +27,7 @@ public class BaseSoldier extends Unit
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
+        return fightMicro.basicNetZombieFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
 
     public boolean carryOutAbility() throws GameActionException

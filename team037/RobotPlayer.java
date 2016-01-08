@@ -62,6 +62,10 @@ public class RobotPlayer
             unit = new BaseViper(rc);
             unit.thisBot = Bots.BASEVIPER;
         }
+        else if (type == RobotType.VIPER)
+        {
+            unit = new BaseViper(rc);
+        }
 
         // initial update to strategy
         try
