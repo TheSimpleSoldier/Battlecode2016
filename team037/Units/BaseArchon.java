@@ -16,6 +16,7 @@ public class BaseArchon extends Unit
     private BuildOrder buildOrder;
     Bots nextBot;
     RobotType nextType;
+    RobotInfo[] neutralBots;
 
     public BaseArchon(RobotController rc)
     {
@@ -28,6 +29,12 @@ public class BaseArchon extends Unit
     public boolean takeNextStep() throws GameActionException
     {
         return navigator.takeNextStep();
+    }
+
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+        neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
     }
 
     public boolean fight() throws GameActionException
@@ -65,6 +72,11 @@ public class BaseArchon extends Unit
             {
                 rc.repair(weakest.location);
             }
+        }
+
+        if (neutralBots.length > 0)
+        {
+            rc.activate(neutralBots[0].location);
         }
 
         if(rc.hasBuildRequirements(nextType) && rc.getCoreDelay() < 1)
