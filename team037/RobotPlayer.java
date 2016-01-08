@@ -4,13 +4,13 @@ import battlecode.common.Clock;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.Enums.Bots;
+import team037.Enums.Strategies;
 import team037.Units.*;
 
 public class RobotPlayer
 {
     private static Unit unit;
 
-    public static final String CASTLE = "castle";
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
@@ -25,7 +25,7 @@ public class RobotPlayer
 
         if (type == RobotType.ARCHON)
         {
-            if (strategy.equals(CASTLE)) {
+            if (strategy.equals(Strategies.CASTLE)) {
                 unit = new CastleArchon(rc);
             }
             //unit = new BaseArchon(rc);

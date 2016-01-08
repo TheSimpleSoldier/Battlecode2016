@@ -9,10 +9,17 @@ public class CastleArchon extends BaseArchon {
 
     private SlugNavigator move;
     private MapLocation home;
+    private int numSoliders = 0;
+    private int numTurrets = 0;
 
     public CastleArchon(RobotController rc) {
         super(rc);
         move = new SlugNavigator(rc);
+    }
+
+    @Override
+    public boolean takeNextStep() throws GameActionException {
+        return false;
     }
 
     @Override
@@ -24,6 +31,7 @@ public class CastleArchon extends BaseArchon {
 
 
         if (moveAwayFromFriendlyArchons()) ;
+        else if (spawnIfNeeded()) ;
         else {
             return false;
         }
@@ -50,7 +58,7 @@ public class CastleArchon extends BaseArchon {
     private AppendOnlyMapLocationArray getFriendlyArchonsInSight() {
         RobotInfo[] allies = nearByAllies;
         AppendOnlyMapLocationArray archonLocs = new AppendOnlyMapLocationArray();
-        for (int i = allies.length; -- i >= 0;) {
+        for (int i = allies.length; --i >= 0;) {
             if (allies[i].type == RobotType.ARCHON) {
                 archonLocs.add(allies[i].location);
             }
@@ -86,20 +94,58 @@ public class CastleArchon extends BaseArchon {
     }
 
 
-    private boolean spawnIfNeeded() {
-        if (rc.hasBuildRequirements(RobotType.SOLDIER)) {
+    private boolean spawnIfNeeded() throws GameActionException {
+        // prereqs
+        if (rc.getTeamParts() < RobotType.SOLDIER.partCost) {
+            return false;
+        }
+        countFriendlyTypes();
+        if (numSoliders < 10 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
+            Direction spawnDir = MapUtils.getRCCanMoveDirection(this);
+            if (!spawnDir.equals(Direction.NONE) && rc.canBuild(spawnDir, RobotType.SOLDIER)) {
+                rc.build(spawnDir, RobotType.SOLDIER);
+                return true;
+            }
+        }
 
+        if (numTurrets < 4 && rc.hasBuildRequirements(RobotType.TURRET)) {
+            Direction spawnDir = MapUtils.getRCCanMoveDirection(this);
+            if (!spawnDir.equals(Direction.NONE) && rc.canBuild(spawnDir, RobotType.TURRET)) {
+                rc.build(spawnDir, RobotType.TURRET);
+                return true;
+            }
+        }
+
+        if (numSoliders < 20 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
+            Direction spawnDir = MapUtils.getRCCanMoveDirection(this);
+            if (!spawnDir.equals(Direction.NONE) && rc.canBuild(spawnDir, RobotType.SOLDIER)) {
+                rc.build(spawnDir, RobotType.SOLDIER);
+                return true;
+            }
         }
         return false;
     }
 
 
     private void countFriendlyTypes() {
-        int numSoldiers = 0;
-        int numTurrets = 0;
-        for (int i = nearByAllies.length; --i > 0;) {
-
+        int numS = 0;
+        int numT = 0;
+        for (int i = nearByAllies.length; --i >= 0;) {
+            if (nearByAllies[i].type == RobotType.SOLDIER) {
+                numS += 1;
+            } else if (nearByAllies[i].type == RobotType.TURRET || nearByAllies[i].type == RobotType.TTM) {
+                numT += 1;
+            }
         }
+        numSoliders = numS;
+        numTurrets = numT;
+    }
+
+
+    private boolean healBuddies() {
+
+
+        return false;
     }
 
 }

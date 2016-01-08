@@ -106,4 +106,26 @@ public class MapUtils
         return toReturn;
     }
 
+
+    /**
+     * returns a direction that this unit can move in
+     * @param unit
+     * @return
+     */
+    public static Direction getRCCanMoveDirection(Unit unit) {
+        Direction toMove = Direction.NORTH;
+        int i = 7;
+        do {
+            if (unit.rc.canMove(toMove)) {
+                break;
+            }
+            toMove = toMove.rotateLeft();
+        } while (--i >= 0);
+
+        if (i <= 0) {
+            return Direction.NONE;
+        }
+
+        return toMove;
+    }
 }
