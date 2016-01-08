@@ -44,32 +44,40 @@ public class BaseArchon extends Unit
         return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
+    public boolean healNearbyAllies() throws GameActionException {
+        // precondition
+        if (nearByAllies.length == 0) {
+            return false;
+        }
+
+        double weakestHealth = 9999;
+        RobotInfo weakest = null;
+
+        for (int i = nearByAllies.length; --i>=0; )
+        {
+            double health = nearByAllies[i].health;
+            if (health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) < RobotType.ARCHON.attackRadiusSquared)
+            {
+                if (health < weakestHealth)
+                {
+                    weakestHealth = health;
+                    weakest = nearByAllies[i];
+                }
+            }
+        }
+
+        if (weakest != null)
+        {
+            rc.repair(weakest.location);
+            return true;
+        }
+        return false;
+    }
+
     // maybe spawn a unit or repair a damaged unit
     public boolean carryOutAbility() throws GameActionException
     {
-        if (nearByAllies.length > 0)
-        {
-            double weakestHealth = 9999;
-            RobotInfo weakest = null;
-
-            for (int i = nearByAllies.length; --i>=0; )
-            {
-                double health = nearByAllies[i].health;
-                if (health < nearByAllies[i].maxHealth)
-                {
-                    if (health < weakestHealth)
-                    {
-                        weakestHealth = health;
-                        weakest = nearByAllies[i];
-                    }
-                }
-            }
-
-            if (weakest != null)
-            {
-                rc.repair(weakest.location);
-            }
-        }
+        healNearbyAllies();
 
         if (neutralBots.length > 0)
         {
