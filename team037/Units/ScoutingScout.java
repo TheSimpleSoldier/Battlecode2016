@@ -36,7 +36,12 @@ public class ScoutingScout extends BaseScout {
             if (enemies[i].type == RobotType.ARCHON) {
                 mapKnowledge.addEnemyArchon(enemies[i]);
                 int msg = mapKnowledge.getArchonMessage();
+
+                msg = enemies[i].location.x;
+                msg *= 100000;
+                msg += enemies[i].location.y;
                 rc.setIndicatorString(1, "msg: " + msg);
+                rc.setIndicatorString(2, "enemyArchon x:" + enemies[i].location.x + " y:" + enemies[i].location.y);
                 rc.broadcastMessageSignal(msg, msg, 2500);
             }
         }
