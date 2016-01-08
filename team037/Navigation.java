@@ -197,7 +197,6 @@ public class Navigation {
         boolean moved;
         MapLocation currentLoc = rc.getLocation();
         if (goal != null) {
-
             if (!searching) {
                 if (rc.isCoreReady()) {
                     // We can move this round; attempt to move.

@@ -1,9 +1,10 @@
 package team037;
 
-import battlecode.common.*;
+import battlecode.common.Clock;
+import battlecode.common.RobotController;
+import battlecode.common.RobotType;
+import team037.Enums.Bots;
 import team037.Units.*;
-
-import java.util.Random;
 
 public class RobotPlayer
 {
@@ -29,27 +30,37 @@ public class RobotPlayer
             }
             //unit = new BaseArchon(rc);
             unit = new AlphaArchon(rc);
+            unit.thisBot = Bots.ALPHAARCHON;
         }
         else if (type == RobotType.GUARD)
         {
             unit = new BaseGaurd(rc);
+            unit.thisBot = Bots.BASEGAURD;
         }
         else if (type == RobotType.SCOUT)
         {
-            //unit = new BaseScout(rc);
-            unit = new ScoutingScout(rc);
+            unit = new BaseScout(rc);
+            unit.thisBot = Bots.BASESCOUT;
         }
         else if (type == RobotType.SOLDIER)
         {
             unit = new BaseSoldier(rc);
+            unit.thisBot = Bots.BASESOLDIER;
         }
         else if (type == RobotType.TURRET)
         {
             unit = new BaseTurret(rc);
+            unit.thisBot = Bots.BASETURRET;
         }
         else if (type == RobotType.TTM)
         {
             unit = new BaseTTM(rc);
+            unit.thisBot = Bots.BASETTM;
+        }
+        else if (type == RobotType.VIPER)
+        {
+            unit = new BaseViper(rc);
+            unit.thisBot = Bots.BASEVIPER;
         }
 
         // initial update to strategy

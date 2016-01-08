@@ -1,6 +1,9 @@
 package team037;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 import team037.DataStructures.AppendOnlyMapLocationSet;
 import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;

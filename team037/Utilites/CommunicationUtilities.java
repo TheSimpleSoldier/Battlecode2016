@@ -2,7 +2,6 @@ package team037.Utilites;
 
 import battlecode.common.MapLocation;
 import battlecode.common.Signal;
-import team037.DataStructures.CommTypeToSpacing;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;
@@ -13,7 +12,7 @@ import team037.Messages.SimpleBotInfoCommunication;
  */
 public class CommunicationUtilities
 {
-    public static int opcodeSize = 5;
+    public static int opcodeSize = 4;
     public static int valSize = 15;
     public static int typeSize = 4;
     public static int botSize = 8;
@@ -26,7 +25,7 @@ public class CommunicationUtilities
     {
         int[] message = signal.getMessage();
         CommunicationType opcode = CommunicationType.fromInt(
-                extractVal(message[0], 1, CommTypeToSpacing.opcodeSize));
+                extractVal(message[0], 1, opcodeSize));
         Communication communication = CommunicationType.getCommunication(opcode);
         communication.setValues(unpack(message, communication.getLengths()));
         return communication;
@@ -36,13 +35,13 @@ public class CommunicationUtilities
     {
         int[] toReturn = new int[lengths.length];
         int current = message[0];
-        int loc = 5;
+        int loc = 1;
         for(int k = 0; k < lengths.length; k++)
         {
             if(loc + lengths[k] > 32)
             {
                 current = message[1];
-                loc = 0;
+                loc = 1;
             }
 
             toReturn[k] = extractVal(current, loc, lengths[k]);
@@ -130,11 +129,11 @@ public class CommunicationUtilities
         current += buffer;
         if(message[0] == 0)
         {
-            message[0] = Integer.parseInt(current + buffer, 2);
+            message[0] = Integer.parseInt(current, 2);
         }
         else
         {
-            message[1] = Integer.parseInt(current + buffer, 2);
+            message[1] = Integer.parseInt(current, 2);
         }
 
         return message;
