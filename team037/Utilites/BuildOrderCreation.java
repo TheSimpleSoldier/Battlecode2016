@@ -18,6 +18,11 @@ public class BuildOrderCreation
         };
         int[] times = {2, 1, 3, 1000};
 
-        return new BuildOrder(buildOrder, times);
+        Bots[][] buildOrderSoldiers = {
+                {Bots.BASESOLDIER}
+        };
+        int[] times2 = {10000};
+
+        return new BuildOrder(buildOrderSoldiers, times2);
     }
 }

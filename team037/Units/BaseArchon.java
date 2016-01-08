@@ -1,9 +1,6 @@
 package team037.Units;
 
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
@@ -39,12 +36,12 @@ public class BaseArchon extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return false;
+        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return false;
+        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     // maybe spawn a unit or repair a damaged unit
