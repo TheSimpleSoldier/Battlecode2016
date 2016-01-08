@@ -2,7 +2,6 @@ package team037.Utilites;
 
 import battlecode.common.MapLocation;
 import battlecode.common.Signal;
-import team037.DataStructures.CommTypeToSpacing;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;
@@ -26,7 +25,7 @@ public class CommunicationUtilities
     {
         int[] message = signal.getMessage();
         CommunicationType opcode = CommunicationType.fromInt(
-                extractVal(message[0], 1, CommTypeToSpacing.opcodeSize));
+                extractVal(message[0], 1, opcodeSize));
         Communication communication = CommunicationType.getCommunication(opcode);
         communication.setValues(unpack(message, communication.getLengths()));
         return communication;
