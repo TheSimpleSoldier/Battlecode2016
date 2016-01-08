@@ -1,8 +1,7 @@
-package team037.DataStructures;
+package team037.Messages;
 
-import battlecode.common.RobotType;
-import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Utilites.CommunicationUtilities;
 
 /**
  * Created by joshua on 1/6/16.
@@ -43,49 +42,26 @@ import team037.Enums.CommunicationType;
 public class Communication
 {
     public CommunicationType opcode;
-    public int val1;
-    public int val2;
-    public int val3;
-    public int val4;
-    public RobotType rType1;
-    public RobotType rType2;
-    public Bots bType1;
-    public Bots bType2;
-    public int loc1X;
-    public int loc1Y;
-    public int loc2X;
-    public int loc2Y;
 
     //Prints values by opcode
     public void print()
     {
+        System.out.println("opcode: " + opcode.toString());
     }
 
-    //Prints all values
-    public void printAll()
+    public int[] getValues()
     {
-        System.out.println("opcode: " + opcode.toString());
-        System.out.println("val1: " + val1);
-        System.out.println("val2: " + val2);
-        System.out.println("val3: " + val3);
-        System.out.println("val4: " + val4);
-        if(rType1 != null)
-        {
-            System.out.println("rtype1: " + rType1.toString());
-        }
-        if(rType2 != null)
-        {
-            System.out.println("rtype2: " + rType2.toString());
-        }
-        if(bType1 != null)
-        {
-            System.out.println("btype1: " + bType1.toString());
-        }
-        if(bType2 != null)
-        {
-            System.out.println("btype2: " + bType2.toString());
-        }
-        System.out.println("loc1: (" + loc1X + ", " + loc1Y + ")");
-        System.out.println("loc2: (" + loc2X + ", " + loc2Y + ")");
+        return new int[]{CommunicationType.toInt(opcode)};
     }
+
+    public void setValues(int[] values)
+    {
+        opcode = CommunicationType.fromInt(values[0]);
+    }
+
+    public int[] getLengths()
+    {
+        return new int[]{CommunicationUtilities.opcodeSize};
+    }
+
 }
