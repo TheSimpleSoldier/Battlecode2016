@@ -25,11 +25,6 @@ public class BaseSoldier extends Unit
         return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
 
-    public Unit getNewStrategy(Unit current) throws GameActionException
-    {
-        return current;
-    }
-
     public boolean carryOutAbility() throws GameActionException
     {
         return false;
