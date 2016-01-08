@@ -1,6 +1,7 @@
 package team037.Utilites;
 
 import battlecode.common.RobotType;
+import battlecode.common.Team;
 import team037.Enums.Bots;
 
 /**
@@ -97,4 +98,33 @@ public class Utilities
         return -1;
     }
 
+    public static int intFromTeam(Team team)
+    {
+        switch(team)
+        {
+            case A:
+                return 0;
+            case B:
+                return 1;
+            case ZOMBIE:
+                return 2;
+        }
+
+        return -1;
+    }
+
+    public static Team teamFromInt(int team)
+    {
+        switch(team)
+        {
+            case 0:
+                return Team.A;
+            case 1:
+                return Team.B;
+            case 2:
+                return Team.ZOMBIE;
+        }
+
+        return null;
+    }
 }

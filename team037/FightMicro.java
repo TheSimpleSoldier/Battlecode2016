@@ -350,7 +350,7 @@ public class FightMicro
             }
 
             if (rc.isCoreReady() && cluster) {
-                rc.setIndicatorString(2, "clustrer");
+                rc.setIndicatorString(2, "cluster");
                 MapLocation ally = new MapLocation(ally_x, ally_y);
                 dir = rc.getLocation().directionTo(ally);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
