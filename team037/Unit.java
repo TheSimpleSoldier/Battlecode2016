@@ -1,9 +1,10 @@
 package team037;
 
 import battlecode.common.*;
-import team037.DataStructures.Communication;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
+import team037.Messages.MissionCommunication;
 
 public abstract class Unit
 {
@@ -75,31 +76,15 @@ public abstract class Unit
         Communication[] communications = communicator.processCommunications();
         for(int k = 0; k < communications.length; k++)
         {
-            if(communications[k].opcode == CommunicationType.INITIALMISSION &&
-               communications[k].val1 == rc.getID())
-            {
-                System.out.println("getting message");
-                nextBot = communications[k].bType1;
-            }
-
             if(communications[k].opcode == CommunicationType.CHANGEMISSION)
             {
-                if(communications[k].val1 == rc.getID() ||
-                   (communications[k].val1 == 0 && communications[k].bType1 == thisBot))
+                MissionCommunication comm = (MissionCommunication) communications[k];
+                if(comm.id == rc.getID())
                 {
-                    nextBot = communications[k].bType2;
+                    nextBot = comm.newBType;
                 }
             }
         }
-        /*
-         * Sample communication creation
-        Communication communication = new Communication();
-        communication.opcode = CommunicationType.DEN;
-        communication.val1 = 120;
-        communication.loc1X = 68;
-        communication.loc1Y = 52;
-        communicator.sendCommunication(100, communication);
-         */
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException

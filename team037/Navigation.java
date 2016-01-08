@@ -27,24 +27,31 @@ public class Navigation {
     static Multimap multimap;  // Priority multimap for the current search.
     static boolean searching, reachedGoal;  // Flags for search status
     static final int bytecodeLimit = 1300; // Bytecode limit
-    static int range;
-    static RobotController rc;
-    static JumpPoint pathStart, lastPath, lastPt, myLoc, goalJP;
+    static RobotController rc = null;
+    static JumpPoint pathStart, lastPt, myLoc, goalJP;
 
+    /**
+     * Initializes variables navigation relies on. Will only initialize once per game.
+     * @param rc_in unit's RobotController instance
+     */
     public static void initialize(RobotController rc_in) {
-        rc = rc_in;
-        map = new Map(rc);
-        range = 3;
+        if (rc == null) {
+            rc = rc_in;
+            map = new Map(rc);
 
-        reachedGoal = false;
-        searching = false;
-        multimap = null;
-        lastPt = null;
-        goalJP = null;
-        int[] getMyLoc = map.mapToArray(rc.getLocation());
-        myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
+            reachedGoal = false;
+            searching = false;
+            multimap = null;
+            lastPt = null;
+            goalJP = null;
+            int[] getMyLoc = map.mapToArray(rc.getLocation());
+            myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
+        }
     }
 
+    /**
+     * Reset variables for new search.
+     */
     public static void reset() {
         reachedGoal = false;
         searching = false;
@@ -55,34 +62,16 @@ public class Navigation {
         myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
     }
 
-
-    public static boolean takePath(MapLocation front, MapLocation left, MapLocation right, MapLocation goal) {
-        boolean takePath = false;
-
-        if (goalJP != null) {
-
-            int distance = goalJP.f;
-
-            // find number of turns it takes to dig to goal
-            int turnsToDig = 100;
-
-            if (distance < turnsToDig) {
-                takePath = true;
-            }
-        }
-
-        return takePath;
-    }
-
     /**
      * Attempt to bug towards the goal. If rubble blocks the way, do not move.
      *
-     * @param goal
-     * @return
+     * @param currentLoc current location of unit
+     * @param goal unit's target location
+     * @return True if unit moved, false otherwise
      */
     public static boolean tryBug(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
-        rc.setIndicatorString(0, "Using bug movement");
+//        rc.setIndicatorString(0, "Using bug movement");
         boolean moved;
 
         Direction forward = currentLoc.directionTo(goal);
@@ -108,16 +97,19 @@ public class Navigation {
             right = right.rotateRight();
             if (rc.canMove(right)) {
                 rc.move(right);
+                moved = true;
             } else if (rc.canMove(left)) {
                 rc.move(left);
+                moved = true;
             } else if (rc.canMove(right.rotateRight())) {
                 rc.move(right.rotateRight());
-            } else if (rc.canMove(left.rotateLeft())) {
-                rc.move(left.rotateLeft());
+                moved = true;
             } else if (rc.canMove(forward.opposite())) {
                 rc.move(forward.opposite());
+                moved = true;
+            } else {
+                moved = false;
             }
-            moved = false;
         } else {
             moved = false;
         }
@@ -125,8 +117,14 @@ public class Navigation {
         return moved;
     }
 
+    /**
+     * Attempt to move along a path returned by a completed search.
+     * @param currentLoc unit's current location
+     * @return True if unit moved, false otherwise
+     * @throws GameActionException
+     */
     public static boolean tryPath(MapLocation currentLoc) throws GameActionException {
-        rc.setIndicatorString(0, "Using Path");
+//        rc.setIndicatorString(0, "Using Path");
         boolean moved = false;
 
         if (lastPt != null && lastPt.mapNext != null) {
@@ -147,10 +145,9 @@ public class Navigation {
                     rc.move(forward);
                     myLoc.move(direction);
                     moved = true;
+                } else if (rc.isLocationOccupied(currentLoc.add(forward))) {
+                    moved = handleTrafficOnPath(currentLoc, forward, direction, nextPt);
                 }
-//                else if (rc.isLocationOccupied(currentLoc.add(forward))) {
-//                    moved = false;
-//                }
             }
         }
         return moved;
@@ -177,66 +174,114 @@ public class Navigation {
         } else if (rubbleFront > 50) {
             rc.clearRubble(forward);
         } else {
-            // Traffic jam?
+            Direction right90 = right.rotateRight();
+            Direction right135 = right90.rotateRight();
+            double rubbleRight90 = rc.senseRubble(currentLoc.add(right90));
+            double rubbleRight135 = rc.senseRubble(currentLoc.add(right135));
+
+            if (rubbleRight90 > 50) {
+                rc.clearRubble(right);
+            } else if (rubbleRight135 > 50) {
+                rc.clearRubble(right);
+            }
         }
     }
 
+    /**
+     * Attempt to move. Scans local vicinity if unit moves.
+     * @param goal this unit's target location
+     * @return True if unit moved, false otherwise
+     * @throws GameActionException
+     */
     public static boolean move(MapLocation goal) throws GameActionException {
-        MapLocation currentLoc = rc.getLocation();
         boolean moved;
-
-        if (goal == null)
-        {
-            return false;
-        }
-
-        if (!searching) {
-            if (rc.isCoreReady()) {
-                // We can move this round; attempt to move.
-                if ((reachedGoal && tryPath(currentLoc)) || tryBug(currentLoc, goal)) {
-                    // We moved; update location and perform scan
+        MapLocation currentLoc = rc.getLocation();
+        if (goal != null) {
+            if (!searching) {
+                if (rc.isCoreReady()) {
+                    // We can move this round; attempt to move.
+                    if ((reachedGoal && tryPath(currentLoc)) || tryBug(currentLoc, goal)) {
+                        // We moved; update location and perform perimeter
 //                    rc.setIndicatorString(1, "Moved");
-                    currentLoc = rc.getLocation();
-                    int[] loc = map.mapToArray(currentLoc);
-                    myLoc = new JumpPoint(loc[0], loc[1]);
+                        currentLoc = rc.getLocation();
+                        int[] loc = map.mapToArray(currentLoc);
+                        myLoc = new JumpPoint(loc[0], loc[1]);
 
-                    map.scanRange(myLoc.xLoc, myLoc.yLoc, range);
-                    moved = true;
-                } else {
+                        map.scan(currentLoc);
+                        moved = true;
+                    } else {
 //                    rc.setIndicatorString(1, "Did not move");
-                    // We did not move; verify location and initiate search.
-                    currentLoc = rc.getLocation();
-                    reset();
+                        // We did not move; verify location and initiate search.
+                        currentLoc = rc.getLocation();
+                        reset();
 
-                    int[] loc = map.mapToArray(currentLoc);
-                    myLoc = new JumpPoint(loc[0], loc[1]);
+                        int[] loc = map.mapToArray(currentLoc);
+                        myLoc = new JumpPoint(loc[0], loc[1]);
 
-                    pathStart = getPath(loc, map.mapToArray(goal));
-                    lastPt = pathStart;
+                        pathStart = getPath(loc, map.mapToArray(goal));
+                        lastPt = pathStart;
+                        moved = false;
+                    }
+                } else {
+                    // Cannot move this round, perform perimeter
+//                rc.setIndicatorString(0, "Scanning");
+//                map.perimeter(currentLoc);
                     moved = false;
                 }
             } else {
-                // Cannot move this round, perform scan
-//                rc.setIndicatorString(0, "Scanning");
-                map.scanRange(myLoc.xLoc, myLoc.yLoc, range);
+                // continue search
+                pathStart = getPath(null, null);
                 moved = false;
             }
+
+            if (rc.isCoreReady()) {
+                // dig
+                dig(currentLoc, goal);
+            }
         } else {
-            // continue search
-            pathStart = getPath(null, null);
             moved = false;
         }
-
-        if (rc.isCoreReady()) {
-            // dig
-            dig(currentLoc, goal);
-        }
-
         return moved;
     }
 
-    public static void handleTraffic(MapLocation currentLoc) {
+    /**
+     * Handles traffic along a path returned by a successful search.
+     * @param currentLoc this unit's current location
+     * @param forward desired direction of movement
+     * @param direction integer representation of forward
+     * @param nextPt next JumpPoint along the path
+     * @return True if unit moved, false otherwise
+     * @throws GameActionException
+     */
+    public static boolean handleTrafficOnPath(MapLocation currentLoc, Direction forward, int direction, JumpPoint nextPt) throws GameActionException {
 
+        boolean moved = false;
+
+        MapLocation forwardLoc = currentLoc.add(forward);
+        int[] forwardPt = map.mapToArray(forwardLoc);
+        Direction left = forward.rotateLeft();
+        Direction right = forward.rotateRight();
+
+        // bug toward JumpPoint
+        if (rc.canMove(right)) {
+            rc.move(right);
+            myLoc.move((direction+1)%8);
+            moved = true;
+        } else if (rc.canMove(left)) {
+            rc.move(left);
+            myLoc.move((direction-1)%8);
+            moved = true;
+        } else if (rc.isLocationOccupied(currentLoc.add(right)) && rc.canMove(right.rotateRight())) {
+            rc.move(right.rotateRight());
+            myLoc.move((direction+2)%8);
+            moved = true;
+        }
+
+        if (moved && nextPt.equals(forwardPt)) {
+            JumpPoint nextNextPt = nextPt.mapNext;
+        }
+
+        return moved;
     }
 
     public static Direction intToDirection(int direction) {
