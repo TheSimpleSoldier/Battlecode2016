@@ -39,6 +39,9 @@ public class AlphaArchon extends BaseArchon
         if (rc.isCoreReady() && carryOutAbility()) {
             return true;
         }
+        if (fight());
+        else if (fightZombies());
+        else if (carryOutAbility());
         if(rc.getLocation().equals(navigator.getTarget())) {
             navigator.setTarget(getNextPartLocation());
         }
