@@ -1,7 +1,10 @@
 package team037;
 
 import battlecode.common.*;
+import team037.Enums.Bots;
+import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
+import team037.Messages.MissionCommunication;
 
 public abstract class Unit
 {
@@ -23,6 +26,8 @@ public abstract class Unit
     public static FightMicro fightMicro;
     public static Navigator navigator;
     public static Communicator communicator;
+    public static Bots nextBot = null;
+    public static Bots thisBot= null;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -69,10 +74,37 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         Communication[] communications = communicator.processCommunications();
+        for(int k = 0; k < communications.length; k++)
+        {
+            if(communications[k].opcode == CommunicationType.CHANGEMISSION)
+            {
+                MissionCommunication comm = (MissionCommunication) communications[k];
+                if(comm.id == rc.getID())
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.bType == thisBot)
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.rType == rc.getType())
+                {
+                    nextBot = comm.newBType;
+                }
+            }
+        }
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
+        if(nextBot != null && nextBot != thisBot)
+        {
+            Unit toReturn = Bots.returnUnit(nextBot, rc);
+            toReturn.thisBot = nextBot;
+            toReturn.nextBot = null;
+            return toReturn;
+        }
+
         return current;
     }
 

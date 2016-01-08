@@ -17,6 +17,8 @@ public class MapKnowledge {
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
 
+    public RobotInfo[] enemyArchons = new RobotInfo[6];
+
     public MapKnowledge() {
         denLocations = new AppendOnlyMapLocationSet();
         archonStartPosition = new AppendOnlyMapLocationSet();
@@ -33,6 +35,40 @@ public class MapKnowledge {
     public MapLocation nearestCorner(MapLocation m) {
         // TODO: implement this
         return null;
+    }
+
+    /**
+     * This method updates an enemy archon in our database
+     *
+     * @param enemyArchon
+     */
+    public void addEnemyArchon(RobotInfo enemyArchon) {
+        for (int i = enemyArchons.length; --i >=0; ) {
+            if (enemyArchons[i] == null || enemyArchons[i].ID == enemyArchon.ID) {
+                enemyArchons[i] = enemyArchon;
+                break;
+            }
+        }
+    }
+
+    /**
+     * This method naively returns a random archon's position stored in an int
+     * @return
+     */
+    public int getArchonMessage() {
+        if (enemyArchons[0] == null) {
+            return 0;
+        }
+
+        int msg = 0;
+
+        msg = enemyArchons[0].location.x;
+
+        msg *= 100000;
+
+        msg += enemyArchons[0].location.y;
+
+        return msg;
     }
 
     /**

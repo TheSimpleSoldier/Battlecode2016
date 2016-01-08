@@ -11,10 +11,10 @@ import team037.Utilites.Utilities;
  */
 public class MissionCommunication extends Communication
 {
-    int id;
-    RobotType rType;
-    Bots bType;
-    Bots newBType;
+    public int id;
+    public RobotType rType;
+    public Bots bType;
+    public Bots newBType;
 
     @Override
     public int[] getValues()

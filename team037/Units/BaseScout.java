@@ -17,17 +17,14 @@ public class BaseScout extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+        return false;
+        //return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
-    }
-
-    public Unit getNewStrategy(Unit current) throws GameActionException
-    {
-        return current;
+        return false;
+        //return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean carryOutAbility() throws GameActionException

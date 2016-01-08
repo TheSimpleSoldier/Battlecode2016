@@ -1,8 +1,6 @@
 package team037.Utilites;
 
 import battlecode.common.*;
-import battlecode.common.GameConstants;
-
 
 public class MapUtils
 {
@@ -13,7 +11,7 @@ public class MapUtils
      */
     public static int senseEdge(RobotController rc, Direction d) throws GameActionException {
 
-        assert !d.isDiagonal();
+//        assert !d.isDiagonal();
 
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;

@@ -31,13 +31,13 @@ public class ScoutingScout extends BaseScout {
         return false;
     }
 
-    private boolean discoverEnemyArchons() throws GameActionException
-    {
-        for (int i = enemies.length; --i>=0; )
-        {
-            if (enemies[i].type == RobotType.ARCHON)
-            {
-
+    private boolean discoverEnemyArchons() throws GameActionException {
+        for (int i = enemies.length; --i>=0; ) {
+            if (enemies[i].type == RobotType.ARCHON) {
+                mapKnowledge.addEnemyArchon(enemies[i]);
+                int msg = mapKnowledge.getArchonMessage();
+                rc.setIndicatorString(1, "msg: " + msg);
+                rc.broadcastMessageSignal(msg, msg, 2500);
             }
         }
         return false;
