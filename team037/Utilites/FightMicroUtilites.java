@@ -50,6 +50,18 @@ public class FightMicroUtilites
             {
                 rc.move(dir.rotateRight());
             }
+            else if (clearRubble && rc.senseRubble(rc.getLocation().add(dir)) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                rc.clearRubble(dir);
+            }
+            else if (clearRubble && rc.senseRubble(rc.getLocation().add(dir.rotateLeft())) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                rc.clearRubble(dir.rotateLeft());
+            }
+            else if (clearRubble && rc.senseRubble(rc.getLocation().add(dir.rotateRight())) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                rc.clearRubble(dir.rotateRight());
+            }
         }
     }
 }
