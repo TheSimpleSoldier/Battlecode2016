@@ -2,13 +2,6 @@ package team037;
 
 import battlecode.common.*;
 
-import battlecode.common.GameActionException;
-import battlecode.common.GameConstants;
-import battlecode.common.RobotController;
-import team037.Navigator;
-
-import java.lang.Override;
-
 public class SlugNavigator extends Navigator
 {
     private RobotController rc;

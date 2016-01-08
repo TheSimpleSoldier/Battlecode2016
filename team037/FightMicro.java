@@ -106,7 +106,7 @@ public class FightMicro
         {
             for (int i = 0; i < nearByEnemies.length; i++)
             {
-                if (rc.canAttackLocation(nearByEnemies[i].location))
+                if (rc.canAttackLocation(nearByEnemies[i].location) && rc.isWeaponReady())
                 {
                     rc.attackLocation(nearByEnemies[i].location);
                     return true;

@@ -9,7 +9,7 @@ import team037.DataStructures.AppendOnlyMapLocationArray;
 public class PartsUtilities
 {
 
-    public static AppendOnlyMapLocationArray findPartsICanSense(RobotController rc)
+    public static AppendOnlyMapLocationArray findPartsAndNeutralsICanSense(RobotController rc)
     {
         MapLocation currentLocation = rc.getLocation();
         RobotType type = rc.getType();
@@ -31,12 +31,19 @@ public class PartsUtilities
                 }
             }
         }
+
+        RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);
+
+        for (int i = neutralBots.length; --i>=0; ) {
+            parts.add(neutralBots[i].location);
+        }
+
         return parts;
     }
 
-    public static AppendOnlyMapLocationArray findPartsICanSenseNotImpassible(RobotController rc)
+    public static AppendOnlyMapLocationArray findPartsAndNeutralsICanSenseNotImpassible(RobotController rc)
     {
-        AppendOnlyMapLocationArray parts = findPartsICanSense(rc);
+        AppendOnlyMapLocationArray parts = findPartsAndNeutralsICanSense(rc);
         AppendOnlyMapLocationArray freeParts = new AppendOnlyMapLocationArray();
         for (int i = parts.length - 1; i >= 0; i--) {
             if (rc.senseRubble(parts.array[i]) < GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
