@@ -9,16 +9,24 @@ public class RobotPlayer
 {
     private static Unit unit;
 
+    public static final String CASTLE = "castle";
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
      **/
     public static void run(RobotController rc)
     {
+        // this will check your ./bc.conf file for a line like this:
+        // bc.testing.strat=foo
+        // and strategy will be foo
+        String strategy = System.getProperty("bc.testing.strat");
         RobotType type = rc.getType();
 
         if (type == RobotType.ARCHON)
         {
+            if (strategy.equals(CASTLE)) {
+                unit = new CastleArchon(rc);
+            }
             //unit = new BaseArchon(rc);
             unit = new AlphaArchon(rc);
         }
