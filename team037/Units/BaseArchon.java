@@ -1,10 +1,13 @@
 package team037.Units;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
 import team037.DataStructures.BuildOrder;
-import team037.DataStructures.Communication;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.MissionCommunication;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
 
@@ -72,10 +75,12 @@ public class BaseArchon extends Unit
                 {
                     rc.build(dirs[i], nextType);
                     int id = rc.senseRobotAtLocation(rc.getLocation().add(dirs[i])).ID;
-                    Communication communication = new Communication();
-                    communication.opcode = CommunicationType.INITIALMISSION;
-                    communication.val1 = id;
-                    communication.bType1 = nextBot;
+                    MissionCommunication communication = new MissionCommunication();
+                    communication.opcode = CommunicationType.CHANGEMISSION;
+                    communication.id = id;
+                    communication.rType = Bots.typeFromBot(nextBot);
+                    communication.bType = nextBot;
+                    communication.newBType = nextBot;
                     communicator.sendCommunication(2, communication);
                     nextBot = buildOrder.nextBot();
                     nextType = Bots.typeFromBot(nextBot);

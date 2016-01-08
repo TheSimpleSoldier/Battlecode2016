@@ -83,6 +83,14 @@ public abstract class Unit
                 {
                     nextBot = comm.newBType;
                 }
+                else if(comm.id == 0 && comm.bType == thisBot)
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.rType == rc.getType())
+                {
+                    nextBot = comm.newBType;
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ import team037.Messages.SimpleBotInfoCommunication;
  */
 public class CommunicationUtilities
 {
-    public static int opcodeSize = 5;
+    public static int opcodeSize = 4;
     public static int valSize = 15;
     public static int typeSize = 4;
     public static int botSize = 8;
@@ -35,13 +35,13 @@ public class CommunicationUtilities
     {
         int[] toReturn = new int[lengths.length];
         int current = message[0];
-        int loc = 5;
+        int loc = 1;
         for(int k = 0; k < lengths.length; k++)
         {
             if(loc + lengths[k] > 32)
             {
                 current = message[1];
-                loc = 0;
+                loc = 1;
             }
 
             toReturn[k] = extractVal(current, loc, lengths[k]);

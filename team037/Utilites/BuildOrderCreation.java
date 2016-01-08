@@ -11,8 +11,8 @@ public class BuildOrderCreation
     public static BuildOrder createBuildOrder()
     {
         Bots[][] buildOrder = {
-                {Bots.BASESCOUT, Bots.BASESOLDIER},
                 {Bots.SCOUTINGSCOUT, Bots.BASESOLDIER},
+                {Bots.BASESCOUT, Bots.BASESOLDIER},
                 {Bots.BASEVIPER, Bots.BASESOLDIER},
                 {Bots.BASESOLDIER, null}
         };
