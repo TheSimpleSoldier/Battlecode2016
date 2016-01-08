@@ -136,18 +136,14 @@ public abstract class Unit
         currentLocation = newLoc;
 
 
-        rc.setIndicatorString(1, "scanning2 " + rc.getRoundNum() + ", " + enemies.length);
         if(enemies.length > 0)
         {
-            rc.setIndicatorString(1, "scanning1");
             if(type == RobotType.ARCHON || type == RobotType.SCOUT)
             {
                 for(int k = 0; k < enemies.length; k++)
                 {
-                    rc.setIndicatorString(1, "scanning");
                     if(enemies[k].type == RobotType.ARCHON)
                     {
-                        rc.setIndicatorString(0, "saw an archon");
                         BotInfoCommunication comm = new BotInfoCommunication();
                         comm.opcode = CommunicationType.ENEMY;
                         comm.type = RobotType.ARCHON;
