@@ -2,7 +2,7 @@ package team037;
 
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
-import team037.DataStructures.Communication;
+import team037.Messages.Communication;
 import team037.Utilites.MapUtils;
 
 public class MapKnowledge {

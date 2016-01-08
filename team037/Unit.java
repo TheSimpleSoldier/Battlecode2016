@@ -1,7 +1,7 @@
 package team037;
 
 import battlecode.common.*;
-import team037.DataStructures.Communication;
+import team037.Messages.Communication;
 
 public abstract class Unit
 {
@@ -69,19 +69,6 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         Communication[] communications = communicator.processCommunications();
-        for(int k = 0; k < communications.length; k++)
-        {
-            communications[k].printAll();
-        }
-        /*
-         * Sample communication creation
-        Communication communication = new Communication();
-        communication.opcode = CommunicationType.DEN;
-        communication.val1 = 120;
-        communication.loc1X = 68;
-        communication.loc1Y = 52;
-        communicator.sendCommunication(100, communication);
-         */
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException
