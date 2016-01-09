@@ -55,6 +55,62 @@ public class SlugNavigator extends Navigator
     }
 
 
+    public boolean moveAndClear() throws GameActionException {
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+
+        if (target == null) {
+            return false;
+        }
+
+        MapLocation currentLocation = rc.getLocation();
+        if (currentLocation.equals(target)) {
+            return false;
+        }
+
+        Direction toMove = currentLocation.directionTo(target);
+        if (tryMove(toMove, currentLocation)) {
+            return true;
+        } else if (tryMove(toMove.rotateLeft(), currentLocation)) {
+            return true;
+        } else if (tryMove(toMove.rotateRight(), currentLocation)) {
+            return true;
+        }
+
+        if (tryClear(toMove, currentLocation)) {
+            return true;
+        } else if (tryClear(toMove.rotateLeft(), currentLocation)) {
+            return true;
+        } else if (tryClear(toMove.rotateRight(), currentLocation)) {
+            return true;
+        }
+
+        if (tryMove(toMove.rotateLeft().rotateLeft(), currentLocation)) {
+            return true;
+        } else if (tryMove(toMove.rotateRight().rotateRight(), currentLocation)) {
+            return true;
+        }
+
+        if (tryClear(toMove.rotateLeft().rotateLeft(), currentLocation)) {
+            return true;
+        } else if (tryClear(toMove.rotateRight().rotateRight(), currentLocation)) {
+            return true;
+        }
+
+        if (tryMove(toMove.rotateLeft().rotateLeft().rotateLeft(), currentLocation)) {
+            return true;
+        } else if (tryMove(toMove.rotateRight().rotateRight().rotateRight(), currentLocation)) {
+            return true;
+        }
+
+        // we couldn't move anywhere! reset the tail and try again
+        resetTail();
+        return false;
+
+    }
+
+
     @Override
     public boolean takeNextStep() throws GameActionException {
         if (!rc.isCoreReady()) {
@@ -90,8 +146,15 @@ public class SlugNavigator extends Navigator
             resetTail();
             return false;
         }
+    }
 
-
+    private boolean tryClear(Direction toMove, MapLocation currentLocation) throws GameActionException {
+        MapLocation nextLoc = currentLocation.add(toMove);
+        if(rc.senseRubble(nextLoc) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+            rc.clearRubble(toMove);
+            return true;
+        }
+        return false;
     }
 
     private boolean tryMove(Direction toMove, MapLocation currentLocation) throws GameActionException {
