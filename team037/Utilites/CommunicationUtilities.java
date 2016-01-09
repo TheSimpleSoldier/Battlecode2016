@@ -29,7 +29,6 @@ public class CommunicationUtilities
 
         Communication communication = CommunicationType.getCommunication(opcode);
         communication.setValues(unpack(message, communication.getLengths()));
-        communication.opcode = opcode;
 
         return communication;
     }

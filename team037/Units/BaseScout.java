@@ -73,7 +73,7 @@ public class BaseScout extends Unit
                     if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared)
                     {
                         Communication communication = new TurretSupportCommunication();
-                        communication.setValues(new int[]{0,0,enemy.x, enemy.y});
+                        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(enemies[i].coreDelay),enemy.x, enemy.y});
                         communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
                         sentMsg = true;
                     }
@@ -95,7 +95,7 @@ public class BaseScout extends Unit
                         {
                             TurretSupportCommunication communication = new TurretSupportCommunication();
                             communication.opcode = CommunicationType.TURRET_SUPPORT;
-                            communication.setValues(new int[]{0,0,enemy.x, enemy.y});
+                            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(zombies[i].coreDelay),enemy.x, enemy.y});
                             communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
                         }
                     }

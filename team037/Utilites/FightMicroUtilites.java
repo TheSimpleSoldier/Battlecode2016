@@ -92,19 +92,16 @@ public class FightMicroUtilites
 
             for (int i = communications.length; --i>=0; )
             {
-                if (communications[i].opcode == CommunicationType.TURRET_SUPPORT)
+                if (communications[i].opcode == CommunicationType.TURRET_SUPPORT || communications[i].opcode == CommunicationType.OENEMY)
                 {
                     int[] cords = communications[i].getValues();
                     MapLocation enemy = new MapLocation(cords[2], cords[3]);
-                    if (enemy.distanceSquaredTo(loc) <= dist)
+                    double coreDelay = 0;
+                    if (enemy.distanceSquaredTo(loc) <= dist && cords[1] > coreDelay)
                     {
                         target = enemy;
-                        break;
+                        coreDelay = cords[1];
                     }
-                }
-                else if (communications[i].opcode == CommunicationType.OENEMY)
-                {
-
                 }
             }
         }
