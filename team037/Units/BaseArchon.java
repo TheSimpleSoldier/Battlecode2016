@@ -56,7 +56,7 @@ public class BaseArchon extends Unit
         for (int i = nearByAllies.length; --i>=0; )
         {
             double health = nearByAllies[i].health;
-            if (health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) < RobotType.ARCHON.attackRadiusSquared)
+            if (health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) <= RobotType.ARCHON.attackRadiusSquared)
             {
                 if (health < weakestHealth)
                 {
