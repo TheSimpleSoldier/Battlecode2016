@@ -24,7 +24,8 @@ public class CastleSoldier extends BaseSoldier
         findMom();
 
         if (fight()) ;
-        else if (moveToFront()) ;
+        else if (moveToFront());
+        else if (patrol());
 
         return false;
     }
@@ -76,9 +77,11 @@ public class CastleSoldier extends BaseSoldier
     }
 
     private boolean moveToFront() throws GameActionException {
+        //prereqs
         if (currentLocation.distanceSquaredTo(archonLoc) >= 4) {
-            return true;
+            return false;
         }
+
         if (move.getTarget() == null) {
             Direction toMove = archonLoc.directionTo(currentLocation);
             MapLocation target = MapUtils.findOnMapLocationNUnitsAway(this, toMove, 3);
@@ -86,6 +89,66 @@ public class CastleSoldier extends BaseSoldier
         }
         return move.moveAndClear();
     }
+
+    private boolean patrol() throws GameActionException {
+        int xDiff = currentLocation.x - archonLoc.x;
+        int yDiff = currentLocation.y - archonLoc.y;
+
+        int square = 2;
+        if (xDiff == square && yDiff == square) {
+            if (rc.canMove(Direction.NORTH)) {
+                rc.move(Direction.NORTH);
+                return true;
+            }
+            return false;
+        } else if (xDiff == square && yDiff == -square) {
+            if (rc.canMove(Direction.WEST)) {
+                rc.move(Direction.WEST);
+                return true;
+            }
+            return false;
+        } else if (xDiff == -square && yDiff == -square) {
+            if (rc.canMove(Direction.SOUTH)) {
+                rc.move(Direction.SOUTH);
+                return true;
+            }
+            return false;
+        } else if (xDiff == -square && yDiff == square) {
+            if (rc.canMove(Direction.EAST)) {
+                rc.move(Direction.EAST);
+                return true;
+            }
+            return false;
+        } else if (xDiff == square) {
+            if (rc.canMove(Direction.NORTH)) {
+                rc.move(Direction.NORTH);
+                return true;
+            }
+            return false;
+        } else if (xDiff == -square) {
+            if (rc.canMove(Direction.SOUTH)) {
+                rc.move(Direction.SOUTH);
+                return true;
+            }
+            return false;
+        } else if (yDiff == square) {
+            if (rc.canMove(Direction.EAST)) {
+                rc.move(Direction.EAST);
+                return true;
+            }
+            return false;
+        } else if (yDiff == -square) {
+            if (rc.canMove(Direction.WEST)) {
+                rc.move(Direction.WEST);
+                return true;
+            }
+            return false;
+        }
+
+        return false;
+
+    }
+
 
 
 }

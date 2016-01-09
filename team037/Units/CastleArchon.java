@@ -135,7 +135,7 @@ public class CastleArchon extends BaseArchon {
 
 
         countFriendlyTypes();
-        if (numSoliders < 16 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
+        if (numSoliders < 15 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
             Direction spawnDir = nextSpawnDir();
             if (trySpawn(spawnDir, RobotType.SOLDIER)) {
                 return true;
@@ -156,10 +156,11 @@ public class CastleArchon extends BaseArchon {
     private void countFriendlyTypes() {
         int numS = 0;
         int numT = 0;
-        for (int i = nearByAllies.length; --i >= 0;) {
-            if (nearByAllies[i].type == RobotType.SOLDIER) {
+        RobotInfo[] buddies = rc.senseNearbyRobots(8, us);
+        for (int i = buddies.length; --i >= 0;) {
+            if (buddies[i].type == RobotType.SOLDIER) {
                 numS += 1;
-            } else if (nearByAllies[i].type == RobotType.TURRET || nearByAllies[i].type == RobotType.TTM) {
+            } else if (buddies[i].type == RobotType.TURRET || buddies[i].type == RobotType.TTM) {
                 numT += 1;
             }
         }
