@@ -3,8 +3,10 @@ package team037;
 import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 
 public abstract class Unit
 {
@@ -28,6 +30,7 @@ public abstract class Unit
     public static Communicator communicator;
     public static Bots nextBot = null;
     public static Bots thisBot= null;
+    public static Communication[] communications;
     public static int id;
 
     public MapLocation locationLastTurn;
@@ -75,7 +78,7 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
-        Communication[] communications = communicator.processCommunications();
+        communications = communicator.processCommunications();
         for(int k = 0; k < communications.length; k++)
         {
             if(communications[k].opcode == CommunicationType.CHANGEMISSION)
@@ -133,5 +136,58 @@ public abstract class Unit
             previousLocation = currentLocation;
         }
         currentLocation = newLoc;
+
+
+        if(enemies.length > 0)
+        {
+            if(type == RobotType.ARCHON || type == RobotType.SCOUT)
+            {
+                for(int k = 0; k < enemies.length; k++)
+                {
+                    if(enemies[k].type == RobotType.ARCHON)
+                    {
+                        BotInfoCommunication comm = new BotInfoCommunication();
+                        comm.opcode = CommunicationType.ENEMY;
+                        comm.type = RobotType.ARCHON;
+                        comm.id = enemies[k].ID;
+                        comm.team = opponent;
+                        MapLocation loc = enemies[k].location;
+                        comm.x = loc.x;
+                        comm.y = loc.y;
+                        communicator.sendCommunication(20000, comm);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                boolean archon = false;
+                for(int k = 0; k < nearByEnemies.length; k++)
+                {
+                    if(nearByEnemies[k].type == RobotType.ARCHON)
+                    {
+                        archon = true;
+                        break;
+                    }
+                }
+
+                SimpleBotInfoCommunication comm = new SimpleBotInfoCommunication();
+
+                if(archon)
+                {
+                    comm.opcode = CommunicationType.SARCHON;
+                }
+                else
+                {
+                    comm.opcode = CommunicationType.SENEMY;
+                }
+
+                comm.id = rc.getID();
+                MapLocation loc = rc.getLocation();
+                comm.x = loc.x;
+                comm.y = loc.y;
+                communicator.sendSimpleCommunication(20000, comm);
+            }
+        }
     }
 }

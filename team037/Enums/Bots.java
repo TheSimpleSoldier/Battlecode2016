@@ -12,7 +12,7 @@ import team037.Units.*;
 public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
-    SCOUTINGSCOUT;
+    SCOUTINGSCOUT, ATTACKINGSOLDIER;
 
     public static int toInt(Bots type)
     {
@@ -36,6 +36,8 @@ public enum Bots
                 return 7;
             case SCOUTINGSCOUT:
                 return 8;
+            case ATTACKINGSOLDIER:
+                return 9;
         }
         return -1;
     }
@@ -62,6 +64,8 @@ public enum Bots
                 return ALPHAARCHON;
             case 8:
                 return SCOUTINGSCOUT;
+            case 9:
+                return ATTACKINGSOLDIER;
         }
 
         return null;
@@ -80,6 +84,7 @@ public enum Bots
             case SCOUTINGSCOUT:
                 return RobotType.SCOUT;
             case BASESOLDIER:
+            case ATTACKINGSOLDIER:
                 return RobotType.SOLDIER;
             case BASETTM:
                 return RobotType.TTM;
@@ -107,6 +112,8 @@ public enum Bots
                 return new ScoutingScout(rc);
             case BASESOLDIER:
                 return new BaseSoldier(rc);
+            case ATTACKINGSOLDIER:
+                return new AttackingSoldier(rc);
             case BASETTM:
                 return new BaseTTM(rc);
             case BASETURRET:

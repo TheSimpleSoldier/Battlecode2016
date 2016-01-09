@@ -11,18 +11,18 @@ public class BuildOrderCreation
     public static BuildOrder createBuildOrder()
     {
         Bots[][] buildOrder = {
-                {Bots.SCOUTINGSCOUT, Bots.BASESOLDIER},
-                {Bots.BASESCOUT, Bots.BASESOLDIER},
-                {Bots.BASEVIPER, Bots.BASESOLDIER},
-                {Bots.BASESOLDIER, null}
+                {Bots.SCOUTINGSCOUT, Bots.ATTACKINGSOLDIER},
+                {Bots.BASESCOUT, Bots.ATTACKINGSOLDIER},
+                {Bots.BASEVIPER, Bots.ATTACKINGSOLDIER},
+                {Bots.ATTACKINGSOLDIER, null}
         };
         int[] times = {2, 1, 3, 1000};
 
         Bots[][] buildOrderSoldiers = {
-                {Bots.BASESOLDIER}
+                {Bots.ATTACKINGSOLDIER}
         };
         int[] times2 = {10000};
 
-        return new BuildOrder(buildOrderSoldiers, times2);
+        return new BuildOrder(buildOrder, times2);
     }
 }

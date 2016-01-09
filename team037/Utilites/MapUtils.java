@@ -1,8 +1,6 @@
 package team037.Utilites;
 
 import battlecode.common.*;
-import battlecode.common.GameConstants;
-import scala.tools.cmd.gen.AnyVals;
 import team037.Unit;
 
 
