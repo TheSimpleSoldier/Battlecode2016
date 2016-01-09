@@ -33,6 +33,7 @@ public abstract class Unit
     public static Communication[] communications;
     public static MapKnowledge mapKnowledge = new MapKnowledge();
     public static MapLocation start;
+    public static boolean repaired;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -61,6 +62,7 @@ public abstract class Unit
         previousLocation = locationLastTurn;
         currentLocation = locationLastTurn;
         start = rc.getLocation();
+        repaired = false;
 
     }
 
@@ -101,12 +103,14 @@ public abstract class Unit
             }
             else if (type == RobotType.SCOUT && communications[k].opcode == CommunicationType.PARTS)
             {
+
                 // if we get a new msg about parts then send it out
                 int[] values = communications[k].getValues();
                 MapLocation loc = new MapLocation(values[2], values[3]);
 
                 if (!mapKnowledge.partListed(loc))
                 {
+                    mapKnowledge.addPartsAndNeutrals(loc);
                     Communication communication = new PartsCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), values[1], values[2], values[3]});
                     communicator.sendCommunication(Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start))), communication);
@@ -119,6 +123,7 @@ public abstract class Unit
 
                 if (!mapKnowledge.partListed(loc))
                 {
+                    mapKnowledge.addPartsAndNeutrals(loc);
                     Communication communication = new PartsCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), values[1], values[2], values[3]});
                     communicator.sendCommunication(Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start))), communication);

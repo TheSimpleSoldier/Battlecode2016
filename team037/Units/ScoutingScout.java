@@ -1,10 +1,6 @@
 package team037.Units;
 
 import battlecode.common.*;
-import team037.FlyingNavigator;
-import team037.MapKnowledge;
-import team037.Messages.Communication;
-import team037.Messages.TurretSupportCommunication;
 import team037.Utilites.MapUtils;
 
 public class ScoutingScout extends BaseScout {
@@ -24,7 +20,7 @@ public class ScoutingScout extends BaseScout {
         return false;
     }
 
-    private boolean discoverEdges() throws GameActionException {
+    public boolean discoverEdges() throws GameActionException {
         // precondition:
         if (mapKnowledge.mapBoundaryComplete()) {
             return false;
@@ -59,7 +55,7 @@ public class ScoutingScout extends BaseScout {
         return false;
     }
 
-    private boolean setNewScoutDirection() {
+    public boolean setNewScoutDirection() {
         if (mapKnowledge.minY == Integer.MIN_VALUE) {
             scoutDirection = Direction.NORTH;
             return true;

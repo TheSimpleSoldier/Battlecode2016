@@ -58,9 +58,15 @@ public class BaseScout extends Unit
         for (int i = partsArray.length; --i>=0; )
         {
             MapLocation spot = partsArray[i];
-            if (!mapKnowledge.partListed(spot))
+            if (spot != null && !mapKnowledge.partListed(spot))
             {
-                RobotInfo bot = rc.senseRobotAtLocation(parts.array[i]);
+                RobotInfo bot = null;
+
+                if (rc.canSenseLocation(spot))
+                {
+                    bot = rc.senseRobotAtLocation(spot);
+                }
+
                 int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
                 if (rc.senseParts(spot) > 0)
                 {
@@ -69,7 +75,7 @@ public class BaseScout extends Unit
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), (int) rc.senseParts(spot), spot.x, spot.y});
                     communicator.sendCommunication(dist, communication);
                 }
-                else if (bot.team == Team.NEUTRAL)
+                else if (bot != null && bot.team == Team.NEUTRAL)
                 {
                     // create neutral bot msg
                     Communication communication = new PartsCommunication();
@@ -91,7 +97,7 @@ public class BaseScout extends Unit
         }
 
         MapLocation[] allyTurrets = mapKnowledge.getAlliedTurretLocations();
-        boolean sentMsg =false;
+        boolean sentMsg = false;
 
         if (allyTurrets != null && allyTurrets.length > 0)
         {
