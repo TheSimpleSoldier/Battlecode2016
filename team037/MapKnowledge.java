@@ -20,11 +20,13 @@ public class MapKnowledge {
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
     public AppendOnlyMapLocationSet ourTurretLocations;
+    public AppendOnlyMapLocationSet partsAndNeutrals;
 
     public MapKnowledge() {
         denLocations = new AppendOnlyMapLocationSet();
         archonStartPosition = new AppendOnlyMapLocationSet();
         ourTurretLocations = new AppendOnlyMapLocationSet();
+        partsAndNeutrals = new AppendOnlyMapLocationSet();
     }
 
     public void setMinX(int x) { minX = x; }
@@ -36,6 +38,9 @@ public class MapKnowledge {
     public void addStartingArchonLocation(MapLocation m) { archonStartPosition.add(m); }
     public void addAlliedTurretLocation(MapLocation m) { ourTurretLocations.add(m); }
     public MapLocation[] getAlliedTurretLocations() { return ourTurretLocations.array; }
+    public void addPartsAndNeutrals(MapLocation m) { partsAndNeutrals.add(m); }
+    public MapLocation[] getPartsAndNeutrals() { return partsAndNeutrals.array; }
+    public boolean partListed(MapLocation m) { return partsAndNeutrals.contains(m); }
 
     public MapLocation nearestCorner(MapLocation m) {
         // TODO: implement this

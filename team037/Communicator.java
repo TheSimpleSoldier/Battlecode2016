@@ -85,4 +85,24 @@ public class Communicator
 
         return false;
     }
+
+    /**
+     * This method returns the core and weapon delay cost of sending a signal
+     *
+     * @param radius
+     * @param sightRange
+     * @return
+     */
+    public double coreCostForMsg(int radius, int sightRange)
+    {
+        double cost = radius / sightRange;
+        cost -= 2;
+
+        if (cost <= 0)
+        {
+            cost = 0;
+        }
+
+        return 0.05 + 0.03 * cost;
+    }
 }

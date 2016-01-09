@@ -1,10 +1,6 @@
 package team037.Units;
 
 import battlecode.common.*;
-import team037.FlyingNavigator;
-import team037.MapKnowledge;
-import team037.Messages.Communication;
-import team037.Messages.TurretSupportCommunication;
 import team037.Utilites.MapUtils;
 
 public class ScoutingScout extends BaseScout {
