@@ -13,7 +13,7 @@ public class MapUtils
      */
     public static int senseEdge(RobotController rc, Direction d) throws GameActionException {
 
-        assert !d.isDiagonal();
+//        assert !d.isDiagonal();
 
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;

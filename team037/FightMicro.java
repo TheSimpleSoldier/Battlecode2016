@@ -1,6 +1,7 @@
 package team037;
 
 import battlecode.common.*;
+import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
 
@@ -369,6 +370,38 @@ public class FightMicro
         }
 
         return true;
+    }
+
+    /**
+     * This method runs turretFightMicro
+     * @param nearByEnemies
+     * @param nearByZombies
+     * @param enemies
+     * @param allies
+     * @param target
+     * @return
+     * @throws GameActionException
+     */
+    public boolean turretFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByZombies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target, Communication[] communications) throws GameActionException
+    {
+        MapLocation bestTarget = FightMicroUtilites.getTurretAttackPoint(nearByEnemies, rc, communications);
+
+        if (bestTarget != null && rc.canAttackLocation(bestTarget))
+        {
+            rc.attackLocation(bestTarget);
+            return true;
+        }
+
+        bestTarget = FightMicroUtilites.getBestTurretTarget(nearByZombies, rc);
+
+        if (bestTarget != null && rc.canAttackLocation(bestTarget))
+        {
+            rc.attackLocation(bestTarget);
+            return true;
+        }
+
+        // TODO: add net for logic about turning into TTM to move
+        return false;
     }
 
     public double[] getInputs1(RobotInfo[] enemies, RobotInfo[] allies, RobotInfo[] nearByEnemies)

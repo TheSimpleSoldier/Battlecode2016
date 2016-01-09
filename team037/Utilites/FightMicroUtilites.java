@@ -1,6 +1,9 @@
 package team037.Utilites;
 
 import battlecode.common.*;
+import team037.Communicator;
+import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
 
 public class FightMicroUtilites
 {
@@ -24,6 +27,91 @@ public class FightMicroUtilites
         }
 
         return weakest;
+    }
+
+    /**
+     * This method returns the best target from a list of enemies
+     *
+     * @param nearByEnemies
+     * @param rc
+     * @return
+     */
+    public static MapLocation getBestTurretTarget(RobotInfo[] nearByEnemies, RobotController rc)
+    {
+        MapLocation target = null;
+
+        if (nearByEnemies.length > 0)
+        {
+            double weakestHealth = 999;
+            for (int i = 0; i < nearByEnemies.length; i++)
+            {
+                MapLocation enemy = nearByEnemies[i].location;
+                if (rc.getLocation().distanceSquaredTo(enemy) > 5)
+                {
+                    double enemyHealth = nearByEnemies[i].health;
+
+                    // we want to hit enemy with highest health that we can kill with one shot
+                    if (enemyHealth <= RobotType.TURRET.attackPower && weakestHealth < RobotType.TURRET.attackPower)
+                    {
+                        if (weakestHealth < enemyHealth)
+                        {
+                            weakestHealth = enemyHealth;
+                            target = enemy;
+                        }
+                    }
+                    // other wise we kill the weak
+                    else if (weakestHealth > enemyHealth)
+                    {
+                        weakestHealth = enemyHealth;
+                        target = enemy;
+                    }
+                }
+            }
+        }
+
+        return target;
+    }
+
+    /**
+     * This method gets the best location for a turret to attack
+     *
+     * @param nearByEnemies
+     * @param rc
+     * @return
+     */
+    public static MapLocation getTurretAttackPoint(RobotInfo[] nearByEnemies, RobotController rc, Communication[] communications)
+    {
+        MapLocation target = getBestTurretTarget(nearByEnemies, rc);
+
+        // search signals for scouts telling us locations as well as
+        // for enemy broadcasts
+        if (target == null)
+        {
+            Team us = rc.getTeam();
+            MapLocation loc = rc.getLocation();
+            int dist = rc.getType().attackRadiusSquared;
+
+            for (int i = communications.length; --i>=0; )
+            {
+                if (communications[i].opcode == CommunicationType.TURRET_SUPPORT)
+                {
+                    // then msg is from our scout
+                }
+                else if (communications[i].opcode == CommunicationType.OENEMY)
+                {
+                    // TODO: fix this!!
+                    MapLocation enemy = null;
+                    int[] cords = communications[i].getValues();
+                    if (enemy.distanceSquaredTo(loc) <= dist)
+                    {
+                        target = enemy;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return target;
     }
 
     public static Direction getDir(RobotController rc, MapLocation target)

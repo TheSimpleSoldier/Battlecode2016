@@ -1,6 +1,7 @@
 package team037.Units;
 
 import battlecode.common.*;
+import team037.Messages.Communication;
 import team037.Unit;
 
 public class BaseTurret extends Unit
@@ -18,12 +19,14 @@ public class BaseTurret extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
+        Communication[] communications = communicator.processCommunications();
+        return fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
     }
 
+    // zombie fight micro happens in fight()
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByZombies);
+        return false;
     }
 
     public boolean carryOutAbility() throws GameActionException

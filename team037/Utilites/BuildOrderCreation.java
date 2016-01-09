@@ -13,7 +13,7 @@ public class BuildOrderCreation
         Bots[][] buildOrder = {
                 {Bots.SCOUTINGSCOUT, Bots.BASESOLDIER},
                 {Bots.BASESCOUT, Bots.BASESOLDIER},
-                {Bots.BASEVIPER, Bots.BASESOLDIER},
+                {Bots.BASETURRET, Bots.BASESOLDIER},
                 {Bots.BASESOLDIER, null}
         };
         int[] times = {2, 1, 3, 1000};
@@ -23,6 +23,6 @@ public class BuildOrderCreation
         };
         int[] times2 = {10000};
 
-        return new BuildOrder(buildOrderSoldiers, times2);
+        return new BuildOrder(buildOrder, times);
     }
 }
