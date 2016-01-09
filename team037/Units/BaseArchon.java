@@ -77,6 +77,7 @@ public class BaseArchon extends Unit
     // maybe spawn a unit or repair a damaged unit
     public boolean carryOutAbility() throws GameActionException
     {
+        // heal doesn't effect core cooldown
         healNearbyAllies();
 
         if (neutralBots.length > 0)

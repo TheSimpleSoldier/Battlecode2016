@@ -15,7 +15,9 @@ public class MapUtils
      */
     public static int senseEdge(RobotController rc, Direction d) throws GameActionException {
 
-        assert !d.isDiagonal();
+        if (d.isDiagonal()) {
+            return Integer.MIN_VALUE;
+        }
 
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;
@@ -73,7 +75,8 @@ public class MapUtils
     }
 
     public static Direction randomDirection(int id, int roundNumber) {
-        Direction toReturn = Direction.NORTH;
+        Direction toReturn;
+
         switch((id + roundNumber) % 8) {
             case 0:
                 toReturn = Direction.NORTH;
@@ -113,7 +116,7 @@ public class MapUtils
      * @return
      */
     public static Direction getRCCanMoveDirection(Unit unit) {
-        Direction toMove = Direction.NORTH;
+        Direction toMove = randomDirection(unit.id, unit.rc.getRoundNum());
         int i = 7;
         do {
             if (unit.rc.canMove(toMove)) {

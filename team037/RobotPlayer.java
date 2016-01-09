@@ -21,16 +21,21 @@ public class RobotPlayer
         // bc.testing.strat=foo
         // and strategy will be foo
         String strategy = System.getProperty("bc.testing.strat");
+        // IT DOESN'T WORK CURRENTLY :(
+        strategy = Strategies.CASTLE;
+
+
         RobotType type = rc.getType();
 
         if (type == RobotType.ARCHON)
         {
             if (strategy.equals(Strategies.CASTLE)) {
                 unit = new CastleArchon(rc);
+            } else {
+                //unit = new BaseArchon(rc);
+                unit = new AlphaArchon(rc);
+                unit.thisBot = Bots.ALPHAARCHON;
             }
-            //unit = new BaseArchon(rc);
-            unit = new AlphaArchon(rc);
-            unit.thisBot = Bots.ALPHAARCHON;
         }
         else if (type == RobotType.GUARD)
         {
@@ -44,13 +49,22 @@ public class RobotPlayer
         }
         else if (type == RobotType.SOLDIER)
         {
-            unit = new BaseSoldier(rc);
-            unit.thisBot = Bots.BASESOLDIER;
+            if (strategy.equals(Strategies.CASTLE)) {
+                unit = new CastleSoldier(rc);
+            } else {
+                unit = new BaseSoldier(rc);
+                unit.thisBot = Bots.BASESOLDIER;
+            }
+
         }
         else if (type == RobotType.TURRET)
         {
-            unit = new BaseTurret(rc);
-            unit.thisBot = Bots.BASETURRET;
+            if (strategy.equals(Strategies.CASTLE)) {
+                unit = new CastleTurret(rc);
+            } else {
+                unit = new BaseTurret(rc);
+                unit.thisBot = Bots.BASETURRET;
+            }
         }
         else if (type == RobotType.TTM)
         {

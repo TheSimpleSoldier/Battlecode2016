@@ -11,26 +11,23 @@ public class CastleArchon extends BaseArchon {
     private MapLocation home;
     private int numSoliders = 0;
     private int numTurrets = 0;
+    private Direction lastSpawn;
 
     public CastleArchon(RobotController rc) {
         super(rc);
         move = new SlugNavigator(rc);
+        lastSpawn = MapUtils.randomDirection(id, 0);
     }
 
-    @Override
-    public boolean takeNextStep() throws GameActionException {
-        return false;
-    }
 
     @Override
     public boolean act() throws GameActionException {
-        // preconditions
-        if (!rc.isCoreReady()) {
-            return false;
-        }
+        // don't affect core ready
+        healNearbyAllies();
 
-
-        if (moveAwayFromFriendlyArchons()) ;
+        // actions that affect core
+        if (!rc.isCoreReady()) ;
+        else if (moveAwayFromFriendlyArchons()) ;
         else if (spawnIfNeeded()) ;
         else {
             return false;
@@ -94,35 +91,64 @@ public class CastleArchon extends BaseArchon {
     }
 
 
+    private Direction nextSpawnDir() {
+        lastSpawn = lastSpawn.opposite().rotateLeft();
+        if (rc.canBuild(lastSpawn, RobotType.SOLDIER)) {
+            return lastSpawn;
+        }
+        return MapUtils.getRCCanMoveDirection(this);
+    }
+
+    private Direction nextTurretSpawnDir() {
+        if (rc.canBuild(Direction.NORTH, RobotType.TURRET)) {
+            return Direction.NORTH;
+        } else if (rc.canBuild(Direction.SOUTH, RobotType.TURRET)) {
+            return Direction.SOUTH;
+        } else if (rc.canBuild(Direction.EAST, RobotType.TURRET)) {
+            return Direction.EAST;
+        } else if (rc.canBuild(Direction.WEST, RobotType.TURRET)) {
+            return Direction.WEST;
+        }
+        return Direction.NONE;
+    }
+
+    private boolean trySpawn(Direction d, RobotType toSpawn) throws GameActionException {
+        if (!d.equals(Direction.NONE) && rc.canBuild(d, toSpawn)) {
+            rc.build(d, toSpawn);
+            return true;
+        }
+        return false;
+    }
+
+
     private boolean spawnIfNeeded() throws GameActionException {
         // prereqs
         if (rc.getTeamParts() < RobotType.SOLDIER.partCost) {
             return false;
         }
+        // is it my "turn" to spawn?
+        // we do this so that all archons get a turn to spawn
+        // otherwise the one with the lowest ID almost always spawns first
+        if ((id + rc.getRoundNum()) % 16 < 12) {
+            return false;
+        }
+
+
         countFriendlyTypes();
-        if (numSoliders < 10 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
-            Direction spawnDir = MapUtils.getRCCanMoveDirection(this);
-            if (!spawnDir.equals(Direction.NONE) && rc.canBuild(spawnDir, RobotType.SOLDIER)) {
-                rc.build(spawnDir, RobotType.SOLDIER);
+        if (numSoliders < 16 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
+            Direction spawnDir = nextSpawnDir();
+            if (trySpawn(spawnDir, RobotType.SOLDIER)) {
                 return true;
             }
         }
 
         if (numTurrets < 4 && rc.hasBuildRequirements(RobotType.TURRET)) {
-            Direction spawnDir = MapUtils.getRCCanMoveDirection(this);
-            if (!spawnDir.equals(Direction.NONE) && rc.canBuild(spawnDir, RobotType.TURRET)) {
-                rc.build(spawnDir, RobotType.TURRET);
+            Direction spawnDir = nextTurretSpawnDir();
+            if (trySpawn(spawnDir, RobotType.TURRET)) {
                 return true;
             }
         }
 
-        if (numSoliders < 20 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
-            Direction spawnDir = MapUtils.getRCCanMoveDirection(this);
-            if (!spawnDir.equals(Direction.NONE) && rc.canBuild(spawnDir, RobotType.SOLDIER)) {
-                rc.build(spawnDir, RobotType.SOLDIER);
-                return true;
-            }
-        }
         return false;
     }
 
@@ -141,11 +167,5 @@ public class CastleArchon extends BaseArchon {
         numTurrets = numT;
     }
 
-
-    private boolean healBuddies() {
-
-
-        return false;
-    }
 
 }

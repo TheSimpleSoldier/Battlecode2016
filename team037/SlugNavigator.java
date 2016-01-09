@@ -104,6 +104,8 @@ public class SlugNavigator extends Navigator
             return true;
         }
 
+        // we couldn't move anywhere! reset the tail and try again
+        resetTail();
         return false;
 
     }
