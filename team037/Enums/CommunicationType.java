@@ -8,7 +8,7 @@ import team037.Messages.*;
 public enum CommunicationType
 {
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
-    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS;
+    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT;
 
     public static int toInt(CommunicationType type)
     {
@@ -36,6 +36,8 @@ public enum CommunicationType
                 return 9;
             case SPARTS:
                 return 10;
+            case TURRET_SUPPORT:
+                return 11;
         }
         return -1;
     }
@@ -66,6 +68,8 @@ public enum CommunicationType
                 return SDEN;
             case 10:
                 return SPARTS;
+            case 11:
+                return TURRET_SUPPORT;
         }
         return null;
     }
@@ -95,6 +99,8 @@ public enum CommunicationType
             //MapBoundsCommunication
             case MAP_BOUNDS:
                 return new MapBoundsCommunication();
+            case TURRET_SUPPORT:
+                return new TurretSupportCommunication();
         }
 
         return null;

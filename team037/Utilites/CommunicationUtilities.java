@@ -26,8 +26,10 @@ public class CommunicationUtilities
         int[] message = signal.getMessage();
         CommunicationType opcode = CommunicationType.fromInt(
                 extractVal(message[0], 1, opcodeSize));
+
         Communication communication = CommunicationType.getCommunication(opcode);
         communication.setValues(unpack(message, communication.getLengths()));
+
         return communication;
     }
 

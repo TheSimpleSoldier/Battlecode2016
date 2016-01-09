@@ -38,6 +38,11 @@ import team037.Utilites.CommunicationUtilities;
  *   val3 is the height indicator
  *   loc1y is the y coordinate
  *   val4 is the height
+ *
+ * turret SupportFormat
+ *      opcode is the specific opcode
+ *      val1 is the x cord of enemy
+ *      val2 is the y cord of enemy
  */
 public class Communication
 {

@@ -24,7 +24,7 @@ public class FlyingNavigator extends Navigator
 
     @Override
     public boolean takeNextStep() throws GameActionException {
-        if (!rc.isCoreReady()) {
+        if (!rc.isCoreReady() || target == null) {
             return false;
         }
 

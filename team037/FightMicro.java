@@ -1,6 +1,7 @@
 package team037;
 
 import battlecode.common.*;
+import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
 
@@ -256,33 +257,33 @@ public class FightMicro
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "retreat");
+                rc.setIndicatorString(1, "retreat: " + dir);
             }
 
             if (rc.isCoreReady() && cluster) {
                 MapLocation ally = new MapLocation(ally_x, ally_y);
                 dir = rc.getLocation().directionTo(ally);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Cluster");
+                rc.setIndicatorString(2, "Cluster: " + dir);
             }
 
             if (rc.isCoreReady() && advance) {
                 dir = FightMicroUtilites.getDir(rc, target);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Advance");
+                rc.setIndicatorString(2, "Advance: " + dir);
             }
 
             if (rc.isCoreReady() && pursue) {
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Pursue");
+                rc.setIndicatorString(2, "Pursue: " + dir);
             }
         }
 
-        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
+//        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
         if (rc.isWeaponReady() && nearByEnemies.length > 0) {
-            rc.setIndicatorString(1, "Attacking");
+//            rc.setIndicatorString(1, "Attacking");
             try {
                 RobotInfo weakEnemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
                 if (weakEnemy != null) {
@@ -369,6 +370,41 @@ public class FightMicro
         }
 
         return true;
+    }
+
+    /**
+     * This method runs turretFightMicro
+     * @param nearByEnemies
+     * @param nearByZombies
+     * @param enemies
+     * @param allies
+     * @param target
+     * @return
+     * @throws GameActionException
+     */
+    public boolean turretFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByZombies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target, Communication[] communications) throws GameActionException
+    {
+        if (!rc.isWeaponReady())
+            return false;
+
+        MapLocation bestTarget = FightMicroUtilites.getTurretAttackPoint(nearByEnemies, rc, communications);
+
+        if (bestTarget != null && rc.canAttackLocation(bestTarget))
+        {
+            rc.attackLocation(bestTarget);
+            return true;
+        }
+
+        bestTarget = FightMicroUtilites.getBestTurretTarget(nearByZombies, rc);
+
+        if (bestTarget != null && rc.canAttackLocation(bestTarget))
+        {
+            rc.attackLocation(bestTarget);
+            return true;
+        }
+
+        // TODO: add net for logic about turning into TTM to move
+        return false;
     }
 
     public double[] getInputs1(RobotInfo[] enemies, RobotInfo[] allies, RobotInfo[] nearByEnemies)

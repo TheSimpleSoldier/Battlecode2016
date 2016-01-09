@@ -46,7 +46,7 @@ public class BaseArchon extends Unit
 
     public boolean healNearbyAllies() throws GameActionException {
         // precondition
-        if (nearByAllies.length == 0) {
+        if (nearByAllies.length == 0 || rc.isCoreReady()) {
             return false;
         }
 
@@ -56,7 +56,7 @@ public class BaseArchon extends Unit
         for (int i = nearByAllies.length; --i>=0; )
         {
             double health = nearByAllies[i].health;
-            if (health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) <= RobotType.ARCHON.attackRadiusSquared)
+            if (nearByAllies[i].type != RobotType.ARCHON && health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) <= RobotType.ARCHON.attackRadiusSquared)
             {
                 if (health < weakestHealth)
                 {
