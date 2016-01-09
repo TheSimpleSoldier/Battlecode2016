@@ -94,10 +94,6 @@ public abstract class Unit
                     nextBot = comm.newBType;
                 }
             }
-            else if (communications[k].opcode == CommunicationType.TURRET_SUPPORT)
-            {
-                System.out.println("TURRET_SUPPORT");
-            }
         }
     }
 

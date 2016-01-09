@@ -252,19 +252,12 @@ public class FightMicro
             pursue = true;
         }
 
-        rc.setIndicatorString(0, "");
-        rc.setIndicatorString(1, "");
-        rc.setIndicatorString(2, "");
-
-
         if (rc.isCoreReady() && offensiveEnemies > 0) {
             if (retreat) {
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
-                rc.setIndicatorString(0, "retreat: " + dir + " to x:" + rc.getLocation().add(dir).x + " y:" + rc.getLocation().add(dir).y);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(1, "retreat: " + dir + " to x:" + rc.getLocation().x + " y:" + rc.getLocation().y);
-                rc.setIndicatorString(2, "retreat: " + dir + " to x:" + rc.getLocation().add(dir).x + " y:" + rc.getLocation().add(dir).y);
+                rc.setIndicatorString(1, "retreat: " + dir);
             }
 
             if (rc.isCoreReady() && cluster) {

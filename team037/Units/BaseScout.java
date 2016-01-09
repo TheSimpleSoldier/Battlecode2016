@@ -48,12 +48,10 @@ public class BaseScout extends Unit
 
     private void msgTurrets() throws GameActionException
     {
-        rc.setIndicatorString(1, "");
         for (int i = allies.length; --i >= 0; )
         {
             if (allies[i].type == RobotType.TURRET)
             {
-                rc.setIndicatorString(0, "We found a turret");
                 mapKnowledge.ourTurretLocations.add(allies[i].location);
             }
         }
@@ -74,10 +72,9 @@ public class BaseScout extends Unit
                     double dist = allyTurrets[j].distanceSquaredTo(enemy);
                     if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared)
                     {
-                        rc.setIndicatorString(1, "Helping Turret");
                         Communication communication = new TurretSupportCommunication();
                         communication.setValues(new int[]{0,0,enemy.x, enemy.y});
-                        communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]), communication);
+                        communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
                         sentMsg = true;
                     }
                 }
@@ -88,8 +85,6 @@ public class BaseScout extends Unit
                 for (int i = zombies.length; --i >= 0; )
                 {
                     MapLocation enemy = zombies[i].location;
-//                    if (enemy == null)
-//                        continue;
 
                     for (int j = allyTurrets.length; --j >= 0; )
                     {
@@ -98,12 +93,10 @@ public class BaseScout extends Unit
 
                         if (allyTurrets[j].distanceSquaredTo(enemy) <= RobotType.TURRET.attackRadiusSquared)
                         {
-                            rc.setIndicatorString(1, "Helping Turret");
                             TurretSupportCommunication communication = new TurretSupportCommunication();
                             communication.opcode = CommunicationType.TURRET_SUPPORT;
                             communication.setValues(new int[]{0,0,enemy.x, enemy.y});
-                            communicator.sendCommunication(400, communication);
-                            //communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
+                            communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
                         }
                     }
                 }
