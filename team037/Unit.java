@@ -5,6 +5,7 @@ import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
+import team037.Messages.PartsCommunication;
 
 public abstract class Unit
 {
@@ -30,6 +31,8 @@ public abstract class Unit
     public static Bots thisBot= null;
     public static int id;
     public static Communication[] communications;
+    public static MapKnowledge mapKnowledge = new MapKnowledge();
+    public static MapLocation start;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -57,6 +60,8 @@ public abstract class Unit
         locationLastTurn = rc.getLocation();
         previousLocation = locationLastTurn;
         currentLocation = locationLastTurn;
+        start = rc.getLocation();
+
     }
 
     public boolean act() throws GameActionException {
@@ -92,6 +97,31 @@ public abstract class Unit
                 else if(comm.id == 0 && comm.rType == rc.getType())
                 {
                     nextBot = comm.newBType;
+                }
+            }
+            else if (type == RobotType.SCOUT && communications[k].opcode == CommunicationType.PARTS)
+            {
+                // if we get a new msg about parts then send it out
+                int[] values = communications[k].getValues();
+                MapLocation loc = new MapLocation(values[2], values[3]);
+
+                if (!mapKnowledge.partListed(loc))
+                {
+                    Communication communication = new PartsCommunication();
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), values[1], values[2], values[3]});
+                    communicator.sendCommunication(Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start))), communication);
+                }
+            }
+            else if (type == RobotType.SCOUT && communications[k].opcode == CommunicationType.NEUTRAL)
+            {
+                int[] values = communications[k].getValues();
+                MapLocation loc = new MapLocation(values[2], values[3]);
+
+                if (!mapKnowledge.partListed(loc))
+                {
+                    Communication communication = new PartsCommunication();
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), values[1], values[2], values[3]});
+                    communicator.sendCommunication(Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start))), communication);
                 }
             }
         }

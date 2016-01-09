@@ -5,12 +5,14 @@ import team037.Enums.CommunicationType;
 import team037.FlyingNavigator;
 import team037.MapKnowledge;
 import team037.Messages.Communication;
+import team037.Messages.PartsCommunication;
 import team037.Messages.TurretSupportCommunication;
 import team037.Unit;
+import team037.Utilites.PartsUtilities;
+import team037.DataStructures.*;
 
 public class BaseScout extends Unit
 {
-    MapKnowledge mapKnowledge = new MapKnowledge();
     FlyingNavigator move;
 
     public BaseScout(RobotController rc)
@@ -44,6 +46,38 @@ public class BaseScout extends Unit
         super.handleMessages();
 
         msgTurrets();
+
+        msgParts();
+    }
+
+    private void msgParts() throws GameActionException
+    {
+        AppendOnlyMapLocationArray parts = PartsUtilities.findPartsAndNeutralsICanSense(rc);
+        MapLocation[] partsArray = parts.array;
+
+        for (int i = partsArray.length; --i>=0; )
+        {
+            MapLocation spot = partsArray[i];
+            if (!mapKnowledge.partListed(spot))
+            {
+                RobotInfo bot = rc.senseRobotAtLocation(parts.array[i]);
+                int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
+                if (rc.senseParts(spot) > 0)
+                {
+                    // create parts msg
+                    Communication communication = new PartsCommunication();
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), (int) rc.senseParts(spot), spot.x, spot.y});
+                    communicator.sendCommunication(dist, communication);
+                }
+                else if (bot.team == Team.NEUTRAL)
+                {
+                    // create neutral bot msg
+                    Communication communication = new PartsCommunication();
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), bot.type.partCost, spot.x, spot.y});
+                    communicator.sendCommunication(dist, communication);
+                }
+            }
+        }
     }
 
     private void msgTurrets() throws GameActionException
@@ -52,7 +86,7 @@ public class BaseScout extends Unit
         {
             if (allies[i].type == RobotType.TURRET)
             {
-                mapKnowledge.ourTurretLocations.add(allies[i].location);
+                mapKnowledge.addAlliedTurretLocation(allies[i].location);
             }
         }
 
