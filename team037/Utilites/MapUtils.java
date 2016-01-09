@@ -49,7 +49,7 @@ public class MapUtils
     public static MapLocation findOnMapLocationNUnitsAway(Unit unit, Direction d, int toMove) throws GameActionException {
         MapLocation current = unit.currentLocation;
         for (int i = toMove; --i >= 0;) {
-            if (!unit.rc.canSense(current)) {
+            if (!unit.rc.canSenseLocation(current)) {
                 break;
             }
             MapLocation toTry = current.add(d);
