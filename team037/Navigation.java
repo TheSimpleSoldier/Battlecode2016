@@ -155,7 +155,14 @@ public class Navigation {
 
     public static void dig(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
+
         Direction forward = currentLoc.directionTo(goal);
+
+        // if we have reached goal then it will try to clear rubble
+        // for direction omni which throws an error
+        if (forward == Direction.NONE || forward == Direction.OMNI)
+            return;
+
         Direction right = forward.rotateRight();
         Direction left = forward.rotateLeft();
 

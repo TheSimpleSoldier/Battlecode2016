@@ -81,32 +81,36 @@ public class FightMicroUtilites
      */
     public static MapLocation getTurretAttackPoint(RobotInfo[] nearByEnemies, RobotController rc, Communication[] communications)
     {
+
+        rc.setIndicatorString(0, "# of comms: " + communications.length);
+
         MapLocation target = getBestTurretTarget(nearByEnemies, rc);
 
         // search signals for scouts telling us locations as well as
         // for enemy broadcasts
         if (target == null)
         {
-            Team us = rc.getTeam();
             MapLocation loc = rc.getLocation();
             int dist = rc.getType().attackRadiusSquared;
 
             for (int i = communications.length; --i>=0; )
             {
+                rc.setIndicatorString(2, "Gettting msgs: " + communications[i].opcode);
                 if (communications[i].opcode == CommunicationType.TURRET_SUPPORT)
                 {
-                    // then msg is from our scout
-                }
-                else if (communications[i].opcode == CommunicationType.OENEMY)
-                {
-                    // TODO: fix this!!
-                    MapLocation enemy = null;
+                    System.out.println("WE got a message!!!!!");
                     int[] cords = communications[i].getValues();
+                    rc.setIndicatorString(1, "Attacking enemy at location x:" + cords[2] + " y: " + cords[3]);
+                    MapLocation enemy = new MapLocation(cords[2], cords[3]);
                     if (enemy.distanceSquaredTo(loc) <= dist)
                     {
                         target = enemy;
                         break;
                     }
+                }
+                else if (communications[i].opcode == CommunicationType.OENEMY)
+                {
+
                 }
             }
         }

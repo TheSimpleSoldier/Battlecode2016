@@ -29,6 +29,7 @@ public abstract class Unit
     public static Bots nextBot = null;
     public static Bots thisBot= null;
     public static int id;
+    public static Communication[] communications;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -59,8 +60,7 @@ public abstract class Unit
     }
 
     public boolean act() throws GameActionException {
-        if (fight());
-        else if (fightZombies());
+        if (fight() || fightZombies());
         else if (carryOutAbility());
         else if (takeNextStep());
 
@@ -75,7 +75,7 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
-        Communication[] communications = communicator.processCommunications();
+        communications = communicator.processCommunications();
         for(int k = 0; k < communications.length; k++)
         {
             if(communications[k].opcode == CommunicationType.CHANGEMISSION)
@@ -93,6 +93,10 @@ public abstract class Unit
                 {
                     nextBot = comm.newBType;
                 }
+            }
+            else if (communications[k].opcode == CommunicationType.TURRET_SUPPORT)
+            {
+                System.out.println("TURRET_SUPPORT");
             }
         }
     }

@@ -19,7 +19,6 @@ public class BaseTurret extends Unit
 
     public boolean fight() throws GameActionException
     {
-        Communication[] communications = communicator.processCommunications();
         return fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
     }
 

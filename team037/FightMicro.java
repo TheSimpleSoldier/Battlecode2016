@@ -252,38 +252,45 @@ public class FightMicro
             pursue = true;
         }
 
+        rc.setIndicatorString(0, "");
+        rc.setIndicatorString(1, "");
+        rc.setIndicatorString(2, "");
+
+
         if (rc.isCoreReady() && offensiveEnemies > 0) {
             if (retreat) {
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
+                rc.setIndicatorString(0, "retreat: " + dir + " to x:" + rc.getLocation().add(dir).x + " y:" + rc.getLocation().add(dir).y);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "retreat");
+                rc.setIndicatorString(1, "retreat: " + dir + " to x:" + rc.getLocation().x + " y:" + rc.getLocation().y);
+                rc.setIndicatorString(2, "retreat: " + dir + " to x:" + rc.getLocation().add(dir).x + " y:" + rc.getLocation().add(dir).y);
             }
 
             if (rc.isCoreReady() && cluster) {
                 MapLocation ally = new MapLocation(ally_x, ally_y);
                 dir = rc.getLocation().directionTo(ally);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Cluster");
+                rc.setIndicatorString(2, "Cluster: " + dir);
             }
 
             if (rc.isCoreReady() && advance) {
                 dir = FightMicroUtilites.getDir(rc, target);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Advance");
+                rc.setIndicatorString(2, "Advance: " + dir);
             }
 
             if (rc.isCoreReady() && pursue) {
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Pursue");
+                rc.setIndicatorString(2, "Pursue: " + dir);
             }
         }
 
-        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
+//        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
         if (rc.isWeaponReady() && nearByEnemies.length > 0) {
-            rc.setIndicatorString(1, "Attacking");
+//            rc.setIndicatorString(1, "Attacking");
             try {
                 RobotInfo weakEnemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
                 if (weakEnemy != null) {
@@ -384,6 +391,9 @@ public class FightMicro
      */
     public boolean turretFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByZombies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target, Communication[] communications) throws GameActionException
     {
+        if (!rc.isWeaponReady())
+            return false;
+
         MapLocation bestTarget = FightMicroUtilites.getTurretAttackPoint(nearByEnemies, rc, communications);
 
         if (bestTarget != null && rc.canAttackLocation(bestTarget))

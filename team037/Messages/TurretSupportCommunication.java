@@ -17,17 +17,17 @@ public class TurretSupportCommunication extends Communication
 
     public int[] getValues()
     {
-        return new int[]{x,y};
+        return new int[]{CommunicationType.toInt(opcode),0,x,y};
     }
 
     public void setValues(int[] values)
     {
-        x = values[0];
-        y = values[1];
+        x = values[2];
+        y = values[3];
     }
 
     public int[] getLengths()
     {
-        return new int[]{CommunicationUtilities.opcodeSize, 10, 10};
+        return new int[]{CommunicationUtilities.opcodeSize, CommunicationUtilities.valSize, CommunicationUtilities.valSize, CommunicationUtilities.valSize};
     }
 }
