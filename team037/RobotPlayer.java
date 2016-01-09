@@ -22,7 +22,10 @@ public class RobotPlayer
         // and strategy will be foo
         String strategy = System.getProperty("bc.testing.strat");
         // IT DOESN'T WORK CURRENTLY :(
-        strategy = Strategies.CASTLE;
+        // BUT THEY ARE FIXING IT!
+
+        // hardcode disabled for now
+        strategy = "not castle";
 
 
         RobotType type = rc.getType();
