@@ -20,7 +20,7 @@ public class ScoutingScout extends BaseScout {
         return false;
     }
 
-    public boolean discoverEdges() throws GameActionException {
+    private boolean discoverEdges() throws GameActionException {
         // precondition:
         if (mapKnowledge.mapBoundaryComplete()) {
             return false;
@@ -55,7 +55,7 @@ public class ScoutingScout extends BaseScout {
         return false;
     }
 
-    public boolean setNewScoutDirection() {
+    private boolean setNewScoutDirection() {
         if (mapKnowledge.minY == Integer.MIN_VALUE) {
             scoutDirection = Direction.NORTH;
             return true;

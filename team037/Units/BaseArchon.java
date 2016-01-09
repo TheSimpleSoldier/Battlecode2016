@@ -151,7 +151,6 @@ public class BaseArchon extends Unit
                 // if we get a new msg about parts then check to see if we have added it to our list of sorted parts
                 int[] values = communications[k].getValues();
                 MapLocation loc = new MapLocation(values[2], values[3]);
-                System.out.println("We received a msg about parts at location x: " + values[2] + " y: " + values[3]);
 
                 if (!sortedParts.contains(loc))
                 {
@@ -163,8 +162,6 @@ public class BaseArchon extends Unit
                 // if we get a msg about neturals then check to see if we have that location stored
                 int[] values = communications[k].getValues();
                 MapLocation loc = new MapLocation(values[2], values[3]);
-
-                System.out.println("We received a msg about a neutral bot at location x: " + values[2] + " y: " + values[3]);
 
                 if (!sortedParts.contains(loc))
                 {
