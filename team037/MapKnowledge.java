@@ -14,6 +14,8 @@ public class MapKnowledge {
     public int minY = Integer.MIN_VALUE;
     public int maxY = Integer.MIN_VALUE;
 
+    public boolean[] exploredRegions = new boolean[16];
+
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
     public AppendOnlyMapLocationSet ourTurretLocations;
@@ -237,7 +239,7 @@ public class MapKnowledge {
      * @param numb
      * @return
      */
-    public MapLocation[] getRegion(int numb)
+    public MapLocation[] getRegion(int numb, int minX, int maxX, int minY, int maxY)
     {
         int topX, topY, bottomX, bottomY;
 
@@ -284,5 +286,160 @@ public class MapKnowledge {
         }
 
         return new MapLocation[]{new MapLocation(topX, topY), new MapLocation(bottomX, bottomY)};
+    }
+
+    /**
+     * This method returns the region for a mapLocation
+     *
+     * 0    1   2   3
+     * 4    5   6   7
+     * 8    9   10  11
+     * 12   13  14  15
+     *
+     * @param spot
+     * @return
+     */
+    public int getRegion(MapLocation spot, int minX, int maxX, int minY, int maxY)
+    {
+        int x = spot.x;
+        int y = spot.y;
+
+        int row = 0;
+        int col;
+
+        if (x < minX + (maxX - minX) / 4)
+        {
+            col = 0;
+        }
+        else if (x < minX + (maxX - minX) / 2)
+        {
+            col = 1;
+        }
+        else if (x < minX + 3 * (maxX - minX) / 4)
+        {
+            col = 2;
+        }
+        else
+        {
+            col = 3;
+        }
+
+        if (y < minY + (maxY - minY) / 4)
+        {
+            row = 0;
+        }
+        else if (y < minY + (maxY - minY) / 2)
+        {
+            row = 1;
+        }
+        else if (y < minY + 3 * (maxY - minY) / 4)
+        {
+            row = 2;
+        }
+        else
+        {
+            row = 3;
+        }
+
+        return row * 4 + col;
+    }
+
+    /**
+     * This method returns if the current region has been explored yet
+     *
+     * @param current
+     * @return
+     */
+    public boolean exploredCurrentRegion(MapLocation current)
+    {
+        return exploredRegions[getRegion(current, minX, maxX, minY, maxY)];
+    }
+
+    /**
+     * This method returns the center of a region
+     *
+     * @param region
+     * @return
+     */
+    public MapLocation getRegionCenter(int region)
+    {
+        MapLocation[] bounds = getRegion(region, minX, maxX, minY, maxY);
+
+        return new MapLocation((bounds[0].x + bounds[1].x) / 2, (bounds[0].y + bounds[1].y) / 2);
+    }
+
+    /**
+     * This method returns the closest unexplored region
+     *
+     * @param current
+     * @return
+     */
+    public int closestUnexploredRegion(MapLocation current)
+    {
+        int closestDist = Integer.MAX_VALUE;
+        int region = -1;
+
+        for (int i = 0; i < 16; i++)
+        {
+            if (!exploredRegions[i])
+            {
+                int dist = current.distanceSquaredTo(getRegionCenter(i));
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    region = i;
+                }
+            }
+        }
+        return region;
+    }
+
+    /**
+     * This method updates the explored regions when a new bound is discovered
+     *
+     * @param newMaxX
+     * @param newMaxY
+     * @param newMinX
+     * @param newMinY
+     */
+    public void updateRegions(int newMaxX, int newMaxY, int newMinX, int newMinY)
+    {
+        boolean[] updatedExploredRegions = new boolean[16];
+        for (int i = 0; i < 16; i++)
+        {
+            if (exploredRegions[i])
+            {
+                if (newMaxX > maxX)
+                {
+                    if (i % 4 != 3)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i+1];
+                    }
+                }
+                else if (newMaxY > maxY)
+                {
+                    if (i < 12)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i+4];
+                    }
+                }
+                else if (newMinX < minX)
+                {
+                    if (i % 4 != 0)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i-1];
+                    }
+                }
+                else if (newMinY < minY)
+                {
+                    if (i >= 4)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i-4];
+                    }
+                }
+            }
+        }
+        exploredRegions = updatedExploredRegions;
     }
 }
