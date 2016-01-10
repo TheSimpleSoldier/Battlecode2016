@@ -5,7 +5,9 @@ import team037.DataStructures.BuildOrder;
 import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
 
@@ -110,6 +112,23 @@ public class BaseArchon extends Unit
                     communication.bType = nextBot;
                     communication.newBType = nextBot;
                     communicator.sendCommunication(2, communication);
+
+                    if (nextBot == Bots.DENKILLERGUARD || nextBot == Bots.DENKILLERSOLDIER)
+                    {
+                        for (int j = mapKnowledge.denLocations.length; --j>=0; )
+                        {
+                            MapLocation den = mapKnowledge.denLocations.array[j];
+
+                            if (den != null)
+                            {
+                                Communication communicationDen = new SimpleBotInfoCommunication();
+                                communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                                communicator.sendCommunication(2, communicationDen);
+                            }
+                        }
+                    }
+
+
                     nextBot = buildOrder.nextBot();
                     nextType = Bots.typeFromBot(nextBot);
                     return true;
@@ -167,7 +186,6 @@ public class BaseArchon extends Unit
                 {
                     sortedParts.addParts(loc, currentLocation, values[1], true);
                 }
-
             }
         }
     }

@@ -45,6 +45,9 @@ public class SortedParts
      */
     public void addParts(MapLocation m, MapLocation currentSpot, int value, boolean neutral)
     {
+        if (m == null || currentSpot == null)
+            return;
+
         double newValue = value;
 
         // b/c neutral parts don't have a build time

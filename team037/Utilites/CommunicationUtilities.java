@@ -5,6 +5,7 @@ import battlecode.common.Signal;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;
+import team037.Unit;
 
 /**
  * Created by joshua on 1/5/16.
@@ -74,31 +75,40 @@ public class CommunicationUtilities
     public static Communication readSimpleCommunication(Signal signal, int round)
     {
         CommunicationType opcode = null;
-        switch(round % 10)
-        {
-            case 0:
-            case 1:
-                opcode = CommunicationType.SARCHON;
-                break;
-            case 2:
-            case 3:
-                opcode = CommunicationType.SENEMY;
-                break;
-            case 4:
-            case 5:
-                opcode = CommunicationType.SZOMBIE;
-                break;
-            case 6:
-            case 7:
-                opcode = CommunicationType.SDEN;
-                break;
-            case 8:
-            case 9:
-                opcode = CommunicationType.SPARTS;
-                break;
-        }
 
         MapLocation loc = signal.getLocation();
+
+        if (Unit.mapKnowledge.denLocations.contains(loc))
+        {
+            opcode = CommunicationType.SKILLED_DEN;
+        }
+        else
+        {
+            switch(round % 10)
+            {
+                case 0:
+                case 1:
+                    opcode = CommunicationType.SARCHON;
+                    break;
+                case 2:
+                case 3:
+                    opcode = CommunicationType.SENEMY;
+                    break;
+                case 4:
+                case 5:
+                    opcode = CommunicationType.SZOMBIE;
+                    break;
+                case 6:
+                case 7:
+                    opcode = CommunicationType.SDEN;
+                    break;
+                case 8:
+                case 9:
+                    opcode = CommunicationType.SPARTS;
+                    break;
+            }
+        }
+
         Communication communication = new SimpleBotInfoCommunication();
         communication.setValues(new int[]{CommunicationType.toInt(opcode),
         signal.getRobotID(), loc.x, loc.y});

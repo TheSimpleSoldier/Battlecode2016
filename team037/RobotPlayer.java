@@ -98,6 +98,7 @@ public class RobotPlayer
         // Game loop that will execute very round
         while (true)
         {
+            Unit.msgsSent = 0;
             try
             {
                 unit.collectData();

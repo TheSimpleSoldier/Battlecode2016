@@ -6,6 +6,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.PartsCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 
 public abstract class Unit
 {
@@ -34,6 +35,7 @@ public abstract class Unit
     public static MapKnowledge mapKnowledge = new MapKnowledge();
     public static MapLocation start;
     public static boolean repaired;
+    public static int msgsSent = 0;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
@@ -83,51 +85,99 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         communications = communicator.processCommunications();
+        int[] values;
+        int dist = 0;
+
+        if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+            dist = Math.max(type.sensorRadiusSquared * 2, Math.min(type.sensorRadiusSquared * 7, rc.getLocation().distanceSquaredTo(start)));
+
         for(int k = 0; k < communications.length; k++)
         {
-            if(communications[k].opcode == CommunicationType.CHANGEMISSION)
+            switch (communications[k].opcode)
             {
-                MissionCommunication comm = (MissionCommunication) communications[k];
-                if(comm.id == rc.getID())
-                {
-                    nextBot = comm.newBType;
-                }
-                else if(comm.id == 0 && comm.bType == thisBot)
-                {
-                    nextBot = comm.newBType;
-                }
-                else if(comm.id == 0 && comm.rType == rc.getType())
-                {
-                    nextBot = comm.newBType;
-                }
-            }
-            else if (type == RobotType.SCOUT && communications[k].opcode == CommunicationType.PARTS)
-            {
+                case CHANGEMISSION:
+                    MissionCommunication comm = (MissionCommunication) communications[k];
+                    if(comm.id == rc.getID())
+                    {
+                        nextBot = comm.newBType;
+                    }
+                    else if(comm.id == 0 && comm.bType == thisBot)
+                    {
+                        nextBot = comm.newBType;
+                    }
+                    else if(comm.id == 0 && comm.rType == rc.getType())
+                    {
+                        nextBot = comm.newBType;
+                    }
+                    break;
+                case SDEN:
+                    values = communications[k].getValues();
+                    MapLocation den = new MapLocation(values[2], values[3]);
 
-                // if we get a new msg about parts then send it out
-                int[] values = communications[k].getValues();
-                MapLocation loc = new MapLocation(values[2], values[3]);
+                    if (!mapKnowledge.denLocations.contains(den))
+                    {
+                        mapKnowledge.addDenLocation(den);
 
-                if (!mapKnowledge.partListed(loc))
-                {
-                    mapKnowledge.addPartsAndNeutrals(loc);
-                    Communication communication = new PartsCommunication();
-                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), values[1], values[2], values[3]});
-                    communicator.sendCommunication(Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start))), communication);
-                }
-            }
-            else if (type == RobotType.SCOUT && communications[k].opcode == CommunicationType.NEUTRAL)
-            {
-                int[] values = communications[k].getValues();
-                MapLocation loc = new MapLocation(values[2], values[3]);
+                        if (type == RobotType.SCOUT || type == RobotType.ARCHON && msgsSent < 20)
+                        {
+                            Communication communication = new SimpleBotInfoCommunication();
+                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), values[1], values[2], values[3]});
+                            communicator.sendCommunication(dist, communication);
+                            msgsSent++;
+                        }
+                    }
 
-                if (!mapKnowledge.partListed(loc))
-                {
-                    mapKnowledge.addPartsAndNeutrals(loc);
-                    Communication communication = new PartsCommunication();
-                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), values[1], values[2], values[3]});
-                    communicator.sendCommunication(Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start))), communication);
-                }
+
+                    break;
+                case PARTS:
+                    if (type == RobotType.SCOUT)
+                    {
+                        // if we get a new msg about parts then send it out
+                        values = communications[k].getValues();
+                        MapLocation loc = new MapLocation(values[2], values[3]);
+
+                        if (!mapKnowledge.partListed(loc) && msgsSent < 20)
+                        {
+                            mapKnowledge.addPartsAndNeutrals(loc);
+                            Communication communication = new PartsCommunication();
+                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), values[1], values[2], values[3]});
+                            communicator.sendCommunication(dist, communication);
+                            msgsSent++;
+                        }
+                    }
+                    break;
+                case NEUTRAL:
+                    if (type == RobotType.SCOUT)
+                    {
+                        values = communications[k].getValues();
+                        MapLocation loc = new MapLocation(values[2], values[3]);
+
+                        if (!mapKnowledge.partListed(loc) && msgsSent < 20)
+                        {
+                            mapKnowledge.addPartsAndNeutrals(loc);
+//                            Communication communication = new PartsCommunication();
+//                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), values[1], values[2], values[3]});
+                            communicator.sendCommunication(dist, communications[k]);
+                            msgsSent++;
+                        }
+                    }
+                    break;
+                case SKILLED_DEN:
+                case DEAD_DEN:
+                    values = communications[k].getValues();
+                    MapLocation spot = new MapLocation(values[2], values[3]);
+
+                    if (mapKnowledge.denLocations.contains(spot))
+                    {
+                        mapKnowledge.denLocations.remove(spot);
+
+                        if (type == RobotType.SCOUT && msgsSent < 20)
+                        {
+                            communicator.sendCommunication(dist, communications[k]);
+                            msgsSent++;
+                        }
+                    }
+                    break;
             }
         }
     }
@@ -167,6 +217,7 @@ public abstract class Unit
         if (!newLoc.equals(currentLocation)) {
             previousLocation = currentLocation;
         }
+
         currentLocation = newLoc;
     }
 }

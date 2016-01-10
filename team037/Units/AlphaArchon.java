@@ -18,7 +18,6 @@ public class AlphaArchon extends BaseArchon
 
     private MapLocation getNextPartLocation() {
         MapLocation best = sortedParts.getBestSpot();
-        System.out.println("We are now going to: " + best);
         return best;
     }
 

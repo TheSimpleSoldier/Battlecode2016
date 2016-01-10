@@ -2,13 +2,10 @@ package team037.Enums;
 
 import team037.Messages.*;
 
-/**
- * Created by joshua on 1/5/16.
- */
 public enum CommunicationType
 {
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
-    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT, NEUTRAL;
+    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT, NEUTRAL, SKILLED_DEN, DEAD_DEN;
 
     public static int toInt(CommunicationType type)
     {
@@ -40,6 +37,10 @@ public enum CommunicationType
                 return 11;
             case NEUTRAL:
                 return 12;
+            case SKILLED_DEN:
+                return 13;
+            case DEAD_DEN:
+                return 14;
         }
         return -1;
     }
@@ -74,6 +75,10 @@ public enum CommunicationType
                 return TURRET_SUPPORT;
             case 12:
                 return NEUTRAL;
+            case 13:
+                return SKILLED_DEN;
+            case 14:
+                return DEAD_DEN;
         }
         return null;
     }
@@ -88,6 +93,8 @@ public enum CommunicationType
                 return new BotInfoCommunication();
             //SimpleBotInfoCommunication
             case OENEMY:
+            case SKILLED_DEN:
+            case DEAD_DEN:
             case SARCHON:
             case SENEMY:
             case SPARTS:

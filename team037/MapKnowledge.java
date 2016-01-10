@@ -1,9 +1,6 @@
 package team037;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
 import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;
@@ -44,6 +41,57 @@ public class MapKnowledge {
 
     public MapLocation nearestCorner(MapLocation m) {
         // TODO: implement this
+        return null;
+    }
+
+    /**
+     * This method returns the closest discovered den
+     *
+     * @param currentLoc
+     * @return
+     */
+    public MapLocation closestDen(MapLocation currentLoc)
+    {
+        MapLocation closest = null;
+        int closestDist = Integer.MAX_VALUE;
+        for (int i = denLocations.length; --i>=0;)
+        {
+            if (denLocations.array[i] == null)
+                continue;
+
+            MapLocation den = denLocations.array[i];
+            int dist = den.distanceSquaredTo(currentLoc);
+            if (closestDist > dist)
+            {
+                closest = den;
+                closestDist = dist;
+            }
+        }
+
+        return closest;
+    }
+
+    /**
+     * This method removes enemy den locations that have been eliminated
+     *
+     * @param rc
+     * @throws GameActionException
+     */
+    public MapLocation updateDens(RobotController rc) throws GameActionException
+    {
+        for (int i = denLocations.length; --i >= 0; )
+        {
+            MapLocation den = denLocations.array[i];
+            if (den == null)
+                continue;
+
+            if (rc.canSenseLocation(den) && (rc.senseRobotAtLocation(den) == null || rc.senseRobotAtLocation(den).type != RobotType.ZOMBIEDEN))
+            {
+                denLocations.remove(den);
+                return den;
+            }
+        }
+
         return null;
     }
 
