@@ -13,7 +13,7 @@ import team037.Unit;
  */
 public class CommunicationUtilities
 {
-    public static int opcodeSize = 4;
+    public static int opcodeSize = 6;
     public static int valSize = 15;
     public static int typeSize = 4;
     public static int botSize = 8;
@@ -30,6 +30,7 @@ public class CommunicationUtilities
 
         Communication communication = CommunicationType.getCommunication(opcode);
         communication.setValues(unpack(message, communication.getLengths()));
+        communication.setSignalValues(signal.getID(), signal.getLocation(), signal.getTeam());
 
         return communication;
     }

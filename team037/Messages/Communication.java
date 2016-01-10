@@ -1,5 +1,7 @@
 package team037.Messages;
 
+import battlecode.common.MapLocation;
+import battlecode.common.Team;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
@@ -47,6 +49,9 @@ import team037.Utilites.CommunicationUtilities;
 public class Communication
 {
     public CommunicationType opcode;
+    public int signalID;
+    public MapLocation signalLoc;
+    public Team signalTeam;
 
     //Prints values by opcode
     public void print()
@@ -69,4 +74,10 @@ public class Communication
         return new int[]{CommunicationUtilities.opcodeSize};
     }
 
+    public void setSignalValues(int signalID, MapLocation signalLoc, Team signalTeam)
+    {
+        this.signalID = signalID;
+        this.signalLoc = signalLoc;
+        this.signalTeam = signalTeam;
+    }
 }
