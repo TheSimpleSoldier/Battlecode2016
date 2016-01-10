@@ -3,9 +3,9 @@ package team037.Units;
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
 import team037.FlyingNavigator;
-import team037.MapKnowledge;
 import team037.Messages.Communication;
 import team037.Messages.PartsCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Messages.TurretSupportCommunication;
 import team037.Unit;
 import team037.Utilites.PartsUtilities;
@@ -48,6 +48,49 @@ public class BaseScout extends Unit
         msgTurrets();
 
         msgParts();
+
+        msgDens();
+    }
+
+    private void msgDens() throws GameActionException
+    {
+        int dist = -1;
+        for (int i = zombies.length; --i>=0; )
+        {
+            if (zombies[i].type == RobotType.ZOMBIEDEN)
+            {
+                MapLocation zombieDen = zombies[i].location;
+                if (!mapKnowledge.denLocations.contains(zombieDen) && msgsSent < 20)
+                {
+                    if (dist == -1)
+                        dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
+
+                    mapKnowledge.addDenLocation(zombieDen);
+                    Communication communication = new SimpleBotInfoCommunication();
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), zombies[i].ID, zombieDen.x, zombieDen.y});
+                    communicator.sendCommunication(dist, communication);
+                    msgsSent++;
+                }
+            }
+        }
+
+        if (rc.getRoundNum() % 5 == 1)
+        {
+            MapLocation deadDen = mapKnowledge.updateDens(rc);
+
+            if (dist == -1)
+                dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
+
+            // if a den has been destroyed send it out
+            if (deadDen != null && msgsSent < 20)
+            {
+                Communication communication = new SimpleBotInfoCommunication();
+                communication.opcode = CommunicationType.DEAD_DEN;
+                communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, deadDen.x, deadDen.y});
+                communicator.sendCommunication(dist, communication);
+                msgsSent++;
+            }
+        }
     }
 
     private void msgParts() throws GameActionException
@@ -68,19 +111,21 @@ public class BaseScout extends Unit
                 }
 
                 int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
-                if (rc.senseParts(spot) > 0)
+                if (rc.senseParts(spot) > 0 && msgsSent < 20)
                 {
                     // create parts msg
                     Communication communication = new PartsCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), (int) rc.senseParts(spot), spot.x, spot.y});
                     communicator.sendCommunication(dist, communication);
+                    msgsSent++;
                 }
-                else if (bot != null && bot.team == Team.NEUTRAL)
+                else if (bot != null && bot.team == Team.NEUTRAL && msgsSent < 20)
                 {
                     // create neutral bot msg
                     Communication communication = new PartsCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), bot.type.partCost, spot.x, spot.y});
                     communicator.sendCommunication(dist, communication);
+                    msgsSent++;
                 }
             }
         }
@@ -110,12 +155,13 @@ public class BaseScout extends Unit
                         continue;
 
                     double dist = allyTurrets[j].distanceSquaredTo(enemy);
-                    if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared)
+                    if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared && msgsSent < 20)
                     {
                         Communication communication = new TurretSupportCommunication();
                         communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(enemies[i].coreDelay),enemy.x, enemy.y});
                         communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
                         sentMsg = true;
+                        msgsSent++;
                     }
                 }
             }
@@ -131,12 +177,13 @@ public class BaseScout extends Unit
                         if (allyTurrets[j] == null)
                             continue;
 
-                        if (allyTurrets[j].distanceSquaredTo(enemy) <= RobotType.TURRET.attackRadiusSquared)
+                        if (allyTurrets[j].distanceSquaredTo(enemy) <= RobotType.TURRET.attackRadiusSquared && msgsSent < 20)
                         {
                             TurretSupportCommunication communication = new TurretSupportCommunication();
                             communication.opcode = CommunicationType.TURRET_SUPPORT;
                             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(zombies[i].coreDelay),enemy.x, enemy.y});
                             communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
+                            msgsSent++;
                         }
                     }
                 }

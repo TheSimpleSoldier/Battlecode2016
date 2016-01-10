@@ -89,6 +89,7 @@ public class FightMicroUtilites
         {
             MapLocation loc = rc.getLocation();
             int dist = rc.getType().attackRadiusSquared;
+            double coreDelay = 0;
 
             for (int i = communications.length; --i>=0; )
             {
@@ -96,7 +97,6 @@ public class FightMicroUtilites
                 {
                     int[] cords = communications[i].getValues();
                     MapLocation enemy = new MapLocation(cords[2], cords[3]);
-                    double coreDelay = 0;
                     if (enemy.distanceSquaredTo(loc) <= dist && cords[1] > coreDelay)
                     {
                         target = enemy;
