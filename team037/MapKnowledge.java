@@ -15,6 +15,7 @@ public class MapKnowledge {
     public int maxY = Integer.MIN_VALUE;
 
     public boolean[] exploredRegions = new boolean[16];
+    public boolean[] exploredEdges = new boolean[4];
 
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
@@ -441,5 +442,108 @@ public class MapKnowledge {
             }
         }
         exploredRegions = updatedExploredRegions;
+    }
+
+    /**
+     * This method returns true if all regions have been searched
+     *
+     * @return
+     */
+    public boolean exporedAllRegions()
+    {
+       for (int i = 0; i < exploredRegions.length; i++)
+       {
+           if (!exploredRegions[i]) return false;
+       }
+
+        return true;
+    }
+
+    /**
+     * This method returns the closest edge of the map
+     *
+     * North = 0
+     * East = 1
+     * South = 2
+     * West = 3
+     *
+     * @param current
+     * @return
+     */
+    public int getClosestDir(MapLocation current)
+    {
+        int maxXDist, maxYDist, minXDist, minYDist;
+
+        // North
+        if (exploredEdges[0])
+            minYDist = Integer.MAX_VALUE;
+        else
+            minYDist = current.y - minY;
+
+        // East
+        if (exploredEdges[1])
+            maxXDist = Integer.MAX_VALUE;
+        else
+            maxXDist = maxX - current.x;
+
+        // South
+        if (exploredEdges[2])
+            maxYDist = Integer.MAX_VALUE;
+        else
+            maxYDist = maxY - current.y;
+
+        // West
+        if (exploredEdges[3])
+            minXDist = Integer.MAX_VALUE;
+        else
+            minXDist = current.x - minX;
+
+        boolean up = true;
+        boolean left = true;
+
+        if (minYDist < maxYDist)
+            up = false;
+
+        if (maxXDist < minXDist)
+            left = false;
+
+        if (up && left)
+        {
+            if (minYDist < minXDist)
+                return 0; // NORTH
+            else
+                return 3; // EAST
+        }
+        else if (up && !left)
+        {
+            if (minYDist < maxXDist)
+                return 0; // NORTH
+            else
+                return 1; // WEST
+        }
+        else if (!up && left)
+        {
+            if (maxYDist < minXDist)
+                return 2; // SOUTH
+            else
+                return 3; // EAST
+        }
+        else
+        {
+            if (maxYDist < maxXDist)
+                return 2; // SOUTH
+            else
+                return 1; // WEST
+        }
+    }
+
+    /**
+     * This method sets an edge to explored
+     *
+     * @param edge
+     */
+    public void reachedEdge(int edge)
+    {
+        exploredEdges[edge] = true;
     }
 }
