@@ -116,110 +116,67 @@ public class MapKnowledge {
         }
     }
 
+    /**
+     * This method updates the map edges from a msg
+     *
+     * @param minX
+     * @param minY
+     * @param height
+     * @param width
+     */
+    public boolean updateEdges(int minX, int minY, int height, int width)
+    {
+        if (inRegionMode()) updateRegions(minX + width, minY + height, minX, minY);
 
-    public MapBoundsCommunication packForMessage() {
-        MapBoundsCommunication communication = new MapBoundsCommunication();
+        boolean updated = false;
 
-        if (minX != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE) {
-            communication.widthIndicator = 3;
-            communication.xVal = minX + MAP_ADD;
-            communication.width = maxX - minX;
-        } else if (minX != Integer.MIN_VALUE) {
-            communication.widthIndicator = 2;
-            communication.xVal = minX + MAP_ADD;
-            communication.width = 0;
-        } else if (maxX != Integer.MIN_VALUE) {
-            communication.widthIndicator = 1;
-            communication.xVal = maxX + MAP_ADD;
-            communication.width = 0;
-        } else {
-            communication.widthIndicator = 0;
-            communication.xVal = 0;
-            communication.width = 0;
+        if (minX < this.minX)
+        {
+            this.minX = minX;
+            updated = true;
         }
 
-
-        if (minY != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE) {
-            communication.heightIndicator = 3;
-            communication.yVal = minY + MAP_ADD;
-            communication.height = maxY - minY;
-        } else if (minY != Integer.MIN_VALUE) {
-            communication.heightIndicator = 2;
-            communication.yVal = minY + MAP_ADD;
-            communication.height = 0;
-        } else if (maxY != Integer.MIN_VALUE) {
-            communication.heightIndicator = 1;
-            communication.yVal = maxY + MAP_ADD;
-            communication.height = 0;
-        } else {
-            communication.heightIndicator = 0;
-            communication.yVal = 0;
-            communication.height = 0;
+        if (minY < this.minY)
+        {
+            this.minY = minY;
+            updated = true;
         }
 
-        return communication;
+        if (minX + width > this.maxX)
+        {
+            this.maxX = minX + width;
+            updated = true;
+        }
+
+        if (minY + height > this.maxY)
+        {
+            this.maxY = minY + height;
+            updated = true;
+        }
+
+        return updated;
     }
 
     public void setValueInDirection(int val, Direction d) {
         switch (d) {
             case NORTH:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 minY = val;
                 break;
             case SOUTH:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 maxY = val;
                 break;
             case WEST:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 minX = val;
                 break;
             case EAST:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 maxX = val;
                 break;
         }
     }
-
-    public void updateEdgesFromMessage(MapBoundsCommunication communication) {
-        int widthBit = communication.widthIndicator;
-        int xCoord = communication.xVal;
-        int width = communication.width;
-
-        int heightBit = communication.heightIndicator;
-        int yCoord = communication.yVal;
-        int height = communication.height;
-
-
-        if (widthBit == 0) {
-            // we know nothing! (jon snow)
-        } else if (widthBit == 1) {
-            // we only have a endcoord
-            maxX = xCoord - MAP_ADD;
-        } else if (widthBit == 2) {
-            // we only have the startcoord
-            minX = xCoord - MAP_ADD;
-        } else if (widthBit == 3) {
-            // we have both
-            minX = xCoord - MAP_ADD;
-            maxX = xCoord - MAP_ADD + width;
-        } else {
-            System.out.println("control bit borked! in MapKnowledge");
-        }
-
-
-        if (heightBit == 0) {
-            // w know nothing! (jon snow)
-        } else if (heightBit == 1) {
-            // we only have the endcoord
-            maxY = yCoord - MAP_ADD;
-        } else if (heightBit == 2) {
-            // we only have the start coord
-            minY = yCoord - MAP_ADD;
-        } else if (heightBit == 3) {
-            minY = yCoord - MAP_ADD;
-            maxY = yCoord - MAP_ADD + height;
-        } else {
-            System.out.println("control bit borked! in MapKnowledge");
-        }
-    }
-
 
     public boolean mapBoundaryComplete() {
         return minX != Integer.MIN_VALUE && minY != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
@@ -545,5 +502,21 @@ public class MapKnowledge {
     public void reachedEdge(int edge)
     {
         exploredEdges[edge] = true;
+    }
+
+    /**
+     * Returns true if we have found 3 edges and false otherwise
+     *
+     * @return
+     */
+    public boolean inRegionMode()
+    {
+        int count = 0;
+        for (int i = exploredEdges.length; --i>=0; )
+        {
+            if (exploredEdges[i]) count++;
+        }
+
+        return count >= 3;
     }
 }

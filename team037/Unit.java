@@ -127,10 +127,9 @@ public abstract class Unit
                         }
                     }
 
-
                     break;
                 case PARTS:
-                    if (type == RobotType.SCOUT)
+                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
                         // if we get a new msg about parts then send it out
                         values = communications[k].getValues();
@@ -139,15 +138,14 @@ public abstract class Unit
                         if (!mapKnowledge.partListed(loc) && msgsSent < 20)
                         {
                             mapKnowledge.addPartsAndNeutrals(loc);
-                            Communication communication = new PartsCommunication();
-                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), values[1], values[2], values[3]});
-                            communicator.sendCommunication(dist, communication);
+                            communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
                     }
                     break;
+
                 case NEUTRAL:
-                    if (type == RobotType.SCOUT)
+                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
                         values = communications[k].getValues();
                         MapLocation loc = new MapLocation(values[2], values[3]);
@@ -155,13 +153,12 @@ public abstract class Unit
                         if (!mapKnowledge.partListed(loc) && msgsSent < 20)
                         {
                             mapKnowledge.addPartsAndNeutrals(loc);
-//                            Communication communication = new PartsCommunication();
-//                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), values[1], values[2], values[3]});
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
                     }
                     break;
+
                 case SKILLED_DEN:
                 case DEAD_DEN:
                     values = communications[k].getValues();
@@ -175,6 +172,21 @@ public abstract class Unit
                         {
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
+                        }
+                    }
+                    break;
+
+                case MAP_BOUNDS:
+                    values = communications[k].getValues();
+                    if (mapKnowledge.updateEdges(values[1], values[4], values[2], values[5]))
+                    {
+                        if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+                        {
+                            if (msgsSent < 20)
+                            {
+                                communicator.sendCommunication(dist, communications[k]);
+                                msgsSent++;
+                            }
                         }
                     }
                     break;

@@ -3,9 +3,6 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
-/**
- * Created by joshua on 1/7/16.
- */
 public class MapBoundsCommunication extends Communication
 {
     public int widthIndicator;
