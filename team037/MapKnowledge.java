@@ -222,5 +222,67 @@ public class MapKnowledge {
         return minX != Integer.MIN_VALUE && minY != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
     }
 
+    /**
+     * This method returns the top left and bottom right corners of a square in the grid
+     *
+     *
+     * 0000     0001    0010    0011
+     *
+     * 0100     0101    0110    0111
+     *
+     * 1000     1001    1010    1011
+     *
+     * 1100     1101    1110    1111
+     *
+     * @param numb
+     * @return
+     */
+    public MapLocation[] getRegion(int numb)
+    {
+        int topX, topY, bottomX, bottomY;
 
+        if (numb % 4 == 0)
+        {
+            topX = minX;
+            bottomX = minX + (maxX - minX) / 4;
+        }
+        else if (numb % 4 == 1)
+        {
+            topX = minX + (maxX - minX) / 4 + 1;
+            bottomX = minX + (maxX - minX) / 2;
+        }
+        else if (numb % 4 == 2)
+        {
+            topX = minX + (maxX - minX) / 2 + 1;
+            bottomX = minX + 3 * (maxX - minX) / 4;
+        }
+        else
+        {
+            topX = minX + 3 * (maxX - minX) / 4 + 1;
+            bottomX = maxX;
+        }
+
+        if (numb < 4)
+        {
+            topY = maxY;
+            bottomY = minY + (maxY - minY / 4);
+        }
+        else if (numb < 8)
+        {
+            topY = minY + (maxY - minY / 4) + 1;
+            bottomY = minY + (maxY - minY / 2);
+        }
+        else if (numb < 12)
+        {
+            topY = minY + (maxY - minY / 2) + 1;
+            bottomY = minY + 3 * (maxY - minY / 4);
+        }
+        else
+        {
+            topY = minY + 3 * (maxY - minY / 4) + 1;
+            bottomY = maxY;
+        }
+
+        return new MapLocation[]{new MapLocation(topX, topY), new MapLocation(bottomX, bottomY)};
+    }
 }
