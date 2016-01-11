@@ -543,6 +543,17 @@ public class MapKnowledge {
     }
 
     /**
+     * This method gets which direction you should go solely based on id
+     *
+     * @param id
+     * @return
+     */
+    public int getDir(int id)
+    {
+        return id % 4;
+    }
+
+    /**
      * This method sets an edge to explored
      *
      * @param edge

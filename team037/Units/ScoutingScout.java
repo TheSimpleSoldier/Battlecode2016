@@ -83,7 +83,7 @@ public class ScoutingScout extends BaseScout {
     }
 
     private boolean setNewScoutDirection() throws GameActionException {
-        dir = mapKnowledge.getClosestDir(currentLocation);
+        dir = mapKnowledge.getDir(id); //mapKnowledge.getClosestDir(currentLocation);
         if (dir == 0) {
             rc.setIndicatorString(0, "Going north");
             scoutDirection = Direction.NORTH;
