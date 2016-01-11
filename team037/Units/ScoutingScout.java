@@ -43,26 +43,28 @@ public class ScoutingScout extends BaseScout {
             if (!setNewScoutDirection()) {
                 return false;
             } else {
+                System.out.println("Setting new target");
                 move.setTarget(currentLocation.add(scoutDirection, 100));
             }
         }
 
-        if (locationLastTurn.equals(currentLocation)) {
-            int edge = MapUtils.senseEdge(rc, scoutDirection);
-            if (edge != Integer.MIN_VALUE) {
-                mapKnowledge.setValueInDirection(edge, scoutDirection);
-                // TODO: send out a message!
-                scoutDirection = null;
-                Communication communication = new EdgeDiscovered();
-                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EXPLORE_EDGE), id, dir});
-                communicator.sendCommunication(2500, communication);
+        int edge = MapUtils.senseEdge(rc, scoutDirection);
+        if (edge != Integer.MIN_VALUE) {
+            mapKnowledge.setValueInDirection(edge, scoutDirection);
+            // TODO: send out a message!
+            scoutDirection = null;
+            Communication communication = new EdgeDiscovered();
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EXPLORE_EDGE), id, dir});
+            communicator.sendCommunication(2500, communication);
 
-                communication = mapKnowledge.getMapBoundsCommunication(id);
-                communicator.sendCommunication(2500, communication);
+            communication = mapKnowledge.getMapBoundsCommunication(id);
+            communicator.sendCommunication(2500, communication);
 
-                return true;
-            }
+            System.out.println("Sending out msgs");
+
+            return true;
         }
+
 
         if (move.takeNextStep()) {
             return true;
@@ -85,19 +87,15 @@ public class ScoutingScout extends BaseScout {
         if (dir == 0) {
             rc.setIndicatorString(0, "Going north");
             scoutDirection = Direction.NORTH;
-            return true;
         } else if (dir == 1) {
             rc.setIndicatorString(0, "Going West");
             scoutDirection = Direction.WEST;
-            return true;
         } else if (dir == 2) {
             rc.setIndicatorString(0, "Going South");
             scoutDirection = Direction.SOUTH;
-            return true;
         } else if (dir == 3) {
             rc.setIndicatorString(0, "Going East");
             scoutDirection = Direction.EAST;
-            return true;
         }
 
         if (dir != -1)
@@ -105,6 +103,7 @@ public class ScoutingScout extends BaseScout {
             Communication communication = new ExploringMapEdge();
             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EXPLORE_EDGE), 0, dir});
             communicator.sendCommunication(2500, communication);
+            return true;
         }
 
 

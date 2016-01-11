@@ -2,6 +2,7 @@ package team037;
 
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
+import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;
@@ -10,9 +11,9 @@ public class MapKnowledge {
     public static final int MAP_ADD = 16100;
 
     // robot's knowledge of the map where MapLocation(x, y)
-    public int minX = Integer.MIN_VALUE;
+    public int minX = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
-    public int minY = Integer.MIN_VALUE;
+    public int minY = Integer.MAX_VALUE;
     public int maxY = Integer.MIN_VALUE;
 
     public boolean[] exploredRegions = new boolean[16];
@@ -103,18 +104,41 @@ public class MapKnowledge {
     /**
      * In addition to reading in info from the comm, this should be called regularly
      */
-    public void senseAndUpdateEdges() throws GameActionException {
-        if (!exploredEdges[0]) {
-            minY = MapUtils.senseFarthest(Direction.NORTH);
+    public void senseAndUpdateEdges() throws GameActionException
+    {
+        if (!exploredEdges[0])
+        {
+            int y = MapUtils.senseFarthest(Direction.NORTH);
+
+            if (y < minY)
+            {
+                minY = y;
+            }
         }
-        if (!exploredEdges[1]) {
-            maxY = MapUtils.senseFarthest(Direction.SOUTH);
+        if (!exploredEdges[1])
+        {
+            int y = MapUtils.senseFarthest(Direction.SOUTH);;
+
+            if (y > maxY)
+            {
+                maxY = y;
+            }
         }
-        if (!exploredEdges[2]) {
-            minX = MapUtils.senseFarthest(Direction.WEST);
+        if (!exploredEdges[2])
+        {
+            int x = MapUtils.senseFarthest(Direction.WEST);
+            if (x < minX)
+            {
+                minX = x;
+            }
         }
-        if (!exploredEdges[3]) {
-            maxX = MapUtils.senseFarthest(Direction.EAST);
+        if (!exploredEdges[3])
+        {
+            int x = MapUtils.senseFarthest(Direction.EAST);
+            if (x > maxX)
+            {
+                maxX = x;
+            }
         }
     }
 
@@ -569,7 +593,16 @@ public class MapKnowledge {
 //            System.out.println("minX: " + minX + " width: " + width + " minY: " + minY + " height: " + height + " id: " + Unit.id);
         }
 
-        communication.setValues(new int[]{0, minX, width, id, minY, height});
+        /**
+         * opcode = CommunicationType.fromInt(values[0]);
+         widthIndicator = values[1];
+         xVal = values[2];
+         width = values[3];
+         heightIndicator = values[4];
+         yVal = values[5];
+         height = values[6];
+         */
+        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), 0, minX, width, 0, minY, height});
         return communication;
     }
 }

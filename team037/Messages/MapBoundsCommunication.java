@@ -34,13 +34,13 @@ public class MapBoundsCommunication extends Communication
     @Override
     public void setValues(int[] values)
     {
-        opcode = CommunicationType.MAP_BOUNDS;
-        widthIndicator = values[0];
-        xVal = values[1];
-        width = values[2];
-        heightIndicator = values[3];
-        yVal = values[4];
-        height = values[5];
+        opcode = CommunicationType.fromInt(values[0]);
+        widthIndicator = values[1];
+        xVal = values[2];
+        width = values[3];
+        heightIndicator = values[4];
+        yVal = values[5];
+        height = values[6];
     }
 
     @Override

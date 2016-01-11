@@ -182,8 +182,10 @@ public abstract class Unit
 
                     if (type == RobotType.SCOUT)
                     {
-                        System.out.println("MAP_BOUNDS: x: " + values[2] + " y: " + values[5] + " width: " + values[3] + " height: " + values[6]);
+//                        System.out.println("MAP_BOUNDS: x: " + values[2] + " y: " + values[5] + " width: " + values[3] + " height: " + values[6]);
                     }
+
+                    rc.setIndicatorString(2, "MAP_BOUNDS: x: " + values[2] + " y: " + values[5] + " width: " + values[3] + " height: " + values[6]);
 
 
                     if (mapKnowledge.updateEdges(values[2], values[5], values[3], values[6]))
@@ -205,11 +207,11 @@ public abstract class Unit
 
                     if (type == RobotType.SCOUT)
                     {
-                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
-                        {
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
+//                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
+//                        {
+//                            communicator.sendCommunication(dist, communications[k]);
+//                            msgsSent++;
+//                        }
 
                         if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
                         {
