@@ -1,6 +1,7 @@
 package team037.Units;
 
 import battlecode.common.*;
+import team037.CastleNavigator;
 import team037.DataStructures.AppendOnlyMapLocationArray;
 import team037.SlugNavigator;
 import team037.Utilites.MapUtils;
@@ -8,14 +9,23 @@ import team037.Utilites.MapUtils;
 public class CastleArchon extends BaseArchon {
 
     private SlugNavigator move;
+    private CastleNavigator castleMove;
     private MapLocation home;
     private int numSoliders = 0;
     private int numTurrets = 0;
     private Direction lastSpawn;
+    private int waitTill;
+
+    private static final String MOVE_AWAY = "move away from archons";
+    private static final String SPAWN = "spawning a unit";
+    private static final String WAIT = "waiting for new spawn";
+
+    private String lastAction;
 
     public CastleArchon(RobotController rc) {
         super(rc);
         move = new SlugNavigator(rc);
+        castleMove = new CastleNavigator(this);
         lastSpawn = MapUtils.randomDirection(id, 0);
     }
 
@@ -28,10 +38,20 @@ public class CastleArchon extends BaseArchon {
         // actions that affect core
         if (!rc.isCoreReady()) ;
         else if (moveAwayFromFriendlyArchons()) ;
-        else if (spawnIfNeeded()) ;
-        else {
-            return false;
+        else if (spawnIfNeeded()) {
+            lastAction = SPAWN;
         }
+        else if (waitIfNeeded()) {
+            lastAction = WAIT;
+        }
+        else {
+            lastAction = "MOVE";
+            Direction rand = MapUtils.randomDirection(id, rc.getRoundNum());
+            if (rc.canMove(rand) && castleMove.canMove(rand)) {
+                rc.move(rand);
+            }
+        }
+        rc.setIndicatorString(0, lastAction);
         return true;
     }
 
@@ -93,8 +113,8 @@ public class CastleArchon extends BaseArchon {
 
     private Direction nextSpawnDir() {
         lastSpawn = lastSpawn.opposite().rotateLeft();
-        if (rc.canBuild(lastSpawn, RobotType.SOLDIER)) {
-            return lastSpawn;
+        if (rc.canBuild(Direction.NORTH, RobotType.SOLDIER)) {
+            return Direction.NORTH;
         }
         return MapUtils.getRCCanMoveDirection(this);
     }
@@ -138,17 +158,27 @@ public class CastleArchon extends BaseArchon {
         if (numSoliders < 15 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
             Direction spawnDir = nextSpawnDir();
             if (trySpawn(spawnDir, RobotType.SOLDIER)) {
+                waitTill = round + RobotType.SOLDIER.buildTurns;
                 return true;
             }
         }
 
-        if (numTurrets < 4 && rc.hasBuildRequirements(RobotType.TURRET)) {
+        if (numTurrets < 4 && rc.hasBuildRequirements(RobotType.TURRET) && round > 2000) {
             Direction spawnDir = nextTurretSpawnDir();
             if (trySpawn(spawnDir, RobotType.TURRET)) {
+                waitTill = round + RobotType.TURRET.buildTurns;
                 return true;
             }
         }
 
+        return false;
+    }
+
+    private boolean waitIfNeeded () {
+        // we have a robot spawning, wait!
+        if (round < waitTill) {
+            return true;
+        }
         return false;
     }
 
@@ -167,6 +197,8 @@ public class CastleArchon extends BaseArchon {
         numSoliders = numS;
         numTurrets = numT;
     }
+
+
 
 
 }

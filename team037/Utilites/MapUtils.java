@@ -117,7 +117,7 @@ public class MapUtils
      */
     public static Direction getRCCanMoveDirection(Unit unit) {
         Direction toMove = randomDirection(unit.id, unit.rc.getRoundNum());
-        int i = 7;
+        int i = 8;
         do {
             if (unit.rc.canMove(toMove)) {
                 break;
