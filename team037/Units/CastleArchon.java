@@ -28,7 +28,7 @@ public class CastleArchon extends BaseArchon {
     private static final String WAIT = "waiting for new spawn";
 
     private String lastAction;
-    private int lastRandomMove = 0;
+    private int lastMove = 0;
 
     public CastleArchon(RobotController rc) {
         super(rc);
@@ -76,6 +76,11 @@ public class CastleArchon extends BaseArchon {
         return true;
     }
 
+    private void move(Direction d) throws GameActionException {
+        lastMove = round;
+        rc.move(d);
+    }
+
     public boolean healNearbyAllies() throws GameActionException {
         // precondition
         if (nearByAllies.length == 0) {
@@ -107,13 +112,13 @@ public class CastleArchon extends BaseArchon {
     }
 
     private boolean moveToParts() throws GameActionException {
-        if (castleMove.getTarget() == null) {
+        if (castleMove.getTarget() == null || round - lastMove < 3) {
             return false;
         }
 
         Direction toMove = castleMove.getNextDirToTarget();
         if (castleMove.canMove(toMove)) {
-            rc.move(toMove);
+            move(toMove);
             return true;
         }
         return false;
@@ -148,7 +153,7 @@ public class CastleArchon extends BaseArchon {
 
     private boolean moveAwayFromBigZombies() throws GameActionException {
         // prereq
-        if (nearByZombies.length == 0) {
+        if (nearByZombies.length == 0 || round - lastMove < 3) {
             return false;
         }
         AppendOnlyMapLocationArray bigZombieLoc = new AppendOnlyMapLocationArray();
@@ -164,7 +169,7 @@ public class CastleArchon extends BaseArchon {
 
         Direction toMove = bigZombieLoc.array[0].directionTo(currentLocation);
         if (castleMove.canDangerousMove(toMove)) {
-            rc.move(toMove);
+            move(toMove);
             return true;
         }
         return false;
@@ -211,14 +216,13 @@ public class CastleArchon extends BaseArchon {
 
     private boolean randomMove() throws GameActionException {
         // prereqs
-        if (soldiersFiring || soldiersDamaged || round - lastRandomMove < 3) {
+        if (soldiersFiring || soldiersDamaged || round - lastMove < 3) {
             return false;
         }
 
         Direction rand = MapUtils.randomDirection(id, round);
         if (rc.canMove(rand) && castleMove.canMove(rand)) {
-            rc.move(rand);
-            lastRandomMove = round;
+            move(rand);
             return true;
         }
         return false;
