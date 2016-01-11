@@ -37,18 +37,18 @@ public class RobotPlayer
             } else {
                 //unit = new BaseArchon(rc);
                 unit = new AlphaArchon(rc);
-                unit.thisBot = Bots.ALPHAARCHON;
+                Unit.thisBot = Bots.ALPHAARCHON;
             }
         }
         else if (type == RobotType.GUARD)
         {
             unit = new BaseGaurd(rc);
-            unit.thisBot = Bots.BASEGAURD;
+            Unit.thisBot = Bots.BASEGAURD;
         }
         else if (type == RobotType.SCOUT)
         {
             unit = new BaseScout(rc);
-            unit.thisBot = Bots.BASESCOUT;
+            Unit.thisBot = Bots.BASESCOUT;
         }
         else if (type == RobotType.SOLDIER)
         {
@@ -56,7 +56,7 @@ public class RobotPlayer
                 unit = new CastleSoldier(rc);
             } else {
                 unit = new BaseSoldier(rc);
-                unit.thisBot = Bots.BASESOLDIER;
+                Unit.thisBot = Bots.BASESOLDIER;
             }
 
         }
@@ -66,18 +66,18 @@ public class RobotPlayer
                 unit = new CastleTurret(rc);
             } else {
                 unit = new BaseTurret(rc);
-                unit.thisBot = Bots.BASETURRET;
+                Unit.thisBot = Bots.BASETURRET;
             }
         }
         else if (type == RobotType.TTM)
         {
             unit = new BaseTTM(rc);
-            unit.thisBot = Bots.BASETTM;
+            Unit.thisBot = Bots.BASETTM;
         }
         else if (type == RobotType.VIPER)
         {
             unit = new BaseViper(rc);
-            unit.thisBot = Bots.BASEVIPER;
+            Unit.thisBot = Bots.BASEVIPER;
         }
         else if (type == RobotType.VIPER)
         {
@@ -98,6 +98,7 @@ public class RobotPlayer
         // Game loop that will execute very round
         while (true)
         {
+            Unit.msgsSent = 0;
             try
             {
                 unit.collectData();
@@ -113,6 +114,7 @@ public class RobotPlayer
                 e.printStackTrace();
             }
 
+            Unit.repaired = false;
             Clock.yield();
         }
     }

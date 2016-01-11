@@ -2,11 +2,15 @@ package team037.Units;
 
 import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
+import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
+
 
 public class BaseArchon extends Unit
 {
@@ -14,6 +18,7 @@ public class BaseArchon extends Unit
     Bots nextBot;
     RobotType nextType;
     RobotInfo[] neutralBots;
+    SortedParts sortedParts = new SortedParts();
 
     public BaseArchon(RobotController rc)
     {
@@ -32,6 +37,12 @@ public class BaseArchon extends Unit
     {
         super.collectData();
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
+
+        // don't need to check every round
+        if (rc.getRoundNum() % 5 == 0)
+        {
+            sortedParts.findPartsAndNeutralsICanSense(rc);
+        }
     }
 
     public boolean fight() throws GameActionException
@@ -46,7 +57,7 @@ public class BaseArchon extends Unit
 
     public boolean healNearbyAllies() throws GameActionException {
         // precondition
-        if (nearByAllies.length == 0) {
+        if (nearByAllies.length == 0 || !repaired) {
             return false;
         }
 
@@ -56,7 +67,7 @@ public class BaseArchon extends Unit
         for (int i = nearByAllies.length; --i>=0; )
         {
             double health = nearByAllies[i].health;
-            if (health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) <= RobotType.ARCHON.attackRadiusSquared)
+            if (nearByAllies[i].type != RobotType.ARCHON && health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) <= RobotType.ARCHON.attackRadiusSquared)
             {
                 if (health < weakestHealth)
                 {
@@ -69,6 +80,7 @@ public class BaseArchon extends Unit
         if (weakest != null)
         {
             rc.repair(weakest.location);
+            repaired = true;
             return true;
         }
         return false;
@@ -80,12 +92,12 @@ public class BaseArchon extends Unit
         // heal doesn't effect core cooldown
         healNearbyAllies();
 
-        if (neutralBots.length > 0)
+        if (neutralBots.length > 0 && rc.isCoreReady())
         {
             rc.activate(neutralBots[0].location);
         }
 
-        if(rc.hasBuildRequirements(nextType) && rc.getCoreDelay() < 1)
+        if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
         {
             for (int i = dirs.length; --i>=0; )
             {
@@ -100,6 +112,23 @@ public class BaseArchon extends Unit
                     communication.bType = nextBot;
                     communication.newBType = nextBot;
                     communicator.sendCommunication(2, communication);
+
+                    if (nextBot == Bots.DENKILLERGUARD || nextBot == Bots.DENKILLERSOLDIER)
+                    {
+                        for (int j = mapKnowledge.denLocations.length; --j>=0; )
+                        {
+                            MapLocation den = mapKnowledge.denLocations.array[j];
+
+                            if (den != null)
+                            {
+                                Communication communicationDen = new SimpleBotInfoCommunication();
+                                communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                                communicator.sendCommunication(2, communicationDen);
+                            }
+                        }
+                    }
+
+
                     nextBot = buildOrder.nextBot();
                     nextType = Bots.typeFromBot(nextBot);
                     return true;
@@ -108,5 +137,56 @@ public class BaseArchon extends Unit
         }
 
         return false;
+    }
+
+    /**
+     * Process incoming msgs
+     *
+     * @throws GameActionException
+     */
+    public void handleMessages() throws GameActionException
+    {
+        communications = communicator.processCommunications();
+        for(int k = 0; k < communications.length; k++)
+        {
+            if(communications[k].opcode == CommunicationType.CHANGEMISSION)
+            {
+                MissionCommunication comm = (MissionCommunication) communications[k];
+                if(comm.id == rc.getID())
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.bType == thisBot)
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.rType == rc.getType())
+                {
+                    nextBot = comm.newBType;
+                }
+            }
+            else if (communications[k].opcode == CommunicationType.PARTS)
+            {
+                // if we get a new msg about parts then check to see if we have added it to our list of sorted parts
+                int[] values = communications[k].getValues();
+                MapLocation loc = new MapLocation(values[2], values[3]);
+
+                if (!sortedParts.contains(loc))
+                {
+                    sortedParts.addParts(loc, currentLocation, values[1], false);
+                }
+            }
+            else if (communications[k].opcode == CommunicationType.NEUTRAL)
+            {
+                // if we get a msg about neturals then check to see if we have that location stored
+                int[] values = communications[k].getValues();
+                MapLocation loc = new MapLocation(values[2], values[3]);
+
+                if (!sortedParts.contains(loc))
+                {
+                    sortedParts.addParts(loc, currentLocation, values[1], true);
+                }
+            }
+        }
     }
 }

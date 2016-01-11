@@ -191,7 +191,7 @@ public class Map {
         }
     }
 
-    private void scanImmediateVicinity(MapLocation currentLoc) throws GameActionException {
+    public void scanImmediateVicinity(MapLocation currentLoc) throws GameActionException {
 
         MapLocation location = currentLoc;
         double rubble = GameConstants.RUBBLE_OBSTRUCTION_THRESH;

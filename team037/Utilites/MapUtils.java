@@ -2,7 +2,6 @@ package team037.Utilites;
 
 import battlecode.common.*;
 import battlecode.common.GameConstants;
-import scala.tools.cmd.gen.AnyVals;
 import team037.Unit;
 
 
@@ -14,7 +13,6 @@ public class MapUtils
      * Senses the edge in the direction specified
      */
     public static int senseEdge(RobotController rc, Direction d) throws GameActionException {
-
         if (d.isDiagonal()) {
             return Integer.MIN_VALUE;
         }
@@ -51,7 +49,7 @@ public class MapUtils
     public static MapLocation findOnMapLocationNUnitsAway(Unit unit, Direction d, int toMove) throws GameActionException {
         MapLocation current = unit.currentLocation;
         for (int i = toMove; --i >= 0;) {
-            if (!unit.rc.canSense(current)) {
+            if (!unit.rc.canSenseLocation(current)) {
                 break;
             }
             MapLocation toTry = current.add(d);

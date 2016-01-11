@@ -1,22 +1,15 @@
 package team037.Units;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
-import team037.FlyingNavigator;
-import team037.MapKnowledge;
+import battlecode.common.*;
 import team037.Utilites.MapUtils;
 
 public class ScoutingScout extends BaseScout {
 
-    FlyingNavigator move;
-    MapKnowledge mapKnowledge = new MapKnowledge();
     boolean fullScan = false;
     Direction scoutDirection;
 
     public ScoutingScout(RobotController rc)  {
         super(rc);
-        move = new FlyingNavigator(rc);
     }
 
     @Override

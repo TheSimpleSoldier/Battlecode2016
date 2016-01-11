@@ -2,13 +2,10 @@ package team037.Enums;
 
 import team037.Messages.*;
 
-/**
- * Created by joshua on 1/5/16.
- */
 public enum CommunicationType
 {
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
-    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS;
+    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT, NEUTRAL, SKILLED_DEN, DEAD_DEN;
 
     public static int toInt(CommunicationType type)
     {
@@ -36,6 +33,14 @@ public enum CommunicationType
                 return 9;
             case SPARTS:
                 return 10;
+            case TURRET_SUPPORT:
+                return 11;
+            case NEUTRAL:
+                return 12;
+            case SKILLED_DEN:
+                return 13;
+            case DEAD_DEN:
+                return 14;
         }
         return -1;
     }
@@ -66,6 +71,14 @@ public enum CommunicationType
                 return SDEN;
             case 10:
                 return SPARTS;
+            case 11:
+                return TURRET_SUPPORT;
+            case 12:
+                return NEUTRAL;
+            case 13:
+                return SKILLED_DEN;
+            case 14:
+                return DEAD_DEN;
         }
         return null;
     }
@@ -80,6 +93,8 @@ public enum CommunicationType
                 return new BotInfoCommunication();
             //SimpleBotInfoCommunication
             case OENEMY:
+            case SKILLED_DEN:
+            case DEAD_DEN:
             case SARCHON:
             case SENEMY:
             case SPARTS:
@@ -87,6 +102,7 @@ public enum CommunicationType
             case SDEN:
                 return new SimpleBotInfoCommunication();
             //PartsCommunication
+            case NEUTRAL:
             case PARTS:
                 return new PartsCommunication();
             //MissionCommunication
@@ -95,6 +111,8 @@ public enum CommunicationType
             //MapBoundsCommunication
             case MAP_BOUNDS:
                 return new MapBoundsCommunication();
+            case TURRET_SUPPORT:
+                return new TurretSupportCommunication();
         }
 
         return null;

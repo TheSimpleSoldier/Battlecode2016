@@ -29,6 +29,7 @@ public class Navigation {
     static final int bytecodeLimit = 1300; // Bytecode limit
     static RobotController rc = null;
     static JumpPoint pathStart, lastPt, myLoc, goalJP;
+    static MapLocation lastScan;
 
     /**
      * Initializes variables navigation relies on. Will only initialize once per game.
@@ -38,13 +39,17 @@ public class Navigation {
         if (rc == null) {
             rc = rc_in;
             map = new Map(rc);
+            lastScan = rc.getLocation();
+            try {
+                map.scanImmediateVicinity(lastScan);
+            } catch (Exception e) {}
 
             reachedGoal = false;
             searching = false;
             multimap = null;
             lastPt = null;
             goalJP = null;
-            int[] getMyLoc = map.mapToArray(rc.getLocation());
+            int[] getMyLoc = map.mapToArray(lastScan);
             myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
         }
     }
@@ -155,7 +160,14 @@ public class Navigation {
 
     public static void dig(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
+
         Direction forward = currentLoc.directionTo(goal);
+
+        // if we have reached goal then it will try to clear rubble
+        // for direction omni which throws an error
+        if (forward == Direction.NONE || forward == Direction.OMNI)
+            return;
+
         Direction right = forward.rotateRight();
         Direction left = forward.rotateLeft();
 
@@ -196,18 +208,26 @@ public class Navigation {
     public static boolean move(MapLocation goal) throws GameActionException {
         boolean moved;
         MapLocation currentLoc = rc.getLocation();
+
+        if (currentLoc.equals(lastScan)) {
+            if (searching) {
+                map.scanImmediateVicinity(currentLoc);
+            } else {
+                map.scan(currentLoc);
+            }
+            lastScan = currentLoc;
+        }
+
         if (goal != null) {
             if (!searching) {
                 if (rc.isCoreReady()) {
                     // We can move this round; attempt to move.
                     if ((reachedGoal && tryPath(currentLoc)) || tryBug(currentLoc, goal)) {
-                        // We moved; update location and perform perimeter
+                        // We moved
 //                    rc.setIndicatorString(1, "Moved");
                         currentLoc = rc.getLocation();
                         int[] loc = map.mapToArray(currentLoc);
                         myLoc = new JumpPoint(loc[0], loc[1]);
-
-                        map.scan(currentLoc);
                         moved = true;
                     } else {
 //                    rc.setIndicatorString(1, "Did not move");
@@ -236,11 +256,14 @@ public class Navigation {
 
             if (rc.isCoreReady()) {
                 // dig
-                dig(currentLoc, goal);
+                try {
+                    dig(currentLoc, goal);
+                } catch (GameActionException e) {}
             }
         } else {
             moved = false;
         }
+
         return moved;
     }
 

@@ -4,6 +4,8 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.Unit;
 import team037.Units.*;
+import team037.Units.DenKillers.DenKillerGuard;
+import team037.Units.DenKillers.DenKillerSoldier;
 
 /**
  * Created by joshua on 1/5/16.
@@ -12,7 +14,7 @@ import team037.Units.*;
 public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
-    SCOUTINGSCOUT;
+    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD;
 
     public static int toInt(Bots type)
     {
@@ -36,6 +38,12 @@ public enum Bots
                 return 7;
             case SCOUTINGSCOUT:
                 return 8;
+            case PATROLSCOUT:
+                return 9;
+            case DENKILLERSOLDIER:
+                return 10;
+            case DENKILLERGUARD:
+                return 11;
         }
         return -1;
     }
@@ -62,6 +70,12 @@ public enum Bots
                 return ALPHAARCHON;
             case 8:
                 return SCOUTINGSCOUT;
+            case 9:
+                return PATROLSCOUT;
+            case 10:
+                return DENKILLERSOLDIER;
+            case 11:
+                return DENKILLERGUARD;
         }
 
         return null;
@@ -74,11 +88,14 @@ public enum Bots
             case ALPHAARCHON:
             case BASEARCHON:
                 return RobotType.ARCHON;
+            case DENKILLERGUARD:
             case BASEGAURD:
                 return RobotType.GUARD;
+            case PATROLSCOUT:
             case BASESCOUT:
             case SCOUTINGSCOUT:
                 return RobotType.SCOUT;
+            case DENKILLERSOLDIER:
             case BASESOLDIER:
                 return RobotType.SOLDIER;
             case BASETTM:
@@ -113,6 +130,12 @@ public enum Bots
                 return new BaseTurret(rc);
             case BASEVIPER:
                 return new BaseViper(rc);
+            case PATROLSCOUT:
+                return new PatrolScout(rc);
+            case DENKILLERSOLDIER:
+                return new DenKillerSoldier(rc);
+            case DENKILLERGUARD:
+                return new DenKillerGuard(rc);
         }
 
         return null;

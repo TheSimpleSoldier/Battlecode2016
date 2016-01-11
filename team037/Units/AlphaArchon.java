@@ -3,35 +3,22 @@ package team037.Units;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import battlecode.common.Team;
 import team037.DataStructures.AppendOnlyMapLocationArray;
 import team037.Utilites.PartsUtilities;
 
 public class AlphaArchon extends BaseArchon
 {
-//    SlugNavigator move;
-    AppendOnlyMapLocationArray parts;
-    int partsIdx;
 
     public AlphaArchon(RobotController rc)
     {
         super(rc);
-//        move = new SlugNavigator(rc);
-        parts = PartsUtilities.findPartsAndNeutralsICanSenseNotImpassible(rc);
-        partsIdx = 0;
         navigator.setTarget(getNextPartLocation());
-//        move.setTarget(getNextPartLocation());
     }
 
     private MapLocation getNextPartLocation() {
-        if (partsIdx >= parts.length) {
-            parts = PartsUtilities.findPartsAndNeutralsICanSenseNotImpassible(rc);
-        }
-        if (parts.length == 0) {
-            return null;
-        }
-        MapLocation nextParts = parts.array[partsIdx];
-        partsIdx += 1;
-        return nextParts;
+        MapLocation best = sortedParts.getBestSpot();
+        return best;
     }
 
     @Override
@@ -42,10 +29,31 @@ public class AlphaArchon extends BaseArchon
         if (fight());
         else if (fightZombies());
         else if (carryOutAbility());
-        if(rc.getLocation().equals(navigator.getTarget())) {
+        if(updateTarget()) {
             navigator.setTarget(getNextPartLocation());
         }
 
         return navigator.takeNextStep();
+    }
+
+    /**
+     * This method determines if we should update our target or not
+     *
+     * @return
+     * @throws GameActionException
+     */
+    private boolean updateTarget() throws GameActionException
+    {
+        MapLocation currentTarget = navigator.getTarget();
+        if (currentTarget == null)
+            return true;
+        if (rc.getLocation().equals(currentTarget))
+            return true;
+        if (rc.canSenseLocation(currentTarget) && (rc.senseParts(currentTarget) == 0 && rc.senseRobotAtLocation(currentTarget) == null))
+            return true;
+        if (rc.canSenseLocation(currentTarget) && (rc.senseRobotAtLocation(currentTarget) != null && rc.senseRobotAtLocation(currentTarget).team != Team.NEUTRAL))
+            return true;
+
+        return false;
     }
 }
