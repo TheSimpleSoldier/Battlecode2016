@@ -7,6 +7,7 @@ import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.PartsCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
+import team037.Units.ScoutingScout;
 
 public abstract class Unit
 {
@@ -84,6 +85,7 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
+        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
@@ -127,10 +129,9 @@ public abstract class Unit
                         }
                     }
 
-
                     break;
                 case PARTS:
-                    if (type == RobotType.SCOUT)
+                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
                         // if we get a new msg about parts then send it out
                         values = communications[k].getValues();
@@ -139,15 +140,14 @@ public abstract class Unit
                         if (!mapKnowledge.partListed(loc) && msgsSent < 20)
                         {
                             mapKnowledge.addPartsAndNeutrals(loc);
-                            Communication communication = new PartsCommunication();
-                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), values[1], values[2], values[3]});
-                            communicator.sendCommunication(dist, communication);
+                            communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
                     }
                     break;
+
                 case NEUTRAL:
-                    if (type == RobotType.SCOUT)
+                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
                         values = communications[k].getValues();
                         MapLocation loc = new MapLocation(values[2], values[3]);
@@ -155,13 +155,12 @@ public abstract class Unit
                         if (!mapKnowledge.partListed(loc) && msgsSent < 20)
                         {
                             mapKnowledge.addPartsAndNeutrals(loc);
-//                            Communication communication = new PartsCommunication();
-//                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), values[1], values[2], values[3]});
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
                     }
                     break;
+
                 case SKILLED_DEN:
                 case DEAD_DEN:
                     values = communications[k].getValues();
@@ -177,6 +176,59 @@ public abstract class Unit
                             msgsSent++;
                         }
                     }
+                    break;
+
+                case MAP_BOUNDS:
+                    values = communications[k].getValues();
+
+
+                    if (mapKnowledge.updateEdges(values[1], values[3], values[1] + values[2], values[3] + values[4]))
+                    {
+                        if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+                        {
+                            if (msgsSent < 20)
+                            {
+                                communicator.sendCommunication(dist, communications[k]);
+                                msgsSent++;
+                            }
+                        }
+                    }
+                    break;
+
+                case EXPLORE_EDGE:
+
+                    values = communications[k].getValues();
+
+                    if (type == RobotType.SCOUT)
+                    {
+//                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
+//                        {
+//                            communicator.sendCommunication(dist, communications[k]);
+//                            msgsSent++;
+//                        }
+
+                        if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
+                        {
+                            ScoutingScout.updateScoutDirection();
+                        }
+                    }
+
+
+                    mapKnowledge.setEdgesBeingExplored(values[2]);
+
+                    break;
+
+                case EDGE_EXPLORED:
+                    values = communications[k].getValues();
+
+
+                    if (type == RobotType.SCOUT && !mapKnowledge.exploredEdges[values[2]] &&  msgsSent < 20)
+                    {
+                        communicator.sendCommunication(dist, communications[k]);
+                        msgsSent++;
+                    }
+
+                    mapKnowledge.exploredEdges[values[2]] = true;
                     break;
             }
         }

@@ -94,6 +94,11 @@ public class RobotPlayer
             e.printStackTrace();
         }
 
+        if (rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
+        {
+            BaseArchon.updateStartingMap();
+        }
+
 
         // Game loop that will execute very round
         while (true)

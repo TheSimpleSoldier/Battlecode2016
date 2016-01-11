@@ -2,7 +2,6 @@ package team037.Utilites;
 
 import battlecode.common.MapLocation;
 import battlecode.common.Signal;
-//import scala.Int;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;

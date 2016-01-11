@@ -16,7 +16,7 @@ public class BuildOrderCreation
                 {Bots.DENKILLERSOLDIER, Bots.DENKILLERGUARD},
                 {Bots.DENKILLERSOLDIER, null}
         };
-        int[] times = {2, 2, 3, 1000};
+        int[] times = {1, 2, 3, 1000};
 
         Bots[][] buildOrderSoldiers = {
                 {Bots.BASESOLDIER}

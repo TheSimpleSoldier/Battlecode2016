@@ -8,8 +8,6 @@ import team037.Units.BaseSoldier;
 
 public class DenKillerSoldier extends BaseSoldier
 {
-    private int index = 0;
-
     public DenKillerSoldier(RobotController rc)
     {
         super(rc);
@@ -31,7 +29,6 @@ public class DenKillerSoldier extends BaseSoldier
             {
                 rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
                 navigator.setTarget(mapKnowledge.closestDen(currentLocation));
-                index++;
             }
         }
         else
@@ -43,8 +40,11 @@ public class DenKillerSoldier extends BaseSoldier
         if (rc.getRoundNum() % 5 == 0 && goal != null && mapKnowledge.denLocations.hasLocations())
         {
             mapKnowledge.updateDens(rc);
-            rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
-            navigator.setTarget(mapKnowledge.closestDen(currentLocation));
+            if (mapKnowledge.denLocations.hasLocations())
+            {
+                rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
+                navigator.setTarget(mapKnowledge.closestDen(currentLocation));
+            }
         }
 
         return navigator.takeNextStep();

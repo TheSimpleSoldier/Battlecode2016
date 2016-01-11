@@ -5,7 +5,7 @@ import team037.Messages.*;
 public enum CommunicationType
 {
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
-    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT, NEUTRAL, SKILLED_DEN, DEAD_DEN;
+    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT, NEUTRAL, SKILLED_DEN, DEAD_DEN, EXPLORE_EDGE, EDGE_EXPLORED;
 
     public static int toInt(CommunicationType type)
     {
@@ -41,6 +41,10 @@ public enum CommunicationType
                 return 13;
             case DEAD_DEN:
                 return 14;
+            case EXPLORE_EDGE:
+                return 15;
+            case EDGE_EXPLORED:
+                return 16;
         }
         return -1;
     }
@@ -79,6 +83,10 @@ public enum CommunicationType
                 return SKILLED_DEN;
             case 14:
                 return DEAD_DEN;
+            case 15:
+                return EXPLORE_EDGE;
+            case 16:
+                return EDGE_EXPLORED;
         }
         return null;
     }
@@ -113,6 +121,10 @@ public enum CommunicationType
                 return new MapBoundsCommunication();
             case TURRET_SUPPORT:
                 return new TurretSupportCommunication();
+            case EXPLORE_EDGE:
+                return new ExploringMapEdge();
+            case EDGE_EXPLORED:
+                return new EdgeDiscovered();
         }
 
         return null;

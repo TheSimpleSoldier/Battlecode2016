@@ -34,12 +34,12 @@ import team037.Utilites.CommunicationUtilities;
  *
  * mk-format(map bounds)
  *   opcode is the specific opcode
- *   val1 is the width indicator
+ *   val1 is the maxX indicator
  *   loc1x is the x coordinate
- *   val2 is the width
- *   val3 is the height indicator
+ *   val2 is the maxX
+ *   val3 is the maxY indicator
  *   loc1y is the y coordinate
- *   val4 is the height
+ *   val4 is the maxY
  *
  * turret SupportFormat
  *      opcode is the specific opcode

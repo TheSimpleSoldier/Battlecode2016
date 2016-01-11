@@ -7,8 +7,6 @@ import team037.Unit;
 
 public class MapUtils
 {
-
-
     /**
      * Senses the edge in the direction specified
      */
@@ -40,6 +38,32 @@ public class MapUtils
     }
 
     /**
+     * Senses furthest point on map
+     */
+    public static int senseFarthest(Direction d) throws GameActionException
+    {
+        if (d.isDiagonal()) {
+            return Integer.MIN_VALUE;
+        }
+
+        RobotType type = Unit.rc.getType();
+        int sensorRadiusSquared = type.sensorRadiusSquared;
+        int radius = (int)Math.floor(Math.sqrt(sensorRadiusSquared));
+
+        MapLocation current = Unit.rc.getLocation();
+
+        if (Unit.rc.onTheMap(current.add(d, radius))) {
+            if (d.equals(Direction.EAST) || d.equals(Direction.WEST)) {
+                return current.add(d, radius).x;
+            } else {
+                return current.add(d, radius).y;
+            }
+        }
+
+        return senseEdge(Unit.rc, d);
+    }
+
+    /**
      * Do you want your unit to move X squares in a direction?
      * Do you need to have a MapLocation in that direction?
      * This will get you a MapLocation ON THE MAP!
@@ -49,23 +73,23 @@ public class MapUtils
     public static MapLocation findOnMapLocationNUnitsAway(Unit unit, Direction d, int toMove) throws GameActionException {
         MapLocation current = unit.currentLocation;
         for (int i = toMove; --i >= 0;) {
-            if (!unit.rc.canSenseLocation(current)) {
+            if (!Unit.rc.canSenseLocation(current)) {
                 break;
             }
             MapLocation toTry = current.add(d);
-            if (unit.rc.onTheMap(toTry)) {
+            if (Unit.rc.onTheMap(toTry)) {
                 current = toTry;
-            } else if (unit.rc.onTheMap(current.add(d.rotateLeft()))) {
+            } else if (Unit.rc.onTheMap(current.add(d.rotateLeft()))) {
                 current = current.add(d.rotateLeft());
-            } else if (unit.rc.onTheMap(current.add(d.rotateRight()))) {
+            } else if (Unit.rc.onTheMap(current.add(d.rotateRight()))) {
                 current = current.add(d.rotateRight());
-            } else if (unit.rc.onTheMap(current.add(d.rotateLeft().rotateLeft()))) {
+            } else if (Unit.rc.onTheMap(current.add(d.rotateLeft().rotateLeft()))) {
                 current = current.add(d.rotateLeft().rotateLeft());
-            } else if (unit.rc.onTheMap(current.add(d.rotateRight().rotateRight()))) {
+            } else if (Unit.rc.onTheMap(current.add(d.rotateRight().rotateRight()))) {
                 current = current.add(d.rotateRight().rotateRight());
-            } else if (unit.rc.onTheMap(current.add(d.rotateLeft().rotateLeft().rotateLeft()))) {
+            } else if (Unit.rc.onTheMap(current.add(d.rotateLeft().rotateLeft().rotateLeft()))) {
                 current = current.add(d.rotateLeft().rotateLeft().rotateLeft());
-            } else if (unit.rc.onTheMap(current.add(d.rotateRight().rotateRight().rotateRight()))) {
+            } else if (Unit.rc.onTheMap(current.add(d.rotateRight().rotateRight().rotateRight()))) {
                 current = current.add(d.rotateRight().rotateRight().rotateRight());
             }
         }

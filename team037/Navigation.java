@@ -192,9 +192,9 @@ public class Navigation {
             double rubbleRight135 = rc.senseRubble(currentLoc.add(right135));
 
             if (rubbleRight90 > 50) {
-                rc.clearRubble(right);
+                rc.clearRubble(right90);
             } else if (rubbleRight135 > 50) {
-                rc.clearRubble(right);
+                rc.clearRubble(right135);
             }
         }
     }

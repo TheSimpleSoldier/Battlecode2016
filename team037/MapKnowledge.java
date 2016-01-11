@@ -2,6 +2,8 @@ package team037;
 
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
+import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
 import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;
 
@@ -9,10 +11,14 @@ public class MapKnowledge {
     public static final int MAP_ADD = 16100;
 
     // robot's knowledge of the map where MapLocation(x, y)
-    public int minX = Integer.MIN_VALUE;
+    public int minX = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
-    public int minY = Integer.MIN_VALUE;
+    public int minY = Integer.MAX_VALUE;
     public int maxY = Integer.MIN_VALUE;
+
+    public boolean[] exploredRegions = new boolean[16];
+    public boolean[] exploredEdges = new boolean[4];
+    public boolean[] edgesBeingExplored = new boolean[4];
 
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
@@ -98,129 +104,534 @@ public class MapKnowledge {
     /**
      * In addition to reading in info from the comm, this should be called regularly
      */
-    public void senseAndUpdateEdges(RobotController rc) throws GameActionException {
-        if (minY == Integer.MIN_VALUE) {
-            minY = MapUtils.senseEdge(rc, Direction.NORTH);
+    public void senseAndUpdateEdges() throws GameActionException
+    {
+        if (!exploredEdges[0])
+        {
+            int y = MapUtils.senseFarthest(Direction.NORTH);
+
+            if (y < minY)
+            {
+                minY = y;
+            }
         }
-        if (maxY == Integer.MIN_VALUE) {
-            maxY = MapUtils.senseEdge(rc, Direction.SOUTH);
+        if (!exploredEdges[1])
+        {
+            int y = MapUtils.senseFarthest(Direction.SOUTH);
+
+            if (y > maxY)
+            {
+                maxY = y;
+            }
         }
-        if (minX == Integer.MIN_VALUE) {
-            minX = MapUtils.senseEdge(rc, Direction.WEST);
+        if (!exploredEdges[2])
+        {
+            int x = MapUtils.senseFarthest(Direction.WEST);
+            if (x < minX)
+            {
+                minX = x;
+            }
         }
-        if (maxX == Integer.MIN_VALUE) {
-            maxX = MapUtils.senseEdge(rc, Direction.EAST);
+        if (!exploredEdges[3])
+        {
+            int x = MapUtils.senseFarthest(Direction.EAST);
+            if (x > maxX)
+            {
+                maxX = x;
+            }
         }
     }
 
+    /**
+     * This method updates the map edges from a msg
+     *
+     * @param minX
+     * @param minY
+     * @param maxX
+     * @param maxY
+     */
+    public boolean updateEdges(int minX, int minY, int maxX, int maxY)
+    {
+        if (inRegionMode()) updateRegions(maxX, maxY, minX, minY);
 
-    public MapBoundsCommunication packForMessage() {
-        MapBoundsCommunication communication = new MapBoundsCommunication();
+        boolean updated = false;
 
-        if (minX != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE) {
-            communication.widthIndicator = 3;
-            communication.xVal = minX + MAP_ADD;
-            communication.width = maxX - minX;
-        } else if (minX != Integer.MIN_VALUE) {
-            communication.widthIndicator = 2;
-            communication.xVal = minX + MAP_ADD;
-            communication.width = 0;
-        } else if (maxX != Integer.MIN_VALUE) {
-            communication.widthIndicator = 1;
-            communication.xVal = maxX + MAP_ADD;
-            communication.width = 0;
-        } else {
-            communication.widthIndicator = 0;
-            communication.xVal = 0;
-            communication.width = 0;
+        if (minX < this.minX)
+        {
+            this.minX = minX;
+            updated = true;
         }
 
-
-        if (minY != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE) {
-            communication.heightIndicator = 3;
-            communication.yVal = minY + MAP_ADD;
-            communication.height = maxY - minY;
-        } else if (minY != Integer.MIN_VALUE) {
-            communication.heightIndicator = 2;
-            communication.yVal = minY + MAP_ADD;
-            communication.height = 0;
-        } else if (maxY != Integer.MIN_VALUE) {
-            communication.heightIndicator = 1;
-            communication.yVal = maxY + MAP_ADD;
-            communication.height = 0;
-        } else {
-            communication.heightIndicator = 0;
-            communication.yVal = 0;
-            communication.height = 0;
+        if (minY < this.minY)
+        {
+            this.minY = minY;
+            updated = true;
         }
 
-        return communication;
+        if (maxX > this.maxX)
+        {
+            this.maxX = maxX;
+            updated = true;
+        }
+
+        if (maxY > this.maxY)
+        {
+            this.maxY = maxY;
+            updated = true;
+        }
+
+        if (updated)
+        {
+//            System.out.println("We updated");
+        }
+
+        return updated;
     }
 
     public void setValueInDirection(int val, Direction d) {
         switch (d) {
             case NORTH:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 minY = val;
                 break;
             case SOUTH:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 maxY = val;
                 break;
             case WEST:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 minX = val;
                 break;
             case EAST:
+                if (inRegionMode()) updateRegions(maxX, maxY, minX, val);
                 maxX = val;
                 break;
         }
     }
 
-    public void updateEdgesFromMessage(MapBoundsCommunication communication) {
-        int widthBit = communication.widthIndicator;
-        int xCoord = communication.xVal;
-        int width = communication.width;
-
-        int heightBit = communication.heightIndicator;
-        int yCoord = communication.yVal;
-        int height = communication.height;
-
-
-        if (widthBit == 0) {
-            // we know nothing! (jon snow)
-        } else if (widthBit == 1) {
-            // we only have a endcoord
-            maxX = xCoord - MAP_ADD;
-        } else if (widthBit == 2) {
-            // we only have the startcoord
-            minX = xCoord - MAP_ADD;
-        } else if (widthBit == 3) {
-            // we have both
-            minX = xCoord - MAP_ADD;
-            maxX = xCoord - MAP_ADD + width;
-        } else {
-            System.out.println("control bit borked! in MapKnowledge");
-        }
-
-
-        if (heightBit == 0) {
-            // w know nothing! (jon snow)
-        } else if (heightBit == 1) {
-            // we only have the endcoord
-            maxY = yCoord - MAP_ADD;
-        } else if (heightBit == 2) {
-            // we only have the start coord
-            minY = yCoord - MAP_ADD;
-        } else if (heightBit == 3) {
-            minY = yCoord - MAP_ADD;
-            maxY = yCoord - MAP_ADD + height;
-        } else {
-            System.out.println("control bit borked! in MapKnowledge");
-        }
-    }
-
-
     public boolean mapBoundaryComplete() {
         return minX != Integer.MIN_VALUE && minY != Integer.MIN_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
     }
 
+    /**
+     * This method returns the top left and bottom right corners of a square in the grid
+     *
+     *
+     * 0000     0001    0010    0011
+     *
+     * 0100     0101    0110    0111
+     *
+     * 1000     1001    1010    1011
+     *
+     * 1100     1101    1110    1111
+     *
+     * @param numb
+     * @return
+     */
+    public MapLocation[] getRegion(int numb, int minX, int maxX, int minY, int maxY)
+    {
+        int topX, topY, bottomX, bottomY;
 
+        if (numb % 4 == 0)
+        {
+            topX = minX;
+            bottomX = minX + (maxX - minX) / 4;
+        }
+        else if (numb % 4 == 1)
+        {
+            topX = minX + (maxX - minX) / 4 + 1;
+            bottomX = minX + (maxX - minX) / 2;
+        }
+        else if (numb % 4 == 2)
+        {
+            topX = minX + (maxX - minX) / 2 + 1;
+            bottomX = minX + 3 * (maxX - minX) / 4;
+        }
+        else
+        {
+            topX = minX + 3 * (maxX - minX) / 4 + 1;
+            bottomX = maxX;
+        }
+
+        if (numb < 4)
+        {
+            topY = maxY;
+            bottomY = minY + (maxY - minY / 4);
+        }
+        else if (numb < 8)
+        {
+            topY = minY + (maxY - minY / 4) + 1;
+            bottomY = minY + (maxY - minY / 2);
+        }
+        else if (numb < 12)
+        {
+            topY = minY + (maxY - minY / 2) + 1;
+            bottomY = minY + 3 * (maxY - minY / 4);
+        }
+        else
+        {
+            topY = minY + 3 * (maxY - minY / 4) + 1;
+            bottomY = maxY;
+        }
+
+        return new MapLocation[]{new MapLocation(topX, topY), new MapLocation(bottomX, bottomY)};
+    }
+
+    /**
+     * This method returns the region for a mapLocation
+     *
+     * 0    1   2   3
+     * 4    5   6   7
+     * 8    9   10  11
+     * 12   13  14  15
+     *
+     * @param spot
+     * @return
+     */
+    public int getRegion(MapLocation spot, int minX, int maxX, int minY, int maxY)
+    {
+        int x = spot.x;
+        int y = spot.y;
+
+        int row = 0;
+        int col;
+
+        if (x < minX + (maxX - minX) / 4)
+        {
+            col = 0;
+        }
+        else if (x < minX + (maxX - minX) / 2)
+        {
+            col = 1;
+        }
+        else if (x < minX + 3 * (maxX - minX) / 4)
+        {
+            col = 2;
+        }
+        else
+        {
+            col = 3;
+        }
+
+        if (y < minY + (maxY - minY) / 4)
+        {
+            row = 0;
+        }
+        else if (y < minY + (maxY - minY) / 2)
+        {
+            row = 1;
+        }
+        else if (y < minY + 3 * (maxY - minY) / 4)
+        {
+            row = 2;
+        }
+        else
+        {
+            row = 3;
+        }
+
+        return row * 4 + col;
+    }
+
+    /**
+     * This method returns if the current region has been explored yet
+     *
+     * @param current
+     * @return
+     */
+    public boolean exploredCurrentRegion(MapLocation current)
+    {
+        return exploredRegions[getRegion(current, minX, maxX, minY, maxY)];
+    }
+
+    /**
+     * This method returns the center of a region
+     *
+     * @param region
+     * @return
+     */
+    public MapLocation getRegionCenter(int region)
+    {
+        MapLocation[] bounds = getRegion(region, minX, maxX, minY, maxY);
+
+        return new MapLocation((bounds[0].x + bounds[1].x) / 2, (bounds[0].y + bounds[1].y) / 2);
+    }
+
+    /**
+     * This method returns the closest unexplored region
+     *
+     * @param current
+     * @return
+     */
+    public int closestUnexploredRegion(MapLocation current)
+    {
+        int closestDist = Integer.MAX_VALUE;
+        int region = -1;
+
+        for (int i = 0; i < 16; i++)
+        {
+            if (!exploredRegions[i])
+            {
+                int dist = current.distanceSquaredTo(getRegionCenter(i));
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    region = i;
+                }
+            }
+        }
+        return region;
+    }
+
+    /**
+     * This method updates the explored regions when a new bound is discovered
+     *
+     * @param newMaxX
+     * @param newMaxY
+     * @param newMinX
+     * @param newMinY
+     */
+    public void updateRegions(int newMaxX, int newMaxY, int newMinX, int newMinY)
+    {
+        System.out.println("In region mode");
+        boolean[] updatedExploredRegions = new boolean[16];
+        for (int i = 0; i < 16; i++)
+        {
+            if (exploredRegions[i])
+            {
+                if (newMaxX > maxX)
+                {
+                    if (i % 4 != 3)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i+1];
+                    }
+                }
+                else if (newMaxY > maxY)
+                {
+                    if (i < 12)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i+4];
+                    }
+                }
+                else if (newMinX < minX)
+                {
+                    if (i % 4 != 0)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i-1];
+                    }
+                }
+                else if (newMinY < minY)
+                {
+                    if (i >= 4)
+                    {
+                        updatedExploredRegions[i] = exploredRegions[i-4];
+                    }
+                }
+            }
+        }
+        exploredRegions = updatedExploredRegions;
+    }
+
+    /**
+     * This method returns true if all regions have been searched
+     *
+     * @return
+     */
+    public boolean exporedAllRegions()
+    {
+       for (int i = 0; i < exploredRegions.length; i++)
+       {
+           if (!exploredRegions[i]) return false;
+       }
+
+        return true;
+    }
+
+    /**
+     * This method returns the closest edge of the map
+     *
+     * North = 0
+     * East = 1
+     * South = 2
+     * West = 3
+     *
+     * @param current
+     * @return
+     */
+    public int getClosestDir(MapLocation current)
+    {
+        int maxXDist, maxYDist, minXDist, minYDist;
+        boolean edgeNotExplored = false;
+
+        // North
+        if (exploredEdges[0] || edgesBeingExplored[0])
+            minYDist = Integer.MAX_VALUE;
+        else
+        {
+            minYDist = current.y - minY;
+            edgeNotExplored = true;
+        }
+
+        // East
+        if (exploredEdges[1] || edgesBeingExplored[1])
+            maxXDist = Integer.MAX_VALUE;
+        else
+        {
+            maxXDist = maxX - current.x;
+            edgeNotExplored = true;
+        }
+
+        // South
+        if (exploredEdges[2] || edgesBeingExplored[2])
+            maxYDist = Integer.MAX_VALUE;
+        else
+        {
+            maxYDist = maxY - current.y;
+            edgeNotExplored = true;
+        }
+
+        // West
+        if (exploredEdges[3] || edgesBeingExplored[3])
+            minXDist = Integer.MAX_VALUE;
+        else
+        {
+            minXDist = current.x - minX;
+            edgeNotExplored = true;
+        }
+
+        // if all edges are being explored then stop
+        if (!edgeNotExplored)
+        {
+            System.out.println("All edges have been explored");
+            return -1;
+
+        }
+
+
+        boolean up = true;
+        boolean left = true;
+
+        if (minYDist < maxYDist)
+            up = false;
+
+        if (maxXDist < minXDist)
+            left = false;
+
+        if (up && left)
+        {
+            if (minYDist < minXDist)
+                return 0; // NORTH
+            else
+                return 3; // EAST
+        }
+        else if (up && !left)
+        {
+            if (minYDist < maxXDist)
+                return 0; // NORTH
+            else
+                return 1; // WEST
+        }
+        else if (!up && left)
+        {
+            if (maxYDist < minXDist)
+                return 2; // SOUTH
+            else
+                return 3; // EAST
+        }
+        else
+        {
+            if (maxYDist < maxXDist)
+                return 2; // SOUTH
+            else
+                return 1; // WEST
+        }
+    }
+
+    /**
+     * This method gets which direction you should go solely based on id
+     *
+     * @param id
+     * @return
+     */
+    public int getDir(int id)
+    {
+        if (exploredEdges[id%4])
+        {
+            if (exploredEdges[(id+1)%4])
+            {
+                if (exploredEdges[(id+2)%4])
+                {
+                    if (exploredEdges[(id+3)%4])
+                    {
+                        return -1;
+                    }
+                    return (id+3)%4;
+                }
+                return (id+2)%4;
+            }
+            return (id+1)%4;
+        }
+        return id % 4;
+    }
+
+    /**
+     * This method sets an edge to explored
+     *
+     * @param edge
+     */
+    public void reachedEdge(int edge)
+    {
+        exploredEdges[edge] = true;
+    }
+
+    /**
+     * This method sets an edge as being explored
+     *
+     * @param edge
+     */
+    public void setEdgesBeingExplored(int edge)
+    {
+        edgesBeingExplored[edge] = true;
+    }
+
+    /**
+     * Returns true if we have found 3 edges and false otherwise
+     *
+     * @return
+     */
+    public boolean inRegionMode()
+    {
+        int count = 0;
+        for (int i = exploredEdges.length; --i>=0; )
+        {
+            if (exploredEdges[i]) count++;
+        }
+
+        return count >= 3;
+    }
+
+    /**
+     * This method returns a map bounds communication
+     * @return
+     */
+    public Communication getMapBoundsCommunication(int id)
+    {
+        Communication communication = new MapBoundsCommunication();
+
+        int width = maxX - minX;
+        int height = maxY - minY;
+
+        /**
+         * opcode = CommunicationType.fromInt(values[0]);
+         widthIndicator = values[1];
+         xVal = values[2];
+         maxX = values[3];
+         heightIndicator = values[4];
+         yVal = values[5];
+         maxY = values[6];
+         */
+        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height});
+        return communication;
+    }
 }
