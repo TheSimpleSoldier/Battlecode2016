@@ -115,34 +115,8 @@ public class Map {
     }
 
     public void scan(MapLocation currentLoc) {
-        try {
-            switch (Clock.getBytecodesLeft() / 1000) {
-                case 0:
-                    break;
-                case 1:
-                case 2:
-                    scanImmediateVicinity(currentLoc);
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    scanPerimeter(currentLoc);
-                    break;
-                case 6:
-                case 7:
-                    scanKnight(currentLoc);
-                    break;
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                    scanRange(currentLoc, RobotType.SOLDIER.sensorRadiusSquared);
-                    break;
-                default:
-                    scanRange(currentLoc, radiusSq);
-                    break;
-            }
-        } catch (GameActionException e) {}
+        MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc,RobotType.SOLDIER.sensorRadiusSquared);
+        scanSoldier(locs);
     }
 
     private void scanPerimeter(MapLocation currentLoc) throws GameActionException {
@@ -315,6 +289,588 @@ public class Map {
             }
         }
     }
+
+
+    public void scanAll(MapLocation currentLoc) {
+        MapLocation[] inSight;
+        switch (rc.getType()) {
+            case ARCHON:
+//                inSight = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, RobotType.ARCHON.sensorRadiusSquared);
+                break;
+            case SCOUT:
+//                inSight = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, RobotType.SCOUT.sensorRadiusSquared);
+//                scanArchon(inSight);
+                break;
+            default:
+                inSight = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc, RobotType.SOLDIER.sensorRadiusSquared);
+                scanSoldier(inSight);
+                break;
+        }
+    }
+
+    private void scanSoldier(MapLocation[] locations) {
+        long[] x = new long[9];
+        long[] y = new long[9];
+        double rubbleThresh = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+
+        try {
+            MapLocation checkLoc = locations[4];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[0] += 4;
+                x[6] += 256;
+            }
+            checkLoc = locations[3];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[0] += 8;
+                x[5] += 256;
+            }
+            checkLoc = locations[2];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[0] += 16;
+                x[4] += 256;
+            }
+            checkLoc = locations[1];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[0] += 32;
+                x[3] += 256;
+            }
+            checkLoc = locations[0];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[0] += 64;
+                x[2] += 256;
+            }
+
+            // y++
+
+            checkLoc = locations[11];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 2;
+                x[7] += 128;
+            }
+            checkLoc = locations[10];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 4;
+                x[6] += 128;
+            }
+            checkLoc = locations[9];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 8;
+                x[5] += 128;
+            }
+            checkLoc = locations[8];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 16;
+                x[4] += 128;
+            }
+            checkLoc = locations[7];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 32;
+                x[3] += 128;
+            }
+            checkLoc = locations[6];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 64;
+                x[2] += 128;
+            }
+            checkLoc = locations[5];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[1] += 128;
+                x[1] += 128;
+            }
+
+
+            // y++
+
+
+            checkLoc = locations[20];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 1;
+                x[8] += 64;
+            }
+            checkLoc = locations[19];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 2;
+                x[7] += 64;
+            }
+            checkLoc = locations[18];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 4;
+                x[6] += 64;
+            }
+            checkLoc = locations[17];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 8;
+                x[5] += 64;
+            }
+            checkLoc = locations[16];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 16;
+                x[4] += 64;
+            }
+            checkLoc = locations[15];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 32;
+                x[3] += 64;
+            }
+            checkLoc = locations[14];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 64;
+                x[2] += 64;
+            }
+            checkLoc = locations[13];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 128;
+                x[1] += 64;
+            }
+            checkLoc = locations[12];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[2] += 256;
+                x[0] += 64;
+            }
+
+
+            // y++
+
+
+            checkLoc = locations[29];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 1;
+                x[8] += 32;
+            }
+            checkLoc = locations[28];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 2;
+                x[7] += 32;
+            }
+            checkLoc = locations[27];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 4;
+                x[6] += 32;
+            }
+            checkLoc = locations[26];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 8;
+                x[5] += 32;
+            }
+            checkLoc = locations[25];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 16;
+                x[4] += 32;
+            }
+            checkLoc = locations[24];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 32;
+                x[3] += 32;
+            }
+            checkLoc = locations[23];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 64;
+                x[2] += 32;
+            }
+            checkLoc = locations[22];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 128;
+                x[1] += 32;
+            }
+            checkLoc = locations[21];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[3] += 256;
+                x[0] += 32;
+            }
+
+            // y++
+
+
+
+            checkLoc = locations[38];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 1;
+                x[8] += 16;
+            }
+            checkLoc = locations[37];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 2;
+                x[7] += 16;
+            }
+            checkLoc = locations[36];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 4;
+                x[6] += 16;
+            }
+            checkLoc = locations[35];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 8;
+                x[5] += 16;
+            }
+            checkLoc = locations[34];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 16;
+                x[4] += 16;
+            }
+            checkLoc = locations[33];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 32;
+                x[3] += 16;
+            }
+            checkLoc = locations[32];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 64;
+                x[2] += 16;
+            }
+            checkLoc = locations[31];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 128;
+                x[1] += 16;
+            }
+            checkLoc = locations[30];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[4] += 256;
+                x[0] += 16;
+            }
+
+
+            // y++
+
+            checkLoc = locations[47];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 1;
+                x[8] += 8;
+            }
+            checkLoc = locations[46];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 2;
+                x[7] += 8;
+            }
+            checkLoc = locations[45];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 4;
+                x[6] += 8;
+            }
+            checkLoc = locations[44];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 8;
+                x[5] += 8;
+            }
+            checkLoc = locations[43];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 16;
+                x[4] += 8;
+            }
+            checkLoc = locations[42];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 32;
+                x[3] += 8;
+            }
+            checkLoc = locations[41];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 64;
+                x[2] += 8;
+            }
+            checkLoc = locations[40];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 128;
+                x[1] += 8;
+            }
+            checkLoc = locations[39];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[5] += 256;
+                x[0] += 8;
+            }
+
+            // y++
+
+
+            checkLoc = locations[56];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 1;
+                x[8] += 4;
+            }
+            checkLoc = locations[55];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 2;
+                x[7] += 4;
+            }
+            checkLoc = locations[54];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 4;
+                x[6] += 4;
+            }
+            checkLoc = locations[53];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 8;
+                x[5] += 4;
+            }
+            checkLoc = locations[52];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 16;
+                x[4] += 4;
+            }
+            checkLoc = locations[51];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 32;
+                x[3] += 4;
+            }
+            checkLoc = locations[50];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 64;
+                x[2] += 4;
+            }
+            checkLoc = locations[49];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 128;
+                x[1] += 4;
+            }
+            checkLoc = locations[48];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[6] += 256;
+                x[0] += 4;
+            }
+
+
+            // y++
+
+
+
+            checkLoc = locations[63];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 2;
+                x[7] += 2;
+            }
+            checkLoc = locations[62];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 4;
+                x[6] += 2;
+            }
+            checkLoc = locations[61];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 8;
+                x[5] += 2;
+            }
+            checkLoc = locations[60];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 16;
+                x[4] += 2;
+            }
+            checkLoc = locations[59];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 32;
+                x[3] += 2;
+            }
+            checkLoc = locations[58];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 64;
+                x[2] += 2;
+            }
+            checkLoc = locations[57];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[7] += 128;
+                x[1] += 2;
+            }
+
+
+            // y++
+
+
+
+            checkLoc = locations[68];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[8] += 4;
+                x[6] += 1;
+            }
+            checkLoc = locations[67];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[8] += 8;
+                x[5] += 1;
+            }
+            checkLoc = locations[66];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[8] += 16;
+                x[4] += 1;
+            }
+            checkLoc = locations[65];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[8] += 32;
+                x[3] += 1;
+            }
+            checkLoc = locations[64];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                y[8] += 64;
+                x[2] += 1;
+            }
+
+
+            int xIndex = locations[0].x - originX + 128;
+            int yIndex = locations[20].y - originY + 128;
+
+            int shift = 63 - (yIndex % 64);
+            int index = yIndex / 64;
+            long not = ~(511L << shift);
+            if (shift > 54) {
+                int index2 = index - 1;
+                int shift2 = 64 - shift;
+                long not2 = ~(511L >> shift2);
+
+                mapY[xIndex][index] &= not;
+                mapY[xIndex][index] |= y[0] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[0] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[1] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[1] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[2] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[2] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[3] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[3] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[4] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[4] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[5] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[5] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[6] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[6] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[7] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[7] >> shift2;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[8] << shift;
+                mapY[xIndex][index2] &= not2;
+                mapY[xIndex][index2] |= y[8] >> shift2;
+            } else {
+                mapY[xIndex][index] &= not;
+                mapY[xIndex][index] |= y[0] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[1] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[2] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[3] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[4] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[5] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[6] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[7] << shift;
+
+                mapY[++xIndex][index] &= not;
+                mapY[xIndex][index] |= y[8] << shift;
+            }
+
+            shift = 63 - (xIndex % 64);
+            index = xIndex / 64;
+            not = ~(511L << shift);
+
+            if (shift > 54) {
+                int index2 = index - 1;
+                int shift2 = 64 - shift;
+                long not2 = ~(511L >> shift2);
+
+                mapX[yIndex][index] &= not;
+                mapX[yIndex][index] |= x[8] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[8] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[7] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[7] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[6] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[6] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[5] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[5] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[4] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[4] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[3] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[3] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[2] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[2] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[1] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[1] >> shift2;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[0] << shift;
+                mapX[yIndex][index2] &= not2;
+                mapX[yIndex][index2] |= x[0] >> shift2;
+            } else {
+                mapX[yIndex][index] &= not;
+                mapX[yIndex][index] |= x[8] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[7] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[6] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[5] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[4] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[3] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[2] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[1] << shift;
+
+                mapX[--yIndex][index] &= not;
+                mapX[yIndex][index] |= x[0] << shift;
+            }
+        } catch (GameActionException e) {}
+    }
+
+    private void scanArchon(MapLocation[] locations) {
+
+    }
+
 
 //    public void readMapBroadcast(int y, int x, int range) {
 //        switch(x%64) {
