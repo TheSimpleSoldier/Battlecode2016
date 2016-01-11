@@ -119,6 +119,11 @@ public class FightMicroUtilites
 
     public static void moveDir(RobotController rc, Direction dir, boolean clearRubble) throws GameActionException
     {
+        if (dir == Direction.NONE || dir == Direction.OMNI)
+        {
+            return;
+        }
+
         if (rc.isCoreReady())
         {
             if (rc.canMove(dir))

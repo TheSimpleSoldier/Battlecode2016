@@ -1,6 +1,7 @@
 package team037.Units;
 
 import battlecode.common.*;
+import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.EdgeDiscovered;
@@ -21,7 +22,8 @@ public class ScoutingScout extends BaseScout {
 
     @Override
     public boolean act() throws GameActionException {
-        if(discoverEdges()) {
+        if (fight()) return true;
+        else if (discoverEdges()) {
             return true;
         }
         return false;
@@ -50,7 +52,9 @@ public class ScoutingScout extends BaseScout {
         }
 
         int edge = MapUtils.senseEdge(rc, scoutDirection);
-        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir]) {
+        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir])
+        {
+            move.setTarget(currentLocation);
             System.out.println("Exploring edge: " + rc.getRoundNum());
             mapKnowledge.setValueInDirection(edge, scoutDirection);
 
@@ -64,6 +68,9 @@ public class ScoutingScout extends BaseScout {
 
             communication = mapKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(2500, communication);
+
+            if (mapKnowledge.inRegionMode())
+                nextBot = Bots.REGIONSCOUT;
 
             return true;
         }

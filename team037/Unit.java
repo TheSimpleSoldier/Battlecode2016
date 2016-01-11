@@ -85,7 +85,6 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
-        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
@@ -199,22 +198,25 @@ public abstract class Unit
 
                     values = communications[k].getValues();
 
-                    if (type == RobotType.SCOUT)
+                    if (rc.getRoundNum() < 30)
                     {
+                        if (type == RobotType.SCOUT)
+                        {
 //                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
 //                        {
 //                            communicator.sendCommunication(dist, communications[k]);
 //                            msgsSent++;
 //                        }
 
-                        if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
-                        {
-                            ScoutingScout.updateScoutDirection();
+                            if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
+                            {
+                                ScoutingScout.updateScoutDirection();
+                            }
                         }
+
+
+                        mapKnowledge.setEdgesBeingExplored(values[2]);
                     }
-
-
-                    mapKnowledge.setEdgesBeingExplored(values[2]);
 
                     break;
 

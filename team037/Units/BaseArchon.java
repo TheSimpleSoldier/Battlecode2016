@@ -6,6 +6,7 @@ import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
+import team037.Messages.EdgeDiscovered;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
@@ -117,6 +118,17 @@ public class BaseArchon extends Unit
 
                     Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication(id);
                     communicator.sendCommunication(5, mapBoundsCommunication);
+
+                    for (int j = mapKnowledge.exploredEdges.length; --j>=0;)
+                    {
+                        if (mapKnowledge.exploredEdges[j])
+                        {
+                            Communication mapBoundDiscovered = new EdgeDiscovered();
+                            mapBoundDiscovered.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, j});
+                            communicator.sendCommunication(2, mapBoundDiscovered);
+                        }
+                    }
+
 
                     if (nextBot == Bots.DENKILLERGUARD || nextBot == Bots.DENKILLERSOLDIER)
                     {

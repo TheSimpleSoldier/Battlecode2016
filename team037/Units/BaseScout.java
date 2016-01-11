@@ -27,7 +27,8 @@ public class BaseScout extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+        return fightMicro.avoidEnemiesInRoute(enemies, move.getTarget());
+//        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean fightZombies() throws GameActionException
@@ -63,6 +64,7 @@ public class BaseScout extends Unit
                 MapLocation zombieDen = zombies[i].location;
                 if (!mapKnowledge.denLocations.contains(zombieDen) && msgsSent < 20)
                 {
+                    System.out.println("We found a zombie den");
                     if (dist == -1)
                         dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
 
