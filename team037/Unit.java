@@ -32,6 +32,7 @@ public abstract class Unit
     public static Bots nextBot = null;
     public static Bots thisBot= null;
     public static int id;
+    public static int round;
     public static Communication[] communications;
     public static MapKnowledge mapKnowledge = new MapKnowledge();
     public static MapLocation start;
@@ -263,6 +264,8 @@ public abstract class Unit
 
         nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
+
+        round = rc.getRoundNum();
 
         MapLocation newLoc = rc.getLocation();
         locationLastTurn = currentLocation;
