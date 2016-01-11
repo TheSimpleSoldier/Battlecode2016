@@ -7,8 +7,7 @@ public class CastleNavigator extends Navigator {
     private static MapLocation target;
     private static Direction[] dirs;
 
-    public CastleNavigator(Unit unit)
-    {
+    public CastleNavigator(Unit unit) {
         super(unit.rc);
         this.unit = unit;
         dirs = new Direction[]{Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
@@ -24,6 +23,7 @@ public class CastleNavigator extends Navigator {
         return target;
     }
 
+
     public Direction getNextDirToTarget() throws GameActionException {
         if (target == null) {
             return Direction.NONE;
@@ -32,20 +32,24 @@ public class CastleNavigator extends Navigator {
 
         if (toMove.isDiagonal()) {
             toMove = toMove.rotateLeft();
-            if (!canMoveOnMap(toMove)) {
-                toMove = toMove.rotateRight().rotateRight();
-                if (!canMoveOnMap(toMove)) {
+        }
 
-                }
+        if (!canMoveOnMap(toMove)) {
+            toMove = toMove.rotateRight().rotateRight();
+            if (!canMoveOnMap(toMove)) {
+                return Direction.NONE;
             }
         }
 
-        return Direction.NONE;
-
+        return toMove;
     }
 
     public boolean canMove(Direction d) throws GameActionException {
-        return canMoveNoRobots(d) && canMoveNoRubble(d) && canMoveOnMap(d);
+        return unit.rc.canMove(d) && canMoveNoRobots(d) && canMoveNoRubble(d) && canMoveOnMap(d);
+    }
+
+    public boolean canDangerousMove(Direction d) throws GameActionException {
+        return unit.rc.canMove(d) && canMoveNoRobots(d) && canMoveOnMap(d);
     }
 
     private boolean canMoveNoRubble(Direction d) throws GameActionException {

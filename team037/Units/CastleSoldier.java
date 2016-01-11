@@ -147,9 +147,7 @@ public class CastleSoldier extends BaseSoldier
                 move.setTarget(target);
             }
         } else if (eucl > Strategies.CASTLE_SIZE) {
-            if (move.getTarget() == null || move.getTarget().distanceSquaredTo(archonLoc) > 4) {
-                move.setTarget(archonLoc);
-            }
+            move.setTarget(archonLoc);
         }
         return move.moveAndClear();
     }
