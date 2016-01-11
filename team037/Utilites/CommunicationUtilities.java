@@ -2,6 +2,7 @@ package team037.Utilites;
 
 import battlecode.common.MapLocation;
 import battlecode.common.Signal;
+import scala.Int;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;
@@ -44,12 +45,19 @@ public class CommunicationUtilities
         {
             if(loc + lengths[k] > 32)
             {
+                int breakLength = lengths[k] - (32 - loc);
+                int val1 = extractVal(message[0], loc, (32 - loc));
+                int val2 = extractVal(message[1], 1, breakLength);
+                val1 = val1 << breakLength;
+                toReturn[k] = val1 | val2;
                 current = message[1];
-                loc = 1;
+                loc = 1 + breakLength;
             }
-
-            toReturn[k] = extractVal(current, loc, lengths[k]);
-            loc += lengths[k];
+            else
+            {
+                toReturn[k] = extractVal(current, loc, lengths[k]);
+                loc += lengths[k];
+            }
         }
 
         return toReturn;
@@ -125,29 +133,34 @@ public class CommunicationUtilities
     private static int[] pack(int[] values, int[] lengths)
     {
         int[] message = new int[2];
-        String current = "";
+        String first = "";
+        String second = "";
+        boolean firstOne = true;
         for(int k = 0; k < values.length; k++)
         {
-            if(current.length() + lengths[k] > 31)
+            if(first.length() + lengths[k] > 31 && firstOne)
             {
-                String buffer = new String(new char[31 - current.length()]).replace('\0', '0');
-                current += buffer;
-                message[0] = Integer.parseInt(current, 2);
-                current = "";
+                String str = createVal(values[k], lengths[k]);
+                firstOne = false;
+                second += str.substring(31 - first.length());
+                first += str.substring(0, (31 - first.length()));
             }
+            else if(firstOne)
+            {
+                first += createVal(values[k], lengths[k]);
+            }
+            else
+            {
+                second += createVal(values[k], lengths[k]);
+            }
+        }
+        String buffer = new String(new char[31 - first.length()]).replace('\0', '0');
+        first += buffer;
+        buffer = new String(new char[31 - second.length()]).replace('\0', '0');
+        second += buffer;
+        message[0] = Integer.parseInt(first, 2);
+        message[1] = Integer.parseInt(second, 2);
 
-            current += createVal(values[k], lengths[k]);
-        }
-        String buffer = new String(new char[31 - current.length()]).replace('\0', '0');
-        current += buffer;
-        if(message[0] == 0)
-        {
-            message[0] = Integer.parseInt(current, 2);
-        }
-        else
-        {
-            message[1] = Integer.parseInt(current, 2);
-        }
 
         return message;
     }
