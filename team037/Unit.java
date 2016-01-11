@@ -7,6 +7,7 @@ import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.PartsCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
+import team037.Units.ScoutingScout;
 
 public abstract class Unit
 {
@@ -178,7 +179,14 @@ public abstract class Unit
 
                 case MAP_BOUNDS:
                     values = communications[k].getValues();
-                    if (mapKnowledge.updateEdges(values[1], values[4], values[2], values[5]))
+
+                    if (type == RobotType.SCOUT)
+                    {
+                        System.out.println("MAP_BOUNDS: x: " + values[2] + " y: " + values[5] + " width: " + values[3] + " height: " + values[6]);
+                    }
+
+
+                    if (mapKnowledge.updateEdges(values[2], values[5], values[3], values[6]))
                     {
                         if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                         {
@@ -192,13 +200,23 @@ public abstract class Unit
                     break;
 
                 case EXPLORE_EDGE:
+
                     values = communications[k].getValues();
 
-                    if (type == RobotType.SCOUT && !mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
+                    if (type == RobotType.SCOUT)
                     {
-                        communicator.sendCommunication(dist, communications[k]);
-                        msgsSent++;
+                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
+                        {
+                            communicator.sendCommunication(dist, communications[k]);
+                            msgsSent++;
+                        }
+
+                        if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
+                        {
+                            ScoutingScout.updateScoutDirection();
+                        }
                     }
+
 
                     mapKnowledge.setEdgesBeingExplored(values[2]);
 

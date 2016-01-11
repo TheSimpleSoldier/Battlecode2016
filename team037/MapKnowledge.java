@@ -2,6 +2,7 @@ package team037;
 
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
+import team037.Messages.Communication;
 import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;
 
@@ -102,18 +103,18 @@ public class MapKnowledge {
     /**
      * In addition to reading in info from the comm, this should be called regularly
      */
-    public void senseAndUpdateEdges(RobotController rc) throws GameActionException {
-        if (minY == Integer.MIN_VALUE) {
-            minY = MapUtils.senseEdge(rc, Direction.NORTH);
+    public void senseAndUpdateEdges() throws GameActionException {
+        if (!exploredEdges[0]) {
+            minY = MapUtils.senseFarthest(Direction.NORTH);
         }
-        if (maxY == Integer.MIN_VALUE) {
-            maxY = MapUtils.senseEdge(rc, Direction.SOUTH);
+        if (!exploredEdges[1]) {
+            maxY = MapUtils.senseFarthest(Direction.SOUTH);
         }
-        if (minX == Integer.MIN_VALUE) {
-            minX = MapUtils.senseEdge(rc, Direction.WEST);
+        if (!exploredEdges[2]) {
+            minX = MapUtils.senseFarthest(Direction.WEST);
         }
-        if (maxX == Integer.MIN_VALUE) {
-            maxX = MapUtils.senseEdge(rc, Direction.EAST);
+        if (!exploredEdges[3]) {
+            maxX = MapUtils.senseFarthest(Direction.EAST);
         }
     }
 
@@ -153,6 +154,11 @@ public class MapKnowledge {
         {
             this.maxY = minY + height;
             updated = true;
+        }
+
+        if (updated)
+        {
+//            System.out.println("We updated");
         }
 
         return updated;
@@ -546,5 +552,24 @@ public class MapKnowledge {
         }
 
         return count >= 3;
+    }
+
+    /**
+     * This method returns a map bounds communication
+     * @return
+     */
+    public Communication getMapBoundsCommunication(int id)
+    {
+        Communication communication = new MapBoundsCommunication();
+        int width = maxX - minX;
+        int height = maxY - minY;
+
+        if (Unit.type == RobotType.ARCHON)
+        {
+//            System.out.println("minX: " + minX + " width: " + width + " minY: " + minY + " height: " + height + " id: " + Unit.id);
+        }
+
+        communication.setValues(new int[]{0, minX, width, id, minY, height});
+        return communication;
     }
 }

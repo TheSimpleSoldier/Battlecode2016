@@ -57,6 +57,9 @@ public class AppendOnlyMapLocationArray {
 
         for (int i = length; --i>=0;)
         {
+            if (array[i] == null)
+                continue;
+
             if (array[i].equals(m))
             {
                 array[i] = null;

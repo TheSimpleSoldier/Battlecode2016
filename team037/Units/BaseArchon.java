@@ -113,6 +113,9 @@ public class BaseArchon extends Unit
                     communication.newBType = nextBot;
                     communicator.sendCommunication(2, communication);
 
+                    Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication(id);
+                    communicator.sendCommunication(2, mapBoundsCommunication);
+
                     if (nextBot == Bots.DENKILLERGUARD || nextBot == Bots.DENKILLERSOLDIER)
                     {
                         for (int j = mapKnowledge.denLocations.length; --j>=0; )
@@ -127,7 +130,6 @@ public class BaseArchon extends Unit
                             }
                         }
                     }
-
 
                     nextBot = buildOrder.nextBot();
                     nextType = Bots.typeFromBot(nextBot);
@@ -188,5 +190,13 @@ public class BaseArchon extends Unit
                 }
             }
         }
+    }
+
+    /**
+     * This method creates the initial starting map and broadcasts it to the world
+     */
+    public static void updateStartingMap()
+    {
+        try { mapKnowledge.senseAndUpdateEdges(); communicator.sendCommunication(2500, mapKnowledge.getMapBoundsCommunication(id)); } catch (Exception e) { e.printStackTrace(); }
     }
 }
