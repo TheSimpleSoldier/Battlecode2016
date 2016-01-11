@@ -13,6 +13,7 @@ public class ScoutingScout extends BaseScout {
     public static boolean fullScan = false;
     public static Direction scoutDirection;
     public static int dir = -1;
+    public static boolean sentEdge = false;
 
     public ScoutingScout(RobotController rc)  {
         super(rc);
@@ -34,24 +35,28 @@ public class ScoutingScout extends BaseScout {
 
         rc.setIndicatorString(1, "Map Bounds minX: " + mapKnowledge.minX + " minY: " + mapKnowledge.minY + " maxX: " + mapKnowledge.maxX + " maxY: " + mapKnowledge.maxY);
 
-        if (!fullScan) {
+        if (rc.getRoundNum() % 5 == 0)
+        {
             mapKnowledge.senseAndUpdateEdges();
-            fullScan = true;
         }
 
         if (scoutDirection == null) {
             if (!setNewScoutDirection()) {
                 return false;
             } else {
-                System.out.println("Setting new target");
+//                System.out.println("Setting new target");
                 move.setTarget(currentLocation.add(scoutDirection, 100));
             }
         }
 
         int edge = MapUtils.senseEdge(rc, scoutDirection);
-        if (edge != Integer.MIN_VALUE) {
+        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir]) {
+            System.out.println("Exploring edge: " + rc.getRoundNum());
             mapKnowledge.setValueInDirection(edge, scoutDirection);
-            // TODO: send out a message!
+
+            if (dir >= 0)
+                mapKnowledge.exploredEdges[dir] = true;
+
             scoutDirection = null;
             Communication communication = new EdgeDiscovered();
             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EXPLORE_EDGE), id, dir});
@@ -59,8 +64,6 @@ public class ScoutingScout extends BaseScout {
 
             communication = mapKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(2500, communication);
-
-            System.out.println("Sending out msgs");
 
             return true;
         }
@@ -83,7 +86,7 @@ public class ScoutingScout extends BaseScout {
     }
 
     private boolean setNewScoutDirection() throws GameActionException {
-        dir = mapKnowledge.getDir(id); //mapKnowledge.getClosestDir(currentLocation);
+        dir = /*mapKnowledge.getDir(id); // */ mapKnowledge.getClosestDir(currentLocation);
         if (dir == 0) {
             rc.setIndicatorString(0, "Going north");
             scoutDirection = Direction.NORTH;

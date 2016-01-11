@@ -7,10 +7,10 @@ public class MapBoundsCommunication extends Communication
 {
     public int widthIndicator;
     public int xVal;
-    public int width;
+    public int maxX;
     public int heightIndicator;
     public int yVal;
-    public int height;
+    public int maxY;
 
     public MapBoundsCommunication() {
         super();
@@ -22,12 +22,10 @@ public class MapBoundsCommunication extends Communication
     {
         return new int[]{
                 CommunicationType.toInt(opcode),
-                widthIndicator,
                 xVal,
-                width,
-                heightIndicator,
+                maxX,
                 yVal,
-                height
+                maxY
         };
     }
 
@@ -35,12 +33,10 @@ public class MapBoundsCommunication extends Communication
     public void setValues(int[] values)
     {
         opcode = CommunicationType.fromInt(values[0]);
-        widthIndicator = values[1];
-        xVal = values[2];
-        width = values[3];
-        heightIndicator = values[4];
-        yVal = values[5];
-        height = values[6];
+        xVal = values[1];
+        maxX = values[2];
+        yVal = values[3];
+        maxY = values[4];
     }
 
     @Override
@@ -48,10 +44,8 @@ public class MapBoundsCommunication extends Communication
     {
         return new int[]{
             CommunicationUtilities.opcodeSize,
-            CommunicationUtilities.mapIndicatorSize,
             CommunicationUtilities.locationSize,
             CommunicationUtilities.mapSpanSize,
-            CommunicationUtilities.mapIndicatorSize,
             CommunicationUtilities.locationSize,
             CommunicationUtilities.mapSpanSize
         };

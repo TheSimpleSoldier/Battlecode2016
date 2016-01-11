@@ -9,7 +9,6 @@ import team037.Messages.SimpleBotInfoCommunication;
 import team037.Messages.TurretSupportCommunication;
 import team037.Unit;
 import team037.Utilites.PartsUtilities;
-import team037.DataStructures.*;
 
 public class BaseScout extends Unit
 {
@@ -43,6 +42,8 @@ public class BaseScout extends Unit
 
     public void handleMessages() throws GameActionException
     {
+        int bytecodes = Clock.getBytecodeNum();
+
         super.handleMessages();
 
         msgTurrets();
@@ -95,8 +96,8 @@ public class BaseScout extends Unit
 
     private void msgParts() throws GameActionException
     {
-        AppendOnlyMapLocationArray parts = PartsUtilities.findPartsAndNeutralsICanSense(rc);
-        MapLocation[] partsArray = parts.array;
+        MapLocation[] partsArray = PartsUtilities.findPartsAndNeutrals(rc);;
+
 
         for (int i = partsArray.length; --i>=0; )
         {
@@ -144,8 +145,9 @@ public class BaseScout extends Unit
         MapLocation[] allyTurrets = mapKnowledge.getAlliedTurretLocations();
         boolean sentMsg = false;
 
-        if (allyTurrets != null && allyTurrets.length > 0)
+        if (allyTurrets != null && mapKnowledge.ourTurretLocations.hasLocations())
         {
+            System.out.println("Ally turrets");
             for (int i = enemies.length; --i >= 0; )
             {
                 MapLocation enemy = enemies[i].location;

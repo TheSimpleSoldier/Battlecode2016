@@ -18,17 +18,15 @@ public class PartsUtilities
             return new AppendOnlyMapLocationArray();
         }
 
-        int radius = (int)Math.ceil(Math.sqrt(sensorRadiusSquared));
         AppendOnlyMapLocationArray parts = new AppendOnlyMapLocationArray();
 
-        for (int i = -radius; i <= radius; i++) {
-            for (int j = -radius; j<= radius; j++) {
-                if (i*i + j*j <= sensorRadiusSquared) {
-                    MapLocation toCheck = currentLocation.add(i, j);
-                    if (rc.senseParts(toCheck) > 0) {
-                        parts.add(toCheck);
-                    }
-                }
+        MapLocation[] squares = MapLocation.getAllMapLocationsWithinRadiusSq(currentLocation, sensorRadiusSquared);
+
+        for (int i = squares.length; --i>=0; )
+        {
+            if (rc.senseParts(squares[i]) > 0)
+            {
+                parts.add(squares[i]);
             }
         }
 
@@ -38,7 +36,45 @@ public class PartsUtilities
             parts.add(neutralBots[i].location);
         }
 
+
         return parts;
+    }
+
+    public static MapLocation[] findPartsAndNeutrals(RobotController rc)
+    {
+        MapLocation currentLocation = rc.getLocation();
+        RobotType type = rc.getType();
+        int sensorRadiusSquared = type.sensorRadiusSquared;
+        if (sensorRadiusSquared <= 0) {
+            return new MapLocation[0];
+        }
+
+        AppendOnlyMapLocationArray parts = new AppendOnlyMapLocationArray();
+
+        MapLocation[] squares = MapLocation.getAllMapLocationsWithinRadiusSq(currentLocation, sensorRadiusSquared);
+
+        for (int i = squares.length; --i>=0; )
+        {
+            if (rc.senseParts(squares[i]) > 0)
+            {
+                parts.add(squares[i]);
+            }
+        }
+
+        RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);
+
+        for (int i = neutralBots.length; --i>=0; ) {
+            parts.add(neutralBots[i].location);
+        }
+
+        MapLocation[] locs = new MapLocation[parts.length];
+
+        for (int i = locs.length; --i>=0; )
+        {
+            locs[i] = parts.array[i];
+        }
+
+        return locs;
     }
 
     public static AppendOnlyMapLocationArray findPartsAndNeutralsICanSenseNotImpassible(RobotController rc)

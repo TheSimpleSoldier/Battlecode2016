@@ -117,7 +117,7 @@ public class MapKnowledge {
         }
         if (!exploredEdges[1])
         {
-            int y = MapUtils.senseFarthest(Direction.SOUTH);;
+            int y = MapUtils.senseFarthest(Direction.SOUTH);
 
             if (y > maxY)
             {
@@ -147,12 +147,12 @@ public class MapKnowledge {
      *
      * @param minX
      * @param minY
-     * @param height
-     * @param width
+     * @param maxX
+     * @param maxY
      */
-    public boolean updateEdges(int minX, int minY, int height, int width)
+    public boolean updateEdges(int minX, int minY, int maxX, int maxY)
     {
-        if (inRegionMode()) updateRegions(minX + width, minY + height, minX, minY);
+        if (inRegionMode()) updateRegions(maxX, maxY, minX, minY);
 
         boolean updated = false;
 
@@ -168,15 +168,15 @@ public class MapKnowledge {
             updated = true;
         }
 
-        if (minX + width > this.maxX)
+        if (maxX > this.maxX)
         {
-            this.maxX = minX + width;
+            this.maxX = maxX;
             updated = true;
         }
 
-        if (minY + height > this.maxY)
+        if (maxY > this.maxY)
         {
-            this.maxY = minY + height;
+            this.maxY = maxY;
             updated = true;
         }
 
@@ -394,6 +394,7 @@ public class MapKnowledge {
      */
     public void updateRegions(int newMaxX, int newMaxY, int newMinX, int newMinY)
     {
+        System.out.println("In region mode");
         boolean[] updatedExploredRegions = new boolean[16];
         for (int i = 0; i < 16; i++)
         {
@@ -501,7 +502,12 @@ public class MapKnowledge {
 
         // if all edges are being explored then stop
         if (!edgeNotExplored)
+        {
+            System.out.println("All edges have been explored");
             return -1;
+
+        }
+
 
         boolean up = true;
         boolean left = true;
@@ -550,6 +556,22 @@ public class MapKnowledge {
      */
     public int getDir(int id)
     {
+        if (exploredEdges[id%4])
+        {
+            if (exploredEdges[(id+1)%4])
+            {
+                if (exploredEdges[(id+2)%4])
+                {
+                    if (exploredEdges[(id+3)%4])
+                    {
+                        return -1;
+                    }
+                    return (id+3)%4;
+                }
+                return (id+2)%4;
+            }
+            return (id+1)%4;
+        }
         return id % 4;
     }
 
@@ -596,24 +618,20 @@ public class MapKnowledge {
     public Communication getMapBoundsCommunication(int id)
     {
         Communication communication = new MapBoundsCommunication();
+
         int width = maxX - minX;
         int height = maxY - minY;
-
-        if (Unit.type == RobotType.ARCHON)
-        {
-//            System.out.println("minX: " + minX + " width: " + width + " minY: " + minY + " height: " + height + " id: " + Unit.id);
-        }
 
         /**
          * opcode = CommunicationType.fromInt(values[0]);
          widthIndicator = values[1];
          xVal = values[2];
-         width = values[3];
+         maxX = values[3];
          heightIndicator = values[4];
          yVal = values[5];
-         height = values[6];
+         maxY = values[6];
          */
-        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), 0, minX, width, 0, minY, height});
+        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height});
         return communication;
     }
 }

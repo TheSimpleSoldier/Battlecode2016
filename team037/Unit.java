@@ -85,6 +85,7 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
+        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
@@ -180,15 +181,8 @@ public abstract class Unit
                 case MAP_BOUNDS:
                     values = communications[k].getValues();
 
-                    if (type == RobotType.SCOUT)
-                    {
-//                        System.out.println("MAP_BOUNDS: x: " + values[2] + " y: " + values[5] + " width: " + values[3] + " height: " + values[6]);
-                    }
 
-                    rc.setIndicatorString(2, "MAP_BOUNDS: x: " + values[2] + " y: " + values[5] + " width: " + values[3] + " height: " + values[6]);
-
-
-                    if (mapKnowledge.updateEdges(values[2], values[5], values[3], values[6]))
+                    if (mapKnowledge.updateEdges(values[1], values[3], values[1] + values[2], values[3] + values[4]))
                     {
                         if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                         {
