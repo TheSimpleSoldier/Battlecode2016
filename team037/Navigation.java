@@ -209,7 +209,7 @@ public class Navigation {
         boolean moved;
         MapLocation currentLoc = rc.getLocation();
 
-        if (currentLoc.equals(lastScan)) {
+        if (!currentLoc.equals(lastScan)) {
             if (searching) {
                 map.scanImmediateVicinity(currentLoc);
             } else {
@@ -258,7 +258,7 @@ public class Navigation {
                 // dig
                 try {
                     dig(currentLoc, goal);
-                } catch (GameActionException e) {}
+                } catch (Exception e) {}
             }
         } else {
             moved = false;
