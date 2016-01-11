@@ -190,6 +190,32 @@ public abstract class Unit
                         }
                     }
                     break;
+
+                case EXPLORE_EDGE:
+                    values = communications[k].getValues();
+
+                    if (type == RobotType.SCOUT && !mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
+                    {
+                        communicator.sendCommunication(dist, communications[k]);
+                        msgsSent++;
+                    }
+
+                    mapKnowledge.setEdgesBeingExplored(values[2]);
+
+                    break;
+
+                case EDGE_EXPLORED:
+                    values = communications[k].getValues();
+
+
+                    if (type == RobotType.SCOUT && !mapKnowledge.exploredEdges[values[2]] &&  msgsSent < 20)
+                    {
+                        communicator.sendCommunication(dist, communications[k]);
+                        msgsSent++;
+                    }
+
+                    mapKnowledge.exploredEdges[values[2]] = true;
+                    break;
             }
         }
     }

@@ -16,6 +16,7 @@ public class MapKnowledge {
 
     public boolean[] exploredRegions = new boolean[16];
     public boolean[] exploredEdges = new boolean[4];
+    public boolean[] edgesBeingExplored = new boolean[4];
 
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
@@ -430,30 +431,47 @@ public class MapKnowledge {
     public int getClosestDir(MapLocation current)
     {
         int maxXDist, maxYDist, minXDist, minYDist;
+        boolean edgeNotExplored = false;
 
         // North
-        if (exploredEdges[0])
+        if (exploredEdges[0] || edgesBeingExplored[0])
             minYDist = Integer.MAX_VALUE;
         else
+        {
             minYDist = current.y - minY;
+            edgeNotExplored = true;
+        }
 
         // East
-        if (exploredEdges[1])
+        if (exploredEdges[1] || edgesBeingExplored[1])
             maxXDist = Integer.MAX_VALUE;
         else
+        {
             maxXDist = maxX - current.x;
+            edgeNotExplored = true;
+        }
 
         // South
-        if (exploredEdges[2])
+        if (exploredEdges[2] || edgesBeingExplored[2])
             maxYDist = Integer.MAX_VALUE;
         else
+        {
             maxYDist = maxY - current.y;
+            edgeNotExplored = true;
+        }
 
         // West
-        if (exploredEdges[3])
+        if (exploredEdges[3] || edgesBeingExplored[3])
             minXDist = Integer.MAX_VALUE;
         else
+        {
             minXDist = current.x - minX;
+            edgeNotExplored = true;
+        }
+
+        // if all edges are being explored then stop
+        if (!edgeNotExplored)
+            return -1;
 
         boolean up = true;
         boolean left = true;
@@ -502,6 +520,16 @@ public class MapKnowledge {
     public void reachedEdge(int edge)
     {
         exploredEdges[edge] = true;
+    }
+
+    /**
+     * This method sets an edge as being explored
+     *
+     * @param edge
+     */
+    public void setEdgesBeingExplored(int edge)
+    {
+        edgesBeingExplored[edge] = true;
     }
 
     /**
