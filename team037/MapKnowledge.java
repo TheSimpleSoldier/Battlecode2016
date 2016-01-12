@@ -404,7 +404,6 @@ public class MapKnowledge {
      */
     public void updateRegions(int newMaxX, int newMaxY, int newMinX, int newMinY)
     {
-        System.out.println("In region mode");
         boolean[] updatedExploredRegions = new boolean[16];
         for (int i = 0; i < 16; i++)
         {
@@ -709,5 +708,44 @@ public class MapKnowledge {
         }
         exploredRegions[region] = true;
         return true;
+    }
+
+    /**
+     * This method attempts to find the opposite corner of the map
+     *
+     * @param startLoc
+     * @return
+     */
+    public MapLocation getOppositeCorner(MapLocation startLoc)
+    {
+        int x = startLoc.x - minX;
+        int y = startLoc.y - minY;
+
+        System.out.println("Opposite corner x: " + (maxX - x) + " y: " + (maxY - y));
+
+        return new MapLocation(maxX - x, maxY - y);
+    }
+
+    /**
+     * This method returns the archon's starting position com
+     *
+     * @return
+     */
+    public MapLocation getArchonCOM()
+    {
+        int x = 0;
+        int y = 0;
+        int count = 0;
+        if (archonStartPosition.hasLocations())
+        {
+            for (int i = archonStartPosition.length; --i>=0;)
+            {
+                count++;
+                x += archonStartPosition.array[i].x;
+                y += archonStartPosition.array[i].y;
+            }
+        }
+
+        return new MapLocation(x/count, y/count);
     }
 }

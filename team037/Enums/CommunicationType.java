@@ -7,7 +7,7 @@ public enum CommunicationType
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
     SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT,
     NEUTRAL, SKILLED_DEN, DEAD_DEN, EXPLORE_EDGE, EDGE_EXPLORED,
-    RUBBLE;
+    ATTACK, RALLY_POINT, RUBBLE;
 
     public static int toInt(CommunicationType type)
     {
@@ -47,8 +47,12 @@ public enum CommunicationType
                 return 15;
             case EDGE_EXPLORED:
                 return 16;
-            case RUBBLE:
+            case ATTACK:
                 return 17;
+            case RALLY_POINT:
+                return 18;
+            case RUBBLE:
+                return 19;
         }
         return -1;
     }
@@ -92,6 +96,10 @@ public enum CommunicationType
             case 16:
                 return EDGE_EXPLORED;
             case 17:
+                return ATTACK;
+            case 18:
+                return RALLY_POINT;
+            case 19:
                 return RUBBLE;
         }
         return null;
@@ -131,6 +139,10 @@ public enum CommunicationType
                 return new ExploringMapEdge();
             case EDGE_EXPLORED:
                 return new EdgeDiscovered();
+            case ATTACK:
+                return new AttackCommunication();
+            case RALLY_POINT:
+                return new AttackCommunication();
             case RUBBLE:
                 return new RubbleCommunication();
         }

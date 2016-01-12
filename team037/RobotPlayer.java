@@ -26,6 +26,7 @@ public class RobotPlayer
 
         // hardcode disabled for now
         strategy = "castle";
+        strategy = "normal";
 
 
         RobotType type = rc.getType();
@@ -97,6 +98,8 @@ public class RobotPlayer
         if (rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
         {
             BaseArchon.updateStartingMap();
+            BaseArchon.sendOutInitialLocation();
+            BaseArchon.mapKnowledge.archonStartPosition.add(rc.getLocation());
         }
 
 

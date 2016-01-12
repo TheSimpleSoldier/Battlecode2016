@@ -490,6 +490,47 @@ public class FightMicro
     }
 
     /**
+     * This method is an agressive fight micro that uses vipers specially ability to target allies in correct situations
+     *
+     * @param nearByEnemies
+     * @param enemies
+     * @param nearByAllies
+     * @return
+     * @throws GameActionException
+     */
+    public boolean aggressiveFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] enemies, RobotInfo[] nearByAllies) throws GameActionException
+    {
+        if (enemies.length == 0) return false;
+
+        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        {
+            RobotInfo enemy = null;
+            if (rc.getType() == RobotType.VIPER)
+            {
+                enemy = FightMicroUtilites.pickViperTarget(nearByAllies, nearByEnemies);
+            }
+            else
+            {
+                enemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+            }
+
+            if (enemy != null && rc.canAttackLocation(enemy.location))
+            {
+                rc.attackLocation(enemy.location);
+                return true;
+            }
+        }
+
+        if (nearByEnemies.length == 0 && rc.isCoreReady())
+        {
+            FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(enemies[0].location), true);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * THis method causes a unit to run towards a target while trying to avoid enemies
      *
      * @param enemies
