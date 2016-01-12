@@ -60,7 +60,23 @@ public class BaseArchon extends Unit
     {
         super.handleMessages();
 
-        if (enemies.length > 0)
+        int offennsiveEnemies = 0;
+
+        for (int i = enemies.length; --i>=0;)
+        {
+            switch (enemies[i].type)
+            {
+                case TURRET:
+                case GUARD:
+                case SOLDIER:
+                case VIPER:
+                    offennsiveEnemies++;
+            }
+        }
+
+        offennsiveEnemies += zombies.length;
+
+        if (offennsiveEnemies > 0)
         {
             Communication distressCall = new BotInfoCommunication();
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});

@@ -94,10 +94,19 @@ public abstract class Unit
                 navigator.setTarget(distressedArchon);
             }
 
-            // rush towards archon shooting anything in path
-            if (rc.isWeaponReady() && nearByEnemies.length > 0)
+            // condition for when we should stop rallying around an archon
+            if (rc.getLocation().distanceSquaredTo(distressedArchon) < 5 && enemies.length == 0)
             {
-                fightMicro.basicFightMicro(nearByEnemies);
+                distressedArchon = null;
+                defendingArchon = false;
+                return false;
+            }
+
+            // rush towards archon shooting anything in path
+            if (rc.isWeaponReady() && (nearByEnemies.length > 0 || nearByZombies.length > 0))
+            {
+                if (fightMicro.basicFightMicro(nearByEnemies));
+                else if (fightMicro.basicFightMicro(nearByZombies));
             }
             else if (rc.isCoreReady())
             {

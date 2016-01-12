@@ -34,8 +34,8 @@ public class DenKillerSoldier extends BaseSoldier
         }
         else
         {
-            target = rc.getLocation().add(dirs[(int) (Math.random() * 8)], 1);
-            navigator.setTarget(target);
+//            target = rc.getLocation().add(dirs[(int) (Math.random() * 8)], 1);
+//            navigator.setTarget(target);
         }
 
         if (rc.getRoundNum() % 5 == 0 && goal != null && mapKnowledge.denLocations.hasLocations())
