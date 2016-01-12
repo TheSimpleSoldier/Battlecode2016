@@ -125,7 +125,7 @@ public class BaseArchon extends Unit
                         {
                             Communication mapBoundDiscovered = new EdgeDiscovered();
                             mapBoundDiscovered.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, j});
-                            communicator.sendCommunication(2, mapBoundDiscovered);
+                            communicator.sendCommunication(5, mapBoundDiscovered);
                         }
                     }
 
