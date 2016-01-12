@@ -16,7 +16,7 @@ public class BaseArchon extends Unit
     Bots nextBot;
     RobotType nextType;
     RobotInfo[] neutralBots;
-    SortedParts sortedParts = new SortedParts();
+    public static SortedParts sortedParts = new SortedParts();
     private int rushingUnits = 0;
     private boolean sentRushSignal = false;
 
@@ -112,8 +112,6 @@ public class BaseArchon extends Unit
                         Communication rushMsg = new AttackCommunication();
 
                         MapLocation archonCOM = mapKnowledge.getArchonCOM();
-
-                        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
                         rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
                         communicator.sendCommunication(2, rushMsg);
