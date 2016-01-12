@@ -17,6 +17,20 @@ public class BaseScout extends Unit
         move = new FlyingNavigator(rc);
     }
 
+    @Override
+    public Unit getNewStrategy(Unit current) throws GameActionException
+    {
+        Unit unit = super.getNewStrategy(current);
+        if(unit.equals(current))
+        {
+            if(zombies.length > 0)
+            {
+                return new HerdingScout(rc);
+            }
+        }
+        return unit;
+    }
+
     public boolean takeNextStep() throws GameActionException
     {
         return move.takeNextStep();
