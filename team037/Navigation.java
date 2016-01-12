@@ -51,6 +51,7 @@ public class Navigation {
             goalJP = null;
             int[] getMyLoc = map.mapToArray(lastScan);
             myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
+            currentGoal = lastScan;
         }
     }
 
@@ -63,8 +64,10 @@ public class Navigation {
         multimap = null;
         lastPt = null;
         goalJP = null;
-        int[] getMyLoc = map.mapToArray(rc.getLocation());
+        MapLocation location = rc.getLocation();
+        int[] getMyLoc = map.mapToArray(location);
         myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
+        currentGoal = location;
     }
 
     /**
@@ -76,7 +79,7 @@ public class Navigation {
      */
     public static boolean tryBug(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
-        rc.setIndicatorString(2, "Using bug movement ("+goal.x+","+goal.y+")");
+        rc.setIndicatorString(2, "Using bug movement ("+currentGoal.x+","+currentGoal.y+")");
         boolean moved;
 
         Direction forward = currentLoc.directionTo(goal);
@@ -132,8 +135,7 @@ public class Navigation {
         boolean moved = false;
 
         if (lastPt != null && lastPt.mapNext != null) {
-            MapLocation goal = map.arrayToMap(multimap.goalX,multimap.goalY);
-            rc.setIndicatorString(2,"Using path ("+goal.x+","+goal.y+")");
+            rc.setIndicatorString(2,"Using path ("+currentGoal.x+","+currentGoal.y+")");
 
             JumpPoint nextPt = lastPt.mapNext;
 
@@ -220,7 +222,7 @@ public class Navigation {
         }
 
         if (goal != null) {
-            if (!goal.equals(currentGoal)) {
+            if (currentGoal != null && !goal.equals(currentGoal)) {
                 reset();
                 currentGoal = goal;
             }
@@ -269,6 +271,7 @@ public class Navigation {
                 } catch (Exception e) {}
             }
         } else {
+            currentGoal = currentLoc;
             moved = false;
         }
 
@@ -287,8 +290,7 @@ public class Navigation {
     public static boolean handleTrafficOnPath(MapLocation currentLoc, Direction forward, int direction, JumpPoint nextPt) throws GameActionException {
 
         boolean moved = false;
-        MapLocation goal = map.arrayToMap(multimap.goalX,multimap.goalY);
-        rc.setIndicatorString(2, "Traffic on the path ("+goal.x+","+goal.y+")");
+        rc.setIndicatorString(2, "Traffic on the path ("+currentGoal.x+","+currentGoal.y+")");
 
         MapLocation forwardLoc = currentLoc.add(forward);
         int[] forwardPt = map.mapToArray(forwardLoc);
