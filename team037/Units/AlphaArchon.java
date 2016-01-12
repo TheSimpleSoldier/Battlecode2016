@@ -25,6 +25,15 @@ public class AlphaArchon extends BaseArchon
         if (rc.isCoreReady() && carryOutAbility()) {
             return true;
         }
+
+        if (sortedParts.contains(currentLocation))
+        {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
+            Communication communication = new BotInfoCommunication();
+                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+                communicator.sendCommunication(400, communication);
+        }
+
         if (fight());
         else if (fightZombies());
         else if (carryOutAbility());
@@ -48,10 +57,15 @@ public class AlphaArchon extends BaseArchon
             return true;
         if (rc.getLocation().equals(currentTarget))
             return true;
-        if (rc.canSenseLocation(currentTarget) && (rc.senseParts(currentTarget) == 0 && rc.senseRobotAtLocation(currentTarget) == null))
+        if (rc.canSenseLocation(currentTarget) && (rc.senseParts(currentTarget) == 0 && rc.senseRobotAtLocation(currentTarget) == null)) {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentTarget));
             return true;
-//        if (rc.canSenseLocation(currentTarget) && (rc.senseRobotAtLocation(currentTarget) != null && rc.senseRobotAtLocation(currentTarget).team != Team.NEUTRAL))
-//            return true;
+        }
+
+        MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
+
+        if (!bestParts.equals(currentTarget))
+            return true;
 
         return false;
     }

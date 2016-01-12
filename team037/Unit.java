@@ -231,6 +231,10 @@ public abstract class Unit
                             BaseArchon.sortedParts.remove(index);
                             navigator.setTarget(BaseArchon.getNextPartLocation());
                         }
+                        else
+                        {
+                            System.out.println("keeping our target");
+                        }
                     }
 
                     break;

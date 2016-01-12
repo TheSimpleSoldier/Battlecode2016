@@ -37,7 +37,6 @@ public class SortedParts
         if (end == start)
             return null;
 
-        int index = 0;
         double highestScore = 0;
         MapLocation best = null;
 
@@ -45,18 +44,15 @@ public class SortedParts
         {
             if (locs[i] != null)
             {
-                int value = (int) (score[i] / (current.distanceSquaredTo(locs[i]) + 1));
+                double value = (score[i] / current.distanceSquaredTo(locs[i]) + 1);
 
                 if (value > highestScore)
                 {
                     best = locs[i];
                     highestScore = value;
-                    index = i;
                 }
             }
         }
-
-        remove(index);
 
         return best;
     }

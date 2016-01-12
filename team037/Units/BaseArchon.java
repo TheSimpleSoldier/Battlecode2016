@@ -229,11 +229,15 @@ public class BaseArchon extends Unit
             if (best != null)
             {
                 rc.setIndicatorString(2, "x: " + best.x + " y: " + best.y);
-                sortedParts.remove(sortedParts.getIndexOfMapLocation(navigator.getTarget()));
+//                sortedParts.remove(sortedParts.getIndexOfMapLocation(navigator.getTarget()));
                 System.out.println("Going after parts at x: " + best.x + " y: " + best.y);
-                Communication communication = new BotInfoCommunication();
-                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
-                communicator.sendCommunication(400, communication);
+//                Communication communication = new BotInfoCommunication();
+//                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+//                communicator.sendCommunication(400, communication);
+            }
+            else
+            {
+                rc.setIndicatorString(2, "null");
             }
         }
         catch (Exception e)
