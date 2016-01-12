@@ -21,18 +21,23 @@ public class RushingSoldier extends BaseSoldier
             return true;
         }
 
-        if (rushing && rushTarget != null)
+        if (navigator.getTarget() == null)
         {
+            navigator.setTarget(rallyPoint);
+        }
+        else if (rushing && rushTarget != null)
+        {
+            rushing = true;
             Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
             target = currentLocation.add(dir, 5);
             navigator.setTarget(target);
         }
         else if (target == null || currentLocation.equals(target))
         {
-            // move randomly
-            Direction dir = dirs[(int) (Math.random() * 8)];
-            target = currentLocation.add(dir, 3);
-            navigator.setTarget(target);
+//            // move randomly
+//            Direction dir = dirs[(int) (Math.random() * 8)];
+//            target = currentLocation.add(dir, 3);
+//            navigator.setTarget(target);
         }
 
         if (rc.isCoreReady())

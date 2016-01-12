@@ -5,10 +5,7 @@ import team037.DataStructures.BuildOrder;
 import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
-import team037.Messages.Communication;
-import team037.Messages.EdgeDiscovered;
-import team037.Messages.MissionCommunication;
-import team037.Messages.SimpleBotInfoCommunication;
+import team037.Messages.*;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
 
@@ -20,6 +17,8 @@ public class BaseArchon extends Unit
     RobotType nextType;
     RobotInfo[] neutralBots;
     SortedParts sortedParts = new SortedParts();
+    private int rushingUnits = 0;
+    private boolean sentRushSignal = false;
 
     public BaseArchon(RobotController rc)
     {
@@ -107,6 +106,28 @@ public class BaseArchon extends Unit
                 if (rc.canBuild(dirs[i], nextType))
                 {
                     rc.build(dirs[i], nextType);
+
+                    if (nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHINGVIPER)
+                    {
+                        rushingUnits++;
+                    }
+
+                    if (rushingUnits > 3 && !sentRushSignal)
+                    {
+                        Communication rushMsg = new AttackCommunication();
+
+                        MapLocation archonCOM = mapKnowledge.getArchonCOM();
+
+                        rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
+                        communicator.sendCommunication(2, rushMsg);
+
+                        MapLocation rushLoc = mapKnowledge.getOppositeCorner(start);
+                        rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.ATTACK), rushLoc.x, rushLoc.y} );
+                        communicator.sendCommunication(2, rushMsg);
+
+                        sentRushSignal = true;
+                    }
+
                     int id = rc.senseRobotAtLocation(rc.getLocation().add(dirs[i])).ID;
                     MissionCommunication communication = new MissionCommunication();
                     communication.opcode = CommunicationType.CHANGEMISSION;
@@ -119,7 +140,7 @@ public class BaseArchon extends Unit
                     Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication(id);
                     communicator.sendCommunication(5, mapBoundsCommunication);
 
-                    for (int j = mapKnowledge.exploredEdges.length; --j>=0;)
+                    for (int j = mapKnowledge.exploredEdges.length; --j>=0; )
                     {
                         if (mapKnowledge.exploredEdges[j])
                         {
@@ -161,5 +182,19 @@ public class BaseArchon extends Unit
     public static void updateStartingMap()
     {
         try { mapKnowledge.senseAndUpdateEdges(); communicator.sendCommunication(2500, mapKnowledge.getMapBoundsCommunication(id)); } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    /**
+     * This method sends out the initial location of the archons
+     */
+    public static void sendOutInitialLocation()
+    {
+        try {
+            Communication communication = new SimpleBotInfoCommunication();
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.SARCHON), id, rc.getLocation().x, rc.getLocation().y});
+            communicator.sendCommunication(2500, communication);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

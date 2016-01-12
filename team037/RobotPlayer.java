@@ -98,6 +98,8 @@ public class RobotPlayer
         if (rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
         {
             BaseArchon.updateStartingMap();
+            BaseArchon.sendOutInitialLocation();
+            BaseArchon.mapKnowledge.archonStartPosition.add(rc.getLocation());
         }
 
 

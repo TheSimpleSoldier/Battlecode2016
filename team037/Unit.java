@@ -5,7 +5,6 @@ import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
-import team037.Messages.PartsCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Units.ScoutingScout;
 
@@ -43,6 +42,7 @@ public abstract class Unit
     public MapLocation previousLocation;
     public MapLocation currentLocation;
     public MapLocation rushTarget;
+    public MapLocation rallyPoint;
 
     public Unit()
     {
@@ -239,9 +239,34 @@ public abstract class Unit
 
                     values = communications[k].getValues();
 
+                    if (type == RobotType.VIPER)
+                    {
+                        System.out.println("WE got a target attack location");
+                    }
+
                     rushTarget = new MapLocation(values[1], values[2]);
 
                     break;
+
+                case SARCHON:
+
+                    values = communications[k].getValues();
+                    MapLocation archon = new MapLocation(values[2], values[3]);
+
+                    if (!mapKnowledge.archonStartPosition.contains(archon))
+                    {
+                        mapKnowledge.archonStartPosition.add(archon);
+                    }
+
+                    break;
+
+                case RALLY_POINT:
+
+                    values = communications[k].getValues();
+                    rallyPoint = new MapLocation(values[2], values[3]);
+
+                    break;
+
             }
         }
     }
