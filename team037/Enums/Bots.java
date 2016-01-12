@@ -4,6 +4,7 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.Unit;
 import team037.Units.*;
+import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.Rushers.RushingSoldier;
@@ -17,7 +18,7 @@ public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
     SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
-    REGIONSCOUT, HERDINGSCOUT;
+    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER;
 
     public static int toInt(Bots type)
     {
@@ -55,6 +56,8 @@ public enum Bots
                 return 14;
             case HERDINGSCOUT:
                 return 15;
+            case CASTLESOLDIER:
+                return 16;
         }
         return -1;
     }
@@ -95,6 +98,8 @@ public enum Bots
                 return REGIONSCOUT;
             case 15:
                 return HERDINGSCOUT;
+            case 16:
+                return CASTLESOLDIER;
         }
 
         return null;
@@ -116,6 +121,7 @@ public enum Bots
             case SCOUTINGSCOUT:
             case HERDINGSCOUT:
                 return RobotType.SCOUT;
+            case CASTLESOLDIER:
             case RUSHINGSOLDIER:
             case DENKILLERSOLDIER:
             case BASESOLDIER:
@@ -167,6 +173,8 @@ public enum Bots
                 return new RegionScout(rc);
             case HERDINGSCOUT:
                 return new HerdingScout(rc);
+            case CASTLESOLDIER:
+                return new CastleSoldier(rc);
         }
 
         return null;

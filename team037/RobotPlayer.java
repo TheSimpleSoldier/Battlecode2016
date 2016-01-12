@@ -6,6 +6,10 @@ import battlecode.common.RobotType;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.*;
+import team037.Units.CastleUnits.CastleArchon;
+import team037.Units.CastleUnits.CastleSoldier;
+import team037.Units.CastleUnits.CastleTurret;
+import team037.Units.DenKillers.DenKillerSoldier;
 
 public class RobotPlayer
 {
@@ -55,8 +59,8 @@ public class RobotPlayer
             if (strategy.equals(Strategies.CASTLE)) {
                 unit = new CastleSoldier(rc);
             } else {
-                unit = new BaseSoldier(rc);
-                Unit.thisBot = Bots.BASESOLDIER;
+                unit = new DenKillerSoldier(rc);
+                Unit.thisBot = Bots.DENKILLERSOLDIER;
             }
 
         }

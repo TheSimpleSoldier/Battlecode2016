@@ -1,13 +1,12 @@
 package team037.Units.Rushers;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 import team037.Units.BaseSoldier;
 
 public class RushingSoldier extends BaseSoldier
 {
     private boolean rushing = false;
+    private MapLocation lastTarget = null;
 
     public RushingSoldier(RobotController rc)
     {
@@ -21,24 +20,20 @@ public class RushingSoldier extends BaseSoldier
             return true;
         }
 
-        if (rushing && navigator.getTarget() == null && rallyPoint != null)
+        if (updateTarget())
         {
-            System.out.println("Rally Point x: " + rallyPoint.x + " y: " + rallyPoint.y);
-            navigator.setTarget(rallyPoint);
-        }
-        else if (!rushing && rushTarget != null)
-        {
-            //rushing = true;
-            Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
-            target = currentLocation.add(dir, 5);
-            navigator.setTarget(target);
-        }
-        else if (target == null || currentLocation.equals(target))
-        {
-//            // move randomly
-//            Direction dir = dirs[(int) (Math.random() * 8)];
-//            target = currentLocation.add(dir, 3);
-//            navigator.setTarget(target);
+            if (rushTarget != null)
+            {
+                lastTarget = rushTarget;
+
+                Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
+
+                navigator.setTarget(currentLocation.add(dir, 5));
+            }
+            else
+            {
+                rushTarget = mapKnowledge.getOppositeCorner(start);
+            }
         }
 
         if (rc.isCoreReady())
@@ -47,6 +42,29 @@ public class RushingSoldier extends BaseSoldier
         }
 
         return false;
+    }
+
+    public boolean updateTarget()
+    {
+        MapLocation target = navigator.getTarget();
+
+        if (target == null)
+            return true;
+
+        if (currentLocation.equals(target))
+            return true;
+
+        if (currentLocation.isAdjacentTo(target))
+            return true;
+
+        if (rc.canSenseLocation(target) && rc.senseRubble(target) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            return true;
+
+        if (rushTarget != null && !rushTarget.equals(lastTarget))
+            return true;
+
+        return false;
+
     }
 
     public boolean fight() throws GameActionException
@@ -60,9 +78,6 @@ public class RushingSoldier extends BaseSoldier
 
     public boolean fightZombies() throws GameActionException
     {
-        if (rushing)
-            return false;
-
         return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
 }

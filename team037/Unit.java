@@ -129,8 +129,6 @@ public abstract class Unit
     public void handleMessages() throws GameActionException
     {
         int rubbleUpdate = 0;
-        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
-
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
