@@ -42,6 +42,7 @@ public abstract class Unit
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
     public MapLocation currentLocation;
+    public MapLocation rushTarget;
 
     public Unit()
     {
@@ -230,6 +231,14 @@ public abstract class Unit
                     }
 
                     mapKnowledge.exploredEdges[values[2]] = true;
+                    break;
+
+                case ATTACK:
+
+                    values = communications[k].getValues();
+
+                    rushTarget = new MapLocation(values[1], values[2]);
+
                     break;
             }
         }

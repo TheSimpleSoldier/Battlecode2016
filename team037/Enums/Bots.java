@@ -6,6 +6,8 @@ import team037.Unit;
 import team037.Units.*;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.Rushers.RushingSoldier;
+import team037.Units.Rushers.RushingViper;
 
 /**
  * Created by joshua on 1/5/16.
@@ -14,7 +16,7 @@ import team037.Units.DenKillers.DenKillerSoldier;
 public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
-    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD;
+    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER;
 
     public static int toInt(Bots type)
     {
@@ -44,6 +46,10 @@ public enum Bots
                 return 10;
             case DENKILLERGUARD:
                 return 11;
+            case RUSHINGSOLDIER:
+                return 12;
+            case RUSHINGVIPER:
+                return 13;
         }
         return -1;
     }
@@ -76,6 +82,10 @@ public enum Bots
                 return DENKILLERSOLDIER;
             case 11:
                 return DENKILLERGUARD;
+            case 12:
+                return RUSHINGSOLDIER;
+            case 13:
+                return RUSHINGVIPER;
         }
 
         return null;
@@ -95,6 +105,7 @@ public enum Bots
             case BASESCOUT:
             case SCOUTINGSCOUT:
                 return RobotType.SCOUT;
+            case RUSHINGSOLDIER:
             case DENKILLERSOLDIER:
             case BASESOLDIER:
                 return RobotType.SOLDIER;
@@ -102,6 +113,7 @@ public enum Bots
                 return RobotType.TTM;
             case BASETURRET:
                 return RobotType.TURRET;
+            case RUSHINGVIPER:
             case BASEVIPER:
                 return RobotType.VIPER;
         }
@@ -136,6 +148,10 @@ public enum Bots
                 return new DenKillerSoldier(rc);
             case DENKILLERGUARD:
                 return new DenKillerGuard(rc);
+            case RUSHINGVIPER:
+                return new RushingViper(rc);
+            case RUSHINGSOLDIER:
+                return new RushingSoldier(rc);
         }
 
         return null;

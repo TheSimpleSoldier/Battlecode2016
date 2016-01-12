@@ -1,6 +1,7 @@
 package team037.Utilites;
 
 import battlecode.common.*;
+import battlecode.util.SquareArray;
 import team037.Communicator;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
@@ -22,6 +23,67 @@ public class FightMicroUtilites
             }
             else if (nearByEnemies[i].health < weakest.health)
             {
+                weakest = nearByEnemies[i];
+            }
+        }
+
+        return weakest;
+    }
+
+    /**
+     * This is a targeting method for vipers to infect their own units
+     *
+     * @param nearByAllies
+     * @param nearByEnemies
+     * @return
+     */
+    public static RobotInfo pickViperTarget(RobotInfo[] nearByAllies, RobotInfo[] nearByEnemies)
+    {
+        double lowestHealth = Double.MAX_VALUE;
+        RobotInfo weakest = null;
+
+        for (int i = nearByEnemies.length; --i>=0; )
+        {
+            if (nearByEnemies[i].viperInfectedTurns == 0 && nearByEnemies[i].zombieInfectedTurns == 0)
+            {
+                if (nearByEnemies[i].health <= 20 && nearByEnemies[i].health < lowestHealth)
+                {
+                    lowestHealth = nearByEnemies[i].health;
+                    weakest = nearByEnemies[i];
+                }
+            }
+        }
+
+        if (weakest != null)
+        {
+            return  weakest;
+        }
+
+        // else look to infect an ally right before death
+        for (int i = nearByAllies.length; --i>=0; )
+        {
+            if (nearByAllies[i].viperInfectedTurns == 0 && nearByAllies[i].zombieInfectedTurns == 0)
+            {
+                if (nearByAllies[i].health <= 10 && nearByAllies[i].health < lowestHealth)
+                {
+                    lowestHealth = nearByAllies[i].health;
+                    weakest = nearByAllies[i];
+                }
+            }
+        }
+
+        if (weakest != null)
+        {
+            return weakest;
+        }
+
+        int infectionAmount = 20;
+
+        for (int i = nearByEnemies.length; --i>=0; )
+        {
+            if (nearByEnemies[i].viperInfectedTurns < infectionAmount)
+            {
+                infectionAmount = nearByEnemies[i].viperInfectedTurns;
                 weakest = nearByEnemies[i];
             }
         }
