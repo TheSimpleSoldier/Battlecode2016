@@ -9,12 +9,13 @@ public class BuildOrderCreation
     {
         Bots[][] buildOrder = {
                 {Bots.SCOUTINGSCOUT, Bots.DENKILLERSOLDIER},
-                {Bots.DENKILLERSOLDIER, Bots.DENKILLERGUARD},
+                {Bots.RUSHINGVIPER, Bots.DENKILLERSOLDIER},
                 {Bots.SCOUTINGSCOUT, Bots.DENKILLERSOLDIER},
                 {Bots.DENKILLERSOLDIER, Bots.DENKILLERGUARD},
+                {Bots.RUSHINGSOLDIER, Bots.RUSHINGVIPER},
                 {Bots.DENKILLERSOLDIER, null}
         };
-        int[] times = {1, 3, 1, 3, 1000};
+        int[] times = {1, 3, 1, 3, 2, 1000};
 
         Bots[][] buildOrderSoldiers = {
                 {Bots.BASESOLDIER}

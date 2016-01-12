@@ -5,7 +5,6 @@ import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
-import team037.Messages.PartsCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Units.ScoutingScout;
 
@@ -42,6 +41,8 @@ public abstract class Unit
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
     public MapLocation currentLocation;
+    public MapLocation rushTarget;
+    public MapLocation rallyPoint;
 
     public Unit()
     {
@@ -86,6 +87,9 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
+        int rubbleUpdate = 0;
+        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
+
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
@@ -181,6 +185,7 @@ public abstract class Unit
                 case MAP_BOUNDS:
                     values = communications[k].getValues();
 
+                    rc.setIndicatorString(1, "xMin: " + values[1] + " yMin: " + values[3] + " width: " + values[2] + " height: " + values[4]);
 
                     if (mapKnowledge.updateEdges(values[1], values[3], values[1] + values[2], values[3] + values[4]))
                     {
@@ -192,6 +197,11 @@ public abstract class Unit
                                 msgsSent++;
                             }
                         }
+                        else if (type == RobotType.VIPER)
+                        {
+                            rushTarget = mapKnowledge.getOppositeCorner(start);
+                            System.out.println("x: " + rushTarget.x + " y: " + rushTarget.y);
+                        }
                     }
                     break;
 
@@ -201,6 +211,7 @@ public abstract class Unit
 
                     if (rc.getRoundNum() < 30)
                     {
+
                         if (type == RobotType.SCOUT)
                         {
 //                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
@@ -224,7 +235,6 @@ public abstract class Unit
                 case EDGE_EXPLORED:
                     values = communications[k].getValues();
 
-
                     if (type == RobotType.SCOUT && !mapKnowledge.exploredEdges[values[2]] &&  msgsSent < 20)
                     {
                         communicator.sendCommunication(dist, communications[k]);
@@ -232,6 +242,46 @@ public abstract class Unit
                     }
 
                     mapKnowledge.exploredEdges[values[2]] = true;
+                    break;
+
+                case ATTACK:
+
+                    values = communications[k].getValues();
+
+                    if (type == RobotType.VIPER)
+                    {
+                        System.out.println("WE got a target attack location");
+                    }
+
+                    rushTarget = new MapLocation(values[1], values[2]);
+
+                    break;
+
+                case SARCHON:
+
+                    values = communications[k].getValues();
+                    MapLocation archon = new MapLocation(values[2], values[3]);
+
+                    if (!mapKnowledge.archonStartPosition.contains(archon))
+                    {
+                        mapKnowledge.archonStartPosition.add(archon);
+                    }
+
+                    break;
+
+                case RALLY_POINT:
+                    values = communications[k].getValues();
+                    rallyPoint = new MapLocation(values[1], values[2]);
+
+                    System.out.println("received rally_point msg x: " + values[1] + " y: " + values[2]);
+
+                    break;
+
+                case RUBBLE:
+                    if (type != RobotType.SCOUT && rubbleUpdate < 2) {
+                        rubbleUpdate++;
+                        Navigation.map.updateFromComms(communications[k]);
+                    }
                     break;
             }
         }
