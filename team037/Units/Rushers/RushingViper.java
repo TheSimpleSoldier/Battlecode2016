@@ -56,8 +56,10 @@ public class RushingViper extends BaseViper
         if (currentLocation.isAdjacentTo(target))
             return true;
 
-        if (rc.canSenseLocation(target) && rc.senseRubble(target) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
-            return true;
+        try {
+            if (rc.canSenseLocation(target) && (rc.senseRubble(target) > GameConstants.RUBBLE_OBSTRUCTION_THRESH || !rc.onTheMap(target)))
+                return true;
+        } catch (Exception e) {}
 
         if (rushTarget != null && !rushTarget.equals(lastTarget))
             return true;
