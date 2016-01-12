@@ -60,7 +60,8 @@ public abstract class Unit
         sightRange = type.sensorRadiusSquared;
         us = rc.getTeam();
         opponent = us.opponent();
-        dirs = Direction.values();
+        dirs = new Direction[]{Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
+        Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         fightMicro = new FightMicro(rc);
         navigator = new Navigator(rc);
         communicator = new Communicator(rc);
