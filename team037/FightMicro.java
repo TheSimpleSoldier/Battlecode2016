@@ -220,7 +220,7 @@ public class FightMicro
 
     public boolean basicNetZombieFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByAllies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target) throws GameActionException
     {
-        if (enemies == null || enemies.length == 0)
+        if (nearByEnemies == null || nearByEnemies.length == 0)
         {
             return false;
         }
@@ -259,6 +259,32 @@ public class FightMicro
         // pursue
         if (output[3] > 0.5) {
             pursue = true;
+        }
+
+        if (rc.isWeaponReady() && nearByEnemies.length > 0) {
+//            rc.setIndicatorString(1, "Attacking");
+            try {
+                RobotInfo weakEnemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+                if (weakEnemy != null) {
+                    MapLocation attackSpot = weakEnemy.location;
+                    if (attackSpot != null && rc.canAttackLocation(attackSpot)) {
+                        rc.attackLocation(attackSpot);
+                    }
+                    rc.setIndicatorString(0, "Enemies: " + nearByEnemies.length + " type: " + weakEnemy.type + " health: " + weakEnemy.health + " round: " + rc.getRoundNum());
+                }
+            } catch (Exception e) {
+                System.out.println("failed when trying to attack");
+                e.printStackTrace();
+            }
+        }
+
+        if (inputs[5] * 10 > 0)
+        {
+            retreat = true;
+        }
+        else
+        {
+            retreat = false;
         }
 
         if (rc.isCoreReady() && offensiveEnemies > 0) {
@@ -301,21 +327,6 @@ public class FightMicro
         }
 
 //        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
-        if (rc.isWeaponReady() && nearByEnemies.length > 0) {
-//            rc.setIndicatorString(1, "Attacking");
-            try {
-                RobotInfo weakEnemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
-                if (weakEnemy != null) {
-                    MapLocation attackSpot = weakEnemy.location;
-                    if (attackSpot != null && rc.canAttackLocation(attackSpot)) {
-                        rc.attackLocation(attackSpot);
-                    }
-                    rc.setIndicatorString(0, "Enemies: " + nearByEnemies.length + " type: " + weakEnemy.type + " health: " + weakEnemy.health + " round: " + rc.getRoundNum());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         return true;
     }
 
@@ -582,12 +593,8 @@ public class FightMicro
         if (underAttack)
             return false;
 
-        if (rc.canMove(direction))
-        {
-            rc.move(direction);
-            return true;
-        }
+        FightMicroUtilites.moveDir(rc, direction, false);
 
-        return false;
+        return true;
     }
 }

@@ -5,9 +5,6 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 
-/**
- * Created by joshua on 1/11/16.
- */
 public class HerdingScout extends BaseScout
 {
     private int minDist = 24;
