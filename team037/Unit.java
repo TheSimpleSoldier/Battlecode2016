@@ -3,6 +3,7 @@ package team037;
 import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
@@ -322,8 +323,20 @@ public abstract class Unit
                     }
 
                     break;
+                case ENEMY:
+                    BotInfoCommunication communication = (BotInfoCommunication) communications[k];
+                    if(communication.type == RobotType.ARCHON)
+                    {
+                        RobotInfo bot = new RobotInfo(communication.id, opponent, RobotType.ARCHON, new MapLocation(communication.x, communication.y), 0,0,0,0,0,0,0);
+                        mapKnowledge.updateEnemyArchonLocation(bot, round);
+                    }
             }
         }
+    }
+
+    public void sendMessages() throws GameActionException
+    {
+        return;
     }
 
     public Unit getNewStrategy(Unit current) throws GameActionException

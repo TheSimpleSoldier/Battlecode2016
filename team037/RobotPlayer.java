@@ -25,7 +25,6 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = "castle";
         strategy = "normal";
 
 
@@ -111,6 +110,7 @@ public class RobotPlayer
             {
                 unit.collectData();
                 unit.handleMessages();
+                unit.sendMessages();
 
                 // default is fight, fightZombie, carryOutAbility, takeNextStep
                 unit.act();

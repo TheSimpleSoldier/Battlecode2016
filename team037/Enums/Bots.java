@@ -17,7 +17,7 @@ public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
     SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
-    REGIONSCOUT;
+    REGIONSCOUT, HERDINGSCOUT;
 
     public static int toInt(Bots type)
     {
@@ -53,6 +53,8 @@ public enum Bots
                 return 13;
             case REGIONSCOUT:
                 return 14;
+            case HERDINGSCOUT:
+                return 15;
         }
         return -1;
     }
@@ -91,6 +93,8 @@ public enum Bots
                 return RUSHINGVIPER;
             case 14:
                 return REGIONSCOUT;
+            case 15:
+                return HERDINGSCOUT;
         }
 
         return null;
@@ -110,6 +114,7 @@ public enum Bots
             case PATROLSCOUT:
             case BASESCOUT:
             case SCOUTINGSCOUT:
+            case HERDINGSCOUT:
                 return RobotType.SCOUT;
             case RUSHINGSOLDIER:
             case DENKILLERSOLDIER:
@@ -160,6 +165,8 @@ public enum Bots
                 return new RushingSoldier(rc);
             case REGIONSCOUT:
                 return new RegionScout(rc);
+            case HERDINGSCOUT:
+                return new HerdingScout(rc);
         }
 
         return null;
