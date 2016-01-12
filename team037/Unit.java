@@ -86,6 +86,9 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
+        int rubbleUpdate = 0;
+        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
+
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
@@ -232,6 +235,12 @@ public abstract class Unit
                     }
 
                     mapKnowledge.exploredEdges[values[2]] = true;
+                    break;
+                case RUBBLE:
+                    if (type != RobotType.SCOUT && rubbleUpdate < 2) {
+                        rubbleUpdate++;
+                        Navigation.map.updateFromComms(communications[k]);
+                    }
                     break;
             }
         }
