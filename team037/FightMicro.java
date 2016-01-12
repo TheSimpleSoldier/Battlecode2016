@@ -212,7 +212,6 @@ public class FightMicro
                     rc.setIndicatorString(0, "Enemies: " + nearByEnemies.length + " type: " + weakEnemy.type + " health: " + weakEnemy.health + " round: " + rc.getRoundNum());
                 }
             } catch (Exception e) {
-                System.out.println("failed when trying to attack");
                 e.printStackTrace();
             }
         }
@@ -314,7 +313,6 @@ public class FightMicro
                     rc.setIndicatorString(0, "Enemies: " + nearByEnemies.length + " type: " + weakEnemy.type + " health: " + weakEnemy.health + " round: " + rc.getRoundNum());
                 }
             } catch (Exception e) {
-                System.out.println("failed when trying to attack");
                 e.printStackTrace();
             }
         }

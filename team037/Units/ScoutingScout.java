@@ -1,12 +1,13 @@
 package team037.Units;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.EdgeDiscovered;
 import team037.Messages.ExploringMapEdge;
-import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;
 
 public class ScoutingScout extends BaseScout {

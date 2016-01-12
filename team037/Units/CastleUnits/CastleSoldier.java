@@ -86,7 +86,6 @@ public class CastleSoldier extends BaseSoldier
 
             if (archonId == Integer.MAX_VALUE)
             {
-                System.out.println("WE have a problem: " + possible.length);
             }
         } else {
             if (rc.canSenseRobot(archonId)) {
