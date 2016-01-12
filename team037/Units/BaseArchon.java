@@ -8,6 +8,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.*;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
+import team037.Utilites.Utilities;
 
 
 public class BaseArchon extends Unit
@@ -53,6 +54,35 @@ public class BaseArchon extends Unit
     public boolean fightZombies() throws GameActionException
     {
         return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+    }
+
+    // additional methods with default behavior
+    public void handleMessages() throws GameActionException
+    {
+        super.handleMessages();
+
+        int offennsiveEnemies = 0;
+
+        for (int i = enemies.length; --i>=0;)
+        {
+            switch (enemies[i].type)
+            {
+                case TURRET:
+                case GUARD:
+                case SOLDIER:
+                case VIPER:
+                    offennsiveEnemies++;
+            }
+        }
+
+        offennsiveEnemies += zombies.length;
+
+        if (offennsiveEnemies > 0)
+        {
+            Communication distressCall = new BotInfoCommunication();
+            distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
+            communicator.sendCommunication(400, distressCall);
+        }
     }
 
     public boolean healNearbyAllies() throws GameActionException {
@@ -142,6 +172,11 @@ public class BaseArchon extends Unit
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static MapLocation getNextPartLocation()
+    {
+        return sortedParts.getBestSpot(currentLocation);
     }
 
     private boolean build(Direction dir) throws GameActionException
