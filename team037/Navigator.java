@@ -29,6 +29,9 @@ public class Navigator
     // This method returns true if we moved and false otherwise
     public boolean takeNextStep() throws GameActionException
     {
+        if (target != null) {
+            rc.setIndicatorString(2,"Target: ("+target.x+","+target.y+"), Round: "+rc.getRoundNum()+"");
+        }
         return Navigation.move(target);
     }
 }
