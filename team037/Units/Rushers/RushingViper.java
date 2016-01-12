@@ -11,6 +11,7 @@ public class RushingViper extends BaseViper
     public RushingViper(RobotController rc)
     {
         super(rc);
+        rc.setIndicatorString(2, "Rushing viper");
     }
 
     @Override
@@ -18,6 +19,7 @@ public class RushingViper extends BaseViper
         if(fight() || fightZombies()) {
             return true;
         }
+
 
 //        if (!rushing && rallyPoint != null)
 //        {
@@ -40,10 +42,16 @@ public class RushingViper extends BaseViper
 ////            navigator.setTarget(target);
 //        }
 
-        if (navigator.getTarget() == null || (rushTarget != null && !rushTarget.equals(lastTarget)))
+        if (navigator.getTarget() == null || currentLocation.equals(navigator.getTarget()) || (rushTarget != null && !rushTarget.equals(lastTarget)))
         {
-            lastTarget = rushTarget;
-            navigator.setTarget(rushTarget);
+            if (rushTarget != null)
+            {
+                lastTarget = rushTarget;
+
+                Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
+
+                navigator.setTarget(currentLocation.add(dir, 5));
+            }
         }
 
         if (rc.isCoreReady())
@@ -58,7 +66,7 @@ public class RushingViper extends BaseViper
     {
         if (rushing)
         {
-            return fightMicro.aggressiveFightMicro(nearByEnemies, nearByAllies, enemies);
+            return fightMicro.aggressiveFightMicro(nearByEnemies, enemies, nearByAllies);
         }
         return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
     }
