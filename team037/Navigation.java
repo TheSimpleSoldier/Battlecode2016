@@ -29,7 +29,7 @@ public class Navigation {
     static final int bytecodeLimit = 1300; // Bytecode limit
     static RobotController rc = null;
     static JumpPoint pathStart, lastPt, myLoc, goalJP;
-    static MapLocation lastScan;
+    static MapLocation lastScan, currentGoal;
 
     /**
      * Initializes variables navigation relies on. Will only initialize once per game.
@@ -51,6 +51,7 @@ public class Navigation {
             goalJP = null;
             int[] getMyLoc = map.mapToArray(lastScan);
             myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
+            currentGoal = lastScan;
         }
     }
 
@@ -63,8 +64,10 @@ public class Navigation {
         multimap = null;
         lastPt = null;
         goalJP = null;
-        int[] getMyLoc = map.mapToArray(rc.getLocation());
+        MapLocation location = rc.getLocation();
+        int[] getMyLoc = map.mapToArray(location);
         myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
+        currentGoal = location;
     }
 
     /**
@@ -76,7 +79,7 @@ public class Navigation {
      */
     public static boolean tryBug(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
-//        rc.setIndicatorString(0, "Using bug movement");
+        rc.setIndicatorString(2, "Using bug movement ("+currentGoal.x+","+currentGoal.y+"), round: " + rc.getRoundNum() + "");
         boolean moved;
 
         Direction forward = currentLoc.directionTo(goal);
@@ -129,10 +132,10 @@ public class Navigation {
      * @throws GameActionException
      */
     public static boolean tryPath(MapLocation currentLoc) throws GameActionException {
-//        rc.setIndicatorString(0, "Using Path");
         boolean moved = false;
 
         if (lastPt != null && lastPt.mapNext != null) {
+            rc.setIndicatorString(2,"Using path ("+currentGoal.x+","+currentGoal.y+"), round: " + rc.getRoundNum() + "");
 
             JumpPoint nextPt = lastPt.mapNext;
 
@@ -159,7 +162,7 @@ public class Navigation {
     }
 
     public static void dig(MapLocation currentLoc, MapLocation goal) throws GameActionException {
-
+        rc.setIndicatorString(2,"Digging ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
 
         Direction forward = currentLoc.directionTo(goal);
 
@@ -219,8 +222,15 @@ public class Navigation {
         }
 
         if (goal != null) {
+            if (currentGoal != null && !goal.equals(currentGoal)) {
+                reset();
+                currentGoal = goal;
+            }
+
             if (!searching) {
+                rc.setIndicatorString(2,"Not searching ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
                 if (rc.isCoreReady()) {
+                    rc.setIndicatorString(2,"Core is ready ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
                     // We can move this round; attempt to move.
                     if ((reachedGoal && tryPath(currentLoc)) || tryBug(currentLoc, goal)) {
                         // We moved
@@ -230,7 +240,7 @@ public class Navigation {
                         myLoc = new JumpPoint(loc[0], loc[1]);
                         moved = true;
                     } else {
-//                    rc.setIndicatorString(1, "Did not move");
+                    rc.setIndicatorString(2, "Did not move, could have moved ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
                         // We did not move; verify location and initiate search.
                         currentLoc = rc.getLocation();
                         reset();
@@ -244,7 +254,7 @@ public class Navigation {
                     }
                 } else {
                     // Cannot move this round, perform perimeter
-//                rc.setIndicatorString(0, "Scanning");
+                rc.setIndicatorString(2, "Unable to move this round ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
 //                map.perimeter(currentLoc);
                     moved = false;
                 }
@@ -261,6 +271,7 @@ public class Navigation {
                 } catch (Exception e) {}
             }
         } else {
+            currentGoal = currentLoc;
             moved = false;
         }
 
@@ -279,6 +290,7 @@ public class Navigation {
     public static boolean handleTrafficOnPath(MapLocation currentLoc, Direction forward, int direction, JumpPoint nextPt) throws GameActionException {
 
         boolean moved = false;
+        rc.setIndicatorString(2, "Traffic on the path ("+currentGoal.x+","+currentGoal.y+"), round: " + rc.getRoundNum() + "");
 
         MapLocation forwardLoc = currentLoc.add(forward);
         int[] forwardPt = map.mapToArray(forwardLoc);

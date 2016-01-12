@@ -140,13 +140,15 @@ public class BaseArchon extends Unit
                     return true;
                 }
                 double tempRubble = rc.senseRubble(currentLocation.add(dirs[i]));
-                if(tempRubble < rubble)
+                if(tempRubble < rubble && tempRubble > 0)
                 {
                     rubble = tempRubble;
                     least = dirs[i];
                 }
             }
-            rc.clearRubble(least);
+            try {
+                rc.clearRubble(least);
+            } catch (Exception e) {}
         }
 
         return false;
