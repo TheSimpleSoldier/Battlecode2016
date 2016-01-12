@@ -517,7 +517,6 @@ public class MapKnowledge {
         // if all edges are being explored then stop
         if (!edgeNotExplored)
         {
-            System.out.println("All edges have been explored");
             return -1;
 
         }
@@ -785,7 +784,6 @@ public class MapKnowledge {
         int x = startLoc.x - minX;
         int y = startLoc.y - minY;
 
-        System.out.println("Opposite corner x: " + (maxX - x) + " y: " + (maxY - y));
 
         return new MapLocation(maxX - x, maxY - y);
     }

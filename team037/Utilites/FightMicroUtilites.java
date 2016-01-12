@@ -1,8 +1,6 @@
 package team037.Utilites;
 
 import battlecode.common.*;
-import battlecode.util.SquareArray;
-import team037.Communicator;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 
@@ -19,7 +17,6 @@ public class FightMicroUtilites
         {
             if (nearByEnemies[i] == null)
             {
-                System.out.println("Enemy is null");
             }
             else if (nearByEnemies[i].health < weakest.health)
             {

@@ -204,7 +204,6 @@ public class FightMicro
 
                 }
             } catch (Exception e) {
-                System.out.println("failed when trying to attack");
                 e.printStackTrace();
             }
         }

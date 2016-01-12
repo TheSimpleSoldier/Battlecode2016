@@ -189,7 +189,6 @@ public abstract class Unit
 
                         if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
                         {
-                            System.out.println("Adding parts from msg");
                             BaseArchon.sortedParts.addParts(loc, values[1], false);
                         }
                     }
@@ -210,7 +209,6 @@ public abstract class Unit
 
                         if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
                         {
-                            System.out.println("Adding parts from msg");
                             BaseArchon.sortedParts.addParts(loc, values[1], true);
                         }
                     }
@@ -225,13 +223,11 @@ public abstract class Unit
                         {
                             MapLocation loc = new MapLocation(values[4], values[5]);
                             int index = BaseArchon.sortedParts.getIndexOfMapLocation(loc);
-                            System.out.println("removing parts x: " + values[4] + " y: " + values[5]);
                             BaseArchon.sortedParts.remove(index);
                             navigator.setTarget(BaseArchon.getNextPartLocation());
                         }
                         else
                         {
-                            System.out.println("keeping our target");
                         }
                     }
 
@@ -272,7 +268,6 @@ public abstract class Unit
                         else if (type == RobotType.VIPER)
                         {
                             rushTarget = mapKnowledge.getOppositeCorner(start);
-                            System.out.println("x: " + rushTarget.x + " y: " + rushTarget.y);
                         }
                     }
                     break;
