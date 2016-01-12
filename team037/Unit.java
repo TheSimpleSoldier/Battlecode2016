@@ -1,7 +1,6 @@
 package team037;
 
 import battlecode.common.*;
-import com.fasterxml.jackson.databind.deser.Deserializers;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
