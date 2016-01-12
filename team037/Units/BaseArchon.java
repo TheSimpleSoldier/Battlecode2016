@@ -53,7 +53,7 @@ public class BaseArchon extends Unit
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+        return fightMicro.runPassiveFightMicro(zombies, nearByAllies, allies, target, nearByZombies);
     }
 
     // additional methods with default behavior

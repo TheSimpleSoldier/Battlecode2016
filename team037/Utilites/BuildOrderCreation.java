@@ -15,7 +15,7 @@ public class BuildOrderCreation
                 {Bots.DENKILLERSOLDIER, Bots.CASTLESOLDIER},
                 {Bots.DENKILLERSOLDIER, Bots.RUSHINGVIPER},
                 {Bots.PATROLSCOUT, Bots.BASETURRET},
-                {Bots.RUSHINGVIPER, Bots.BASETURRET},
+                {Bots.CASTLESOLDIER, Bots.BASETURRET},
                 {Bots.DENKILLERSOLDIER, null}
         };
 
