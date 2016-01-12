@@ -5,10 +5,13 @@ import battlecode.common.*;
 public class SortedParts
 {
     MapLocation[] locs;
+    MapLocation[] deleted;
     double[] score;
 
     int start;
     int end;
+
+    int deleteLength;
 
     /**
      * This class is for use of archons and it gives the Archon
@@ -20,6 +23,8 @@ public class SortedParts
         score = new double[2000];
         start = 1000;
         end = 1000;
+        deleted = new MapLocation[2000];
+        deleteLength = 0;
     }
 
     /**
@@ -27,25 +32,44 @@ public class SortedParts
      *
      * @return
      */
-    public MapLocation getBestSpot()
+    public MapLocation getBestSpot(MapLocation current)
     {
         if (end == start)
             return null;
 
-        return locs[end--];
+        double highestScore = 0;
+        MapLocation best = null;
+
+        for (int i = start; i < end; i++)
+        {
+            if (locs[i] != null)
+            {
+                double value = (score[i] / current.distanceSquaredTo(locs[i]) + 1);
+
+                if (value > highestScore)
+                {
+                    best = locs[i];
+                    highestScore = value;
+                }
+            }
+        }
+
+        return best;
     }
 
     /**
      * This method adds a part location to the array
      *
      * @param m
-     * @param currentSpot
      * @param value
      * @param neutral
      */
-    public void addParts(MapLocation m, MapLocation currentSpot, int value, boolean neutral)
+    public void addParts(MapLocation m, int value, boolean neutral)
     {
-        if (m == null || currentSpot == null)
+        if (m == null)
+            return;
+
+        if (deleted(m))
             return;
 
         double newValue = value;
@@ -55,10 +79,96 @@ public class SortedParts
         if (neutral)
             newValue *= 2;
 
-        // the score is equal to
-        newValue = newValue / Math.sqrt(m.distanceSquaredTo(currentSpot));
-        sort(newValue, m);
+
+        locs[end] = m;
+        score[end] = newValue;
+        end++;
+
+        //sort(newValue, m);
     }
+
+    public boolean deleted(MapLocation m)
+    {
+        for (int i = deleteLength; --i>=0; )
+        {
+            if (deleted[i] != null && deleted[i].equals(m))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method returns the index of a mapLocation stored in our array
+     *
+     * @param m
+     * @return
+     */
+    public int getIndexOfMapLocation(MapLocation m)
+    {
+        for (int i = start; i < end; i++)
+        {
+            if (locs[i] != null && locs[i].equals(m))
+                return i;
+        }
+        return -1;
+    }
+
+    /**
+     * This method adds a part to the correct location in an array
+     */
+    public void remove(int index)
+    {
+        if (index == -1)
+            return;
+
+        deleted[deleteLength] = locs[index];
+        deleteLength++;
+
+        locs[index] = null;
+        score[index] = 0;
+
+//        if (index == start)
+//        {
+//            score[start] = 0;
+//            locs[start] = null;
+//            start++;
+//        }
+//        else if (index == end)
+//        {
+//            score[end-1] = 0;
+//            locs[end-1] = null;
+//            end--;
+//        }
+//        // if we are ahead of center push everything forward
+//        else if (start + (end - start) / 2 <= index)
+//        {
+//            int iterator = index;
+//            while (iterator < end)
+//            {
+//                locs[iterator] = locs[iterator+1];
+//                score[iterator] = score[iterator+1];
+//                iterator++;
+//            }
+//            locs[end-1] = null;
+//            score[end-1] = 0;
+//            end--;
+//        }
+//        // push everything ahead
+//        else
+//        {
+//            int iterator = index;
+//            while (iterator > start)
+//            {
+//                locs[iterator] = locs[iterator-1];
+//                score[iterator] = score[iterator-1];
+//                iterator--;
+//            }
+//            locs[start] = null;
+//            score[start] = 0;
+//            start++;
+//        }
+    }
+
 
     /**
      * This method adds a part to the correct location in an array
@@ -162,7 +272,6 @@ public class SortedParts
      */
     public void findPartsAndNeutralsICanSense(RobotController rc)
     {
-        MapLocation currentLocation = rc.getLocation();
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;
 
@@ -172,7 +281,7 @@ public class SortedParts
         {
             if (!contains(parts[i]))
             {
-                addParts(parts[i], currentLocation, (int)rc.senseParts(parts[i]), false);
+                addParts(parts[i], (int)rc.senseParts(parts[i]), false);
             }
         }
 
@@ -182,7 +291,7 @@ public class SortedParts
         {
             if (!contains(neutralBots[i].location))
             {
-                addParts(neutralBots[i].location, currentLocation, neutralBots[i].type.partCost, true);
+                addParts(neutralBots[i].location, neutralBots[i].type.partCost, true);
             }
         }
     }
