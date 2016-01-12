@@ -77,7 +77,7 @@ public class BaseArchon extends Unit
 
         offennsiveEnemies += zombies.length;
 
-        if (offennsiveEnemies > 0)
+        if (offennsiveEnemies > allies.length)
         {
             Communication distressCall = new BotInfoCommunication();
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
@@ -140,6 +140,11 @@ public class BaseArchon extends Unit
             }
         }
 
+        if (enemies.length > allies.length)
+        {
+            return false;
+        }
+
         if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
         {
             double rubble = Double.MAX_VALUE;
@@ -157,7 +162,10 @@ public class BaseArchon extends Unit
                     least = dirs[i];
                 }
             }
-            rc.clearRubble(least);
+            if (least != null)
+            {
+                rc.clearRubble(least);
+            }
         }
 
         return false;
@@ -192,6 +200,12 @@ public class BaseArchon extends Unit
 
     private boolean build(Direction dir) throws GameActionException
     {
+        while (nearByAllies.length > 10 && nextType == RobotType.SOLDIER && nextBot == Bots.CASTLESOLDIER)
+        {
+            nextBot = buildOrder.nextBot();
+            nextType = Bots.typeFromBot(nextBot);
+        }
+
         if (rc.canBuild(dir, nextType))
         {
             rc.build(dir, nextType);

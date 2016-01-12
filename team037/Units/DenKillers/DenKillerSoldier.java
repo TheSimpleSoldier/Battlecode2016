@@ -4,6 +4,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
+import team037.Enums.Bots;
 import team037.Units.BaseSoldier;
 
 public class DenKillerSoldier extends BaseSoldier
@@ -34,8 +35,10 @@ public class DenKillerSoldier extends BaseSoldier
         }
         else
         {
-//            target = rc.getLocation().add(dirs[(int) (Math.random() * 8)], 1);
-//            navigator.setTarget(target);
+            if (rc.getRoundNum() > 1000)
+            {
+                nextBot = Bots.RUSHINGSOLDIER;
+            }
         }
 
         if (rc.getRoundNum() % 5 == 0 && goal != null && mapKnowledge.denLocations.hasLocations())
