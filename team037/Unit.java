@@ -75,8 +75,8 @@ public abstract class Unit
     }
 
     public boolean act() throws GameActionException {
-        if (fight() || fightZombies());
-        else if (aidDistressedArchon());
+        if (aidDistressedArchon());
+        else if (fight() || fightZombies());
         else if (carryOutAbility());
         else if (takeNextStep());
 
@@ -87,14 +87,18 @@ public abstract class Unit
     {
         if (type == RobotType.SOLDIER && distressedArchon != null)
         {
-            System.out.println("Assisting Archon");
             if (!defendingArchon || !navigator.getTarget().equals(distressedArchon))
             {
                 defendingArchon = true;
                 navigator.setTarget(distressedArchon);
             }
 
-            if (rc.isCoreReady())
+            // rush towards archon shooting anything in path
+            if (rc.isWeaponReady() && nearByEnemies.length > 0)
+            {
+                fightMicro.basicFightMicro(nearByEnemies);
+            }
+            else if (rc.isCoreReady())
             {
                 navigator.takeNextStep();
             }
