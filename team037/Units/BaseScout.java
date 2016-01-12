@@ -3,10 +3,7 @@ package team037.Units;
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
 import team037.FlyingNavigator;
-import team037.Messages.Communication;
-import team037.Messages.PartsCommunication;
-import team037.Messages.SimpleBotInfoCommunication;
-import team037.Messages.TurretSupportCommunication;
+import team037.Messages.*;
 import team037.Unit;
 import team037.Utilites.PartsUtilities;
 
@@ -40,17 +37,39 @@ public class BaseScout extends Unit
         return false;
     }
 
-    public void handleMessages() throws GameActionException
+    @Override
+    public void sendMessages() throws GameActionException
     {
         int bytecodes = Clock.getBytecodeNum();
-
-        super.handleMessages();
-
+        msgArchons();
         msgTurrets();
-
         msgParts();
-
         msgDens();
+    }
+
+    public void handleMessages() throws GameActionException
+    {
+        super.handleMessages();
+    }
+
+    private void msgArchons() throws GameActionException
+    {
+        int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
+        for(int k = 0; k < enemies.length; k++)
+        {
+            if(enemies[k].type == RobotType.ARCHON && msgsSent < 20)
+            {
+                BotInfoCommunication communication = new BotInfoCommunication();
+                communication.opcode = CommunicationType.ENEMY;
+                communication.id = enemies[k].ID;
+                communication.team = opponent;
+                communication.type = RobotType.ARCHON;
+                communication.x = enemies[k].location.x;
+                communication.y = enemies[k].location.y;
+                communicator.sendCommunication(dist, communication);
+                msgsSent++;
+            }
+        }
     }
 
     private void msgDens() throws GameActionException

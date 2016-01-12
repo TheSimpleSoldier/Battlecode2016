@@ -10,13 +10,14 @@ public class HerdingScout extends BaseScout
 {
     private int minDist = 24;
     private boolean herding;
+    private boolean goodHerding;
 
     public HerdingScout(RobotController rc)
     {
         super(rc);
         herding = false;
+        goodHerding = false;
         target = getTargetToWait();
-
     }
 
     @Override
@@ -44,6 +45,11 @@ public class HerdingScout extends BaseScout
             {
                 return false;
             }
+            if(!goodHerding)
+            {
+                target = getTargetForHerding();
+                move.setTarget(target);
+            }
             MapLocation nearest = zombies[0].location;
             int x = 0;
             int y = 0;
@@ -68,12 +74,10 @@ public class HerdingScout extends BaseScout
             MapLocation center = new MapLocation(x, y);
             Direction dir = currentLocation.directionTo(target);
             Direction dirCenter = currentLocation.directionTo(center);
-            rc.setIndicatorString(1, "herding: " + nearest.toString() + " center: " + center.toString() + " target: " + target.toString());
 
             //We are on the wrong side!
             if(dirCenter == dir || dirCenter.rotateLeft() == dir || dirCenter.rotateRight() == dir)
             {
-                rc.setIndicatorString(2, "moving around");
                 move.setTarget(currentLocation.add(dir.rotateRight(), 10));
                 move.takeNextStep();
                 move.setTarget(target);
@@ -84,12 +88,10 @@ public class HerdingScout extends BaseScout
                 //time to move
                 if(dist < minDist)
                 {
-                    rc.setIndicatorString(2, "herding: " + dist + ", " + rc.getCoreDelay());
                     return move.takeNextStep();
                 }
                 else
                 {
-                    rc.setIndicatorString(2, "not herding: " + dist + ", " + rc.getCoreDelay());
                     return false;
                 }
             }
@@ -111,17 +113,32 @@ public class HerdingScout extends BaseScout
         return false;
     }
 
+    @Override
+    public void sendMessages()
+    {
+        return;
+    }
+
     private MapLocation getTargetForHerding()
     {
+        MapLocation loc = mapKnowledge.getNearestEnemyArchon(rc.getLocation());
+
+        if(loc != null)
+        {
+            goodHerding = true;
+            return loc;
+        }
+
         return new MapLocation(250, 120);
-        //return target.add(Direction.SOUTH, 50);
     }
 
     private MapLocation getTargetToWait()
     {
-        //MapLocation loc = mapKnowledge.closestDen(currentLocation);
-        MapLocation loc = new MapLocation(241, 62);
-        move.setTarget(loc.add(Direction.SOUTH, 3));
-        return loc.add(Direction.SOUTH, 3);
+        MapLocation loc = mapKnowledge.closestDen(currentLocation);
+        if(loc == null)
+        {
+            loc = currentLocation.add(currentLocation.directionTo(getTargetForHerding()), 5);
+        }
+        return loc;
     }
 }

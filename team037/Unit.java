@@ -237,6 +237,11 @@ public abstract class Unit
         }
     }
 
+    public void sendMessages() throws GameActionException
+    {
+        return;
+    }
+
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
         if(nextBot != null && nextBot != thisBot)

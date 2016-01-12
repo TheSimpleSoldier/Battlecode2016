@@ -26,11 +26,16 @@ public class MapKnowledge {
     public AppendOnlyMapLocationSet ourTurretLocations;
     public AppendOnlyMapLocationSet partsAndNeutrals;
 
+    public RobotInfo[] enemyArchons;
+    public int[] enemiesLastUpdated;
+
     public MapKnowledge() {
         denLocations = new AppendOnlyMapLocationSet();
         archonStartPosition = new AppendOnlyMapLocationSet();
         ourTurretLocations = new AppendOnlyMapLocationSet();
         partsAndNeutrals = new AppendOnlyMapLocationSet();
+        enemyArchons = new RobotInfo[4];
+        enemiesLastUpdated = new int[]{0,0,0,0};
     }
 
     public void setMinX(int x) { minX = x; }
@@ -709,5 +714,62 @@ public class MapKnowledge {
         }
         exploredRegions[region] = true;
         return true;
+    }
+
+    public void updateArchonLocation(RobotInfo archon, int round)
+    {
+        for(int k = 0; k < 4; k++)
+        {
+            if(enemyArchons[k] == null)
+            {
+                return;
+            }
+            if(enemyArchons[k].ID == archon.ID)
+            {
+                enemyArchons[k] = archon;
+                enemiesLastUpdated[k] = round;
+                return;
+            }
+        }
+    }
+
+    public boolean checkIfArchon(int id)
+    {
+        for(int k = 0; k < 4; k++)
+        {
+            if(enemyArchons[k] == null)
+            {
+                return false;
+            }
+            if(enemyArchons[k].ID == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public MapLocation getNearestEnemyArchon(MapLocation location)
+    {
+        double nearestDist = location.distanceSquaredTo(enemyArchons[0].location);
+        MapLocation nearest = enemyArchons[0].location;
+        for(int k = 1; k < 4; k++)
+        {
+            if(enemyArchons[k] == null)
+            {
+                break;
+            }
+
+            double tempDist = location.distanceSquaredTo(enemyArchons[k].location);
+
+            if(tempDist < nearestDist)
+            {
+                nearest = enemyArchons[k].location;
+                nearestDist = tempDist;
+            }
+        }
+
+        return nearest;
     }
 }

@@ -13,6 +13,7 @@ public class PatrolScout extends BaseScout
 
     public boolean carryOutAbility() throws GameActionException
     {
+        super.carryOutAbility();
         if (target == null || rc.getLocation().distanceSquaredTo(target) <= 5) {
             double longestDist = 5;
             for (int i = allies.length; --i >=0; ) {
