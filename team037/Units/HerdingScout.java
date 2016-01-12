@@ -1,7 +1,9 @@
 package team037.Units;
 
-import battlecode.common.*;
-import team037.MapKnowledge;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 /**
  * Created by joshua on 1/11/16.
@@ -39,8 +41,8 @@ public class HerdingScout extends BaseScout
 
         if(herding)
         {
-            /*target = getTargetForHerding();
-            move.setTarget(target);*/
+            target = getTargetForHerding();
+            move.setTarget(target);
             if(target == null || !rc.isCoreReady() || currentLocation.equals(target) || zombies.length == 0)
             {
                 return false;
@@ -112,20 +114,14 @@ public class HerdingScout extends BaseScout
 
     private MapLocation getTargetForHerding()
     {
-        MapLocation loc = mapKnowledge.getNearestEnemyArchon(rc.getLocation());
-        if(loc != null)
+        MapLocation loc = mapKnowledge.getOppositeCorner(start);
+        if(loc != null && currentLocation.distanceSquaredTo(loc) > 50)
         {
             return loc;
         }
 
-        loc = mapKnowledge.getArchonCOM();
-        if(loc != null)
-        {
-            loc = mapKnowledge.getOppositeCorner(loc);
-            return loc.add(currentLocation.directionTo(loc), 100);
-        }
-        loc = mapKnowledge.getOppositeCorner(currentLocation);
-        return loc.add(currentLocation.directionTo(loc), 100);
+        loc = mapKnowledge.getOppositeCorner(start);
+        return loc.add(start.directionTo(loc), 100);
     }
 
     private MapLocation getTargetToWait()
