@@ -389,8 +389,6 @@ public class MapKnowledge {
 
         if (width <= 0 || height <= 0)
             return -1;
-        else
-            System.out.println("Exploring region: " + region);
 
         exploredLocsInRegion = new boolean[width][height];
         return region;
