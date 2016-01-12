@@ -39,7 +39,7 @@ public class BaseScout extends Unit
 
     public void handleMessages() throws GameActionException
     {
-        int bytecodes = Clock.getBytecodeNum();
+//        int bytecodes = Clock.getBytecodeNum();
 
         super.handleMessages();
 
@@ -49,9 +49,7 @@ public class BaseScout extends Unit
 
         msgDens();
 
-        if (rc.getRoundNum() % 5 == id % 5) {
-            msgRubble();
-        }
+        msgRubble();
     }
 
     private void msgDens() throws GameActionException
@@ -195,6 +193,11 @@ public class BaseScout extends Unit
     }
 
     private void msgRubble() {
+
+        if (msgsSent > 19 || rc.getRoundNum() % 5 != id % 5) {
+            return;
+        }
+
         MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), RobotType.SCOUT.sensorRadiusSquared);
 
         double rubbleThresh = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
@@ -423,7 +426,7 @@ public class BaseScout extends Unit
             Communication communication = new RubbleCommunication();
             communication.opcode = CommunicationType.RUBBLE;
             communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.RUBBLE),hi,lo});
-            communicator.sendCommunication(1, communication);
+            communicator.sendCommunication(212, communication);
             msgsSent++;
         } catch (GameActionException e) {
 

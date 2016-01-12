@@ -48,7 +48,7 @@ public enum CommunicationType
             case EDGE_EXPLORED:
                 return 16;
             case RUBBLE:
-                return 16;
+                return 17;
         }
         return -1;
     }
