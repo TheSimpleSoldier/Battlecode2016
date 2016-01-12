@@ -41,15 +41,6 @@ public class AlphaArchon extends BaseArchon
             navigator.setTarget(getNextPartLocation());
         }
 
-        if (navigator.getTarget() != null)
-        {
-            rc.setIndicatorString(0, "x: " + navigator.getTarget().x + " y: " + navigator.getTarget().y  + " Round numb: " + rc.getRoundNum());
-        }
-        else
-        {
-            rc.setIndicatorString(0, "null");
-        }
-
         return navigator.takeNextStep();
     }
 

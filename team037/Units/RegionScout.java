@@ -7,11 +7,9 @@ public class RegionScout extends BaseScout
 {
     private int region = -1;
 
-
     public RegionScout(RobotController rc)
     {
         super(rc);
-        rc.setIndicatorString(0, "Region Scout");
     }
 
     @Override

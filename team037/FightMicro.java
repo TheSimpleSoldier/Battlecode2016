@@ -166,27 +166,23 @@ public class FightMicro
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "retreat");
             }
 
             if (rc.isCoreReady() && cluster) {
                 MapLocation ally = new MapLocation(ally_x, ally_y);
                 dir = rc.getLocation().directionTo(ally);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Cluster");
             }
 
             if (rc.isCoreReady() && advance) {
                 dir = FightMicroUtilites.getDir(rc, target);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Advance");
             }
 
             if (rc.isCoreReady() && pursue) {
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Pursue");
             }
         }
         // pursue
@@ -195,12 +191,9 @@ public class FightMicro
             MapLocation enemy = new MapLocation(enemy_x, enemy_y);
             dir = rc.getLocation().directionTo(enemy);
             FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-            rc.setIndicatorString(2, "Pursue: " + dir);
         }
 
-        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
         if (rc.isWeaponReady() && nearByEnemies.length > 0) {
-            rc.setIndicatorString(1, "Attacking");
             try {
                 RobotInfo weakEnemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
                 if (weakEnemy != null) {
@@ -209,7 +202,6 @@ public class FightMicro
                         rc.attackLocation(attackSpot);
                     }
 
-                    rc.setIndicatorString(0, "Enemies: " + nearByEnemies.length + " type: " + weakEnemy.type + " health: " + weakEnemy.health + " round: " + rc.getRoundNum());
                 }
             } catch (Exception e) {
                 System.out.println("failed when trying to attack");
@@ -263,7 +255,6 @@ public class FightMicro
         }
 
         if (rc.isWeaponReady() && nearByEnemies.length > 0) {
-//            rc.setIndicatorString(1, "Attacking");
             try {
                 RobotInfo weakEnemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
                 if (weakEnemy != null) {
@@ -271,7 +262,6 @@ public class FightMicro
                     if (attackSpot != null && rc.canAttackLocation(attackSpot)) {
                         rc.attackLocation(attackSpot);
                     }
-                    rc.setIndicatorString(0, "Enemies: " + nearByEnemies.length + " type: " + weakEnemy.type + " health: " + weakEnemy.health + " round: " + rc.getRoundNum());
                 }
             } catch (Exception e) {
                 System.out.println("failed when trying to attack");
@@ -293,20 +283,17 @@ public class FightMicro
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(1, "retreat: " + dir);
             }
 
             if (rc.isCoreReady() && cluster) {
                 MapLocation ally = new MapLocation(ally_x, ally_y);
                 dir = rc.getLocation().directionTo(ally);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Cluster: " + dir);
             }
 
             if (rc.isCoreReady() && advance) {
                 dir = FightMicroUtilites.getDir(rc, target);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Advance: " + dir);
             }
 
             if (rc.isCoreReady() && pursue)
@@ -314,7 +301,6 @@ public class FightMicro
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy);
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-                rc.setIndicatorString(2, "Pursue: " + dir);
             }
         }
         // pursue
@@ -323,11 +309,9 @@ public class FightMicro
             MapLocation enemy = new MapLocation(enemy_x, enemy_y);
             dir = rc.getLocation().directionTo(enemy);
             FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-            rc.setIndicatorString(2, "Pursue: " + dir);
 
         }
 
-//        rc.setIndicatorString(1, "" + rc.isWeaponReady() + " " + nearByEnemies.length);
         return true;
     }
 
@@ -369,27 +353,23 @@ public class FightMicro
 
         if (rc.isCoreReady()) {
             if (retreat) {
-                rc.setIndicatorString(2, "retreat");
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
             }
 
 //            if (rc.isCoreReady() && cluster) {
-//                rc.setIndicatorString(2, "cluster");
 //                MapLocation ally = new MapLocation(ally_x, ally_y);
 //                dir = rc.getLocation().directionTo(ally);
 //                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
 //            }
 //
 //            if (rc.isCoreReady() && advance) {
-//                rc.setIndicatorString(2, "advance");
 //                dir = FightMicroUtilites.getDir(rc, target);
 //                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
 //            }
 
             if (rc.isCoreReady()) {
-                rc.setIndicatorString(2, "retreat");
                 MapLocation enemy = new MapLocation(enemy_x, enemy_y);
                 dir = rc.getLocation().directionTo(enemy).opposite();
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);

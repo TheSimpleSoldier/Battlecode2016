@@ -122,8 +122,6 @@ public class BaseArchon extends Unit
         // heal doesn't effect core cooldown
         healNearbyAllies();
 
-        rc.setIndicatorString(1, "Map Bounds minX: " + mapKnowledge.minX + " minY: " + mapKnowledge.minY + " maxX: " + mapKnowledge.maxX + " maxY: " + mapKnowledge.maxY);
-
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
             rc.activate(neutralBots[0].location);

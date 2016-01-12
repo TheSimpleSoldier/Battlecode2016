@@ -11,7 +11,6 @@ public class DenKillerGuard extends BaseGaurd
     public DenKillerGuard(RobotController rc)
     {
         super(rc);
-        rc.setIndicatorString(0, "Den Killer");
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -27,7 +26,6 @@ public class DenKillerGuard extends BaseGaurd
 
             if (mapKnowledge.denLocations.hasLocations())
             {
-                rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
                 navigator.setTarget(mapKnowledge.closestDen(currentLocation));
             }
         }
@@ -42,7 +40,6 @@ public class DenKillerGuard extends BaseGaurd
             mapKnowledge.updateDens(rc);
             if (mapKnowledge.denLocations.hasLocations())
             {
-                rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
                 navigator.setTarget(mapKnowledge.closestDen(currentLocation));
             }
         }

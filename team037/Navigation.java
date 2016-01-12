@@ -79,7 +79,6 @@ public class Navigation {
      */
     public static boolean tryBug(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
-        rc.setIndicatorString(2, "Using bug movement ("+currentGoal.x+","+currentGoal.y+"), round: " + rc.getRoundNum() + "");
         boolean moved;
 
         Direction forward = currentLoc.directionTo(goal);
@@ -135,7 +134,6 @@ public class Navigation {
         boolean moved = false;
 
         if (lastPt != null && lastPt.mapNext != null) {
-            rc.setIndicatorString(2,"Using path ("+currentGoal.x+","+currentGoal.y+"), round: " + rc.getRoundNum() + "");
 
             JumpPoint nextPt = lastPt.mapNext;
 
@@ -162,7 +160,6 @@ public class Navigation {
     }
 
     public static void dig(MapLocation currentLoc, MapLocation goal) throws GameActionException {
-        rc.setIndicatorString(2,"Digging ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
 
         Direction forward = currentLoc.directionTo(goal);
 
@@ -228,19 +225,15 @@ public class Navigation {
             }
 
             if (!searching) {
-                rc.setIndicatorString(2,"Not searching ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
                 if (rc.isCoreReady()) {
-                    rc.setIndicatorString(2,"Core is ready ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
                     // We can move this round; attempt to move.
                     if ((reachedGoal && tryPath(currentLoc)) || tryBug(currentLoc, goal)) {
                         // We moved
-//                    rc.setIndicatorString(1, "Moved");
                         currentLoc = rc.getLocation();
                         int[] loc = map.mapToArray(currentLoc);
                         myLoc = new JumpPoint(loc[0], loc[1]);
                         moved = true;
                     } else {
-                    rc.setIndicatorString(2, "Did not move, could have moved ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
                         // We did not move; verify location and initiate search.
                         currentLoc = rc.getLocation();
                         reset();
@@ -254,7 +247,6 @@ public class Navigation {
                     }
                 } else {
                     // Cannot move this round, perform perimeter
-                rc.setIndicatorString(2, "Unable to move this round ("+goal.x+","+goal.y+"), round: " + rc.getRoundNum() + "");
 //                map.perimeter(currentLoc);
                     moved = false;
                 }
@@ -290,7 +282,6 @@ public class Navigation {
     public static boolean handleTrafficOnPath(MapLocation currentLoc, Direction forward, int direction, JumpPoint nextPt) throws GameActionException {
 
         boolean moved = false;
-        rc.setIndicatorString(2, "Traffic on the path ("+currentGoal.x+","+currentGoal.y+"), round: " + rc.getRoundNum() + "");
 
         MapLocation forwardLoc = currentLoc.add(forward);
         int[] forwardPt = map.mapToArray(forwardLoc);

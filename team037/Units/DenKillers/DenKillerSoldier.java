@@ -12,7 +12,6 @@ public class DenKillerSoldier extends BaseSoldier
     public DenKillerSoldier(RobotController rc)
     {
         super(rc);
-        rc.setIndicatorString(0, "Den Killer");
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -29,7 +28,6 @@ public class DenKillerSoldier extends BaseSoldier
 
             if (mapKnowledge.denLocations.hasLocations())
             {
-                rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
                 navigator.setTarget(mapKnowledge.closestDen(currentLocation));
             }
         }
@@ -46,7 +44,6 @@ public class DenKillerSoldier extends BaseSoldier
             mapKnowledge.updateDens(rc);
             if (mapKnowledge.denLocations.hasLocations())
             {
-                rc.setIndicatorString(2, "Going after Den x: " + mapKnowledge.closestDen(currentLocation).x + " y: " + mapKnowledge.closestDen(currentLocation).y);
                 navigator.setTarget(mapKnowledge.closestDen(currentLocation));
             }
         }

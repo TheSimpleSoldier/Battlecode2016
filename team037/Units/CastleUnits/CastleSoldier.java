@@ -26,7 +26,6 @@ public class CastleSoldier extends BaseSoldier
     {
         super(rc);
         move = new SlugNavigator(rc);
-        rc.setIndicatorString(0, "Castle Soldier");
     }
 
     @Override
@@ -47,7 +46,6 @@ public class CastleSoldier extends BaseSoldier
             return false;
         }
 
-        rc.setIndicatorString(2, "ArchonId: " + archonId);
 
         int round = rc.getRoundNum();
         if (!rc.isCoreReady()) {
