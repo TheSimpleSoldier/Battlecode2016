@@ -25,7 +25,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = "castle";
+        strategy = "not castle";
 
 
         RobotType type = rc.getType();

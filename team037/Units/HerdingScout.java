@@ -1,9 +1,7 @@
 package team037.Units;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
+import battlecode.common.*;
+import team037.MapKnowledge;
 
 /**
  * Created by joshua on 1/11/16.
@@ -17,6 +15,8 @@ public class HerdingScout extends BaseScout
     {
         super(rc);
         herding = false;
+        target = getTargetToWait();
+
     }
 
     @Override
@@ -30,10 +30,11 @@ public class HerdingScout extends BaseScout
     {
         if(!herding)
         {
-            if(currentLocation.equals(target))
+            if(currentLocation.equals(target) || zombies.length > 0)
             {
                 herding = true;
-                target = getTarget();
+                target = getTargetForHerding();
+                move.setTarget(target);
             }
         }
 
@@ -47,18 +48,19 @@ public class HerdingScout extends BaseScout
             int x = 0;
             int y = 0;
             double dist = nearest.distanceSquaredTo(currentLocation);
+            boolean counted = false;
 
             for(int k = zombies.length - 1; k >= 0; k--)
             {
-                double tempDist = nearest.distanceSquaredTo(currentLocation);
-                if(tempDist < dist)
-                {
-                    dist = tempDist;
-                    nearest = zombies[k].location;
-                }
+                    double tempDist = zombies[k].location.distanceSquaredTo(currentLocation);
+                    if(tempDist < dist)
+                    {
+                        dist = tempDist;
+                        nearest = zombies[k].location;
+                    }
 
-                x += zombies[k].location.x;
-                y += zombies[k].location.y;
+                    x += zombies[k].location.x;
+                    y += zombies[k].location.y;
             }
 
             x /= zombies.length;
@@ -66,31 +68,31 @@ public class HerdingScout extends BaseScout
             MapLocation center = new MapLocation(x, y);
             Direction dir = currentLocation.directionTo(target);
             Direction dirCenter = currentLocation.directionTo(center);
+            rc.setIndicatorString(1, "herding: " + nearest.toString() + " center: " + center.toString() + " target: " + target.toString());
 
             //We are on the wrong side!
             if(dirCenter == dir || dirCenter.rotateLeft() == dir || dirCenter.rotateRight() == dir)
             {
-
+                rc.setIndicatorString(2, "moving around");
+                move.setTarget(currentLocation.add(dir.rotateRight(), 10));
+                move.takeNextStep();
+                move.setTarget(target);
+                return true;
             }
             else
             {
                 //time to move
                 if(dist < minDist)
                 {
-                    if(rc.canMove(dir))
-                    {
-                        rc.move(dir);
-                        return true;
-                    }
+                    rc.setIndicatorString(2, "herding: " + dist + ", " + rc.getCoreDelay());
+                    return move.takeNextStep();
                 }
                 else
                 {
+                    rc.setIndicatorString(2, "not herding: " + dist + ", " + rc.getCoreDelay());
                     return false;
                 }
             }
-
-
-            return true;
         }
         else
         {
@@ -99,7 +101,7 @@ public class HerdingScout extends BaseScout
     }
 
     /**
-     * Updates everyone on the map where the zombie is
+     * Updates everyone on the map where the zombies are
      * @return returns whether it broadcast or not
      * @throws GameActionException
      */
@@ -109,8 +111,17 @@ public class HerdingScout extends BaseScout
         return false;
     }
 
-    private MapLocation getTarget()
+    private MapLocation getTargetForHerding()
     {
-        return null;
+        return new MapLocation(250, 120);
+        //return target.add(Direction.SOUTH, 50);
+    }
+
+    private MapLocation getTargetToWait()
+    {
+        //MapLocation loc = mapKnowledge.closestDen(currentLocation);
+        MapLocation loc = new MapLocation(241, 62);
+        move.setTarget(loc.add(Direction.SOUTH, 3));
+        return loc.add(Direction.SOUTH, 3);
     }
 }

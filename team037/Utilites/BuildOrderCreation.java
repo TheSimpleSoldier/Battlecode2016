@@ -21,6 +21,11 @@ public class BuildOrderCreation
         };
         int[] times2 = {10000};
 
-        return new BuildOrder(buildOrder, times);
+        Bots[][] buildOrderHerding = {
+                {Bots.HERDINGSCOUT, Bots.BASESOLDIER, Bots.BASESOLDIER, Bots.BASESOLDIER, Bots.BASESOLDIER},
+        };
+        int[] times3 = {1};
+
+        return new BuildOrder(buildOrderHerding, times3);
     }
 }
