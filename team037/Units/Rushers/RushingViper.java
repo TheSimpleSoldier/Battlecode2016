@@ -11,7 +11,6 @@ public class RushingViper extends BaseViper
     public RushingViper(RobotController rc)
     {
         super(rc);
-        rc.setIndicatorString(2, "Rushing viper");
     }
 
     @Override
@@ -19,28 +18,6 @@ public class RushingViper extends BaseViper
         if(fight() || fightZombies()) {
             return true;
         }
-
-
-//        if (!rushing && rallyPoint != null)
-//        {
-////            System.out.println("Rally Point x: " + rallyPoint.x + " y: " + rallyPoint.y);
-//            navigator.setTarget(rallyPoint);
-//        }
-//        else if (rushing && rushTarget != null && (navigator.getTarget() == null || rc.getLocation().equals(navigator.getTarget()) || rc.getLocation().isAdjacentTo(navigator.getTarget())))
-//        {
-//            Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
-//            target = rushTarget; //currentLocation.add(dir, 3);
-//            navigator.setTarget(rushTarget);
-//            System.out.println("Target x: " + target.x + " y: " + target.y);
-//            rc.setIndicatorString(2, "Target x: " + target.x + " y: " + target.y);
-//        }
-//        else if (target == null || currentLocation.equals(target))
-//        {
-////            // move randomly
-////            Direction dir = dirs[(int) (Math.random() * 8)];
-////            target = currentLocation.add(dir, 3);
-////            navigator.setTarget(target);
-//        }
 
         if (navigator.getTarget() == null || currentLocation.equals(navigator.getTarget()) || (rushTarget != null && !rushTarget.equals(lastTarget)))
         {
@@ -78,5 +55,4 @@ public class RushingViper extends BaseViper
 
         return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
-
 }
