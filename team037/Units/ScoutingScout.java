@@ -1,6 +1,7 @@
 package team037.Units;
 
 import battlecode.common.*;
+import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.EdgeDiscovered;
@@ -21,7 +22,8 @@ public class ScoutingScout extends BaseScout {
 
     @Override
     public boolean act() throws GameActionException {
-        if(discoverEdges()) {
+        if (fight() || fightZombies()) return true;
+        else if (discoverEdges()) {
             return true;
         }
         return false;
@@ -40,6 +42,9 @@ public class ScoutingScout extends BaseScout {
             mapKnowledge.senseAndUpdateEdges();
         }
 
+        if (mapKnowledge.inRegionMode())
+            nextBot = Bots.REGIONSCOUT;
+
         if (scoutDirection == null) {
             if (!setNewScoutDirection()) {
                 return false;
@@ -50,8 +55,9 @@ public class ScoutingScout extends BaseScout {
         }
 
         int edge = MapUtils.senseEdge(rc, scoutDirection);
-        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir]) {
-            System.out.println("Exploring edge: " + rc.getRoundNum());
+        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir])
+        {
+            move.setTarget(currentLocation);
             mapKnowledge.setValueInDirection(edge, scoutDirection);
 
             if (dir >= 0)
@@ -59,7 +65,7 @@ public class ScoutingScout extends BaseScout {
 
             scoutDirection = null;
             Communication communication = new EdgeDiscovered();
-            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EXPLORE_EDGE), id, dir});
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, dir});
             communicator.sendCommunication(2500, communication);
 
             communication = mapKnowledge.getMapBoundsCommunication(id);

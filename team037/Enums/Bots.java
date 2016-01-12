@@ -16,7 +16,8 @@ import team037.Units.Rushers.RushingViper;
 public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
-    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER;
+    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
+    REGIONSCOUT;
 
     public static int toInt(Bots type)
     {
@@ -50,6 +51,8 @@ public enum Bots
                 return 12;
             case RUSHINGVIPER:
                 return 13;
+            case REGIONSCOUT:
+                return 14;
         }
         return -1;
     }
@@ -86,6 +89,8 @@ public enum Bots
                 return RUSHINGSOLDIER;
             case 13:
                 return RUSHINGVIPER;
+            case 14:
+                return REGIONSCOUT;
         }
 
         return null;
@@ -101,6 +106,7 @@ public enum Bots
             case DENKILLERGUARD:
             case BASEGAURD:
                 return RobotType.GUARD;
+            case REGIONSCOUT:
             case PATROLSCOUT:
             case BASESCOUT:
             case SCOUTINGSCOUT:
@@ -152,6 +158,8 @@ public enum Bots
                 return new RushingViper(rc);
             case RUSHINGSOLDIER:
                 return new RushingSoldier(rc);
+            case REGIONSCOUT:
+                return new RegionScout(rc);
         }
 
         return null;
