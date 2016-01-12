@@ -5,7 +5,11 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.DataStructures.AppendOnlyMapLocationArray;
+import team037.Enums.CommunicationType;
+import team037.Messages.BotInfoCommunication;
+import team037.Messages.Communication;
 import team037.Utilites.PartsUtilities;
+import team037.Utilites.Utilities;
 
 public class AlphaArchon extends BaseArchon
 {
@@ -14,11 +18,6 @@ public class AlphaArchon extends BaseArchon
     {
         super(rc);
         navigator.setTarget(getNextPartLocation());
-    }
-
-    private MapLocation getNextPartLocation() {
-        MapLocation best = sortedParts.getBestSpot();
-        return best;
     }
 
     @Override
@@ -51,8 +50,8 @@ public class AlphaArchon extends BaseArchon
             return true;
         if (rc.canSenseLocation(currentTarget) && (rc.senseParts(currentTarget) == 0 && rc.senseRobotAtLocation(currentTarget) == null))
             return true;
-        if (rc.canSenseLocation(currentTarget) && (rc.senseRobotAtLocation(currentTarget) != null && rc.senseRobotAtLocation(currentTarget).team != Team.NEUTRAL))
-            return true;
+//        if (rc.canSenseLocation(currentTarget) && (rc.senseRobotAtLocation(currentTarget) != null && rc.senseRobotAtLocation(currentTarget).team != Team.NEUTRAL))
+//            return true;
 
         return false;
     }

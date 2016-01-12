@@ -8,6 +8,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.*;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
+import team037.Utilites.Utilities;
 
 
 public class BaseArchon extends Unit
@@ -218,5 +219,28 @@ public class BaseArchon extends Unit
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static MapLocation getNextPartLocation() {
+        MapLocation best = sortedParts.getBestSpot(currentLocation);
+
+        try
+        {
+            if (best != null)
+            {
+                rc.setIndicatorString(2, "x: " + best.x + " y: " + best.y);
+                sortedParts.remove(sortedParts.getIndexOfMapLocation(navigator.getTarget()));
+                System.out.println("Going after parts at x: " + best.x + " y: " + best.y);
+                Communication communication = new BotInfoCommunication();
+                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+                communicator.sendCommunication(400, communication);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return best;
     }
 }

@@ -1,6 +1,7 @@
 package team037;
 
 import battlecode.common.*;
+import com.fasterxml.jackson.databind.deser.Deserializers;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
@@ -41,12 +42,12 @@ public abstract class Unit
     public static int msgsSent = 0;
     public static boolean defendingArchon = false;
 
-    public MapLocation locationLastTurn;
-    public MapLocation previousLocation;
-    public MapLocation currentLocation;
-    public MapLocation rushTarget;
-    public MapLocation rallyPoint;
-    public MapLocation distressedArchon;
+    public static MapLocation locationLastTurn;
+    public static MapLocation previousLocation;
+    public static MapLocation currentLocation;
+    public static MapLocation rushTarget;
+    public static MapLocation rallyPoint;
+    public static MapLocation distressedArchon;
 
     public Unit()
     {
@@ -190,7 +191,8 @@ public abstract class Unit
 
                         if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
                         {
-                            BaseArchon.sortedParts.addParts(loc, currentLocation, values[1], false);
+                            System.out.println("Adding parts from msg");
+                            BaseArchon.sortedParts.addParts(loc, values[1], false);
                         }
                     }
                     break;
@@ -210,9 +212,27 @@ public abstract class Unit
 
                         if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
                         {
-                            BaseArchon.sortedParts.addParts(loc, currentLocation, values[1], true);
+                            System.out.println("Adding parts from msg");
+                            BaseArchon.sortedParts.addParts(loc, values[1], true);
                         }
                     }
+                    break;
+
+                case GOING_AFTER_PARTS:
+
+                    if (type == RobotType.ARCHON)
+                    {
+                        values = communications[k].getValues();
+                        if (id < values[3])
+                        {
+                            MapLocation loc = new MapLocation(values[4], values[5]);
+                            int index = BaseArchon.sortedParts.getIndexOfMapLocation(loc);
+                            System.out.println("removing parts x: " + values[4] + " y: " + values[5]);
+                            BaseArchon.sortedParts.remove(index);
+                            navigator.setTarget(BaseArchon.getNextPartLocation());
+                        }
+                    }
+
                     break;
 
                 case SKILLED_DEN:
