@@ -32,6 +32,7 @@ public abstract class Unit
     public static Bots nextBot = null;
     public static Bots thisBot= null;
     public static int id;
+    public static int round;
     public static Communication[] communications;
     public static MapKnowledge mapKnowledge = new MapKnowledge();
     public static MapLocation start;
@@ -85,7 +86,6 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
-        rc.setIndicatorString(0, "Round num: " + rc.getRoundNum() + " Bytecodes: " + Clock.getBytecodeNum());
         communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
@@ -199,22 +199,25 @@ public abstract class Unit
 
                     values = communications[k].getValues();
 
-                    if (type == RobotType.SCOUT)
+                    if (rc.getRoundNum() < 30)
                     {
+                        if (type == RobotType.SCOUT)
+                        {
 //                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
 //                        {
 //                            communicator.sendCommunication(dist, communications[k]);
 //                            msgsSent++;
 //                        }
 
-                        if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
-                        {
-                            ScoutingScout.updateScoutDirection();
+                            if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
+                            {
+                                ScoutingScout.updateScoutDirection();
+                            }
                         }
+
+
+                        mapKnowledge.setEdgesBeingExplored(values[2]);
                     }
-
-
-                    mapKnowledge.setEdgesBeingExplored(values[2]);
 
                     break;
 
@@ -263,6 +266,8 @@ public abstract class Unit
 
         nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
+
+        round = rc.getRoundNum();
 
         MapLocation newLoc = rc.getLocation();
         locationLastTurn = currentLocation;

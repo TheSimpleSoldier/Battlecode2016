@@ -6,6 +6,7 @@ import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
+import team037.Messages.EdgeDiscovered;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
@@ -118,6 +119,17 @@ public class BaseArchon extends Unit
                     Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication(id);
                     communicator.sendCommunication(5, mapBoundsCommunication);
 
+                    for (int j = mapKnowledge.exploredEdges.length; --j>=0;)
+                    {
+                        if (mapKnowledge.exploredEdges[j])
+                        {
+                            Communication mapBoundDiscovered = new EdgeDiscovered();
+                            mapBoundDiscovered.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, j});
+                            communicator.sendCommunication(5, mapBoundDiscovered);
+                        }
+                    }
+
+
                     if (nextBot == Bots.DENKILLERGUARD || nextBot == Bots.DENKILLERSOLDIER)
                     {
                         for (int j = mapKnowledge.denLocations.length; --j>=0; )
@@ -142,57 +154,6 @@ public class BaseArchon extends Unit
 
         return false;
     }
-
-//    /**
-//     * Process incoming msgs
-//     *
-//     * @throws GameActionException
-//     */
-//    public void handleMessages() throws GameActionException
-//    {
-//        communications = communicator.processCommunications();
-//        for(int k = 0; k < communications.length; k++)
-//        {
-//            if(communications[k].opcode == CommunicationType.CHANGEMISSION)
-//            {
-//                MissionCommunication comm = (MissionCommunication) communications[k];
-//                if(comm.id == rc.getID())
-//                {
-//                    nextBot = comm.newBType;
-//                }
-//                else if(comm.id == 0 && comm.bType == thisBot)
-//                {
-//                    nextBot = comm.newBType;
-//                }
-//                else if(comm.id == 0 && comm.rType == rc.getType())
-//                {
-//                    nextBot = comm.newBType;
-//                }
-//            }
-//            else if (communications[k].opcode == CommunicationType.PARTS)
-//            {
-//                // if we get a new msg about parts then check to see if we have added it to our list of sorted parts
-//                int[] values = communications[k].getValues();
-//                MapLocation loc = new MapLocation(values[2], values[3]);
-//
-//                if (!sortedParts.contains(loc))
-//                {
-//                    sortedParts.addParts(loc, currentLocation, values[1], false);
-//                }
-//            }
-//            else if (communications[k].opcode == CommunicationType.NEUTRAL)
-//            {
-//                // if we get a msg about neturals then check to see if we have that location stored
-//                int[] values = communications[k].getValues();
-//                MapLocation loc = new MapLocation(values[2], values[3]);
-//
-//                if (!sortedParts.contains(loc))
-//                {
-//                    sortedParts.addParts(loc, currentLocation, values[1], true);
-//                }
-//            }
-//        }
-//    }
 
     /**
      * This method creates the initial starting map and broadcasts it to the world
