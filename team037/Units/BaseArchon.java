@@ -109,23 +109,18 @@ public class BaseArchon extends Unit
 
                     if (nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHINGVIPER)
                     {
-                        rushingUnits++;
-                    }
-
-                    if (rushingUnits > 3 && !sentRushSignal)
-                    {
                         Communication rushMsg = new AttackCommunication();
 
                         MapLocation archonCOM = mapKnowledge.getArchonCOM();
 
+                        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
                         rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
                         communicator.sendCommunication(2, rushMsg);
 
-                        MapLocation rushLoc = mapKnowledge.getOppositeCorner(start);
+                        MapLocation rushLoc = mapKnowledge.getOppositeCorner(archonCOM);
                         rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.ATTACK), rushLoc.x, rushLoc.y} );
                         communicator.sendCommunication(2, rushMsg);
-
-                        sentRushSignal = true;
                     }
 
                     int id = rc.senseRobotAtLocation(rc.getLocation().add(dirs[i])).ID;

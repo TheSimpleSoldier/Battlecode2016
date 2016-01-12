@@ -182,6 +182,7 @@ public abstract class Unit
                 case MAP_BOUNDS:
                     values = communications[k].getValues();
 
+                    rc.setIndicatorString(1, "xMin: " + values[1] + " yMin: " + values[3] + " width: " + values[2] + " height: " + values[4]);
 
                     if (mapKnowledge.updateEdges(values[1], values[3], values[1] + values[2], values[3] + values[4]))
                     {
@@ -192,6 +193,11 @@ public abstract class Unit
                                 communicator.sendCommunication(dist, communications[k]);
                                 msgsSent++;
                             }
+                        }
+                        else if (type == RobotType.VIPER)
+                        {
+                            rushTarget = mapKnowledge.getOppositeCorner(start);
+                            System.out.println("x: " + rushTarget.x + " y: " + rushTarget.y);
                         }
                     }
                     break;
@@ -261,9 +267,10 @@ public abstract class Unit
                     break;
 
                 case RALLY_POINT:
-
                     values = communications[k].getValues();
-                    rallyPoint = new MapLocation(values[2], values[3]);
+                    rallyPoint = new MapLocation(values[1], values[2]);
+
+                    System.out.println("received rally_point msg x: " + values[1] + " y: " + values[2]);
 
                     break;
 

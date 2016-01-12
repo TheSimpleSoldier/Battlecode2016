@@ -21,13 +21,14 @@ public class RushingSoldier extends BaseSoldier
             return true;
         }
 
-        if (navigator.getTarget() == null)
+        if (rushing && navigator.getTarget() == null && rallyPoint != null)
         {
+            System.out.println("Rally Point x: " + rallyPoint.x + " y: " + rallyPoint.y);
             navigator.setTarget(rallyPoint);
         }
-        else if (rushing && rushTarget != null)
+        else if (!rushing && rushTarget != null)
         {
-            rushing = true;
+            //rushing = true;
             Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
             target = currentLocation.add(dir, 5);
             navigator.setTarget(target);

@@ -5,7 +5,7 @@ import team037.Units.BaseViper;
 
 public class RushingViper extends BaseViper
 {
-    private boolean rushing = false;
+    private boolean rushing = true;
 
     public RushingViper(RobotController rc)
     {
@@ -18,15 +18,17 @@ public class RushingViper extends BaseViper
             return true;
         }
 
-        if (navigator.getTarget() == null)
+        if (!rushing && rallyPoint != null)
         {
+//            System.out.println("Rally Point x: " + rallyPoint.x + " y: " + rallyPoint.y);
             navigator.setTarget(rallyPoint);
         }
-        else if (rushing && rushTarget != null)
+        else if (rushing && rushTarget != null && (navigator.getTarget() == null || rc.getLocation().equals(navigator.getTarget())))
         {
             Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
             target = currentLocation.add(dir, 5);
             navigator.setTarget(target);
+            System.out.println("Target x: " + target.x + " y: " + target.y);
         }
         else if (target == null || currentLocation.equals(target))
         {
