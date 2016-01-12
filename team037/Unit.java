@@ -7,6 +7,7 @@ import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
+import team037.Units.BaseArchon;
 import team037.Units.ScoutingScout;
 
 public abstract class Unit
@@ -148,6 +149,11 @@ public abstract class Unit
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
+
+                        if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
+                        {
+                            BaseArchon.sortedParts.addParts(loc, currentLocation, values[1], false);
+                        }
                     }
                     break;
 
@@ -162,6 +168,11 @@ public abstract class Unit
                             mapKnowledge.addPartsAndNeutrals(loc);
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
+                        }
+
+                        if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
+                        {
+                            BaseArchon.sortedParts.addParts(loc, currentLocation, values[1], true);
                         }
                     }
                     break;

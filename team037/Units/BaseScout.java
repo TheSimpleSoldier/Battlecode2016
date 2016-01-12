@@ -111,14 +111,15 @@ public class BaseScout extends Unit
 
     private void msgParts() throws GameActionException
     {
-        MapLocation[] partsArray = PartsUtilities.findPartsAndNeutrals(rc);;
-
+        MapLocation[] partsArray = PartsUtilities.findPartsAndNeutrals(rc);
 
         for (int i = partsArray.length; --i>=0; )
         {
             MapLocation spot = partsArray[i];
             if (spot != null && !mapKnowledge.partListed(spot))
             {
+                mapKnowledge.partsAndNeutrals.add(spot);
+
                 RobotInfo bot = null;
 
                 if (rc.canSenseLocation(spot))

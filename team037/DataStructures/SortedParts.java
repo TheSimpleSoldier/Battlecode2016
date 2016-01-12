@@ -165,27 +165,14 @@ public class SortedParts
         MapLocation currentLocation = rc.getLocation();
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;
-        int radius = (int)Math.ceil(Math.sqrt(sensorRadiusSquared));
-        MapLocation[] spots = new MapLocation[20];
-        int[] parts = new int[20];
-        int index = 0;
 
-        for (int i = -radius; i <= radius; i++)
+        MapLocation[] parts = rc.sensePartLocations(rc.getType().sensorRadiusSquared);
+
+        for (int i = parts.length; --i>=0; )
         {
-            for (int j = -radius; j<= radius; j++)
+            if (!contains(parts[i]))
             {
-                if (i*i + j*j <= sensorRadiusSquared)
-                {
-                    MapLocation toCheck = currentLocation.add(i, j);
-                    int part = (int) rc.senseParts(toCheck);
-                    double rubble = rc.senseRubble(toCheck);
-                    if (part > 0 && rubble < GameConstants.RUBBLE_OBSTRUCTION_THRESH)
-                    {
-                        parts[index] = part;
-                        spots[index] = toCheck;
-                        index++;
-                    }
-                }
+                addParts(parts[i], currentLocation, (int)rc.senseParts(parts[i]), false);
             }
         }
 
@@ -193,16 +180,9 @@ public class SortedParts
 
         for (int i = neutralBots.length; --i>=0; )
         {
-            parts[index] = neutralBots[i].type.partCost * 2;
-            spots[index] = neutralBots[i].location;
-            index++;
-        }
-
-        for (int i = index - 1; --i>=0; )
-        {
-            if (!contains(spots[i]))
+            if (!contains(neutralBots[i].location))
             {
-                addParts(spots[index], rc.getLocation(), parts[index], false);
+                addParts(neutralBots[i].location, currentLocation, neutralBots[i].type.partCost, true);
             }
         }
     }
