@@ -271,7 +271,7 @@ public abstract class Unit
                                 msgsSent++;
                             }
                         }
-                        else if (type == RobotType.VIPER)
+                        else if (type == RobotType.VIPER || type == RobotType.SCOUT)
                         {
                             rushTarget = mapKnowledge.getOppositeCorner(start);
                             System.out.println("x: " + rushTarget.x + " y: " + rushTarget.y);
