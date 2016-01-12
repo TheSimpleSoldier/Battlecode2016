@@ -63,7 +63,7 @@ public class BaseScout extends Unit
                 if (!mapKnowledge.denLocations.contains(zombieDen) && msgsSent < 20)
                 {
                     if (dist == -1)
-                        dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
+                        dist = 2500; //Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
 
                     mapKnowledge.addDenLocation(zombieDen);
                     Communication communication = new SimpleBotInfoCommunication();
@@ -79,7 +79,7 @@ public class BaseScout extends Unit
             MapLocation deadDen = mapKnowledge.updateDens(rc);
 
             if (dist == -1)
-                dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
+                dist = Math.max(type.sensorRadiusSquared * 2, Math.min(2500, rc.getLocation().distanceSquaredTo(start)));
 
             // if a den has been destroyed send it out
             if (deadDen != null && msgsSent < 20)

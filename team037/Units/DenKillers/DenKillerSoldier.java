@@ -17,6 +17,7 @@ public class DenKillerSoldier extends BaseSoldier
     public boolean takeNextStep() throws GameActionException
     {
         MapLocation goal = navigator.getTarget();
+
         if (goal == null || currentLocation.equals(goal) || (rc.canSenseLocation(goal) && (rc.senseRobotAtLocation(goal) == null || rc.senseRobotAtLocation(goal).team != Team.ZOMBIE || !rc.onTheMap(goal))))
         {
             // if we are standing on a den location alert all other allies that a zombie den has been destroyed

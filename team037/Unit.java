@@ -38,12 +38,14 @@ public abstract class Unit
     public static MapLocation start;
     public static boolean repaired;
     public static int msgsSent = 0;
+    public static boolean defendingArchon = false;
 
     public MapLocation locationLastTurn;
     public MapLocation previousLocation;
     public MapLocation currentLocation;
     public MapLocation rushTarget;
     public MapLocation rallyPoint;
+    public MapLocation distressedArchon;
 
     public Unit()
     {
@@ -74,10 +76,33 @@ public abstract class Unit
 
     public boolean act() throws GameActionException {
         if (fight() || fightZombies());
+        else if (aidDistressedArchon());
         else if (carryOutAbility());
         else if (takeNextStep());
 
         return true;
+    }
+
+    public boolean aidDistressedArchon() throws GameActionException
+    {
+        if (type == RobotType.SOLDIER && distressedArchon != null)
+        {
+            System.out.println("Assisting Archon");
+            if (!defendingArchon || !navigator.getTarget().equals(distressedArchon))
+            {
+                defendingArchon = true;
+                navigator.setTarget(distressedArchon);
+            }
+
+            if (rc.isCoreReady())
+            {
+                navigator.takeNextStep();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     // abstract methods that all units will need to implement
@@ -225,18 +250,11 @@ public abstract class Unit
 
                         if (type == RobotType.SCOUT)
                         {
-//                        if (!mapKnowledge.edgesBeingExplored[values[2]] &&  msgsSent < 20)
-//                        {
-//                            communicator.sendCommunication(dist, communications[k]);
-//                            msgsSent++;
-//                        }
-
                             if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
                             {
                                 ScoutingScout.updateScoutDirection();
                             }
                         }
-
 
                         mapKnowledge.setEdgesBeingExplored(values[2]);
                     }
@@ -259,10 +277,6 @@ public abstract class Unit
 
                     values = communications[k].getValues();
 
-                    if (type == RobotType.VIPER)
-                    {
-                        System.out.println("WE got a target attack location");
-                    }
 
                     rushTarget = new MapLocation(values[1], values[2]);
 
@@ -284,8 +298,6 @@ public abstract class Unit
                     values = communications[k].getValues();
                     rallyPoint = new MapLocation(values[1], values[2]);
 
-                    System.out.println("received rally_point msg x: " + values[1] + " y: " + values[2]);
-
                     break;
 
                 case RUBBLE:
@@ -293,6 +305,18 @@ public abstract class Unit
                         rubbleUpdate++;
                         Navigation.map.updateFromComms(communications[k]);
                     }
+                    break;
+
+                case ARCHON_DISTRESS:
+
+                    // archons and vipers don't respond to distress calls
+                    if (type != RobotType.ARCHON && type != RobotType.VIPER)
+                    {
+                        values = communications[k].getValues();
+                        distressedArchon = new MapLocation(values[4], values[5]);
+                        navigator.setTarget(distressedArchon);
+                    }
+
                     break;
             }
         }

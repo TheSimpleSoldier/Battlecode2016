@@ -55,6 +55,19 @@ public class BaseArchon extends Unit
         return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
+    // additional methods with default behavior
+    public void handleMessages() throws GameActionException
+    {
+        super.handleMessages();
+
+        if (enemies.length > 0)
+        {
+            Communication distressCall = new BotInfoCommunication();
+            distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
+            communicator.sendCommunication(400, distressCall);
+        }
+    }
+
     public boolean healNearbyAllies() throws GameActionException {
         // precondition
         if (nearByAllies.length == 0 || !repaired) {
