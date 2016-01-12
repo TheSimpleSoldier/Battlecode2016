@@ -42,7 +42,6 @@ public class PartsUtilities
 
     public static MapLocation[] findPartsAndNeutrals(RobotController rc)
     {
-        MapLocation currentLocation = rc.getLocation();
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;
         if (sensorRadiusSquared <= 0) {
@@ -51,7 +50,7 @@ public class PartsUtilities
 
         AppendOnlyMapLocationArray parts = new AppendOnlyMapLocationArray();
 
-        MapLocation[] squares = MapLocation.getAllMapLocationsWithinRadiusSq(currentLocation, sensorRadiusSquared);
+        MapLocation[] squares = rc.sensePartLocations(sensorRadiusSquared);
 
         for (int i = squares.length; --i>=0; )
         {
