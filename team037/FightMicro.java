@@ -488,4 +488,68 @@ public class FightMicro
 
         return inputs;
     }
+
+    /**
+     * THis method causes a unit to run towards a target while trying to avoid enemies
+     *
+     * @param enemies
+     * @param target
+     * @return
+     * @throws GameActionException
+     */
+    public boolean avoidEnemiesInRoute(RobotInfo[] enemies, MapLocation target) throws GameActionException
+    {
+        if (enemies.length == 0 || !rc.isCoreReady() || target == null || target.equals(rc.getLocation()))
+            return false;
+
+        Direction direction = rc.getLocation().directionTo(target);
+        MapLocation next;
+        boolean underAttack;
+        int counter = 0;
+
+        do
+        {
+            underAttack = false;
+            if (counter % 2 == 0)
+            {
+                for (int i = 0; i < counter; i++)
+                {
+                    direction = direction.rotateRight();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < counter; i++)
+                {
+                    direction = direction.rotateLeft();
+                }
+            }
+
+            next = rc.getLocation().add(direction);
+
+            for (int i  = enemies.length; --i>=0;)
+            {
+                int dist = enemies[i].location.distanceSquaredTo(next);
+
+                if (dist <= enemies[i].type.attackRadiusSquared)
+                {
+                    underAttack = true;
+                    i = 0;
+                }
+            }
+
+            counter++;
+        } while (underAttack && counter <= 4);
+
+        if (underAttack)
+            return false;
+
+        if (rc.canMove(direction))
+        {
+            rc.move(direction);
+            return true;
+        }
+
+        return false;
+    }
 }
