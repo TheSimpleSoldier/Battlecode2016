@@ -36,31 +36,22 @@ public class FlyingNavigator extends Navigator
         Direction toMove = currentLocation.directionTo(target);
         rc.setIndicatorString(1, toMove.name());
         if (tryMove(toMove)) {
-            rc.setIndicatorString(0, "1");
             return true;
         } else if (tryMove(toMove.rotateLeft())) {
-            rc.setIndicatorString(0, "2");
             return true;
         } else if (tryMove(toMove.rotateRight())) {
-            rc.setIndicatorString(0, "3");
             return true;
         } else if (tryMove(toMove.rotateLeft().rotateLeft())) {
-            rc.setIndicatorString(0, "4");
             return true;
         } else if (tryMove(toMove.rotateRight().rotateRight())) {
-            rc.setIndicatorString(0, "5");
             return true;
         } else if (tryMove(toMove.rotateLeft().rotateLeft().rotateLeft())) {
-            rc.setIndicatorString(0, "6");
             return true;
         } else if (tryMove(toMove.rotateRight().rotateRight().rotateRight())) {
-            rc.setIndicatorString(0, "7");
             return true;
         } else if (tryMove(toMove.opposite())) {
-            rc.setIndicatorString(0, "8");
             return true;
         } else {
-            rc.setIndicatorString(0, "9");
             return false;
         }
     }
