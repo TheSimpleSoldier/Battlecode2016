@@ -715,12 +715,14 @@ public class MapKnowledge {
         return true;
     }
 
-    public void updateArchonLocation(RobotInfo archon, int round)
+    public void updateEnemyArchonLocation(RobotInfo archon, int round)
     {
         for(int k = 0; k < 4; k++)
         {
             if(enemyArchons[k] == null)
             {
+                enemyArchons[k] = archon;
+                enemiesLastUpdated[k] = round;
                 return;
             }
             if(enemyArchons[k].ID == archon.ID)
@@ -732,7 +734,7 @@ public class MapKnowledge {
         }
     }
 
-    public boolean checkIfArchon(int id)
+    public boolean checkIfEnemyArchon(int id)
     {
         for(int k = 0; k < 4; k++)
         {
@@ -751,8 +753,8 @@ public class MapKnowledge {
 
     public MapLocation getNearestEnemyArchon(MapLocation location)
     {
-        double nearestDist = location.distanceSquaredTo(enemyArchons[0].location);
-        MapLocation nearest = enemyArchons[0].location;
+        double nearestDist = Integer.MAX_VALUE;
+        MapLocation nearest = null;
         for(int k = 1; k < 4; k++)
         {
             if(enemyArchons[k] == null)
@@ -808,6 +810,10 @@ public class MapKnowledge {
             }
         }
 
-        return new MapLocation(x/count, y/count);
+        if(count > 0)
+        {
+            return new MapLocation(x/count, y/count);
+        }
+        return null;
     }
 }

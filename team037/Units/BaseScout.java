@@ -48,11 +48,6 @@ public class BaseScout extends Unit
         msgRubble();
     }
 
-    public void handleMessages() throws GameActionException
-    {
-        super.handleMessages();
-    }
-
     private void msgArchons() throws GameActionException
     {
         int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));

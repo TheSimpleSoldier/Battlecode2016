@@ -10,13 +10,11 @@ public class HerdingScout extends BaseScout
 {
     private int minDist = 24;
     private boolean herding;
-    private boolean goodHerding;
 
     public HerdingScout(RobotController rc)
     {
         super(rc);
         herding = false;
-        goodHerding = false;
         target = getTargetToWait();
     }
 
@@ -41,28 +39,21 @@ public class HerdingScout extends BaseScout
 
         if(herding)
         {
+            /*target = getTargetForHerding();
+            move.setTarget(target);*/
             if(target == null || !rc.isCoreReady() || currentLocation.equals(target) || zombies.length == 0)
             {
                 return false;
             }
-            if(!goodHerding)
-            {
-                target = getTargetForHerding();
-                move.setTarget(target);
-            }
-            MapLocation nearest = zombies[0].location;
             int x = 0;
             int y = 0;
-            double dist = nearest.distanceSquaredTo(currentLocation);
-            boolean counted = false;
-
+            double dist = Integer.MAX_VALUE;
             for(int k = zombies.length - 1; k >= 0; k--)
             {
                     double tempDist = zombies[k].location.distanceSquaredTo(currentLocation);
                     if(tempDist < dist)
                     {
                         dist = tempDist;
-                        nearest = zombies[k].location;
                     }
 
                     x += zombies[k].location.x;
@@ -122,14 +113,19 @@ public class HerdingScout extends BaseScout
     private MapLocation getTargetForHerding()
     {
         MapLocation loc = mapKnowledge.getNearestEnemyArchon(rc.getLocation());
-
         if(loc != null)
         {
-            goodHerding = true;
             return loc;
         }
 
-        return new MapLocation(250, 120);
+        loc = mapKnowledge.getArchonCOM();
+        if(loc != null)
+        {
+            loc = mapKnowledge.getOppositeCorner(loc);
+            return loc.add(currentLocation.directionTo(loc), 100);
+        }
+        loc = mapKnowledge.getOppositeCorner(currentLocation);
+        return loc.add(currentLocation.directionTo(loc), 100);
     }
 
     private MapLocation getTargetToWait()
