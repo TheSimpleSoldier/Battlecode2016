@@ -14,7 +14,7 @@ import team037.Units.DenKillers.DenKillerSoldier;
 public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
-    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD;
+    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, REGIONSCOUT;
 
     public static int toInt(Bots type)
     {
@@ -44,6 +44,8 @@ public enum Bots
                 return 10;
             case DENKILLERGUARD:
                 return 11;
+            case REGIONSCOUT:
+                return 12;
         }
         return -1;
     }
@@ -76,6 +78,8 @@ public enum Bots
                 return DENKILLERSOLDIER;
             case 11:
                 return DENKILLERGUARD;
+            case 12:
+                return REGIONSCOUT;
         }
 
         return null;
@@ -91,6 +95,7 @@ public enum Bots
             case DENKILLERGUARD:
             case BASEGAURD:
                 return RobotType.GUARD;
+            case REGIONSCOUT:
             case PATROLSCOUT:
             case BASESCOUT:
             case SCOUTINGSCOUT:
@@ -136,6 +141,8 @@ public enum Bots
                 return new DenKillerSoldier(rc);
             case DENKILLERGUARD:
                 return new DenKillerGuard(rc);
+            case REGIONSCOUT:
+                return new RegionScout(rc);
         }
 
         return null;

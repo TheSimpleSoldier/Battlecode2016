@@ -19,6 +19,7 @@ public class MapKnowledge {
     public boolean[] exploredRegions = new boolean[16];
     public boolean[] exploredEdges = new boolean[4];
     public boolean[] edgesBeingExplored = new boolean[4];
+    public boolean[][] exploredLocsInRegion;
 
     public AppendOnlyMapLocationSet denLocations;
     public AppendOnlyMapLocationSet archonStartPosition;
@@ -381,6 +382,15 @@ public class MapKnowledge {
                 }
             }
         }
+
+        MapLocation[] corners = getRegion(region, minX, maxX, minY, maxY);
+        int width = corners[1].x - corners[0].x;
+        int height = corners[1].y - corners[0].y;
+
+        if (width <= 0 || height <= 0)
+            return -1;
+
+        exploredLocsInRegion = new boolean[width][height];
         return region;
     }
 
@@ -633,5 +643,71 @@ public class MapKnowledge {
          */
         communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height});
         return communication;
+    }
+
+    public MapLocation nxtUnexploredSquare(int region)
+    {
+        MapLocation[] corners = getRegion(region, minX, maxX, minY, maxY);
+        int topX = corners[0].x;
+        int topY = corners[0].y;
+        for (int i = exploredLocsInRegion.length; --i>=0;)
+        {
+            for (int j = exploredLocsInRegion[i].length; --j>=0;)
+            {
+                if (!exploredLocsInRegion[i][j])
+                {
+                    return new MapLocation(topX + i, topY + j);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * This method updates a region based on current loc
+     *
+     * @param region
+     * @param rc
+     */
+    public void upDateExploredLocs(int region, RobotController rc)
+    {
+        MapLocation[] corners = getRegion(region, minX, maxX, minY, maxY);
+        int topX = corners[0].x;
+        int topY = corners[0].y;
+        int bottomX = corners[1].x;
+        int bottomY = corners[1].y;
+
+        MapLocation[] seen = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), rc.getType().sensorRadiusSquared);
+
+        for (int i = seen.length; --i>=0; )
+        {
+            int x = seen[i].x;
+            int y = seen[i].y;
+
+            if (x >= topX && x < bottomX && y >= topY && y < bottomY)
+            {
+                exploredLocsInRegion[x-topX][y-topY] = true;
+            }
+        }
+    }
+
+    /**
+     * This method returns true if a region is explored false o.w.
+     *
+     * @param region
+     * @return
+     */
+    public boolean regionExplored(int region)
+    {
+        for (int i = exploredLocsInRegion.length; --i>=0;)
+        {
+            for (int j = exploredLocsInRegion[i].length; --j>=0; )
+            {
+                if (!exploredLocsInRegion[i][j])
+                    return false;
+            }
+        }
+        exploredRegions[region] = true;
+        return true;
     }
 }
