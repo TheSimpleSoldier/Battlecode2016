@@ -1,8 +1,9 @@
-package team037.Units;
+package team037.Units.CastleUnits;
 
 import battlecode.common.*;
 import team037.Enums.Strategies;
 import team037.SlugNavigator;
+import team037.Units.BaseSoldier;
 import team037.Utilites.MapUtils;
 
 public class CastleSoldier extends BaseSoldier
@@ -24,10 +25,13 @@ public class CastleSoldier extends BaseSoldier
     {
         super(rc);
         move = new SlugNavigator(rc);
+        rc.setIndicatorString(1, "Castle Soldier");
     }
 
     @Override
-    public void handleMessages() throws GameActionException {
+    public void handleMessages() throws GameActionException
+    {
+
     }
 
 

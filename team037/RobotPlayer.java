@@ -6,6 +6,9 @@ import battlecode.common.RobotType;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.*;
+import team037.Units.CastleUnits.CastleArchon;
+import team037.Units.CastleUnits.CastleSoldier;
+import team037.Units.CastleUnits.CastleTurret;
 
 public class RobotPlayer
 {
