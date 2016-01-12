@@ -5,6 +5,7 @@ package team037;
  */
 
 import battlecode.common.*;
+import team037.Messages.Communication;
 
 public class Map {
 
@@ -13,7 +14,7 @@ public class Map {
     public final int originX, originY;  // Origin in real coordinates.
     static RobotController rc;
     static int[] perimeter, knight;
-    static int radiusSq;
+    public static int radiusSq;
 
     /**
      * Constructor.
@@ -112,6 +113,415 @@ public class Map {
      */
     public MapLocation arrayToMap(int[] location) {
         return new MapLocation(location[0]-128+originX,location[1]-128+originY);
+    }
+
+    public void updateFromComms(Communication com) {
+
+        long[] x = new long[7];
+        long[] y = new long[7];
+
+        int[] values = com.getValues();
+
+        long data = values[2];              // Lower 25 bits
+        data += ((long) values[1]) << 25;   // Upper 24 bits
+
+        if ((data & 0b1000000000000000000000000000000000000000000000000L)!= 0) {
+            //2^48
+            y[0] += 64;
+            x[0] += 64;
+        }
+        if ((data & 0b100000000000000000000000000000000000000000000000L)!= 0) {
+            //2^47
+            y[0] += 32;
+            x[1] += 64;
+        }
+        if ((data & 0b10000000000000000000000000000000000000000000000L)!= 0) {
+            //2^46
+            y[0] += 16;
+            x[2] += 64;
+        }
+        if ((data & 0b1000000000000000000000000000000000000000000000L)!= 0) {
+            //2^45
+            y[0] += 8;
+            x[3] += 64;
+        }
+        if ((data & 0b100000000000000000000000000000000000000000000L)!= 0) {
+            //2^44
+            y[0] += 4;
+            x[4] += 64;
+        }
+        if ((data & 0b10000000000000000000000000000000000000000000L)!= 0) {
+            //2^43
+            y[0] += 2;
+            x[5] += 64;
+        }
+        if ((data & 0b1000000000000000000000000000000000000000000L)!= 0) {
+            //2^42
+            y[0] += 1;
+            x[6] += 64;
+        }
+
+        // x++
+
+        if ((data & 0b100000000000000000000000000000000000000000L)!= 0) {
+            //2^41
+            y[1] += 64;
+            x[0] += 32;
+        }
+        if ((data & 0b10000000000000000000000000000000000000000L)!= 0) {
+            //2^40
+            y[1] += 32;
+            x[1] += 32;
+        }
+        if ((data & 0b1000000000000000000000000000000000000000L)!= 0) {
+            //2^39
+            y[1] += 16;
+            x[2] += 32;
+        }
+        if ((data & 0b100000000000000000000000000000000000000L)!= 0) {
+            //2^38
+            y[1] += 8;
+            x[3] += 32;
+        }
+        if ((data & 0b10000000000000000000000000000000000000L)!= 0) {
+            //2^37
+            y[1] += 4;
+            x[4] += 32;
+        }
+        if ((data & 0b1000000000000000000000000000000000000L)!= 0) {
+            //2^36
+            y[1] += 2;
+            x[5] += 32;
+        }
+        if ((data & 0b100000000000000000000000000000000000L)!= 0) {
+            //2^35
+            y[1] += 1;
+            x[6] += 32;
+        }
+
+        // x++
+
+        if ((data & 0b10000000000000000000000000000000000L)!= 0) {
+            //2^34
+            y[2] += 64;
+            x[0] += 16;
+        }
+        if ((data & 0b1000000000000000000000000000000000L)!= 0) {
+            //2^33
+            y[2] += 32;
+            x[1] += 16;
+        }
+        if ((data & 0b100000000000000000000000000000000L)!= 0) {
+            //2^32
+            y[2] += 16;
+            x[2] += 16;
+        }
+        if ((data & 0b10000000000000000000000000000000L)!= 0) {
+            //2^31
+            y[2] += 8;
+            x[3] += 16;
+        }
+        if ((data & 0b1000000000000000000000000000000L)!= 0) {
+            //2^30
+            y[2] += 4;
+            x[4] += 16;
+        }
+        if ((data & 0b100000000000000000000000000000L)!= 0) {
+            //2^29
+            y[2] += 2;
+            x[5] += 16;
+        }
+        if ((data & 0b10000000000000000000000000000L)!= 0) {
+            //2^28
+            y[2] += 1;
+            x[6] += 16;
+        }
+
+        // x++
+
+        if ((data & 0b1000000000000000000000000000L)!= 0) {
+            //2^27
+            y[3] += 64;
+            x[0] += 8;
+        }
+        if ((data & 0b100000000000000000000000000L)!= 0) {
+            //2^26
+            y[3] += 32;
+            x[1] += 8;
+        }
+        if ((data & 0b10000000000000000000000000L)!= 0) {
+            //2^25
+            y[3] += 16;
+            x[2] += 8;
+        }
+        if ((data & 0b1000000000000000000000000L)!= 0) {
+            //2^24
+            y[3] += 8;
+            x[3] += 8;
+        }
+        if ((data & 0b100000000000000000000000L)!= 0) {
+            //2^23
+            y[3] += 4;
+            x[4] += 8;
+        }
+        if ((data & 0b10000000000000000000000L)!= 0) {
+            //2^22
+            y[3] += 2;
+            x[5] += 8;
+        }
+        if ((data & 0b1000000000000000000000L)!= 0) {
+            //2^21
+            y[3] += 1;
+            x[6] += 8;
+        }
+
+        // x++
+
+        if ((data & 0b100000000000000000000L)!= 0) {
+            //2^20
+            y[4] += 64;
+            x[0] += 4;
+        }
+        if ((data & 0b10000000000000000000L)!= 0) {
+            //2^19
+            y[4] += 32;
+            x[1] += 4;
+        }
+        if ((data & 0b1000000000000000000L)!= 0) {
+            //2^18
+            y[4] += 16;
+            x[2] += 4;
+        }
+        if ((data & 0b100000000000000000L)!= 0) {
+            //2^17
+            y[4] += 8;
+            x[3] += 4;
+        }
+        if ((data & 0b10000000000000000L)!= 0) {
+            //2^16
+            y[4] += 4;
+            x[4] += 4;
+        }
+        if ((data & 0b1000000000000000L)!= 0) {
+            //2^15
+            y[4] += 2;
+            x[5] += 4;
+        }
+        if ((data & 0b100000000000000L)!= 0) {
+            //2^14
+            y[4] += 1;
+            x[6] += 4;
+        }
+
+        // x++
+
+        if ((data & 0b10000000000000L)!= 0) {
+            //2^13
+            y[5] += 64;
+            x[0] += 2;
+        }
+        if ((data & 0b1000000000000L)!= 0) {
+            //2^12
+            y[5] += 32;
+            x[1] += 2;
+        }
+        if ((data & 0b100000000000L)!= 0) {
+            //2^11
+            y[5] += 16;
+            x[2] += 2;
+        }
+        if ((data & 0b10000000000L)!= 0) {
+            //2^10
+            y[5] += 8;
+            x[3] += 2;
+        }
+        if ((data & 0b1000000000L)!= 0) {
+            //2^9
+            y[5] += 4;
+            x[4] += 2;
+        }
+        if ((data & 0b100000000L)!= 0) {
+            //2^8
+            y[5] += 2;
+            x[5] += 2;
+        }
+        if ((data & 0b10000000L)!= 0) {
+            //2^7
+            y[5] += 1;
+            x[6] += 2;
+        }
+
+        // x++
+
+        if ((data & 0b1000000L)!= 0) {
+            //2^6
+            y[6] += 64;
+            x[0] += 1;
+        }
+        if ((data & 0b100000L)!= 0) {
+            //2^5
+            y[6] += 32;
+            x[1] += 1;
+        }
+        if ((data & 0b10000L)!= 0) {
+            //2^4
+            y[6] += 16;
+            x[2] += 1;
+        }
+        if ((data & 0b1000L)!= 0) {
+            //2^3
+            y[6] += 8;
+            x[3] += 1;
+        }
+        if ((data & 0b100L)!= 0) {
+            //2^2
+            y[6] += 4;
+            x[4] += 1;
+        }
+        if ((data & 0b10L)!= 0) {
+            //2^1
+            y[6] += 2;
+            x[5] += 1;
+        }
+        if ((data & 0b1L)!= 0) {
+            //2^0
+            y[6] += 1;
+            x[6] += 1;
+        }
+
+        int xIndex = com.signalLoc.x - originX + 125;
+        int yIndex = com.signalLoc.y - originY + 131;
+
+        int shift = 63 - (yIndex % 64);
+        int index = yIndex / 64;
+        long not = ~(64L << shift);
+        if (shift > 54) {
+            int index2 = index - 1;
+            int shift2 = 64 - shift;
+            long not2 = ~(64L >> shift2);
+
+            mapY[xIndex][index] &= not;
+            mapY[xIndex][index] |= y[0] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[0] >> shift2;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[1] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[1] >> shift2;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[2] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[2] >> shift2;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[3] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[3] >> shift2;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[4] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[4] >> shift2;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[5] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[5] >> shift2;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[6] << shift;
+            mapY[xIndex][index2] &= not2;
+            mapY[xIndex][index2] |= y[6] >> shift2;
+        } else {
+            mapY[xIndex][index] &= not;
+            mapY[xIndex][index] |= y[0] << shift;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[1] << shift;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[2] << shift;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[3] << shift;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[4] << shift;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[5] << shift;
+
+            mapY[++xIndex][index] &= not;
+            mapY[xIndex][index] |= y[6] << shift;
+        }
+
+        shift = 63 - (xIndex % 64);
+        index = xIndex / 64;
+        not = ~(64L << shift);
+
+        if (shift > 54) {
+            int index2 = index - 1;
+            int shift2 = 64 - shift;
+            long not2 = ~(64L >> shift2);
+
+            mapX[yIndex][index] &= not;
+            mapX[yIndex][index] |= x[6] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[6] >> shift2;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[5] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[5] >> shift2;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[4] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[4] >> shift2;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[3] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[3] >> shift2;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[2] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[2] >> shift2;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[1] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[1] >> shift2;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[0] << shift;
+            mapX[yIndex][index2] &= not2;
+            mapX[yIndex][index2] |= x[0] >> shift2;
+        } else {
+            mapX[yIndex][index] &= not;
+            mapX[yIndex][index] |= x[6] << shift;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[5] << shift;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[4] << shift;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[3] << shift;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[2] << shift;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[1] << shift;
+
+            mapX[--yIndex][index] &= not;
+            mapX[yIndex][index] |= x[0] << shift;
+        }
     }
 
     public void scan(MapLocation currentLoc) {

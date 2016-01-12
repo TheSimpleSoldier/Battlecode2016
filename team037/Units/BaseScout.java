@@ -3,10 +3,7 @@ package team037.Units;
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
 import team037.FlyingNavigator;
-import team037.Messages.Communication;
-import team037.Messages.PartsCommunication;
-import team037.Messages.SimpleBotInfoCommunication;
-import team037.Messages.TurretSupportCommunication;
+import team037.Messages.*;
 import team037.Unit;
 import team037.Utilites.PartsUtilities;
 
@@ -51,6 +48,10 @@ public class BaseScout extends Unit
         msgParts();
 
         msgDens();
+
+        if (rc.getRoundNum() % 5 == id % 5) {
+            msgRubble();
+        }
     }
 
     private void msgDens() throws GameActionException
@@ -190,6 +191,242 @@ public class BaseScout extends Unit
                     }
                 }
             }
+        }
+    }
+
+    private void msgRubble() {
+        MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(rc.getLocation(), RobotType.SCOUT.sensorRadiusSquared);
+
+        double rubbleThresh = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+
+        long broadcast = 0L;
+
+        try {
+            MapLocation checkLoc = locations[41];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[42];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[43];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[44];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[45];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[46];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[47];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000000000000000L;
+            }
+
+            // x++
+
+            checkLoc = locations[55];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[56];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[57];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[58];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[59];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[60];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000000000L;
+            }
+            checkLoc = locations[61];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000000000L;
+            }
+
+            // x++
+
+            checkLoc = locations[70];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000000000L;
+            }
+            checkLoc = locations[71];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000000L;
+            }
+            checkLoc = locations[72];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000000L;
+            }
+            checkLoc = locations[73];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000000L;
+            }
+            checkLoc = locations[74];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000000L;
+            }
+            checkLoc = locations[75];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000000L;
+            }
+            checkLoc = locations[76];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000000L;
+            }
+
+            // x++
+
+            checkLoc = locations[85];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000000L;
+            }
+            checkLoc = locations[86];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000000L;
+            }
+            checkLoc = locations[87];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000000L;
+            }
+            checkLoc = locations[88];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000000L;
+            }
+            checkLoc = locations[89];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000000L;
+            }
+            checkLoc = locations[90];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000000L;
+            }
+            checkLoc = locations[91];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000000L;
+            }
+
+            // x++
+
+            checkLoc = locations[100];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000000L;
+            }
+            checkLoc = locations[101];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000000L;
+            }
+            checkLoc = locations[102];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000000L;
+            }
+            checkLoc = locations[103];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000000L;
+            }
+            checkLoc = locations[104];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000000L;
+            }
+            checkLoc = locations[105];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000000L;
+            }
+            checkLoc = locations[106];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000000L;
+            }
+
+            // x++
+
+            checkLoc = locations[115];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000000L;
+            }
+            checkLoc = locations[116];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000000L;
+            }
+            checkLoc = locations[117];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000000L;
+            }
+            checkLoc = locations[118];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000000L;
+            }
+            checkLoc = locations[119];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000000L;
+            }
+            checkLoc = locations[120];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000000L;
+            }
+            checkLoc = locations[121];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000000L;
+            }
+
+            // x++
+
+            checkLoc = locations[129];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000000L;
+            }
+            checkLoc = locations[130];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100000L;
+            }
+            checkLoc = locations[131];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10000L;
+            }
+            checkLoc = locations[132];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1000L;
+            }
+            checkLoc = locations[133];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b100L;
+            }
+            checkLoc = locations[134];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b10L;
+            }
+            checkLoc = locations[135];
+            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+                broadcast += 0b1L;
+            }
+
+            int hi = (int) (broadcast >>> 25);       // Upper 24 bits
+            int lo = (int) (broadcast & 0x1FFFFFF);  // Lower 25 bits
+
+            Communication communication = new RubbleCommunication();
+            communication.opcode = CommunicationType.RUBBLE;
+            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.RUBBLE),hi,lo});
+            communicator.sendCommunication(1, communication);
+            msgsSent++;
+        } catch (GameActionException e) {
+
         }
     }
 }
