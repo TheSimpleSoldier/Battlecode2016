@@ -97,6 +97,17 @@ public class BaseArchon extends Unit
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
             rc.activate(neutralBots[0].location);
+            for (int j = mapKnowledge.denLocations.length; --j>=0; )
+            {
+                MapLocation den = mapKnowledge.denLocations.array[j];
+
+                if (den != null)
+                {
+                    Communication communicationDen = new SimpleBotInfoCommunication();
+                    communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                    communicator.sendCommunication(2, communicationDen);
+                }
+            }
         }
 
         if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
@@ -187,7 +198,7 @@ public class BaseArchon extends Unit
             }
 
 
-            if (nextBot == Bots.DENKILLERGUARD || nextBot == Bots.DENKILLERSOLDIER)
+            if (Bots.typeFromBot(nextBot) == RobotType.GUARD || Bots.typeFromBot(nextBot) == RobotType.SOLDIER)
             {
                 for (int j = mapKnowledge.denLocations.length; --j>=0; )
                 {

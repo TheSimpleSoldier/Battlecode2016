@@ -163,7 +163,6 @@ public class BaseScout extends Unit
 
         if (allyTurrets != null && mapKnowledge.ourTurretLocations.hasLocations())
         {
-            System.out.println("Ally turrets");
             for (int i = enemies.length; --i >= 0; )
             {
                 MapLocation enemy = enemies[i].location;

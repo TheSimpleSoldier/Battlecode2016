@@ -6,9 +6,6 @@ import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 import team037.Utilites.Utilities;
 
-/**
- * Created by joshua on 1/7/16.
- */
 public class MissionCommunication extends Communication
 {
     public int id;

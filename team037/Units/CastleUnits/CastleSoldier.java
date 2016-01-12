@@ -1,6 +1,7 @@
 package team037.Units.CastleUnits;
 
 import battlecode.common.*;
+import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.SlugNavigator;
 import team037.Units.BaseSoldier;
@@ -25,7 +26,7 @@ public class CastleSoldier extends BaseSoldier
     {
         super(rc);
         move = new SlugNavigator(rc);
-        rc.setIndicatorString(1, "Castle Soldier");
+        rc.setIndicatorString(0, "Castle Soldier");
     }
 
     @Override
@@ -40,9 +41,16 @@ public class CastleSoldier extends BaseSoldier
 
         findMom();  // looks for the archon
 
+        if (archonId == Integer.MAX_VALUE)
+        {
+            nextBot = Bots.DENKILLERSOLDIER;
+            return false;
+        }
+
+        rc.setIndicatorString(2, "ArchonId: " + archonId);
+
         int round = rc.getRoundNum();
         if (!rc.isCoreReady()) {
-            rc.setIndicatorString(0, "cooldown");
             return false;
         } else if (moveToMom()) {
             lastAction = MOVE_TO_MOM;
@@ -55,11 +63,9 @@ public class CastleSoldier extends BaseSoldier
         } else if (patrol()) {
             lastAction = PATROL;
         } else {
-            rc.setIndicatorString(0, "wait");
             return false;
         }
 
-        rc.setIndicatorString(0, lastAction);
         return true;
     }
 
@@ -67,7 +73,7 @@ public class CastleSoldier extends BaseSoldier
         if (archonId == Integer.MAX_VALUE) {
             MapLocation location = null;
             int id = Integer.MAX_VALUE;
-            RobotInfo[] possible = rc.senseNearbyRobots(2, us);
+            RobotInfo[] possible = rc.senseNearbyRobots(sightRange, us);
             for (int i = possible.length; --i >= 0;) {
                 if (possible[i].type == RobotType.ARCHON) {
                     location = possible[i].location;
@@ -77,6 +83,11 @@ public class CastleSoldier extends BaseSoldier
             }
             archonId = id;
             archonLoc = location;
+
+            if (archonId == Integer.MAX_VALUE)
+            {
+                System.out.println("WE have a problem: " + possible.length);
+            }
         } else {
             if (rc.canSenseRobot(archonId)) {
                 RobotInfo archon = rc.senseRobot(archonId);
@@ -138,6 +149,9 @@ public class CastleSoldier extends BaseSoldier
     }
 
     private boolean moveToFront() throws GameActionException {
+        if (archonLoc == null)
+            return false;
+
         //prereqs
         int eucl = Math.max(Math.abs(currentLocation.x - archonLoc.x), Math.abs(currentLocation.y - archonLoc.y));
         if (eucl == Strategies.CASTLE_SIZE) {
@@ -161,6 +175,12 @@ public class CastleSoldier extends BaseSoldier
         if (nearByEnemies.length > 0 || nearByZombies.length > 0) {
             return false;
         }
+
+        if (lastAction == null)
+        {
+            return false;
+        }
+
         if (lastAction.equals(CLEAN_UP)) {
             return false;
         }
@@ -175,6 +195,12 @@ public class CastleSoldier extends BaseSoldier
             return true;
         }
         Direction toCheck = currentLocation.directionTo(archonLoc);
+
+        if (toCheck == null)
+        {
+            return false;
+        }
+
         int i = 8;
         do {
             if (rc.senseRubble(currentLocation.add(toCheck)) > 0) {
@@ -193,6 +219,12 @@ public class CastleSoldier extends BaseSoldier
         }
 
         Direction toMove = getNextPatrolDirection();
+
+        if (toMove == null)
+        {
+            return false;
+        }
+
         if (!rc.canMove(toMove)) {
             return false;
         }
@@ -202,6 +234,9 @@ public class CastleSoldier extends BaseSoldier
     }
 
     private Direction getNextPatrolDirection() {
+        if (archonLoc == null)
+            return null;
+
         int xDiff = currentLocation.x - archonLoc.x;
         int yDiff = currentLocation.y - archonLoc.y;
 

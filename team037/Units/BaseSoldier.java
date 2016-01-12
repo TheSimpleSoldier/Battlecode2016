@@ -8,6 +8,7 @@ public class BaseSoldier extends Unit
     public BaseSoldier(RobotController rc)
     {
         super(rc);
+        rc.setIndicatorString(0, "base soldier");
     }
 
     public boolean takeNextStep() throws GameActionException
