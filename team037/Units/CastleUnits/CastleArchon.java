@@ -329,8 +329,4 @@ public class CastleArchon extends BaseArchon {
         numSoliders = numS;
         numTurrets = numT;
     }
-
-
-
-
 }

@@ -19,6 +19,7 @@ public class BuildOrderCreation
         };
         int[] times = {1, 3, 1, 1, 3, 1, 3, 1000};
 
+
         Bots[][] buildOrderSoldiers = {
                 {Bots.BASESOLDIER}
         };

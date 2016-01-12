@@ -19,7 +19,7 @@ public class RushingViper extends BaseViper
             return true;
         }
 
-        if (navigator.getTarget() == null || currentLocation.equals(navigator.getTarget()) || (rushTarget != null && !rushTarget.equals(lastTarget)))
+        if (updateTarget())
         {
             if (rushTarget != null)
             {
@@ -29,6 +29,10 @@ public class RushingViper extends BaseViper
 
                 navigator.setTarget(currentLocation.add(dir, 5));
             }
+            else
+            {
+                rushTarget = mapKnowledge.getOppositeCorner(start);
+            }
         }
 
         if (rc.isCoreReady())
@@ -37,6 +41,29 @@ public class RushingViper extends BaseViper
         }
 
         return false;
+    }
+
+    public boolean updateTarget()
+    {
+        MapLocation target = navigator.getTarget();
+
+        if (target == null)
+            return true;
+
+        if (currentLocation.equals(target))
+            return true;
+
+        if (currentLocation.isAdjacentTo(target))
+            return true;
+
+        if (rc.canSenseLocation(target) && rc.senseRubble(target) > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            return true;
+
+        if (rushTarget != null && !rushTarget.equals(lastTarget))
+            return true;
+
+        return false;
+
     }
 
     public boolean fight() throws GameActionException

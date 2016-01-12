@@ -336,7 +336,6 @@ public class FightMicro
         boolean retreat = false;
         boolean advance = false;
         boolean cluster = false;
-        boolean standGround = false;
         double[] output = net.compute(new double[]{inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5]});
 
         // retreat
@@ -353,11 +352,6 @@ public class FightMicro
         // cluster
         if (output[2] > 0.5) {
             cluster = true;
-        }
-
-        // standGround
-        if (output[3] > 0.5) {
-            standGround = true;
         }
 
         if (rc.isCoreReady()) {
@@ -381,9 +375,11 @@ public class FightMicro
                 FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
             }
 
-            if (rc.isCoreReady() && standGround) {
-                rc.setIndicatorString(2, "standGround");
-                // do nothing
+            if (rc.isCoreReady()) {
+                rc.setIndicatorString(2, "retreat");
+                MapLocation enemy = new MapLocation(enemy_x, enemy_y);
+                dir = rc.getLocation().directionTo(enemy).opposite();
+                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
             }
         }
 
