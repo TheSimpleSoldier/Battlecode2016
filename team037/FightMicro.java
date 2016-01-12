@@ -594,12 +594,8 @@ public class FightMicro
         if (underAttack)
             return false;
 
-        if (rc.canMove(direction))
-        {
-            rc.move(direction);
-            return true;
-        }
+        FightMicroUtilites.moveDir(rc, direction, false);
 
-        return false;
+        return true;
     }
 }
