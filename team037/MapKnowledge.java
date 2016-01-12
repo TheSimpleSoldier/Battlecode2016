@@ -26,11 +26,16 @@ public class MapKnowledge {
     public AppendOnlyMapLocationSet ourTurretLocations;
     public AppendOnlyMapLocationSet partsAndNeutrals;
 
+    public RobotInfo[] enemyArchons;
+    public int[] enemiesLastUpdated;
+
     public MapKnowledge() {
         denLocations = new AppendOnlyMapLocationSet();
         archonStartPosition = new AppendOnlyMapLocationSet();
         ourTurretLocations = new AppendOnlyMapLocationSet();
         partsAndNeutrals = new AppendOnlyMapLocationSet();
+        enemyArchons = new RobotInfo[4];
+        enemiesLastUpdated = new int[]{0,0,0,0};
     }
 
     public void setMinX(int x) { minX = x; }
@@ -710,6 +715,65 @@ public class MapKnowledge {
         return true;
     }
 
+    public void updateEnemyArchonLocation(RobotInfo archon, int round)
+    {
+        for(int k = 0; k < 4; k++)
+        {
+            if(enemyArchons[k] == null)
+            {
+                enemyArchons[k] = archon;
+                enemiesLastUpdated[k] = round;
+                return;
+            }
+            if(enemyArchons[k].ID == archon.ID)
+            {
+                enemyArchons[k] = archon;
+                enemiesLastUpdated[k] = round;
+                return;
+            }
+        }
+    }
+
+    public boolean checkIfEnemyArchon(int id)
+    {
+        for(int k = 0; k < 4; k++)
+        {
+            if(enemyArchons[k] == null)
+            {
+                return false;
+            }
+            if(enemyArchons[k].ID == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public MapLocation getNearestEnemyArchon(MapLocation location)
+    {
+        double nearestDist = Integer.MAX_VALUE;
+        MapLocation nearest = null;
+        for(int k = 1; k < 4; k++)
+        {
+            if(enemyArchons[k] == null)
+            {
+                break;
+            }
+
+            double tempDist = location.distanceSquaredTo(enemyArchons[k].location);
+
+            if(tempDist < nearestDist)
+            {
+                nearest = enemyArchons[k].location;
+                nearestDist = tempDist;
+            }
+        }
+
+        return nearest;
+    }
+
     /**
      * This method attempts to find the opposite corner of the map
      *
@@ -746,6 +810,10 @@ public class MapKnowledge {
             }
         }
 
-        return new MapLocation(x/count, y/count);
+        if(count > 0)
+        {
+            return new MapLocation(x/count, y/count);
+        }
+        return null;
     }
 }

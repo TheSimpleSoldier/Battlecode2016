@@ -34,6 +34,7 @@ public class FlyingNavigator extends Navigator
         }
 
         Direction toMove = currentLocation.directionTo(target);
+        rc.setIndicatorString(1, toMove.name());
         if (tryMove(toMove)) {
             return true;
         } else if (tryMove(toMove.rotateLeft())) {
