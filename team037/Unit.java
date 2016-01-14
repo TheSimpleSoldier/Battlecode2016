@@ -26,6 +26,8 @@ public abstract class Unit
     public static RobotInfo[] allies;
     public static RobotInfo[] nearByZombies;
     public static RobotInfo[] zombies;
+    public static MapLocation[] enemyArchonStartLocs;
+    public static MapLocation[] alliedArchonStartLocs;
     public static MapLocation target;
     public static Direction[] dirs;
     public static FightMicro fightMicro;
@@ -75,7 +77,8 @@ public abstract class Unit
         currentLocation = locationLastTurn;
         start = rc.getLocation();
         repaired = false;
-
+        alliedArchonStartLocs = rc.getInitialArchonLocations(us);
+        enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
     }
 
     public boolean act() throws GameActionException {
