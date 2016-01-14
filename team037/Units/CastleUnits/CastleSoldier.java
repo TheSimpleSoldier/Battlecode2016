@@ -156,7 +156,7 @@ public class CastleSoldier extends BaseSoldier
         }
 
         if (eucl < Strategies.CASTLE_SIZE) {
-            if (move.getTarget() == null || move.getTarget().distanceSquaredTo(archonLoc) <= 2) {
+            if (move.getTarget() == null || move.getTarget().distanceSquaredTo(archonLoc) <= 4) {
                 Direction toMove = archonLoc.directionTo(currentLocation);
                 MapLocation target = MapUtils.findOnMapLocationNUnitsAway(this, toMove, 3);
                 move.setTarget(target);
