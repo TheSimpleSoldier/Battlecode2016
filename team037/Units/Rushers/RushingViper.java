@@ -14,35 +14,26 @@ public class RushingViper extends BaseViper
     }
 
     @Override
-    public boolean act() throws GameActionException {
-        if(fight() || fightZombies()) {
-            return true;
-        }
-
-        if (updateTarget())
+    public MapLocation getNextSpot()
+    {
+        if (rushTarget != null)
         {
-            if (rushTarget != null)
-            {
-                lastTarget = rushTarget;
+            lastTarget = rushTarget;
 
-                Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
+            Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
 
-                navigator.setTarget(currentLocation.add(dir, 5));
-            }
-            else
-            {
-                rushTarget = mapKnowledge.getOppositeCorner(start);
-            }
+            return currentLocation.add(dir, 5);
         }
-
-        if (rc.isCoreReady())
+        else
         {
-            return navigator.takeNextStep();
+            rushing = true;
+            rushTarget = mapKnowledge.getOppositeCorner(start);
         }
 
-        return false;
+        return null;
     }
 
+    @Override
     public boolean updateTarget()
     {
         MapLocation target = navigator.getTarget();
@@ -68,6 +59,7 @@ public class RushingViper extends BaseViper
 
     }
 
+    @Override
     public boolean fight() throws GameActionException
     {
         if (rushing)
@@ -77,6 +69,7 @@ public class RushingViper extends BaseViper
         return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
     }
 
+    @Override
     public boolean fightZombies() throws GameActionException
     {
         if (rushing)

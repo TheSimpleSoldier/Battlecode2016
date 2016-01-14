@@ -52,14 +52,14 @@ public class ScoutingScout extends BaseScout {
                 return false;
             } else {
 //                System.out.println("Setting new target");
-                move.setTarget(currentLocation.add(scoutDirection, 100));
+                navigator.setTarget(currentLocation.add(scoutDirection, 100));
             }
         }
 
         int edge = MapUtils.senseEdge(rc, scoutDirection);
         if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir])
         {
-            move.setTarget(currentLocation);
+            navigator.setTarget(currentLocation);
             mapKnowledge.setValueInDirection(edge, scoutDirection);
 
             if (dir >= 0)
@@ -77,7 +77,7 @@ public class ScoutingScout extends BaseScout {
         }
 
 
-        if (move.takeNextStep()) {
+        if (navigator.takeNextStep()) {
             return true;
         }
         return false;

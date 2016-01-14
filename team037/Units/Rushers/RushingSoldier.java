@@ -14,36 +14,26 @@ public class RushingSoldier extends BaseSoldier
     }
 
     @Override
-    public boolean act() throws GameActionException
+    public MapLocation getNextSpot()
     {
-        if(fight() || fightZombies()) {
-            return true;
-        }
-
-        if (updateTarget())
+        if (rushTarget != null)
         {
-            if (rushTarget != null)
-            {
-                lastTarget = rushTarget;
+            lastTarget = rushTarget;
 
-                Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
+            Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
 
-                navigator.setTarget(currentLocation.add(dir, 5));
-            }
-            else
-            {
-                rushTarget = mapKnowledge.getOppositeCorner(start);
-            }
+            return currentLocation.add(dir, 5);
         }
-
-        if (rc.isCoreReady())
+        else
         {
-            return navigator.takeNextStep();
+            rushing = true;
+            rushTarget = mapKnowledge.getOppositeCorner(start);
         }
 
-        return false;
+        return null;
     }
 
+    @Override
     public boolean updateTarget()
     {
         MapLocation target = navigator.getTarget();
@@ -67,6 +57,7 @@ public class RushingSoldier extends BaseSoldier
 
     }
 
+    @Override
     public boolean fight() throws GameActionException
     {
         if (rushing)
@@ -76,6 +67,7 @@ public class RushingSoldier extends BaseSoldier
         return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
     }
 
+    @Override
     public boolean fightZombies() throws GameActionException
     {
         return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);

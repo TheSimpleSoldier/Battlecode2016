@@ -9,27 +9,27 @@ import team037.Utilites.PartsUtilities;
 
 public class BaseScout extends Unit
 {
-    public FlyingNavigator move;
+//    public FlyingNavigator move;
 
     public BaseScout(RobotController rc)
     {
         super(rc);
-        move = new FlyingNavigator(rc);
+        navigator = new FlyingNavigator(rc);
     }
 
     public boolean takeNextStep() throws GameActionException
     {
-        return move.takeNextStep();
+        return navigator.takeNextStep();
     }
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(enemies, move.getTarget());
+        return fightMicro.avoidEnemiesInRoute(enemies, navigator.getTarget());
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(zombies, move.getTarget());
+        return fightMicro.avoidEnemiesInRoute(zombies, navigator.getTarget());
     }
 
     public boolean precondition()
