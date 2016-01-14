@@ -37,6 +37,6 @@ public class BuildOrderCreation
 
         int[] timesTurtle = {3, 1, 1, 1000};
 
-        return new BuildOrder(buildOrder, times);
+        return new BuildOrder(buildOrderTurtle, timesTurtle);
     }
 }

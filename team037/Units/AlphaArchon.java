@@ -17,6 +17,7 @@ public class AlphaArchon extends BaseArchon
     public AlphaArchon(RobotController rc)
     {
         super(rc);
+        System.out.println("Alpha archon");
         navigator.setTarget(getNextPartLocation());
     }
 

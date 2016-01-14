@@ -18,7 +18,7 @@ public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
     SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
-    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER;
+    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER, TURTLEARCHON, TURTLESOLDIER, TURTLETURRET, TURTLEGUARD;
 
     public static int toInt(Bots type)
     {
@@ -58,6 +58,14 @@ public enum Bots
                 return 15;
             case CASTLESOLDIER:
                 return 16;
+            case TURTLEARCHON:
+                return 17;
+            case TURTLEGUARD:
+                return 18;
+            case TURTLESOLDIER:
+                return 19;
+            case TURTLETURRET:
+                return 20;
         }
         return -1;
     }
@@ -100,6 +108,14 @@ public enum Bots
                 return HERDINGSCOUT;
             case 16:
                 return CASTLESOLDIER;
+            case 17:
+                return TURTLEARCHON;
+            case 18:
+                return TURTLEGUARD;
+            case 19:
+                return TURTLESOLDIER;
+            case 20:
+                return TURTLETURRET;
         }
 
         return null;
@@ -109,9 +125,11 @@ public enum Bots
     {
         switch(bot)
         {
+            case TURTLEARCHON:
             case ALPHAARCHON:
             case BASEARCHON:
                 return RobotType.ARCHON;
+            case TURTLEGUARD:
             case DENKILLERGUARD:
             case BASEGAURD:
                 return RobotType.GUARD;
@@ -121,6 +139,7 @@ public enum Bots
             case SCOUTINGSCOUT:
             case HERDINGSCOUT:
                 return RobotType.SCOUT;
+            case TURTLESOLDIER:
             case CASTLESOLDIER:
             case RUSHINGSOLDIER:
             case DENKILLERSOLDIER:
@@ -128,6 +147,7 @@ public enum Bots
                 return RobotType.SOLDIER;
             case BASETTM:
                 return RobotType.TTM;
+            case TURTLETURRET:
             case BASETURRET:
                 return RobotType.TURRET;
             case RUSHINGVIPER:
