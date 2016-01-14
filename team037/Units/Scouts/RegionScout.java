@@ -27,7 +27,6 @@ public class RegionScout extends BaseScout
 
         if (region == -1 || mapKnowledge.regionExplored(region))
             region = mapKnowledge.closestUnexploredRegion(currentLocation);
-
     }
 
     @Override
