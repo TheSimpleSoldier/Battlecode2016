@@ -13,29 +13,22 @@ public class DenKillerGuard extends BaseGaurd
         super(rc);
     }
 
-    public boolean takeNextStep() throws GameActionException
+    @Override
+    public void sendMessages() throws GameActionException
     {
-        MapLocation goal = navigator.getTarget();
-        if (goal == null || currentLocation.equals(goal) || (rc.canSenseLocation(goal) && (rc.senseRobotAtLocation(goal) == null || rc.senseRobotAtLocation(goal).team != Team.ZOMBIE || !rc.onTheMap(goal))))
+        if (mapKnowledge.denLocations.contains(currentLocation))
         {
-            // if we are standing on a den location alert all other allies that a zombie den has been destroyed
-            if (mapKnowledge.denLocations.contains(currentLocation))
-            {
-                rc.broadcastSignal(2500);
-            }
-
-            if (mapKnowledge.denLocations.hasLocations())
-            {
-                navigator.setTarget(mapKnowledge.closestDen(currentLocation));
-            }
+            mapKnowledge.denLocations.remove(currentLocation);
+            rc.broadcastSignal(2500);
         }
-        else
-        {
-//            target = rc.getLocation().add(dirs[(int) (Math.random() * 8)], 1);
-//            navigator.setTarget(target);
-        }
+    }
 
-        if (rc.getRoundNum() % 5 == 0 && goal != null)
+    @Override
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+
+        if (rc.getRoundNum() % 5 == 0)
         {
             mapKnowledge.updateDens(rc);
             if (mapKnowledge.denLocations.hasLocations())
@@ -43,7 +36,25 @@ public class DenKillerGuard extends BaseGaurd
                 navigator.setTarget(mapKnowledge.closestDen(currentLocation));
             }
         }
+    }
 
-        return navigator.takeNextStep();
+    @Override
+    public boolean updateTarget() throws GameActionException
+    {
+        MapLocation goal = navigator.getTarget();
+        if (goal == null) return true;
+        if (currentLocation.equals(goal)) return true;
+        if (rc.canSenseLocation(goal) && (rc.senseRobotAtLocation(goal) == null || rc.senseRobotAtLocation(goal).team != Team.ZOMBIE || !rc.onTheMap(goal))) return true;
+
+        return false;
+    }
+
+    @Override
+    public MapLocation getNextSpot()
+    {
+        if (mapKnowledge.denLocations.hasLocations())
+            return mapKnowledge.closestDen(currentLocation);
+
+        return null;
     }
 }
