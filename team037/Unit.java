@@ -372,10 +372,15 @@ public abstract class Unit
                     {
                         RobotInfo bot = new RobotInfo(communication.id, opponent, RobotType.ARCHON, new MapLocation(communication.x, communication.y), 0,0,0,0,0,0,0);
                         mapKnowledge.updateEnemyArchonLocation(bot, round);
-                        simpleMapKnowledge.updateArchon(new SimpleRobotInfo(communication.id,
+                        simpleMapKnowledge.addArchon(new SimpleRobotInfo(communication.id,
                                 new MapLocation(communication.x, communication.y), RobotType.ARCHON,
                                 opponent), false);
                     }
+                    break;
+                case OENEMY:
+                    SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communications[k];
+                    simpleMapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
+                            new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
             }
         }
     }

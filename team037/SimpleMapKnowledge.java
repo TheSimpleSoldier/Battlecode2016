@@ -66,7 +66,7 @@ public class SimpleMapKnowledge
         }
     }
 
-    public void updateArchon(SimpleRobotInfo archon, boolean us)
+    public void addArchon(SimpleRobotInfo archon, boolean us)
     {
         SimpleRobotInfo[] archons;
         if(us)
@@ -81,6 +81,32 @@ public class SimpleMapKnowledge
         for(int k = 0; k < 4; k++)
         {
             if(archons[k] == null || archons[k].id == archon.id)
+            {
+                archons[k] = archon;
+                return;
+            }
+        }
+    }
+
+    public void updateArchon(SimpleRobotInfo archon, boolean us)
+    {
+        SimpleRobotInfo[] archons;
+        if(us)
+        {
+            archons = ourArchons;
+        }
+        else
+        {
+            archons = theirArchons;
+        }
+
+        for(int k = 0; k < 4; k++)
+        {
+            if(archons[k] == null)
+            {
+                return;
+            }
+            if(archons[k].id == archon.id)
             {
                 archons[k] = archon;
                 return;
