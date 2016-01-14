@@ -17,14 +17,13 @@ public class AlphaArchon extends BaseArchon
     public AlphaArchon(RobotController rc)
     {
         super(rc);
-        System.out.println("Alpha archon");
         navigator.setTarget(getNextPartLocation());
     }
 
     @Override
     public boolean act() throws GameActionException {
-        if (rc.isCoreReady() && carryOutAbility()) {
-            return true;
+        if (!rc.isCoreReady()) {
+            return false;
         }
 
         if (sortedParts.contains(currentLocation))
@@ -38,7 +37,7 @@ public class AlphaArchon extends BaseArchon
         if (fight());
         else if (fightZombies());
         else if (carryOutAbility());
-        if(updateTarget()) {
+        else if (updateTarget()) {
             navigator.setTarget(getNextPartLocation());
         }
 

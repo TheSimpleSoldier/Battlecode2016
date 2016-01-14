@@ -5,6 +5,7 @@ public class Strategies {
 
     public static final String CASTLE = "castle";
     public static final String TURTLE = "turtle";
+    public static final String NORMAL = "normal";
     public static final int CASTLE_SIZE = 3;
 
 }

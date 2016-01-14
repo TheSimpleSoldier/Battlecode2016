@@ -36,15 +36,19 @@ public class TurtleArchon extends BaseArchon
     @Override
     public boolean act() throws GameActionException
     {
-        if (!rc.isCoreReady()) { // && carryOutAbility()) {
+        if (!rc.isCoreReady()) {
             return false;
         }
 
-        if (fight());
-        else if (fightZombies());
+
+
+        if (fight() || fightZombies()) rc.setIndicatorString(1, "fighting");
 //        else if (carryOutAbility());
-        if (updateTarget()) {
-            navigator.setTarget(getNextSpot());
+        else if (updateTarget()) {
+            MapLocation nxtSpot = getNextSpot();
+            if (nxtSpot != null)
+                rc.setIndicatorString(0, "Standard Update  x: " + nxtSpot.x + " y: " + nxtSpot.y);
+            navigator.setTarget(nxtSpot);
         }
 
         if (navigator.getTarget() != null)

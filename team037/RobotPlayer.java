@@ -15,6 +15,7 @@ import team037.Units.TurtleUnits.TurtleArchon;
 public class RobotPlayer
 {
     private static Unit unit;
+    public static String strategy;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -25,12 +26,12 @@ public class RobotPlayer
         // this will check your ./bc.conf file for a line like this:
         // bc.testing.strat=foo
         // and strategy will be foo
-        String strategy = System.getProperty("bc.testing.strat");
+        strategy = System.getProperty("bc.testing.strat");
         // IT DOESN'T WORK CURRENTLY :(
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.TURTLE;
+        strategy = Strategies.NORMAL;
 
 
         RobotType type = rc.getType();
@@ -42,8 +43,7 @@ public class RobotPlayer
             } else if (strategy.equals(Strategies.TURTLE)) {
                 unit = new TurtleArchon(rc);
                 Unit.thisBot = Bots.TURTLEARCHON;
-            } else {
-                //unit = new BaseArchon(rc);
+            } else { // default to alpha archons
                 unit = new AlphaArchon(rc);
                 Unit.thisBot = Bots.ALPHAARCHON;
             }

@@ -49,12 +49,27 @@ public class BaseArchon extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+        MapLocation newTarget = fightMicro.ArchonRunAway(enemies, allies);
+        if (newTarget == null) {
+            return false;
+        }
+
+        navigator.setTarget(newTarget);
+        return true;
+        //return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(zombies, nearByAllies, allies, target, nearByZombies);
+        MapLocation newTarget = fightMicro.ArchonRunAway(zombies, allies);
+        if (newTarget == null) {
+            return false;
+        }
+
+        rc.setIndicatorString(0, "x: " + newTarget.x + " y: " + newTarget.y);
+        navigator.setTarget(newTarget);
+        return true;
+        //return fightMicro.runPassiveFightMicro(zombies, nearByAllies, allies, target, nearByZombies);
     }
 
     // additional methods with default behavior
