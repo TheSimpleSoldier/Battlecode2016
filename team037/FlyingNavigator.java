@@ -7,7 +7,6 @@ public class FlyingNavigator extends Navigator
     private RobotController rc;
     private MapLocation target;
 
-
     public FlyingNavigator(RobotController rc) {
         super(rc);
         this.rc = rc;
@@ -20,7 +19,6 @@ public class FlyingNavigator extends Navigator
 
     @Override
     public void setTarget(MapLocation dest) { target = dest; }
-
 
     @Override
     public boolean takeNextStep() throws GameActionException {

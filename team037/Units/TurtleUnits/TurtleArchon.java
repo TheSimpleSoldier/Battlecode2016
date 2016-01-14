@@ -8,6 +8,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Units.BaseArchon;
+import team037.Utilites.MapUtils;
 import team037.Utilites.Utilities;
 
 public class TurtleArchon extends BaseArchon
@@ -18,22 +19,8 @@ public class TurtleArchon extends BaseArchon
     public TurtleArchon(RobotController rc)
     {
         super(rc);
-
-        int x = 0, y = 0, len = alliedArchonStartLocs.length;
-        for (int i = len; --i>=0; )
-        {
-            x += alliedArchonStartLocs[i].x;
-            y += alliedArchonStartLocs[i].y;
-        }
-        turtleSpot = new MapLocation(x/len,y/len);
+        turtleSpot = MapUtils.getTurtleSpot(alliedArchonStartLocs);
         turtleSpot = turtleSpot.add(turtleSpot.directionTo(currentLocation), 3);
-    }
-
-    // currently not used for turtle archons
-    @Override
-    public boolean carryOutAbility()
-    {
-        return false;
     }
 
     @Override

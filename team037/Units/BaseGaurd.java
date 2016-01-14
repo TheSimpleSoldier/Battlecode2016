@@ -23,7 +23,7 @@ public class BaseGaurd extends Unit
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
+        return fightMicro.basicFightMicro(nearByZombies);
         //return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
 

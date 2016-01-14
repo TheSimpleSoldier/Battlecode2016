@@ -153,4 +153,23 @@ public class MapUtils
 
         return toMove;
     }
+
+    /**
+     * This method returns the turtle location which is currently very dumb as the COM of starting allied archons
+     *
+     * @param alliedArchonStartLocs
+     * @return
+     */
+    public static MapLocation getTurtleSpot(MapLocation[] alliedArchonStartLocs)
+    {
+        int x = 0, y = 0, len = alliedArchonStartLocs.length;
+
+        for (int i = len; --i>=0; )
+        {
+            x += alliedArchonStartLocs[i].x;
+            y += alliedArchonStartLocs[i].y;
+        }
+
+        return new MapLocation(x/len,y/len);
+    }
 }
