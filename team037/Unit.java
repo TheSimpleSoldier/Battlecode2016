@@ -1,6 +1,7 @@
 package team037;
 
 import battlecode.common.*;
+import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
@@ -36,6 +37,7 @@ public abstract class Unit
     public static int round;
     public static Communication[] communications;
     public static MapKnowledge mapKnowledge = new MapKnowledge();
+    public static SimpleMapKnowledge simpleMapKnowledge = new SimpleMapKnowledge();
     public static MapLocation start;
     public static boolean repaired;
     public static int msgsSent = 0;
@@ -172,6 +174,11 @@ public abstract class Unit
                         }
                     }
 
+                    if(!simpleMapKnowledge.dens.contains(den))
+                    {
+                        simpleMapKnowledge.dens.add(den);
+                    }
+
                     break;
                 case PARTS:
                     if (type == RobotType.SCOUT || type == RobotType.ARCHON)
@@ -248,6 +255,11 @@ public abstract class Unit
                             msgsSent++;
                         }
                     }
+
+                    if(simpleMapKnowledge.dens.contains(spot))
+                    {
+                        simpleMapKnowledge.dens.remove(spot);
+                    }
                     break;
 
                 case MAP_BOUNDS:
@@ -270,6 +282,8 @@ public abstract class Unit
                             rushTarget = mapKnowledge.getOppositeCorner(start);
                         }
                     }
+
+                    simpleMapKnowledge.updateEdgesFromInts(values[1], values[2], values[3], values[4]);
                     break;
 
                 case EXPLORE_EDGE:
@@ -355,6 +369,9 @@ public abstract class Unit
                     {
                         RobotInfo bot = new RobotInfo(communication.id, opponent, RobotType.ARCHON, new MapLocation(communication.x, communication.y), 0,0,0,0,0,0,0);
                         mapKnowledge.updateEnemyArchonLocation(bot, round);
+                        simpleMapKnowledge.updateArchon(new SimpleRobotInfo(communication.id,
+                                new MapLocation(communication.x, communication.y), RobotType.ARCHON,
+                                opponent), false);
                     }
             }
         }

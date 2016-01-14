@@ -111,7 +111,7 @@ public class HerdingScout extends BaseScout
 
     private MapLocation getTargetForHerding()
     {
-        MapLocation loc = mapKnowledge.getOppositeCorner(start);
+        MapLocation loc;
         if(loc != null && currentLocation.distanceSquaredTo(loc) > 50)
         {
             return loc;
