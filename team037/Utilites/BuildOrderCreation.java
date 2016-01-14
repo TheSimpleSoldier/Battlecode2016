@@ -29,10 +29,10 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.TURTLE))
         {
             Bots[][] buildOrderTurtle = {
-                    {Bots.CASTLESOLDIER},
-                    {Bots.BASETURRET, Bots.CASTLESOLDIER},
-                    {Bots.PATROLSCOUT, Bots.BASETURRET},
-                    {Bots.CASTLESOLDIER, Bots.BASETURRET},
+                    {Bots.TURTLESOLDIER},
+                    {Bots.TURTLETURRET, Bots.TURTLEGUARD},
+                    {Bots.PATROLSCOUT, Bots.TURTLETURRET},
+                    {Bots.TURTLESOLDIER, Bots.TURTLETURRET},
             };
 
             int[] timesTurtle = {3, 1, 1, 1000};
