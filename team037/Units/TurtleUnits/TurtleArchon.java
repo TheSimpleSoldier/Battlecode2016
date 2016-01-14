@@ -19,45 +19,24 @@ public class TurtleArchon extends BaseArchon
     {
         super(rc);
 
-        System.out.println("Running turtle archon");
-
         int x = 0, y = 0, len = alliedArchonStartLocs.length;
         for (int i = len; --i>=0; )
         {
             x += alliedArchonStartLocs[i].x;
             y += alliedArchonStartLocs[i].y;
         }
-
-        System.out.println("Turtle Spot: " + x/len + " y: " + y/len);
         turtleSpot = new MapLocation(x/len,y/len);
         turtleSpot = turtleSpot.add(turtleSpot.directionTo(currentLocation), 3);
     }
 
+    // currently not used for turtle archons
     @Override
-    public boolean act() throws GameActionException
+    public boolean carryOutAbility()
     {
-        if (!rc.isCoreReady()) {
-            return false;
-        }
-
-
-
-        if (fight() || fightZombies()) rc.setIndicatorString(1, "fighting");
-//        else if (carryOutAbility());
-        else if (updateTarget()) {
-            MapLocation nxtSpot = getNextSpot();
-            if (nxtSpot != null)
-                rc.setIndicatorString(0, "Standard Update  x: " + nxtSpot.x + " y: " + nxtSpot.y);
-            navigator.setTarget(nxtSpot);
-        }
-
-        if (navigator.getTarget() != null)
-            return navigator.takeNextStep();
-
         return false;
     }
 
-
+    @Override
     public boolean updateTarget() throws GameActionException
     {
         MapLocation target = navigator.getTarget();
@@ -70,7 +49,8 @@ public class TurtleArchon extends BaseArchon
         return false;
     }
 
-    public MapLocation getNextSpot()
+    @Override
+    public MapLocation getNextSpot() throws GameActionException
     {
         if (currentLocation.distanceSquaredTo(turtleSpot) > 2)
         {

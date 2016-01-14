@@ -17,29 +17,16 @@ public class TurtleSoldier extends BaseSoldier
     }
 
     @Override
-    public boolean act() throws GameActionException
-    {
-        if (rc.isCoreReady() && carryOutAbility()) {
-            return true;
-        }
-
-        if (fight());
-        else if (fightZombies());
-        else if (carryOutAbility());
-        if(updateTarget()) {
-            navigator.setTarget(getNextSpot());
-        }
-
-        return navigator.takeNextStep();
-    }
-
     public boolean updateTarget()
     {
+        // TODO: Implement this
         return false;
     }
 
+    @Override
     public MapLocation getNextSpot()
     {
+        // TODO: Implement this
         return null;
     }
 }

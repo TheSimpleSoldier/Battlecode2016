@@ -79,13 +79,33 @@ public abstract class Unit
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
     }
 
-    public boolean act() throws GameActionException {
+    public boolean act() throws GameActionException
+    {
+        if (precondition()) return false;
+
         if (aidDistressedArchon());
         else if (fight() || fightZombies());
         else if (carryOutAbility());
-        else if (takeNextStep());
+        else if (updateTarget()) {
+            navigator.setTarget(getNextSpot());
+        }
 
-        return true;
+        return navigator.takeNextStep();
+    }
+
+    public boolean updateTarget() throws GameActionException
+    {
+        return false;
+    }
+
+    public MapLocation getNextSpot() throws GameActionException
+    {
+        return null;
+    }
+
+    public boolean precondition()
+    {
+        return false;
     }
 
     public boolean aidDistressedArchon() throws GameActionException

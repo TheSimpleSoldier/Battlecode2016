@@ -9,6 +9,10 @@ import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.Rushers.RushingSoldier;
 import team037.Units.Rushers.RushingViper;
+import team037.Units.TurtleUnits.TurtleArchon;
+import team037.Units.TurtleUnits.TurtleGuard;
+import team037.Units.TurtleUnits.TurtleSoldier;
+import team037.Units.TurtleUnits.TurtleTurret;
 
 /**
  * Created by joshua on 1/5/16.
@@ -195,6 +199,14 @@ public enum Bots
                 return new HerdingScout(rc);
             case CASTLESOLDIER:
                 return new CastleSoldier(rc);
+            case TURTLEARCHON:
+                return new TurtleArchon(rc);
+            case TURTLEGUARD:
+                return new TurtleGuard(rc);
+            case TURTLESOLDIER:
+                return new TurtleSoldier(rc);
+            case TURTLETURRET:
+                return new TurtleTurret(rc);
         }
 
         return null;

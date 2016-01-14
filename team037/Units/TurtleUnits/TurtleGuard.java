@@ -11,35 +11,22 @@ import team037.Utilites.Utilities;
 
 public class TurtleGuard extends BaseGaurd
 {
+    MapLocation turtlePoint;
+
     public TurtleGuard(RobotController rc)
     {
         super(rc);
     }
 
-    @Override
-    public boolean act() throws GameActionException
-    {
-        if (rc.isCoreReady() && carryOutAbility()) {
-            return true;
-        }
-
-        if (fight());
-        else if (fightZombies());
-        else if (carryOutAbility());
-        if(updateTarget()) {
-            navigator.setTarget(getNextSpot());
-        }
-
-        return navigator.takeNextStep();
-    }
-
     public boolean updateTarget()
     {
+        // TODO: Implement this
         return false;
     }
 
     public MapLocation getNextSpot()
     {
+        // TODO: Implement this
         return null;
     }
 }

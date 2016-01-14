@@ -30,6 +30,11 @@ public class BaseArchon extends Unit
         nextType = Bots.typeFromBot(nextBot);
     }
 
+    public boolean precondition()
+    {
+        return !rc.isCoreReady();
+    }
+
     public boolean takeNextStep() throws GameActionException
     {
         return navigator.takeNextStep();
@@ -56,7 +61,6 @@ public class BaseArchon extends Unit
 
         navigator.setTarget(newTarget);
         return true;
-        //return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
     public boolean fightZombies() throws GameActionException
@@ -66,10 +70,8 @@ public class BaseArchon extends Unit
             return false;
         }
 
-        rc.setIndicatorString(0, "x: " + newTarget.x + " y: " + newTarget.y);
         navigator.setTarget(newTarget);
         return true;
-        //return fightMicro.runPassiveFightMicro(zombies, nearByAllies, allies, target, nearByZombies);
     }
 
     // additional methods with default behavior
