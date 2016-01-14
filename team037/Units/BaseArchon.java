@@ -20,6 +20,7 @@ public class BaseArchon extends Unit
     private int rushingUnits = 0;
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
+    private int retreatCall = 0;
 
     public BaseArchon(RobotController rc)
     {
@@ -77,8 +78,9 @@ public class BaseArchon extends Unit
 
         offennsiveEnemies += zombies.length;
 
-        if (offennsiveEnemies > allies.length)
+        if (offennsiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25)
         {
+            retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
             communicator.sendCommunication(400, distressCall);
