@@ -28,6 +28,15 @@ public class BuildOrderCreation
         };
         int[] times2 = {10000};
 
+        Bots[][] buildOrderTurtle = {
+                {Bots.CASTLESOLDIER},
+                {Bots.BASETURRET, Bots.CASTLESOLDIER},
+                {Bots.PATROLSCOUT, Bots.BASETURRET},
+                {Bots.CASTLESOLDIER, Bots.BASETURRET},
+        };
+
+        int[] timesTurtle = {3, 1, 1, 1000};
+
         return new BuildOrder(buildOrder, times);
     }
 }
