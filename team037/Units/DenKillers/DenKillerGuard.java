@@ -4,7 +4,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
-import team037.Units.BaseGaurd;
+import team037.Units.BaseUnits.BaseGaurd;
 
 public class DenKillerGuard extends BaseGaurd
 {

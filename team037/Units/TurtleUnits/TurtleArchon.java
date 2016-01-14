@@ -4,11 +4,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
-import team037.Enums.CommunicationType;
-import team037.Messages.BotInfoCommunication;
-import team037.Messages.Communication;
-import team037.Units.BaseArchon;
-import team037.Utilites.Utilities;
+import team037.Units.BaseUnits.BaseArchon;
 
 public class TurtleArchon extends BaseArchon
 {

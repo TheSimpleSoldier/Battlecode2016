@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
@@ -9,7 +9,7 @@ import team037.Utilites.PartsUtilities;
 
 public class BaseScout extends Unit
 {
-    FlyingNavigator move;
+    public FlyingNavigator move;
 
     public BaseScout(RobotController rc)
     {
@@ -32,15 +32,14 @@ public class BaseScout extends Unit
         return fightMicro.avoidEnemiesInRoute(zombies, move.getTarget());
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady();
     }
 
     @Override
     public void sendMessages() throws GameActionException
     {
-        int bytecodes = Clock.getBytecodeNum();
         msgArchons();
         msgTurrets();
         msgParts();

@@ -1,8 +1,9 @@
-package team037.Units;
+package team037.Units.Scouts;
 
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import team037.Units.BaseUnits.BaseScout;
 
 public class PatrolScout extends BaseScout
 {

@@ -1,7 +1,7 @@
 package team037.Units.Rushers;
 
 import battlecode.common.*;
-import team037.Units.BaseViper;
+import team037.Units.BaseUnits.BaseViper;
 
 public class RushingViper extends BaseViper
 {

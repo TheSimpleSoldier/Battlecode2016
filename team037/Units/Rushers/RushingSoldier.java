@@ -1,7 +1,7 @@
 package team037.Units.Rushers;
 
 import battlecode.common.*;
-import team037.Units.BaseSoldier;
+import team037.Units.BaseUnits.BaseSoldier;
 
 public class RushingSoldier extends BaseSoldier
 {

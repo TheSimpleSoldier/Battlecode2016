@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.Scouts;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -8,6 +8,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.EdgeDiscovered;
 import team037.Messages.ExploringMapEdge;
+import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.MapUtils;
 
 public class ScoutingScout extends BaseScout {

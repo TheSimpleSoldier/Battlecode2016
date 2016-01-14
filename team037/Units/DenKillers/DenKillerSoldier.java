@@ -5,7 +5,7 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.Enums.Bots;
-import team037.Units.BaseSoldier;
+import team037.Units.BaseUnits.BaseSoldier;
 
 public class DenKillerSoldier extends BaseSoldier
 {

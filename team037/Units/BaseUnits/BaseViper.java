@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Unit;
@@ -25,8 +25,8 @@ public class BaseViper extends Unit
         return fightMicro.basicFightMicro(nearByZombies);
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady() && !rc.isWeaponReady();
     }
 }

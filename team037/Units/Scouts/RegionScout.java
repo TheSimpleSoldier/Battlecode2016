@@ -1,7 +1,8 @@
-package team037.Units;
+package team037.Units.Scouts;
 
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
+import team037.Units.BaseUnits.BaseScout;
 
 public class RegionScout extends BaseScout
 {
