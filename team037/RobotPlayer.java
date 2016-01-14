@@ -126,7 +126,6 @@ public class RobotPlayer
                 e.printStackTrace();
             }
 
-            Unit.repaired = false;
             Clock.yield();
         }
     }
