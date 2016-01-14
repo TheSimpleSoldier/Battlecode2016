@@ -1,9 +1,7 @@
 package team037.Units.TurtleUnits;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.Team;
+import battlecode.common.*;
+import team037.Enums.Bots;
 import team037.Units.BaseUnits.BaseArchon;
 
 public class TurtleArchon extends BaseArchon
@@ -58,5 +56,16 @@ public class TurtleArchon extends BaseArchon
         }
 
         return sortedParts.getBestSpot(currentLocation);
+    }
+
+    @Override
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        while (nearByAllies.length > 10 && nextType == RobotType.SOLDIER && nextBot == Bots.CASTLESOLDIER)
+        {
+            nextBot = buildOrder.nextBot();
+            nextType = Bots.typeFromBot(nextBot);
+        }
+        return nextBot;
     }
 }
