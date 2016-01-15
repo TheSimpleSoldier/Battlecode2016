@@ -7,6 +7,8 @@ import team037.Units.*;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.PacMan.PacManArchon;
+import team037.Units.PacMan.PacManScout;
 import team037.Units.Rushers.RushingSoldier;
 import team037.Units.Rushers.RushingViper;
 
@@ -18,7 +20,7 @@ public enum Bots
 {
     BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
     SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
-    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER;
+    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER, PACMANARCHON, PACMANSCOUT;
 
     public static int toInt(Bots type)
     {
@@ -58,6 +60,10 @@ public enum Bots
                 return 15;
             case CASTLESOLDIER:
                 return 16;
+            case PACMANARCHON:
+                return 17;
+            case PACMANSCOUT:
+                return 18;
         }
         return -1;
     }
@@ -100,6 +106,10 @@ public enum Bots
                 return HERDINGSCOUT;
             case 16:
                 return CASTLESOLDIER;
+            case 17:
+                return PACMANARCHON;
+            case 18:
+                return PACMANSCOUT;
         }
 
         return null;
@@ -111,6 +121,7 @@ public enum Bots
         {
             case ALPHAARCHON:
             case BASEARCHON:
+            case PACMANARCHON:
                 return RobotType.ARCHON;
             case DENKILLERGUARD:
             case BASEGAURD:
@@ -120,6 +131,7 @@ public enum Bots
             case BASESCOUT:
             case SCOUTINGSCOUT:
             case HERDINGSCOUT:
+            case PACMANSCOUT:
                 return RobotType.SCOUT;
             case CASTLESOLDIER:
             case RUSHINGSOLDIER:
@@ -175,6 +187,10 @@ public enum Bots
                 return new HerdingScout(rc);
             case CASTLESOLDIER:
                 return new CastleSoldier(rc);
+            case PACMANARCHON:
+                return new PacManArchon(rc);
+            case PACMANSCOUT:
+                return new PacManScout(rc);
         }
 
         return null;

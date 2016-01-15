@@ -10,6 +10,7 @@ import team037.Units.CastleUnits.CastleArchon;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.PacMan.PacManArchon;
 
 public class RobotPlayer
 {
@@ -29,7 +30,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = "normal";
+        strategy = "pacman";
 
 
         RobotType type = rc.getType();
@@ -38,6 +39,9 @@ public class RobotPlayer
         {
             if (strategy.equals(Strategies.CASTLE)) {
                 unit = new CastleArchon(rc);
+            } else if (strategy.equals("pacman")) {
+                unit = new PacManArchon(rc);
+                Unit.thisBot = Bots.PACMANARCHON;
             } else {
                 //unit = new BaseArchon(rc);
                 unit = new AlphaArchon(rc);
