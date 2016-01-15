@@ -141,7 +141,12 @@ public class BaseScout extends Unit
                 {
                     // create neutral bot msg
                     Communication communication = new PartsCommunication();
-                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), bot.type.partCost, spot.x, spot.y});
+                    int parts = bot.type.partCost;
+                    if (bot.type == RobotType.ARCHON)
+                    {
+                        parts = 1000;
+                    }
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), parts, spot.x, spot.y});
                     communicator.sendCommunication(dist, communication);
                     msgsSent++;
                 }
