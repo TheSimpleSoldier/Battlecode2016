@@ -37,7 +37,7 @@ public class MapKnowledge
         int width = maxX - minX;
         int height = maxY - minY;
 
-        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height});
+        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX + MAP_ADD, width, minY + MAP_ADD, height});
         return communication;
     }
 
@@ -81,6 +81,12 @@ public class MapKnowledge
         {
             this.maxY = minY + height;
         }
+    }
+
+    public void updateEdgesFromMessage(Communication communication)
+    {
+        int[] values = communication.getValues();
+        updateEdgesFromInts(values[1] - MAP_ADD, values[3] - MAP_ADD, values[2], values[4]);
     }
 
     public void senseAndUpdateEdges() throws GameActionException

@@ -38,7 +38,7 @@ public abstract class Unit
     public static int id;
     public static int round;
     public static Communication[] communications;
-    public static MapKnowledge mapKnowledge = new ScoutMapKnowledge();
+    public static MapKnowledge mapKnowledge = new MapKnowledge();
     public static MapLocation start;
     public static boolean repaired;
     public static int msgsSent = 0;
@@ -278,9 +278,7 @@ public abstract class Unit
                     break;
 
                 case MAP_BOUNDS:
-                    values = communications[k].getValues();
-
-                    mapKnowledge.updateEdgesFromInts(values[1], values[3], values[1] + values[2], values[3] + values[4]);
+                    mapKnowledge.updateEdgesFromMessage(communications[k]);
                     if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
                         if (msgsSent < 20)

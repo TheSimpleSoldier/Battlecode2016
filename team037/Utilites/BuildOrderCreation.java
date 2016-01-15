@@ -43,7 +43,7 @@ public class BuildOrderCreation
 
         // This is the default strategy
         Bots[][] buildOrder = {
-                {Bots.HERDINGSCOUT, Bots.DENKILLERSOLDIER},
+                {Bots.SCOUTINGSCOUT, Bots.DENKILLERSOLDIER},
                 {Bots.DENKILLERSOLDIER, Bots.CASTLESOLDIER},
                 {Bots.DENKILLERSOLDIER, Bots.HERDINGSCOUT},
                 {Bots.SCOUTINGSCOUT, Bots.DENKILLERSOLDIER},

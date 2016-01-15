@@ -40,19 +40,6 @@ public class BaseScout extends Unit
     }
 
     @Override
-    public void handleMessages() throws GameActionException
-    {
-        super.handleMessages();
-        for(int k = 0; k < communications.length; k++)
-        {
-            switch(communications[k].opcode)
-            {
-
-            }
-        }
-    }
-
-    @Override
     public void sendMessages() throws GameActionException
     {
         msgArchons();
