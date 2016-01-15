@@ -33,7 +33,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.NORMAL;
+        strategy = Strategies.TURRET_RUSH;
 
 
         RobotType type = rc.getType();

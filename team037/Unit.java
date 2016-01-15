@@ -91,7 +91,7 @@ public abstract class Unit
             navigator.setTarget(getNextSpot());
         }
 
-        return navigator.takeNextStep();
+        return takeNextStep();
     }
 
     public boolean updateTarget() throws GameActionException
@@ -278,19 +278,19 @@ public abstract class Unit
                     break;
 
                 case MAP_BOUNDS:
-                    mapKnowledge.updateEdgesFromMessage(communications[k]);
-                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
-                    {
-                        if (msgsSent < 20)
-                        {
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
-                    }
-                    else if (type == RobotType.VIPER)
-                    {
-                        rushTarget = mapKnowledge.getOppositeCorner(start);
-                    }
+//                    mapKnowledge.updateEdgesFromMessage(communications[k]);
+//                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+//                    {
+//                        if (msgsSent < 20)
+//                        {
+//                            communicator.sendCommunication(dist, communications[k]);
+//                            msgsSent++;
+//                        }
+//                    }
+//                    else if (type == RobotType.VIPER)
+//                    {
+//                        rushTarget = mapKnowledge.getOppositeCorner(start);
+//                    }
 
                     break;
 
