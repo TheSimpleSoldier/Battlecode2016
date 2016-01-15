@@ -173,7 +173,7 @@ public class MapUtils
         return new MapLocation(x/len,y/len);
     }
 
-    
+
     public static MapLocation getCenterOfMass(MapLocation[] locations)
     {
         int x = 0;

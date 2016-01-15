@@ -1,11 +1,7 @@
 package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
-import team037.Enums.CommunicationType;
-import team037.Messages.BotInfoCommunication;
-import team037.Messages.Communication;
 import team037.Utilites.MapUtils;
-import team037.Utilites.Utilities;
 import team037.Units.BaseUnits.BaseGaurd;
 
 public class TurtleGuard extends BaseGaurd
@@ -28,7 +24,7 @@ public class TurtleGuard extends BaseGaurd
         MapLocation target = navigator.getTarget();
         if (zombies.length > 0) return true;
         if (target == null) return true;
-        if (currentLocation.equals(target) && (rc.getRoundNum() - turnsArrivedLoc) > 10) return true;
+        if ((currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) && (rc.getRoundNum() - turnsArrivedLoc) > 10) return true;
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
         if (rc.getHealth() <= 25) return true;
 
@@ -39,9 +35,8 @@ public class TurtleGuard extends BaseGaurd
     public boolean carryOutAbility() throws GameActionException
     {
         if (!rc.isCoreReady()) return false;
-        if (!currentLocation.equals(navigator.getTarget())) return false;
+        if (!currentLocation.equals(navigator.getTarget()) && !currentLocation.isAdjacentTo(navigator.getTarget())) return false;
         if (zombies.length > 0) return false;
-
 
         for (int i = dirs.length; --i>=0; )
         {
@@ -64,7 +59,6 @@ public class TurtleGuard extends BaseGaurd
             return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
         }
 
-
         if (zombies.length > 0)
         {
             chasingZombies = true;
@@ -82,7 +76,8 @@ public class TurtleGuard extends BaseGaurd
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
 
-            if (possible.distanceSquaredTo(turtlePoint) <= 49 && possible.distanceSquaredTo(turtlePoint) > 10)
+            int dist = possible.distanceSquaredTo(turtlePoint);
+            if (dist <= 49 && dist > 5)
             {
                 arrived = false;
                 return possible;

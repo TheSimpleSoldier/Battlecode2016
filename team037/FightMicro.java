@@ -700,6 +700,8 @@ public class FightMicro
             MapLocation spot = zombies[i].location;
             x += spot.x;
             y += spot.y;
+
+
         }
 
         enemyCOM = new MapLocation(x / len, y / len);
@@ -716,7 +718,7 @@ public class FightMicro
 
             for (int j = zombies.length; --j >=0; )
             {
-                if (zombies[i].location.distanceSquaredTo(newLoc) <= zombies[i].type.attackRadiusSquared)
+                if (zombies[j].location.distanceSquaredTo(newLoc) <= zombies[j].type.attackRadiusSquared)
                 {
                     safe = false;
                     break;
@@ -735,11 +737,12 @@ public class FightMicro
         }
 
         // don't turn into zombie so flee if you have low health
-        if (rc.getHealth() <= 25 && rc.isCoreReady())
+        if (rc.getHealth() <= 50 && rc.isCoreReady())
         {
             if (fleeDir != null)
             {
                 rc.move(fleeDir);
+                return true;
             }
         }
 
@@ -760,11 +763,11 @@ public class FightMicro
             if (fleeDir != null)
             {
                 rc.move(fleeDir);
+                return true;
             }
         }
 
         // if we are outranged then rush them!!!
-
         if (rc.isCoreReady())
         {
             boolean outRanged = false;
@@ -807,9 +810,10 @@ public class FightMicro
             if (outRanged || alliesEngaged)
             {
                 FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), false);
+                return true;
             }
         }
 
-        return false;
+        return true;
     }
 }
