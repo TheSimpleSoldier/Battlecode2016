@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
@@ -12,13 +12,15 @@ import team037.Utilites.BuildOrderCreation;
 
 public class BaseArchon extends Unit
 {
-    private BuildOrder buildOrder;
-    Bots nextBot;
-    RobotType nextType;
-    RobotInfo[] neutralBots;
+    public BuildOrder buildOrder;
+    public static Bots nextBot;
+    public static RobotType nextType;
+    public static RobotInfo[] neutralBots;
     public static SortedParts sortedParts = new SortedParts();
     private int rushingUnits = 0;
     private boolean sentRushSignal = false;
+    private int turnHealed = 0;
+    private int retreatCall = 0;
 
     public BaseArchon(RobotController rc)
     {
@@ -26,6 +28,11 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
+    }
+
+    public boolean precondition()
+    {
+        return !rc.isCoreReady();
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -47,12 +54,24 @@ public class BaseArchon extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+        MapLocation newTarget = fightMicro.ArchonRunAway(enemies, allies);
+        if (newTarget == null) {
+            return false;
+        }
+
+        navigator.setTarget(newTarget);
+        return true;
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(zombies, nearByAllies, allies, target, nearByZombies);
+        MapLocation newTarget = fightMicro.ArchonRunAway(zombies, allies);
+        if (newTarget == null) {
+            return false;
+        }
+
+        navigator.setTarget(newTarget);
+        return true;
     }
 
     // additional methods with default behavior
@@ -76,8 +95,9 @@ public class BaseArchon extends Unit
 
         offennsiveEnemies += zombies.length;
 
-        if (offennsiveEnemies > allies.length)
+        if (offennsiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25)
         {
+            retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
             communicator.sendCommunication(400, distressCall);
@@ -86,7 +106,7 @@ public class BaseArchon extends Unit
 
     public boolean healNearbyAllies() throws GameActionException {
         // precondition
-        if (nearByAllies.length == 0 || !repaired) {
+        if (nearByAllies.length == 0 || turnHealed == rc.getRoundNum()) {
             return false;
         }
 
@@ -106,12 +126,16 @@ public class BaseArchon extends Unit
             }
         }
 
-        if (weakest != null)
+        try
         {
-            rc.repair(weakest.location);
-            repaired = true;
-            return true;
-        }
+            if (weakest != null)
+            {
+                rc.repair(weakest.location);
+                turnHealed = rc.getRoundNum();
+                return true;
+            }
+        } catch (Exception e) {e.printStackTrace();}
+
         return false;
     }
 
@@ -196,11 +220,7 @@ public class BaseArchon extends Unit
 
     private boolean build(Direction dir) throws GameActionException
     {
-        while (nearByAllies.length > 10 && nextType == RobotType.SOLDIER && nextBot == Bots.CASTLESOLDIER)
-        {
-            nextBot = buildOrder.nextBot();
-            nextType = Bots.typeFromBot(nextBot);
-        }
+        nextBot = changeBuildOrder(nextBot);
 
         if (rc.canBuild(dir, nextType))
         {
@@ -264,5 +284,10 @@ public class BaseArchon extends Unit
         }
 
         return false;
+    }
+
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        return nextBot;
     }
 }

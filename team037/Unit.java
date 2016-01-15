@@ -7,8 +7,8 @@ import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
-import team037.Units.BaseArchon;
-import team037.Units.ScoutingScout;
+import team037.Units.BaseUnits.BaseArchon;
+import team037.Units.Scouts.ScoutingScout;
 
 public abstract class Unit
 {
@@ -25,6 +25,8 @@ public abstract class Unit
     public static RobotInfo[] allies;
     public static RobotInfo[] nearByZombies;
     public static RobotInfo[] zombies;
+    public static MapLocation[] enemyArchonStartLocs;
+    public static MapLocation[] alliedArchonStartLocs;
     public static MapLocation target;
     public static Direction[] dirs;
     public static FightMicro fightMicro;
@@ -73,16 +75,37 @@ public abstract class Unit
         currentLocation = locationLastTurn;
         start = rc.getLocation();
         repaired = false;
-
+        alliedArchonStartLocs = rc.getInitialArchonLocations(us);
+        enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
     }
 
-    public boolean act() throws GameActionException {
+    public boolean act() throws GameActionException
+    {
+        if (precondition()) return false;
+
         if (aidDistressedArchon());
         else if (fight() || fightZombies());
         else if (carryOutAbility());
-        else if (takeNextStep());
+        else if (updateTarget()) {
+            navigator.setTarget(getNextSpot());
+        }
 
-        return true;
+        return navigator.takeNextStep();
+    }
+
+    public boolean updateTarget() throws GameActionException
+    {
+        return false;
+    }
+
+    public MapLocation getNextSpot() throws GameActionException
+    {
+        return null;
+    }
+
+    public boolean precondition()
+    {
+        return false;
     }
 
     public boolean aidDistressedArchon() throws GameActionException
@@ -252,7 +275,6 @@ public abstract class Unit
 
                 case MAP_BOUNDS:
                     values = communications[k].getValues();
-
 //                    rc.setIndicatorString(1, "xMin: " + values[1] + " yMin: " + values[3] + " width: " + values[2] + " height: " + values[4]);
 
                     if (mapKnowledge.updateEdges(values[1], values[3], values[1] + values[2], values[3] + values[4]))
@@ -370,8 +392,8 @@ public abstract class Unit
         if(nextBot != null && nextBot != thisBot)
         {
             Unit toReturn = Bots.returnUnit(nextBot, rc);
-            toReturn.thisBot = nextBot;
-            toReturn.nextBot = null;
+            Unit.thisBot = nextBot;
+            Unit.nextBot = null;
             return toReturn;
         }
 

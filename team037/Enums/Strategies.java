@@ -4,7 +4,9 @@ package team037.Enums;
 public class Strategies {
 
     public static final String CASTLE = "castle";
+    public static final String TURTLE = "turtle";
+    public static final String NORMAL = "normal";
     public static final String PACMAN = "pacman";
-    public static final int CASTLE_SIZE = 2;
+    public static final int CASTLE_SIZE = 3;
 
 }

@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Messages.Communication;
@@ -28,8 +28,8 @@ public class BaseTurret extends Unit
         return false;
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady() && !rc.isWeaponReady();
     }
 }

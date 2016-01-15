@@ -4,7 +4,7 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
-import team037.Units.HerdingScout;
+import team037.Units.Scouts.HerdingScout;
 
 /**
  * PacManArchon runs away. PacManScout escorts PacManArchon.
@@ -29,7 +29,7 @@ public class PacManScout extends HerdingScout {
         MapLocation loc = mapKnowledge.closestDen(currentLocation);
         if(loc == null)
         {
-            loc = currentLocation.add(currentLocation.directionTo(getTargetForHerding()), 5);
+//            loc = currentLocation.add(currentLocation.directionTo(getTargetForHerding()), 5);
         }
         return loc;
     }
