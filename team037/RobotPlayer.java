@@ -7,14 +7,17 @@ import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.*;
+import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleArchon;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.TurtleUnits.TurtleArchon;
 
 public class RobotPlayer
 {
     private static Unit unit;
+    public static String strategy;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -25,12 +28,12 @@ public class RobotPlayer
         // this will check your ./bc.conf file for a line like this:
         // bc.testing.strat=foo
         // and strategy will be foo
-        String strategy = System.getProperty("bc.testing.strat");
+        strategy = System.getProperty("bc.testing.strat");
         // IT DOESN'T WORK CURRENTLY :(
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = "normal";
+        strategy = Strategies.NORMAL;
 
 
         RobotType type = rc.getType();
@@ -39,8 +42,10 @@ public class RobotPlayer
         {
             if (strategy.equals(Strategies.CASTLE)) {
                 unit = new CastleArchon(rc);
-            } else {
-                //unit = new BaseArchon(rc);
+            } else if (strategy.equals(Strategies.TURTLE)) {
+                unit = new TurtleArchon(rc);
+                Unit.thisBot = Bots.TURTLEARCHON;
+            } else { // default to alpha archons
                 unit = new AlphaArchon(rc);
                 Unit.thisBot = Bots.ALPHAARCHON;
             }

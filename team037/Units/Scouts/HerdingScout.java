@@ -1,10 +1,11 @@
-package team037.Units;
+package team037.Units.Scouts;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import team037.Utilites.MapUtils;
+import team037.Units.BaseUnits.BaseScout;
 
 public class HerdingScout extends BaseScout
 {
@@ -33,14 +34,14 @@ public class HerdingScout extends BaseScout
             {
                 herding = true;
                 target = getTargetForHerding();
-                move.setTarget(target);
+                navigator.setTarget(target);
             }
         }
 
         if(herding)
         {
             target = getTargetForHerding();
-            move.setTarget(target);
+            navigator.setTarget(target);
             if(target == null || !rc.isCoreReady() || currentLocation.equals(target) || zombies.length == 0)
             {
                 return false;
@@ -69,9 +70,9 @@ public class HerdingScout extends BaseScout
             //We are on the wrong side!
             if(dirCenter == dir || dirCenter.rotateLeft() == dir || dirCenter.rotateRight() == dir)
             {
-                move.setTarget(currentLocation.add(dir.rotateRight(), 10));
-                move.takeNextStep();
-                move.setTarget(target);
+                navigator.setTarget(currentLocation.add(dir.rotateRight(), 10));
+                navigator.takeNextStep();
+                navigator.setTarget(target);
                 return true;
             }
             else
@@ -79,7 +80,7 @@ public class HerdingScout extends BaseScout
                 //time to move
                 if(dist < minDist)
                 {
-                    return move.takeNextStep();
+                    return navigator.takeNextStep();
                 }
                 else
                 {

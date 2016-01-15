@@ -8,8 +8,8 @@ import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
-import team037.Units.BaseArchon;
-import team037.Units.ScoutingScout;
+import team037.Units.BaseUnits.BaseArchon;
+import team037.Units.Scouts.ScoutingScout;
 
 public abstract class Unit
 {
@@ -80,13 +80,33 @@ public abstract class Unit
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
     }
 
-    public boolean act() throws GameActionException {
+    public boolean act() throws GameActionException
+    {
+        if (precondition()) return false;
+
         if (aidDistressedArchon());
         else if (fight() || fightZombies());
         else if (carryOutAbility());
-        else if (takeNextStep());
+        else if (updateTarget()) {
+            navigator.setTarget(getNextSpot());
+        }
 
-        return true;
+        return navigator.takeNextStep();
+    }
+
+    public boolean updateTarget() throws GameActionException
+    {
+        return false;
+    }
+
+    public MapLocation getNextSpot() throws GameActionException
+    {
+        return null;
+    }
+
+    public boolean precondition()
+    {
+        return false;
     }
 
     public boolean aidDistressedArchon() throws GameActionException
@@ -385,8 +405,8 @@ public abstract class Unit
         if(nextBot != null && nextBot != thisBot)
         {
             Unit toReturn = Bots.returnUnit(nextBot, rc);
-            toReturn.thisBot = nextBot;
-            toReturn.nextBot = null;
+            Unit.thisBot = nextBot;
+            Unit.nextBot = null;
             return toReturn;
         }
 

@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
@@ -10,34 +10,33 @@ import team037.Utilites.PartsUtilities;
 
 public class BaseScout extends Unit
 {
-    FlyingNavigator move;
-    ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
+    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
 
     public BaseScout(RobotController rc)
     {
         super(rc);
-        move = new FlyingNavigator(rc);
         mapKnowledge = mKnowledge;
+        navigator = new FlyingNavigator(rc);
     }
 
     public boolean takeNextStep() throws GameActionException
     {
-        return move.takeNextStep();
+        return navigator.takeNextStep();
     }
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(enemies, move.getTarget());
+        return fightMicro.avoidEnemiesInRoute(enemies, navigator.getTarget());
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(zombies, move.getTarget());
+        return fightMicro.avoidEnemiesInRoute(zombies, navigator.getTarget());
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady();
     }
 
     @Override
@@ -56,7 +55,6 @@ public class BaseScout extends Unit
     @Override
     public void sendMessages() throws GameActionException
     {
-        int bytecodes = Clock.getBytecodeNum();
         msgArchons();
         msgTurrets();
         msgParts();

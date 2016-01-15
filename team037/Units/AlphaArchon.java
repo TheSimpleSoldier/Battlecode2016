@@ -3,12 +3,10 @@ package team037.Units;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import battlecode.common.Team;
-import team037.DataStructures.AppendOnlyMapLocationArray;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
-import team037.Utilites.PartsUtilities;
+import team037.Units.BaseUnits.BaseArchon;
 import team037.Utilites.Utilities;
 
 public class AlphaArchon extends BaseArchon
@@ -21,36 +19,7 @@ public class AlphaArchon extends BaseArchon
     }
 
     @Override
-    public boolean act() throws GameActionException {
-        if (rc.isCoreReady() && carryOutAbility()) {
-            return true;
-        }
-
-        if (sortedParts.contains(currentLocation))
-        {
-            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
-            Communication communication = new BotInfoCommunication();
-                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
-                communicator.sendCommunication(400, communication);
-        }
-
-        if (fight());
-        else if (fightZombies());
-        else if (carryOutAbility());
-        if(updateTarget()) {
-            navigator.setTarget(getNextPartLocation());
-        }
-
-        return navigator.takeNextStep();
-    }
-
-    /**
-     * This method determines if we should update our target or not
-     *
-     * @return
-     * @throws GameActionException
-     */
-    private boolean updateTarget() throws GameActionException
+    public boolean updateTarget() throws GameActionException
     {
         MapLocation currentTarget = navigator.getTarget();
         if (currentTarget == null)
@@ -68,5 +37,25 @@ public class AlphaArchon extends BaseArchon
             return true;
 
         return false;
+    }
+
+    @Override
+    public MapLocation getNextSpot() throws GameActionException
+    {
+        return getNextPartLocation();
+    }
+
+    @Override
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+
+        if (sortedParts.contains(currentLocation))
+        {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
+            Communication communication = new BotInfoCommunication();
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+            communicator.sendCommunication(400, communication);
+        }
     }
 }

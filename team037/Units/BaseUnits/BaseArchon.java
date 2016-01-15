@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
@@ -14,10 +14,10 @@ import team037.Utilites.MapUtils;
 
 public class BaseArchon extends Unit
 {
-    private BuildOrder buildOrder;
-    Bots nextBot;
-    RobotType nextType;
-    RobotInfo[] neutralBots;
+    public BuildOrder buildOrder;
+    public static Bots nextBot;
+    public static RobotType nextType;
+    public static RobotInfo[] neutralBots;
     public static SortedParts sortedParts = new SortedParts();
     private int rushingUnits = 0;
     private boolean sentRushSignal = false;
@@ -32,6 +32,11 @@ public class BaseArchon extends Unit
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
         mapKnowledge = mKnowledge;
+    }
+
+    public boolean precondition()
+    {
+        return !rc.isCoreReady();
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -53,12 +58,24 @@ public class BaseArchon extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
+        MapLocation newTarget = fightMicro.ArchonRunAway(enemies, allies);
+        if (newTarget == null) {
+            return false;
+        }
+
+        navigator.setTarget(newTarget);
+        return true;
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.runPassiveFightMicro(zombies, nearByAllies, allies, target, nearByZombies);
+        MapLocation newTarget = fightMicro.ArchonRunAway(zombies, allies);
+        if (newTarget == null) {
+            return false;
+        }
+
+        navigator.setTarget(newTarget);
+        return true;
     }
 
     // additional methods with default behavior
@@ -207,11 +224,7 @@ public class BaseArchon extends Unit
 
     private boolean build(Direction dir) throws GameActionException
     {
-        while (nearByAllies.length > 10 && nextType == RobotType.SOLDIER && nextBot == Bots.CASTLESOLDIER)
-        {
-            nextBot = buildOrder.nextBot();
-            nextType = Bots.typeFromBot(nextBot);
-        }
+        nextBot = changeBuildOrder(nextBot);
 
         if (rc.canBuild(dir, nextType))
         {
@@ -276,5 +289,10 @@ public class BaseArchon extends Unit
         }
 
         return false;
+    }
+
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        return nextBot;
     }
 }

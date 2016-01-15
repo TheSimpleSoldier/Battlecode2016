@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Unit;
@@ -27,8 +27,8 @@ public class BaseGaurd extends Unit
         //return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady() && !rc.isWeaponReady();
     }
 }
