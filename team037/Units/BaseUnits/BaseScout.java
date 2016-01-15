@@ -4,16 +4,18 @@ import battlecode.common.*;
 import team037.Enums.CommunicationType;
 import team037.FlyingNavigator;
 import team037.Messages.*;
+import team037.ScoutMapKnowledge;
 import team037.Unit;
 import team037.Utilites.PartsUtilities;
 
 public class BaseScout extends Unit
 {
-//    public FlyingNavigator move;
+    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
 
     public BaseScout(RobotController rc)
     {
         super(rc);
+        mapKnowledge = mKnowledge;
         navigator = new FlyingNavigator(rc);
     }
 
@@ -75,12 +77,12 @@ public class BaseScout extends Unit
             if (zombies[i].type == RobotType.ZOMBIEDEN)
             {
                 MapLocation zombieDen = zombies[i].location;
-                if (!mapKnowledge.denLocations.contains(zombieDen) && msgsSent < 20)
+                if (!mKnowledge.dens.contains(zombieDen) && msgsSent < 20)
                 {
                     if (dist == -1)
                         dist = 2500; //Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
 
-                    mapKnowledge.addDenLocation(zombieDen);
+                    mKnowledge.dens.add(zombieDen);
                     Communication communication = new SimpleBotInfoCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), zombies[i].ID, zombieDen.x, zombieDen.y});
                     communicator.sendCommunication(dist, communication);
@@ -91,7 +93,7 @@ public class BaseScout extends Unit
 
         if (rc.getRoundNum() % 5 == 1)
         {
-            MapLocation deadDen = mapKnowledge.updateDens(rc);
+            MapLocation deadDen = mKnowledge.updateDens(rc);
 
             if (dist == -1)
                 dist = Math.max(type.sensorRadiusSquared * 2, Math.min(2500, rc.getLocation().distanceSquaredTo(start)));
@@ -115,9 +117,9 @@ public class BaseScout extends Unit
         for (int i = partsArray.length; --i>=0; )
         {
             MapLocation spot = partsArray[i];
-            if (spot != null && !mapKnowledge.partListed(spot))
+            if (spot != null && !mKnowledge.partListed(spot))
             {
-                mapKnowledge.partsAndNeutrals.add(spot);
+                mKnowledge.partsAndNeutrals.add(spot);
 
                 RobotInfo bot = null;
 
@@ -153,14 +155,14 @@ public class BaseScout extends Unit
         {
             if (allies[i].type == RobotType.TURRET)
             {
-                mapKnowledge.addAlliedTurretLocation(allies[i].location);
+                mKnowledge.addAlliedTurretLocation(allies[i].location);
             }
         }
 
-        MapLocation[] allyTurrets = mapKnowledge.getAlliedTurretLocations();
+        MapLocation[] allyTurrets = mKnowledge.getAlliedTurretLocations();
         boolean sentMsg = false;
 
-        if (allyTurrets != null && mapKnowledge.ourTurretLocations.hasLocations())
+        if (allyTurrets != null && mKnowledge.ourTurretLocations.hasLocations())
         {
             for (int i = enemies.length; --i >= 0; )
             {

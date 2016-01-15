@@ -4,6 +4,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
+import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
 
 public class DenKillerGuard extends BaseGaurd
@@ -16,9 +17,9 @@ public class DenKillerGuard extends BaseGaurd
     @Override
     public void sendMessages() throws GameActionException
     {
-        if (mapKnowledge.denLocations.contains(currentLocation))
+        if (mapKnowledge.dens.contains(currentLocation))
         {
-            mapKnowledge.denLocations.remove(currentLocation);
+            mapKnowledge.dens.remove(currentLocation);
             rc.broadcastSignal(2500);
         }
     }
@@ -31,9 +32,9 @@ public class DenKillerGuard extends BaseGaurd
         if (rc.getRoundNum() % 5 == 0)
         {
             mapKnowledge.updateDens(rc);
-            if (mapKnowledge.denLocations.hasLocations())
+            if (mapKnowledge.dens.hasLocations())
             {
-                navigator.setTarget(mapKnowledge.closestDen(currentLocation));
+                navigator.setTarget(MapUtils.getNearestLocation(mapKnowledge.dens.array, currentLocation));
             }
         }
     }
@@ -52,8 +53,8 @@ public class DenKillerGuard extends BaseGaurd
     @Override
     public MapLocation getNextSpot()
     {
-        if (mapKnowledge.denLocations.hasLocations())
-            return mapKnowledge.closestDen(currentLocation);
+        if (mapKnowledge.dens.hasLocations())
+            return MapUtils.getNearestLocation(mapKnowledge.dens.array, currentLocation);
 
         return null;
     }

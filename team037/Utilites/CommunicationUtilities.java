@@ -86,7 +86,7 @@ public class CommunicationUtilities
 
         MapLocation loc = signal.getLocation();
 
-        if (Unit.mapKnowledge.denLocations.contains(loc))
+        if (Unit.mapKnowledge.dens.contains(loc))
         {
             opcode = CommunicationType.SKILLED_DEN;
         }

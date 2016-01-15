@@ -28,26 +28,26 @@ public class ScoutingScout extends BaseScout
 
         if (rc.getRoundNum() % 5 == 0)
         {
-            mapKnowledge.senseAndUpdateEdges();
+            mKnowledge.senseAndUpdateEdges();
         }
 
-        if (mapKnowledge.inRegionMode())
+        if (mKnowledge.inRegionMode())
             nextBot = Bots.REGIONSCOUT;
 
         int edge = MapUtils.senseEdge(rc, scoutDirection);
-        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir])
+        if (edge != Integer.MIN_VALUE && !mKnowledge.exploredEdges[dir])
         {
-            mapKnowledge.setValueInDirection(edge, scoutDirection);
+            mKnowledge.setValueInDirection(edge, scoutDirection);
 
             if (dir >= 0)
-                mapKnowledge.exploredEdges[dir] = true;
+                mKnowledge.exploredEdges[dir] = true;
 
             scoutDirection = null;
             Communication communication = new EdgeDiscovered();
             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, dir});
             communicator.sendCommunication(2500, communication);
 
-            communication = mapKnowledge.getMapBoundsCommunication(id);
+            communication = mKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(2500, communication);
         }
     }
@@ -63,7 +63,7 @@ public class ScoutingScout extends BaseScout
     {
         if (scoutDirection != null) return false;
 
-        dir = mapKnowledge.getClosestDir(currentLocation);
+        dir = mKnowledge.getClosestDir(currentLocation);
         if (dir == 0) {
             rc.setIndicatorString(0, "Going north");
             scoutDirection = Direction.NORTH;
