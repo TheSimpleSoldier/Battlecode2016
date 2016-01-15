@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import team037.Unit;
 import battlecode.common.*;
@@ -30,8 +30,8 @@ public class BaseSoldier extends Unit
         return fightMicro.basicNetZombieFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady() && !rc.isWeaponReady();
     }
 }

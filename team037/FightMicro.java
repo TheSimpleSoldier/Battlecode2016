@@ -378,6 +378,107 @@ public class FightMicro
         return true;
     }
 
+    public MapLocation ArchonRunAway(RobotInfo[] enemies, RobotInfo[] allies) throws GameActionException
+    {
+        int len = enemies.length;
+        if (len == 0)
+            return null;
+
+        int offensiveEnemies = 0;
+        int enemiesInRangeOfUs = 0, x = 0, y = 0;
+        MapLocation current = rc.getLocation();
+
+        for (int i = len; --i>=0; )
+        {
+            RobotType type = enemies[i].type;
+            switch (type)
+            {
+                case TURRET:
+                case GUARD:
+                case SOLDIER:
+                case VIPER:
+                case RANGEDZOMBIE:
+                case STANDARDZOMBIE:
+                case FASTZOMBIE:
+                case BIGZOMBIE:
+                    offensiveEnemies++;
+                    MapLocation enemy = enemies[i].location;
+                    x += enemy.x;
+                    y += enemy.y;
+                    if (current.distanceSquaredTo(enemy) <= type.attackRadiusSquared)
+                    {
+                        enemiesInRangeOfUs++;
+                    }
+                    break;
+            }
+        }
+
+        if (offensiveEnemies == 0)
+            return null;
+
+
+        int offensiveAllies = 0;
+
+        for (int i = allies.length; --i>=0;)
+        {
+            switch (allies[i].type)
+            {
+                case VIPER:
+                case SOLDIER:
+                case GUARD:
+                case TURRET:
+                    offensiveAllies++;
+            }
+        }
+
+        if (enemiesInRangeOfUs == 0 && offensiveAllies > len)
+            return current;
+
+        x /= len;
+        y /= len;
+
+        MapLocation enemyCOM = new MapLocation(x,y);
+        MapLocation runAwaySpot = current.add(enemyCOM.directionTo(current), 4);
+
+        if (enemyCOM.equals(current) || !rc.onTheMap(runAwaySpot))
+        {
+            int[] totalDist = new int[8];
+
+            for (int i = totalDist.length; --i >= 0; )
+            {
+                MapLocation tempTarget = current.add(Unit.dirs[i], 4);
+                totalDist[i] = 0;
+
+                if (rc.onTheMap(tempTarget))
+                {
+                    for (int j = enemies.length; --j>=0; )
+                    {
+                        totalDist[i] += Math.sqrt(tempTarget.distanceSquaredTo(enemies[j].location));
+                    }
+                }
+            }
+
+            int highestDist = 0;
+            int highestIndex = 0;
+
+            for (int i = totalDist.length; --i>=0; )
+            {
+                if (highestDist < totalDist[i])
+                {
+                    highestDist = totalDist[i];
+                    highestIndex = i;
+                }
+            }
+
+            rc.setIndicatorString(2, "Direction: " + Unit.dirs[highestIndex]);
+            runAwaySpot = current.add(Unit.dirs[highestIndex], 4);
+        }
+
+        rc.setIndicatorString(1, "x: " + runAwaySpot.x + " y: " + runAwaySpot.y);
+
+        return runAwaySpot;
+    }
+
     /**
      * This method runs turretFightMicro
      * @param nearByEnemies

@@ -1,42 +1,30 @@
-package team037.Units;
+package team037.Units.Scouts;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Messages.EdgeDiscovered;
 import team037.Messages.ExploringMapEdge;
+import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.MapUtils;
 
-public class ScoutingScout extends BaseScout {
-
-    public static boolean fullScan = false;
+public class ScoutingScout extends BaseScout
+{
     public static Direction scoutDirection;
     public static int dir = -1;
-    public static boolean sentEdge = false;
 
     public ScoutingScout(RobotController rc)  {
         super(rc);
     }
 
     @Override
-    public boolean act() throws GameActionException {
-        if (fight() || fightZombies()) return true;
-        else if (discoverEdges()) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean discoverEdges() throws GameActionException {
-        // precondition:
-//        if (mapKnowledge.mapBoundaryComplete()) {
-//            return false;
-//        }
-
-        rc.setIndicatorString(1, "Map Bounds minX: " + mapKnowledge.minX + " minY: " + mapKnowledge.minY + " maxX: " + mapKnowledge.maxX + " maxY: " + mapKnowledge.maxY);
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
 
         if (rc.getRoundNum() % 5 == 0)
         {
@@ -46,19 +34,9 @@ public class ScoutingScout extends BaseScout {
         if (mapKnowledge.inRegionMode())
             nextBot = Bots.REGIONSCOUT;
 
-        if (scoutDirection == null) {
-            if (!setNewScoutDirection()) {
-                return false;
-            } else {
-//                System.out.println("Setting new target");
-                move.setTarget(currentLocation.add(scoutDirection, 100));
-            }
-        }
-
         int edge = MapUtils.senseEdge(rc, scoutDirection);
         if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir])
         {
-            move.setTarget(currentLocation);
             mapKnowledge.setValueInDirection(edge, scoutDirection);
 
             if (dir >= 0)
@@ -71,29 +49,21 @@ public class ScoutingScout extends BaseScout {
 
             communication = mapKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(2500, communication);
-
-            return true;
         }
-
-
-        if (move.takeNextStep()) {
-            return true;
-        }
-        return false;
     }
 
-    public static void updateScoutDirection()
+    @Override
+    public MapLocation getNextSpot() throws GameActionException
     {
-        scoutDirection = null;
+        return currentLocation.add(scoutDirection, 100);
     }
 
-    public static int getScoutDir()
+    @Override
+    public boolean updateTarget() throws GameActionException
     {
-        return dir;
-    }
+        if (scoutDirection != null) return false;
 
-    private boolean setNewScoutDirection() throws GameActionException {
-        dir = /*mapKnowledge.getDir(id); // */ mapKnowledge.getClosestDir(currentLocation);
+        dir = mapKnowledge.getClosestDir(currentLocation);
         if (dir == 0) {
             rc.setIndicatorString(0, "Going north");
             scoutDirection = Direction.NORTH;
@@ -116,7 +86,16 @@ public class ScoutingScout extends BaseScout {
             return true;
         }
 
-
         return false;
+    }
+
+    public static void updateScoutDirection()
+    {
+        scoutDirection = null;
+    }
+
+    public static int getScoutDir()
+    {
+        return dir;
     }
 }
