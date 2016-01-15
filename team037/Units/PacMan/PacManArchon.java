@@ -47,9 +47,33 @@ public class PacManArchon extends Unit {
     }
 
     @Override
+    public boolean aidDistressedArchon() {return false;}
+
+    @Override
+    public boolean precondition() {
+        if (!locationLastTurn.equals(currentLocation)) {
+            Navigation.map.scan(currentLocation);
+            Navigation.lastScan = currentLocation;
+        }
+
+        try {
+            if (sortedParts.contains(currentLocation)) {
+                sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
+                Communication communication = new BotInfoCommunication();
+                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+                communicator.sendCommunication(400, communication);
+            }
+
+            if (updateTarget()) {
+                navigator.setTarget(sortedParts.getBestSpot(currentLocation));
+            }
+        } catch (GameActionException e) {}
+        return false;
+    }
+
+    @Override
     public boolean act() throws GameActionException {
         boolean ability = carryOutAbility();
-
         if (!locationLastTurn.equals(currentLocation)) {
             Navigation.map.scan(currentLocation);
             Navigation.lastScan = currentLocation;
@@ -86,7 +110,7 @@ public class PacManArchon extends Unit {
         return false;
     }
 
-    private boolean updateTarget() throws GameActionException {
+    public boolean updateTarget() throws GameActionException {
         MapLocation currentTarget = navigator.getTarget();
         if (currentTarget == null)
             return true;
@@ -498,35 +522,35 @@ public class PacManArchon extends Unit {
     // maybe spawn a unit or repair a damaged unit
     public boolean carryOutAbility() throws GameActionException {
         // heal doesn't effect core cooldown
-        healNearbyAllies();
+//        healNearbyAllies();
 
-        if (neutralBots.length > 0 && rc.isCoreReady()) {
-            rc.activate(neutralBots[0].location);
-            return !rc.isCoreReady();
-        }
-
-        if (enemies.length > allies.length || zombies.length > allies.length) {
-            return false;
-        }
-
-        if (rc.hasBuildRequirements(nextType) && rc.isCoreReady()) {
-            double rubble = Double.MAX_VALUE;
-            Direction least = dirs[0];
-            for (int i = dirs.length; --i >= 0; ) {
-                if (build(dirs[i])) {
-                    return true;
-                }
-                double tempRubble = rc.senseRubble(currentLocation.add(dirs[i]));
-                if (tempRubble < rubble && tempRubble > 0) {
-                    rubble = tempRubble;
-                    least = dirs[i];
-                }
-            }
-            try {
-                rc.clearRubble(least);
-            } catch (Exception e) {
-            }
-        }
+//        if (neutralBots.length > 0 && rc.isCoreReady()) {
+//            rc.activate(neutralBots[0].location);
+//            return !rc.isCoreReady();
+//        }
+//
+//        if (enemies.length > allies.length || zombies.length > allies.length) {
+//            return false;
+//        }
+//
+//        if (rc.hasBuildRequirements(nextType) && rc.isCoreReady()) {
+//            double rubble = Double.MAX_VALUE;
+//            Direction least = dirs[0];
+//            for (int i = dirs.length; --i >= 0; ) {
+//                if (build(dirs[i])) {
+//                    return true;
+//                }
+//                double tempRubble = rc.senseRubble(currentLocation.add(dirs[i]));
+//                if (tempRubble < rubble && tempRubble > 0) {
+//                    rubble = tempRubble;
+//                    least = dirs[i];
+//                }
+//            }
+//            try {
+//                rc.clearRubble(least);
+//            } catch (Exception e) {
+//            }
+//        }
 
         return false;
     }

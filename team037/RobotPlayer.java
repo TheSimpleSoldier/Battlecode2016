@@ -33,7 +33,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.NORMAL;
+        strategy = Strategies.PACMAN;
 
 
         RobotType type = rc.getType();
@@ -45,7 +45,7 @@ public class RobotPlayer
             } else if (strategy.equals(Strategies.TURTLE)) {
                 unit = new TurtleArchon(rc);
                 Unit.thisBot = Bots.TURTLEARCHON;
-            } else if (strategy.equals("pacman")) {
+            } else if (strategy.equals(Strategies.PACMAN)) {
                 unit = new PacManArchon(rc);
                 Unit.thisBot = Bots.PACMANARCHON;
             } else { // default to alpha archons
