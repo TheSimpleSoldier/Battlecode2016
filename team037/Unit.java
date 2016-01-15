@@ -389,6 +389,7 @@ public abstract class Unit
                     SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communications[k];
                     mapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
                             new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
+                    mapKnowledge.updateEdgesFromLocation(new MapLocation(com.x, com.y));
             }
         }
     }
