@@ -40,6 +40,15 @@ public class BuildOrderCreation
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }
 
+        if (RobotPlayer.strategy.equals(Strategies.TURRET_RUSH))
+        {
+            Bots[][] buildOrderSoldiers = {
+                    {Bots.BASETURRET}
+            };
+            int[] times2 = {10000};
+            return new BuildOrder(buildOrderSoldiers, times2);
+        }
+
 
         // This is the default strategy
         Bots[][] buildOrder = {

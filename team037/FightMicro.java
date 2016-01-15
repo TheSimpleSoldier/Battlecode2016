@@ -481,6 +481,7 @@ public class FightMicro
 
     /**
      * This method runs turretFightMicro
+     *
      * @param nearByEnemies
      * @param nearByZombies
      * @param enemies
@@ -510,7 +511,6 @@ public class FightMicro
             return true;
         }
 
-        // TODO: add net for logic about turning into TTM to move
         return false;
     }
 
