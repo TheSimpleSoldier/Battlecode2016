@@ -14,6 +14,7 @@ import team037.Utilites.MapUtils;
 public class MapKnowledge
 {
     public static final int MAP_ADD = 16100;
+    private static final int numArchons = 9;
 
     public int minX = Integer.MAX_VALUE;
     public int minY = Integer.MAX_VALUE;
@@ -25,8 +26,8 @@ public class MapKnowledge
 
     public MapKnowledge()
     {
-        ourArchons = new SimpleRobotInfo[5];
-        theirArchons = new SimpleRobotInfo[5];
+        ourArchons = new SimpleRobotInfo[numArchons];
+        theirArchons = new SimpleRobotInfo[numArchons];
         dens = new AppendOnlyMapLocationSet();
     }
 
@@ -132,7 +133,7 @@ public class MapKnowledge
             archons = theirArchons;
         }
 
-        for(int k = 0; k < 5; k++)
+        for(int k = 0; k < numArchons; k++)
         {
             if(archons[k] == null || archons[k].id == archon.id)
             {
@@ -154,9 +155,9 @@ public class MapKnowledge
             archons = theirArchons;
         }
 
-        MapLocation[] all = new MapLocation[5];
+        MapLocation[] all = new MapLocation[numArchons];
         int last = 0;
-        for(int k = 0; k < 5; k++)
+        for(int k = 0; k < numArchons; k++)
         {
             if(archons[k] == null)
             {
@@ -190,7 +191,7 @@ public class MapKnowledge
             archons = theirArchons;
         }
 
-        for(int k = 0; k < 5; k++)
+        for(int k = 0; k < numArchons; k++)
         {
             if(archons[k] == null)
             {
@@ -216,7 +217,7 @@ public class MapKnowledge
             archons = theirArchons;
         }
 
-        for(int k = 0; k < 5; k++)
+        for(int k = 0; k < numArchons; k++)
         {
             if(archons[k] == null)
             {
@@ -225,7 +226,7 @@ public class MapKnowledge
             else if(archons[k].id == id)
             {
                 archons[k] = null;
-                for(int a = k + 1; a < 5; a++)
+                for(int a = k + 1; a < numArchons; a++)
                 {
                     if(archons[a] == null)
                     {
