@@ -52,7 +52,6 @@ public class AlphaArchon extends BaseArchon
 
         if (sortedParts.contains(currentLocation))
         {
-            System.out.println("sending out msgs");
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
             Communication communication = new BotInfoCommunication();
             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});

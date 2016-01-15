@@ -278,19 +278,19 @@ public abstract class Unit
                     break;
 
                 case MAP_BOUNDS:
-//                    mapKnowledge.updateEdgesFromMessage(communications[k]);
-//                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
-//                    {
-//                        if (msgsSent < 20)
-//                        {
-//                            communicator.sendCommunication(dist, communications[k]);
-//                            msgsSent++;
-//                        }
-//                    }
-//                    else if (type == RobotType.VIPER)
-//                    {
-//                        rushTarget = mapKnowledge.getOppositeCorner(start);
-//                    }
+                    mapKnowledge.updateEdgesFromMessage(communications[k]);
+                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+                    {
+                        if (msgsSent < 20)
+                        {
+                            communicator.sendCommunication(dist, communications[k]);
+                            msgsSent++;
+                        }
+                    }
+                    else if (type == RobotType.VIPER)
+                    {
+                        rushTarget = mapKnowledge.getOppositeCorner(start);
+                    }
 
                     break;
 
