@@ -35,11 +35,15 @@ public class MapKnowledge
     {
         Communication communication = new MapBoundsCommunication();
 
-        int width = maxX - minX;
-        int height = maxY - minY;
+        if(minX != Integer.MAX_VALUE && minY != Integer.MAX_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE)
+        {
+            int width = maxX - minX;
+            int height = maxY - minY;
 
-        communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX + MAP_ADD, width, minY + MAP_ADD, height});
-        return communication;
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX + MAP_ADD, width, minY + MAP_ADD, height});
+            return communication;
+        }
+        return null;
     }
 
     public void updateEdgesFromLocation(MapLocation location)
