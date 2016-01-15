@@ -678,4 +678,101 @@ public class FightMicro
 
         return true;
     }
+
+    /**
+     * This is basic fight micro against zombies
+     *
+     * @param zombies
+     * @param nearByZombies
+     * @return
+     */
+    public boolean guardZombieMicro(RobotInfo[] zombies, RobotInfo[] nearByZombies, RobotInfo[] allies) throws GameActionException
+    {
+        int len = zombies.length;
+        if (len == 0) return false;
+
+        int x = 0, y = 0;
+        MapLocation enemyCOM;
+
+        for (int i = len; --i>=0; )
+        {
+            MapLocation spot = zombies[i].location;
+            x += spot.x;
+            y += spot.y;
+        }
+
+        enemyCOM = new MapLocation(x / len, y / len);
+
+        // don't turn into zombie so flee if you have low health
+        if (rc.getHealth() <= 25 && rc.isCoreReady())
+        {
+            FightMicroUtilites.moveDir(rc, enemyCOM.directionTo(rc.getLocation()), false);
+        }
+
+        if (rc.isWeaponReady() && nearByZombies.length > 0)
+        {
+            RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByZombies);
+
+            if (rc.canAttackLocation(weakest.location))
+            {
+                rc.attackLocation(weakest.location);
+                return true;
+            }
+        }
+
+        // if there are enemy zombies in range of us kite back
+        if (rc.isCoreReady() && nearByZombies.length > 0)
+        {
+            FightMicroUtilites.moveDir(rc, enemyCOM.directionTo(rc.getLocation()), false);
+        }
+
+        // if we are outranged then rush them!!!
+
+        if (rc.isCoreReady())
+        {
+            boolean outRanged = false;
+            boolean alliesEngaged = false;
+            MapLocation rushLoc = null;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                if (zombies[i].type == RobotType.RANGEDZOMBIE)
+                {
+
+                    outRanged = true;
+                    rushLoc = zombies[i].location;
+                    break;
+                }
+            }
+
+            if (!outRanged)
+            {
+                for (int i = allies.length; --i>=0; )
+                {
+                    for (int j = zombies.length; --j>=0; )
+                    {
+                        MapLocation ally = allies[i].location;
+                        MapLocation enemy = zombies[j].location;
+
+                        if (ally.distanceSquaredTo(enemy) < zombies[j].type.attackRadiusSquared)
+                        {
+                            rushLoc = ally;
+                            alliesEngaged = true;
+
+                            // break out of both loops
+                            i = -1;
+                            j = -1;
+                        }
+                    }
+                }
+            }
+
+            if (outRanged || alliesEngaged)
+            {
+                FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), false);
+            }
+        }
+
+        return false;
+    }
 }

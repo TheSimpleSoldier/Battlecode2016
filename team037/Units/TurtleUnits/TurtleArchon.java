@@ -34,11 +34,6 @@ public class TurtleArchon extends BaseArchon
         return false;
     }
 
-    public boolean carryOutAbility() throws GameActionException
-    {
-        return false;
-    }
-
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
