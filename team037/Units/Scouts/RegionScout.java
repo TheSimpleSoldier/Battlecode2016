@@ -20,27 +20,27 @@ public class RegionScout extends BaseScout
         super.collectData();
 
         if (region >= 0 && !currentLocation.equals(locationLastTurn))
-            mapKnowledge.upDateExploredLocs(region, rc);
+            mKnowledge.upDateExploredLocs(region, rc);
 
-        if (region >= 0 && mapKnowledge.exploredRegions[region])
+        if (region >= 0 && mKnowledge.exploredRegions[region])
             region = -1;
 
-        if (region == -1 || mapKnowledge.regionExplored(region))
-            region = mapKnowledge.closestUnexploredRegion(currentLocation);
+        if (region == -1 || mKnowledge.regionExplored(region))
+            region = mKnowledge.closestUnexploredRegion(currentLocation);
     }
 
     @Override
     public MapLocation getNextSpot()
     {
-        return mapKnowledge.nxtUnexploredSquare(region);
+        return mKnowledge.nxtUnexploredSquare(region);
     }
 
     @Override
     public boolean updateTarget()
     {
-        if (mapKnowledge.exporedAllRegions())
+        if (mKnowledge.exporedAllRegions())
             return false;
 
-        return (region >= 0 && !mapKnowledge.exploredRegions[region]);
+        return (region >= 0 && !mKnowledge.exploredRegions[region]);
     }
 }
