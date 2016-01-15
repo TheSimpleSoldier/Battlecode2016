@@ -693,6 +693,7 @@ public class FightMicro
 
         int x = 0, y = 0;
         MapLocation enemyCOM;
+        MapLocation currentLoc = rc.getLocation();
 
         for (int i = len; --i>=0; )
         {
@@ -703,10 +704,43 @@ public class FightMicro
 
         enemyCOM = new MapLocation(x / len, y / len);
 
+        int dist = 0;
+        Direction fleeDir = null;
+
+        for (int i = Unit.dirs.length; --i>=0; )
+        {
+            if (!rc.canMove(Unit.dirs[i])) continue;
+
+            MapLocation newLoc = currentLoc.add(Unit.dirs[i]);
+            boolean safe = true;
+
+            for (int j = zombies.length; --j >=0; )
+            {
+                if (zombies[i].location.distanceSquaredTo(newLoc) <= zombies[i].type.attackRadiusSquared)
+                {
+                    safe = false;
+                    break;
+                }
+            }
+
+            if (safe)
+            {
+                int newDist = newLoc.distanceSquaredTo(enemyCOM);
+                if (newDist > dist)
+                {
+                    dist = newDist;
+                    fleeDir = Unit.dirs[i];
+                }
+            }
+        }
+
         // don't turn into zombie so flee if you have low health
         if (rc.getHealth() <= 25 && rc.isCoreReady())
         {
-            FightMicroUtilites.moveDir(rc, enemyCOM.directionTo(rc.getLocation()), false);
+            if (fleeDir != null)
+            {
+                rc.move(fleeDir);
+            }
         }
 
         if (rc.isWeaponReady() && nearByZombies.length > 0)
@@ -723,7 +757,10 @@ public class FightMicro
         // if there are enemy zombies in range of us kite back
         if (rc.isCoreReady() && nearByZombies.length > 0)
         {
-            FightMicroUtilites.moveDir(rc, enemyCOM.directionTo(rc.getLocation()), false);
+            if (fleeDir != null)
+            {
+                rc.move(fleeDir);
+            }
         }
 
         // if we are outranged then rush them!!!
