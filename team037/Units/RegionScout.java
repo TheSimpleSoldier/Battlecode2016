@@ -24,25 +24,25 @@ public class RegionScout extends BaseScout
 
     public boolean exploreRegions() throws GameActionException
     {
-        if (mapKnowledge.exporedAllRegions())
+        if (mKnowledge.exporedAllRegions())
             return false;
 
         if (region >= 0 && !currentLocation.equals(locationLastTurn))
-            mapKnowledge.upDateExploredLocs(region, rc);
+            mKnowledge.upDateExploredLocs(region, rc);
 
-        if (region == -1 || mapKnowledge.regionExplored(region))
+        if (region == -1 || mKnowledge.regionExplored(region))
         {
-            region = mapKnowledge.closestUnexploredRegion(currentLocation);
+            region = mKnowledge.closestUnexploredRegion(currentLocation);
         }
 
-        if (region >= 0 && mapKnowledge.exploredRegions[region])
+        if (region >= 0 && mKnowledge.exploredRegions[region])
         {
             region = -1;
         }
 
-        if (region >= 0 && !mapKnowledge.exploredRegions[region])
+        if (region >= 0 && !mKnowledge.exploredRegions[region])
         {
-            move.setTarget(mapKnowledge.nxtUnexploredSquare(region));
+            move.setTarget(mKnowledge.nxtUnexploredSquare(region));
         }
 
         move.takeNextStep();

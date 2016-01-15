@@ -6,6 +6,7 @@ import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.Enums.Bots;
 import team037.Units.BaseSoldier;
+import team037.Utilites.MapUtils;
 
 public class DenKillerSoldier extends BaseSoldier
 {
@@ -21,14 +22,14 @@ public class DenKillerSoldier extends BaseSoldier
         if (goal == null || currentLocation.equals(goal) || (rc.canSenseLocation(goal) && (rc.senseRobotAtLocation(goal) == null || rc.senseRobotAtLocation(goal).team != Team.ZOMBIE || !rc.onTheMap(goal))))
         {
             // if we are standing on a den location alert all other allies that a zombie den has been destroyed
-            if (mapKnowledge.denLocations.contains(currentLocation))
+            if (mapKnowledge.dens.contains(currentLocation))
             {
                 rc.broadcastSignal(2500);
             }
 
-            if (mapKnowledge.denLocations.hasLocations())
+            if (mapKnowledge.dens.hasLocations())
             {
-                navigator.setTarget(mapKnowledge.closestDen(currentLocation));
+                navigator.setTarget(MapUtils.getNearestLocation(mapKnowledge.dens.array, currentLocation));
             }
         }
         else
@@ -39,12 +40,12 @@ public class DenKillerSoldier extends BaseSoldier
             }
         }
 
-        if (rc.getRoundNum() % 5 == 0 && goal != null && mapKnowledge.denLocations.hasLocations())
+        if (rc.getRoundNum() % 5 == 0 && goal != null && mapKnowledge.dens.hasLocations())
         {
             mapKnowledge.updateDens(rc);
-            if (mapKnowledge.denLocations.hasLocations())
+            if (mapKnowledge.dens.hasLocations())
             {
-                navigator.setTarget(mapKnowledge.closestDen(currentLocation));
+                navigator.setTarget(MapUtils.getNearestLocation(mapKnowledge.dens.array, currentLocation));
             }
         }
 

@@ -4,6 +4,7 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import team037.Utilites.MapUtils;
 
 public class HerdingScout extends BaseScout
 {
@@ -123,7 +124,7 @@ public class HerdingScout extends BaseScout
 
     private MapLocation getTargetToWait()
     {
-        MapLocation loc = mapKnowledge.closestDen(currentLocation);
+        MapLocation loc = MapUtils.getNearestLocation(mKnowledge.dens.array, currentLocation);
         if(loc == null)
         {
             loc = currentLocation.add(currentLocation.directionTo(getTargetForHerding()), 5);

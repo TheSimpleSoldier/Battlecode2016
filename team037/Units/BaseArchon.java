@@ -9,6 +9,7 @@ import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
 import team037.Utilites.BuildOrderCreation;
+import team037.Utilites.MapUtils;
 
 
 public class BaseArchon extends Unit
@@ -22,7 +23,7 @@ public class BaseArchon extends Unit
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
     private int retreatCall = 0;
-    private static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
+    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
 
     public BaseArchon(RobotController rc)
     {
@@ -30,6 +31,7 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
+        mapKnowledge = mKnowledge;
     }
 
     public boolean takeNextStep() throws GameActionException
@@ -219,7 +221,8 @@ public class BaseArchon extends Unit
             {
                 Communication rushMsg = new AttackCommunication();
 
-                MapLocation archonCOM = mKnowledge.getArchonCOM();
+                MapLocation[] archons = mKnowledge.getArchonLocations(false);
+                MapLocation archonCOM = MapUtils.getCenterOfMass(archons);
 
                 rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
                 communicator.sendCommunication(2, rushMsg);

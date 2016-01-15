@@ -17,6 +17,7 @@ public class BaseScout extends Unit
     {
         super(rc);
         move = new FlyingNavigator(rc);
+        mapKnowledge = mKnowledge;
     }
 
     public boolean takeNextStep() throws GameActionException

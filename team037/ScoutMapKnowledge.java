@@ -522,4 +522,5 @@ public class ScoutMapKnowledge extends MapKnowledge
         exploredRegions[region] = true;
         return true;
     }
+
 }

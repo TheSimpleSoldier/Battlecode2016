@@ -1,8 +1,6 @@
 package team037;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.CommunicationType;
@@ -29,6 +27,7 @@ public class MapKnowledge
     {
         ourArchons = new SimpleRobotInfo[5];
         theirArchons = new SimpleRobotInfo[5];
+        dens = new AppendOnlyMapLocationSet();
     }
 
     public Communication getMapBoundsCommunication(int id)
@@ -137,6 +136,42 @@ public class MapKnowledge
         }
     }
 
+    public MapLocation[] getArchonLocations(boolean us)
+    {
+        SimpleRobotInfo[] archons;
+        if(us)
+        {
+            archons = ourArchons;
+        }
+        else
+        {
+            archons = theirArchons;
+        }
+
+        MapLocation[] all = new MapLocation[5];
+        int last = 0;
+        for(int k = 0; k < 5; k++)
+        {
+            if(archons[k] == null)
+            {
+                last = k;
+                break;
+            }
+            else
+            {
+                all[k] = archons[k].location;
+            }
+        }
+
+        MapLocation[] toReturn = new MapLocation[last];
+        for(int k = 0; k < last; k++)
+        {
+            toReturn[k] = all[k];
+        }
+
+        return toReturn;
+    }
+
     public void updateArchon(SimpleRobotInfo archon, boolean us)
     {
         SimpleRobotInfo[] archons;
@@ -205,5 +240,23 @@ public class MapKnowledge
         int y = startLoc.y - minY;
 
         return new MapLocation(maxX - x, maxY - y);
+    }
+
+    public MapLocation updateDens(RobotController rc) throws GameActionException
+    {
+        for (int i = dens.length; --i >= 0; )
+        {
+            MapLocation den = dens.array[i];
+            if (den == null)
+                continue;
+
+            if (rc.canSenseLocation(den) && (rc.senseRobotAtLocation(den) == null || rc.senseRobotAtLocation(den).type != RobotType.ZOMBIEDEN))
+            {
+                dens.remove(den);
+                return den;
+            }
+        }
+
+        return null;
     }
 }

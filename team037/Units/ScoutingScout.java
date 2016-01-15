@@ -32,18 +32,18 @@ public class ScoutingScout extends BaseScout {
 
     private boolean discoverEdges() throws GameActionException {
         // precondition:
-//        if (mapKnowledge.mapBoundaryComplete()) {
+//        if (mKnowledge.mapBoundaryComplete()) {
 //            return false;
 //        }
 
-        rc.setIndicatorString(1, "Map Bounds minX: " + mapKnowledge.minX + " minY: " + mapKnowledge.minY + " maxX: " + mapKnowledge.maxX + " maxY: " + mapKnowledge.maxY);
+        rc.setIndicatorString(1, "Map Bounds minX: " + mKnowledge.minX + " minY: " + mKnowledge.minY + " maxX: " + mKnowledge.maxX + " maxY: " + mKnowledge.maxY);
 
         if (rc.getRoundNum() % 5 == 0)
         {
-            mapKnowledge.senseAndUpdateEdges();
+            mKnowledge.senseAndUpdateEdges();
         }
 
-        if (mapKnowledge.inRegionMode())
+        if (mKnowledge.inRegionMode())
             nextBot = Bots.REGIONSCOUT;
 
         if (scoutDirection == null) {
@@ -56,20 +56,20 @@ public class ScoutingScout extends BaseScout {
         }
 
         int edge = MapUtils.senseEdge(rc, scoutDirection);
-        if (edge != Integer.MIN_VALUE && !mapKnowledge.exploredEdges[dir])
+        if (edge != Integer.MIN_VALUE && !mKnowledge.exploredEdges[dir])
         {
             move.setTarget(currentLocation);
-            mapKnowledge.setValueInDirection(edge, scoutDirection);
+            mKnowledge.setValueInDirection(edge, scoutDirection);
 
             if (dir >= 0)
-                mapKnowledge.exploredEdges[dir] = true;
+                mKnowledge.exploredEdges[dir] = true;
 
             scoutDirection = null;
             Communication communication = new EdgeDiscovered();
             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, dir});
             communicator.sendCommunication(2500, communication);
 
-            communication = mapKnowledge.getMapBoundsCommunication(id);
+            communication = mKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(2500, communication);
 
             return true;
@@ -93,7 +93,7 @@ public class ScoutingScout extends BaseScout {
     }
 
     private boolean setNewScoutDirection() throws GameActionException {
-        dir = /*mapKnowledge.getDir(id); // */ mapKnowledge.getClosestDir(currentLocation);
+        dir = /*mKnowledge.getDir(id); // */ mKnowledge.getClosestDir(currentLocation);
         if (dir == 0) {
             rc.setIndicatorString(0, "Going north");
             scoutDirection = Direction.NORTH;

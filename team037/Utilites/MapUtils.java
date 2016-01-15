@@ -179,11 +179,14 @@ public class MapUtils
         MapLocation nearest = null;
         for(int k = locations.length; --k >= 0;)
         {
-            double tempDist = location.distanceSquaredTo(locations[k]);
-            if(tempDist < nearestDist)
+            if(locations[k] != null)
             {
-                nearest = locations[k];
-                nearestDist = tempDist;
+                double tempDist = location.distanceSquaredTo(locations[k]);
+                if(tempDist < nearestDist)
+                {
+                    nearest = locations[k];
+                    nearestDist = tempDist;
+                }
             }
         }
 
