@@ -153,4 +153,41 @@ public class MapUtils
 
         return toMove;
     }
+
+    public static MapLocation getCenterOfMass(MapLocation[] locations)
+    {
+        int x = 0;
+        int y = 0;
+        int count = 0;
+        for(int k = locations.length; --k >= 0;)
+        {
+            count++;
+            x += locations[k].x;
+            y += locations[k].y;
+        }
+
+        if(count > 0)
+        {
+            return new MapLocation(x / count, y / count);
+        }
+        return null;
+    }
+
+    public static MapLocation getNearestLocation(MapLocation[] locations, MapLocation location)
+    {
+        double nearestDist = Integer.MAX_VALUE;
+        MapLocation nearest = null;
+        for(int k = locations.length; --k >= 0;)
+        {
+            double tempDist = location.distanceSquaredTo(locations[k]);
+            if(tempDist < nearestDist)
+            {
+                nearest = locations[k];
+                nearestDist = tempDist;
+            }
+        }
+
+        return nearest;
+    }
+
 }

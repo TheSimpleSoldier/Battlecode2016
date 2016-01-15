@@ -38,8 +38,7 @@ public abstract class Unit
     public static int id;
     public static int round;
     public static Communication[] communications;
-    public static MapKnowledge mapKnowledge = new MapKnowledge();
-    public static SimpleMapKnowledge simpleMapKnowledge = new SimpleMapKnowledge();
+    public static MapKnowledge mapKnowledge = new ScoutMapKnowledge();
     public static MapLocation start;
     public static boolean repaired;
     public static int msgsSent = 0;
@@ -164,9 +163,9 @@ public abstract class Unit
                     values = communications[k].getValues();
                     MapLocation den = new MapLocation(values[2], values[3]);
 
-                    if (!mapKnowledge.denLocations.contains(den))
+                    if (!mapKnowledge.dens.contains(den))
                     {
-                        mapKnowledge.addDenLocation(den);
+                        mapKnowledge.dens.add(den);
 
                         if (type == RobotType.SCOUT || type == RobotType.ARCHON && msgsSent < 20)
                         {
@@ -177,22 +176,18 @@ public abstract class Unit
                         }
                     }
 
-                    if(!simpleMapKnowledge.dens.contains(den))
-                    {
-                        simpleMapKnowledge.dens.add(den);
-                    }
-
                     break;
                 case PARTS:
                     if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
                         // if we get a new msg about parts then send it out
+                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge)mapKnowledge;
                         values = communications[k].getValues();
                         MapLocation loc = new MapLocation(values[2], values[3]);
 
-                        if (!mapKnowledge.partListed(loc) && msgsSent < 20)
+                        if (!tempKnow.partListed(loc) && msgsSent < 20)
                         {
-                            mapKnowledge.addPartsAndNeutrals(loc);
+                            tempKnow.addPartsAndNeutrals(loc);
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
@@ -207,12 +202,13 @@ public abstract class Unit
                 case NEUTRAL:
                     if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
+                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge)mapKnowledge;
                         values = communications[k].getValues();
                         MapLocation loc = new MapLocation(values[2], values[3]);
 
-                        if (!mapKnowledge.partListed(loc) && msgsSent < 20)
+                        if (!tempKnow.partListed(loc) && msgsSent < 20)
                         {
-                            mapKnowledge.addPartsAndNeutrals(loc);
+                            tempKnow.addPartsAndNeutrals(loc);
                             communicator.sendCommunication(dist, communications[k]);
                             msgsSent++;
                         }
@@ -248,9 +244,9 @@ public abstract class Unit
                     values = communications[k].getValues();
                     MapLocation spot = new MapLocation(values[2], values[3]);
 
-                    if (mapKnowledge.denLocations.contains(spot))
+                    if(mapKnowledge.dens.contains(spot))
                     {
-                        mapKnowledge.denLocations.remove(spot);
+                        mapKnowledge.dens.remove(spot);
 
                         if (type == RobotType.SCOUT && msgsSent < 20)
                         {
@@ -259,66 +255,65 @@ public abstract class Unit
                         }
                     }
 
-                    if(simpleMapKnowledge.dens.contains(spot))
-                    {
-                        simpleMapKnowledge.dens.remove(spot);
-                    }
                     break;
 
                 case MAP_BOUNDS:
                     values = communications[k].getValues();
 
-                    rc.setIndicatorString(1, "xMin: " + values[1] + " yMin: " + values[3] + " width: " + values[2] + " height: " + values[4]);
-
-                    if (mapKnowledge.updateEdges(values[1], values[3], values[1] + values[2], values[3] + values[4]))
+                    mapKnowledge.updateEdgesFromInts(values[1], values[3], values[1] + values[2], values[3] + values[4]);
+                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
-                        if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+                        if (msgsSent < 20)
                         {
-                            if (msgsSent < 20)
-                            {
-                                communicator.sendCommunication(dist, communications[k]);
-                                msgsSent++;
-                            }
-                        }
-                        else if (type == RobotType.VIPER)
-                        {
-                            rushTarget = mapKnowledge.getOppositeCorner(start);
+                            communicator.sendCommunication(dist, communications[k]);
+                            msgsSent++;
                         }
                     }
+                    else if (type == RobotType.VIPER)
+                    {
+                        rushTarget = mapKnowledge.getOppositeCorner(start);
+                    }
 
-                    simpleMapKnowledge.updateEdgesFromInts(values[1], values[2], values[3], values[4]);
                     break;
 
                 case EXPLORE_EDGE:
 
-                    values = communications[k].getValues();
-
-                    if (rc.getRoundNum() < 30)
+                    if(type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
+                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
+                        values = communications[k].getValues();
 
-                        if (type == RobotType.SCOUT)
+                        if(rc.getRoundNum() < 30)
                         {
-                            if (ScoutingScout.getScoutDir() == values[2] && id > values[1])
-                            {
-                                ScoutingScout.updateScoutDirection();
-                            }
-                        }
 
-                        mapKnowledge.setEdgesBeingExplored(values[2]);
+                            if(type == RobotType.SCOUT)
+                            {
+                                if(ScoutingScout.getScoutDir() == values[2] && id > values[1])
+                                {
+                                    ScoutingScout.updateScoutDirection();
+                                }
+                            }
+
+                            tempKnow.setEdgesBeingExplored(values[2]);
+                        }
                     }
 
                     break;
 
                 case EDGE_EXPLORED:
-                    values = communications[k].getValues();
-
-                    if (type == RobotType.SCOUT && !mapKnowledge.exploredEdges[values[2]] &&  msgsSent < 20)
+                    if(type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
-                        communicator.sendCommunication(dist, communications[k]);
-                        msgsSent++;
-                    }
+                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
+                        values = communications[k].getValues();
 
-                    mapKnowledge.exploredEdges[values[2]] = true;
+                        if(type == RobotType.SCOUT && !tempKnow.exploredEdges[values[2]] && msgsSent < 20)
+                        {
+                            communicator.sendCommunication(dist, communications[k]);
+                            msgsSent++;
+                        }
+
+                        tempKnow.exploredEdges[values[2]] = true;
+                    }
                     break;
 
                 case ATTACK:
@@ -335,10 +330,7 @@ public abstract class Unit
                     values = communications[k].getValues();
                     MapLocation archon = new MapLocation(values[2], values[3]);
 
-                    if (!mapKnowledge.archonStartPosition.contains(archon))
-                    {
-                        mapKnowledge.archonStartPosition.add(archon);
-                    }
+                    mapKnowledge.addArchon(new SimpleRobotInfo(-1, archon, RobotType.ARCHON, opponent), false);
 
                     break;
 
@@ -370,16 +362,14 @@ public abstract class Unit
                     BotInfoCommunication communication = (BotInfoCommunication) communications[k];
                     if(communication.type == RobotType.ARCHON)
                     {
-                        RobotInfo bot = new RobotInfo(communication.id, opponent, RobotType.ARCHON, new MapLocation(communication.x, communication.y), 0,0,0,0,0,0,0);
-                        mapKnowledge.updateEnemyArchonLocation(bot, round);
-                        simpleMapKnowledge.addArchon(new SimpleRobotInfo(communication.id,
+                        mapKnowledge.addArchon(new SimpleRobotInfo(communication.id,
                                 new MapLocation(communication.x, communication.y), RobotType.ARCHON,
                                 opponent), false);
                     }
                     break;
                 case OENEMY:
                     SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communications[k];
-                    simpleMapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
+                    mapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
                             new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
             }
         }
