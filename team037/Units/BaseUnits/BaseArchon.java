@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.BuildOrder;
@@ -12,10 +12,10 @@ import team037.Utilites.BuildOrderCreation;
 
 public class BaseArchon extends Unit
 {
-    private BuildOrder buildOrder;
-    Bots nextBot;
-    RobotType nextType;
-    RobotInfo[] neutralBots;
+    public BuildOrder buildOrder;
+    public static Bots nextBot;
+    public static RobotType nextType;
+    public static RobotInfo[] neutralBots;
     public static SortedParts sortedParts = new SortedParts();
     private int rushingUnits = 0;
     private boolean sentRushSignal = false;
@@ -220,11 +220,7 @@ public class BaseArchon extends Unit
 
     private boolean build(Direction dir) throws GameActionException
     {
-        while (nearByAllies.length > 10 && nextType == RobotType.SOLDIER && nextBot == Bots.CASTLESOLDIER)
-        {
-            nextBot = buildOrder.nextBot();
-            nextType = Bots.typeFromBot(nextBot);
-        }
+        nextBot = changeBuildOrder(nextBot);
 
         if (rc.canBuild(dir, nextType))
         {
@@ -288,5 +284,10 @@ public class BaseArchon extends Unit
         }
 
         return false;
+    }
+
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        return nextBot;
     }
 }

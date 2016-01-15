@@ -3,12 +3,10 @@ package team037.Units;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import battlecode.common.Team;
-import team037.DataStructures.AppendOnlyMapLocationArray;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
-import team037.Utilites.PartsUtilities;
+import team037.Units.BaseUnits.BaseArchon;
 import team037.Utilites.Utilities;
 
 public class AlphaArchon extends BaseArchon

@@ -2,8 +2,7 @@ package team037.Units.CastleUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationArray;
-import team037.Unit;
-import team037.Units.BaseTurret;
+import team037.Units.BaseUnits.BaseTurret;
 
 public class CastleTurret extends BaseTurret
 {

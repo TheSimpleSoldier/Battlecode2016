@@ -7,8 +7,8 @@ import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
-import team037.Units.BaseArchon;
-import team037.Units.ScoutingScout;
+import team037.Units.BaseUnits.BaseArchon;
+import team037.Units.Scouts.ScoutingScout;
 
 public abstract class Unit
 {
@@ -391,8 +391,8 @@ public abstract class Unit
         if(nextBot != null && nextBot != thisBot)
         {
             Unit toReturn = Bots.returnUnit(nextBot, rc);
-            toReturn.thisBot = nextBot;
-            toReturn.nextBot = null;
+            Unit.thisBot = nextBot;
+            Unit.nextBot = null;
             return toReturn;
         }
 

@@ -30,12 +30,12 @@ public class BuildOrderCreation
         {
             Bots[][] buildOrderTurtle = {
                     {Bots.TURTLEGUARD},
-                    {Bots.TURTLETURRET, Bots.TURTLEGUARD},
+                    {Bots.TURTLETURRET},
                     {Bots.PATROLSCOUT, Bots.TURTLETURRET},
                     {Bots.TURTLEGUARD, Bots.TURTLETURRET},
             };
 
-            int[] timesTurtle = {3, 1, 1, 1000};
+            int[] timesTurtle = {3, 2, 1, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }

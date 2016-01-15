@@ -2,7 +2,7 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import team037.Units.BaseScout;
+import team037.Units.BaseUnits.BaseScout;
 
 public class TurtleScout extends BaseScout
 {

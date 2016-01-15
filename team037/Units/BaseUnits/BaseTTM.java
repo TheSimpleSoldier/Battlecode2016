@@ -1,4 +1,4 @@
-package team037.Units;
+package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import battlecode.common.RobotController;
@@ -26,8 +26,8 @@ public class BaseTTM extends Unit
         return fightMicro.runPassiveFightMicro(enemies, nearByAllies, allies, target, nearByEnemies);
     }
 
-    public boolean carryOutAbility() throws GameActionException
+    public boolean precondition()
     {
-        return false;
+        return !rc.isCoreReady();
     }
 }

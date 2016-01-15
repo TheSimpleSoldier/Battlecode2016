@@ -4,7 +4,7 @@ import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.SlugNavigator;
-import team037.Units.BaseSoldier;
+import team037.Units.BaseUnits.BaseSoldier;
 import team037.Utilites.MapUtils;
 
 public class CastleSoldier extends BaseSoldier

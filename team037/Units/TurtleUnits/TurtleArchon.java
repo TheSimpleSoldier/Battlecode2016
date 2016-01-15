@@ -4,12 +4,10 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
-import team037.Enums.CommunicationType;
-import team037.Messages.BotInfoCommunication;
-import team037.Messages.Communication;
-import team037.Units.BaseArchon;
 import team037.Utilites.MapUtils;
-import team037.Utilites.Utilities;
+import battlecode.common.*;
+import team037.Enums.Bots;
+import team037.Units.BaseUnits.BaseArchon;
 
 public class TurtleArchon extends BaseArchon
 {
@@ -36,6 +34,11 @@ public class TurtleArchon extends BaseArchon
         return false;
     }
 
+    public boolean carryOutAbility() throws GameActionException
+    {
+        return false;
+    }
+
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
@@ -49,5 +52,16 @@ public class TurtleArchon extends BaseArchon
         }
 
         return sortedParts.getBestSpot(currentLocation);
+    }
+
+    @Override
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        while (nearByAllies.length > 10 && nextType == RobotType.SOLDIER && nextBot == Bots.CASTLESOLDIER)
+        {
+            nextBot = buildOrder.nextBot();
+            nextType = Bots.typeFromBot(nextBot);
+        }
+        return nextBot;
     }
 }
