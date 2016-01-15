@@ -33,7 +33,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.NORMAL;
+        strategy = Strategies.TURRET_RUSH;
 
 
         RobotType type = rc.getType();
@@ -70,7 +70,7 @@ public class RobotPlayer
             }
 
         }
-        else if (type == RobotType.TURRET)
+        else if (type == RobotType.TURRET || type == RobotType.TTM)
         {
             if (strategy.equals(Strategies.CASTLE)) {
                 unit = new CastleTurret(rc);
@@ -78,11 +78,6 @@ public class RobotPlayer
                 unit = new BaseTurret(rc);
                 Unit.thisBot = Bots.BASETURRET;
             }
-        }
-        else if (type == RobotType.TTM)
-        {
-            unit = new BaseTTM(rc);
-            Unit.thisBot = Bots.BASETTM;
         }
         else if (type == RobotType.VIPER)
         {

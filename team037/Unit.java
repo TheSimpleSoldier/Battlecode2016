@@ -91,7 +91,7 @@ public abstract class Unit
             navigator.setTarget(getNextSpot());
         }
 
-        return navigator.takeNextStep();
+        return takeNextStep();
     }
 
     public boolean updateTarget() throws GameActionException
