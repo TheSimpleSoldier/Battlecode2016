@@ -3,6 +3,7 @@ package team037;
 import battlecode.common.Clock;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
+import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.*;
@@ -111,7 +112,7 @@ public class RobotPlayer
         {
             BaseArchon.updateStartingMap();
             BaseArchon.sendOutInitialLocation();
-            BaseArchon.mapKnowledge.archonStartPosition.add(rc.getLocation());
+            BaseArchon.mKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
         }
 
 
