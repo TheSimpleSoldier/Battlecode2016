@@ -291,7 +291,14 @@ public class SortedParts
         {
             if (!contains(neutralBots[i].location))
             {
-                addParts(neutralBots[i].location, neutralBots[i].type.partCost, true);
+                if (neutralBots[i].type == RobotType.ARCHON)
+                {
+                    addParts(neutralBots[i].location, 1000, true);
+                }
+                else
+                {
+                    addParts(neutralBots[i].location, neutralBots[i].type.partCost, true);
+                }
             }
         }
     }
