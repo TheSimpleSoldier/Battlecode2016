@@ -49,6 +49,10 @@ public class BaseArchon extends Unit
         super.collectData();
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        if (sortedParts.contains(currentLocation)) {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
+        }
+
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0)
         {
@@ -149,8 +153,10 @@ public class BaseArchon extends Unit
         // heal doesn't effect core cooldown
         healNearbyAllies();
 
+        System.out.println("Carrying out that ability");
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
+            System.out.println("Activating");
             rc.activate(neutralBots[0].location);
             for (int j = mKnowledge.dens.length; --j>=0; )
             {

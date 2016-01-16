@@ -29,9 +29,15 @@ public class ScoutBombScout extends BaseScout
             }
             
         }
+        return false;
 
     }
 
+
+    @Override
+    public void sendMessages() {
+
+    }
 
     @Override
     public boolean fight() throws GameActionException
