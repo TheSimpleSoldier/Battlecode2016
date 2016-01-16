@@ -16,6 +16,12 @@ public interface PacMan {
      */
     int ZOMBIES = 0, ENEMIES = 1, TARGET = 2;
 
+    double[][] DEFAULT_WEIGHTS = new double[][] {
+            {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
+            {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
+            {-8, -4, -2, -1, 0},            // target constants (attract towards target)
+    };
+
     /**
      * If you want to use PacMan navigation, you should use the default runAway() method. If you need to incorporate
      * additional factors, implement them in the applyAdditionalWeights and applyAdditionalConstants methods.
@@ -55,6 +61,10 @@ public interface PacMan {
             MapLocation currentLocation = Unit.currentLocation;
             Navigator navigator = Unit.navigator;
             Direction[] dirs = Unit.dirs;
+
+            if (weights == null) {
+                weights = DEFAULT_WEIGHTS;
+            }
 
 
         /* This is the array that will ultimately decide where we go.

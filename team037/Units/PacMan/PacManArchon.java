@@ -9,6 +9,7 @@ import team037.Messages.*;
 import team037.Navigation;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
+import team037.Utilites.BuildOrderCreation;
 import team037.Utilites.MapUtils;
 import team037.Utilites.Utilities;
 
@@ -38,50 +39,17 @@ public class PacManArchon extends Unit implements PacMan {
 
     public PacManArchon(RobotController rc) {
         super(rc);
-        buildOrder = createBuildOrder();
+        buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
         myScouts = new RobotInfo[5];
         scoutCount = 0;
     }
 
-    public static BuildOrder createBuildOrder() {
-        Bots[][] buildOrder = {
-                {Bots.PACMANGUARD, null},
-        };
-
-        int[] times = {1000};
-
-        return new BuildOrder(buildOrder, times);
-    }
-
     @Override
     public boolean aidDistressedArchon() {
         return false;
     }
-
-//    @Override
-//    public boolean precondition() {
-//        if (!locationLastTurn.equals(currentLocation)) {
-//            Navigation.map.scan(currentLocation);
-//            Navigation.lastScan = currentLocation;
-//        }
-//
-//        try {
-//            if (sortedParts.contains(currentLocation)) {
-//                sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
-//                Communication communication = new BotInfoCommunication();
-//                communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
-//                communicator.sendCommunication(400, communication);
-//            }
-//
-//            if (updateTarget()) {
-//                navigator.setTarget(sortedParts.getBestSpot(currentLocation));
-//            }
-//        } catch (GameActionException e) {
-//        }
-//        return false;
-//    }
 
     @Override
     public boolean act() throws GameActionException {
@@ -221,54 +189,6 @@ public class PacManArchon extends Unit implements PacMan {
 
         if (rc.canBuild(dir, nextType)) {
             rc.build(dir, nextType);
-
-//            if (nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHINGVIPER) {
-//                Communication rushMsg = new AttackCommunication();
-//
-//                MapLocation[] archons = mKnowledge.getArchonLocations(false);
-//                MapLocation archonCOM = MapUtils.getCenterOfMass(archons);
-//
-//                rushMsg.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y});
-//                communicator.sendCommunication(2, rushMsg);
-//
-//                MapLocation rushLoc = mKnowledge.getOppositeCorner(archonCOM);
-//                rushMsg.setValues(new int[]{CommunicationType.toInt(CommunicationType.ATTACK), rushLoc.x, rushLoc.y});
-//                communicator.sendCommunication(2, rushMsg);
-//            }
-//
-//            int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
-//            MissionCommunication communication = new MissionCommunication();
-//            communication.opcode = CommunicationType.CHANGEMISSION;
-//            communication.id = id;
-//            communication.rType = Bots.typeFromBot(nextBot);
-//            communication.bType = nextBot;
-//            communication.newBType = nextBot;
-//            communicator.sendCommunication(2, communication);
-//
-//            Communication mapBoundsCommunication = mKnowledge.getMapBoundsCommunication(id);
-//            communicator.sendCommunication(5, mapBoundsCommunication);
-//
-//            for (int j = mKnowledge.exploredEdges.length; --j >= 0; ) {
-//                if (mKnowledge.exploredEdges[j]) {
-//                    Communication mapBoundDiscovered = new EdgeDiscovered();
-//                    mapBoundDiscovered.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, j});
-//                    communicator.sendCommunication(5, mapBoundDiscovered);
-//                }
-//            }
-//
-//
-//            if (Bots.typeFromBot(nextBot) == RobotType.GUARD || Bots.typeFromBot(nextBot) == RobotType.SOLDIER) {
-//                for (int j = mKnowledge.dens.length; --j >= 0; ) {
-//                    MapLocation den = mKnowledge.dens.array[j];
-//
-//                    if (den != null) {
-//                        Communication communicationDen = new SimpleBotInfoCommunication();
-//                        communicationDen.setValues(new int[]{CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
-//                        communicator.sendCommunication(2, communicationDen);
-//                    }
-//                }
-//            }
-
             nextBot = buildOrder.nextBot();
             nextType = Bots.typeFromBot(nextBot);
             return true;
