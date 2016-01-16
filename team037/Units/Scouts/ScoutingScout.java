@@ -7,7 +7,6 @@ import battlecode.common.RobotController;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
-import team037.Messages.EdgeDiscovered;
 import team037.Messages.ExploringMapEdge;
 import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.MapUtils;
@@ -43,12 +42,6 @@ public class ScoutingScout extends BaseScout
                 mKnowledge.exploredEdges[dir] = true;
 
             scoutDirection = null;
-            Communication communication = new EdgeDiscovered();
-            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, dir});
-            communicator.sendCommunication(2500, communication);
-
-            communication = mKnowledge.getMapBoundsCommunication(id);
-            communicator.sendCommunication(2500, communication);
         }
     }
 

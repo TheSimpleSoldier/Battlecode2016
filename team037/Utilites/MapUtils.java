@@ -11,7 +11,7 @@ public class MapUtils
      * Senses the edge in the direction specified
      */
     public static int senseEdge(RobotController rc, Direction d) throws GameActionException {
-        if (d.isDiagonal()) {
+        if (d == null || d.isDiagonal()) {
             return Integer.MIN_VALUE;
         }
 

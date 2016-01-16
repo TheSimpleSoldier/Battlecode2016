@@ -257,17 +257,6 @@ public class BaseArchon extends Unit
             Communication mapBoundsCommunication = mKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(5, mapBoundsCommunication);
 
-            for (int j = mKnowledge.exploredEdges.length; --j>=0; )
-            {
-                if (mKnowledge.exploredEdges[j])
-                {
-                    Communication mapBoundDiscovered = new EdgeDiscovered();
-                    mapBoundDiscovered.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, j});
-                    communicator.sendCommunication(5, mapBoundDiscovered);
-                }
-            }
-
-
             if (Bots.typeFromBot(nextBot) == RobotType.GUARD || Bots.typeFromBot(nextBot) == RobotType.SOLDIER)
             {
                 for (int j = mKnowledge.dens.length; --j>=0; )

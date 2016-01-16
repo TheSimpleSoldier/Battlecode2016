@@ -19,6 +19,7 @@ public class MapKnowledge
     public int minY = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
     public int maxY = Integer.MIN_VALUE;
+    public boolean[] exploredEdges = new boolean[4];
     public SimpleRobotInfo[] ourArchons;
     public SimpleRobotInfo[] theirArchons;
     public AppendOnlyMapLocationSet dens;
@@ -39,7 +40,7 @@ public class MapKnowledge
             int width = maxX - minX;
             int height = maxY - minY;
 
-            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height});
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height, indicatorToEdge()});
             return communication;
         }
         return null;
@@ -91,36 +92,52 @@ public class MapKnowledge
     {
         int[] values = communication.getValues();
         updateEdgesFromInts(values[1], values[3], values[2], values[4]);
+        edgeToIndicator(values[5]);
     }
 
     public void senseAndUpdateEdges() throws GameActionException
     {
-        int y = MapUtils.senseFarthest(Direction.NORTH);
+        int y;
+        int x;
 
-        if (y < minY)
+        if(!edgeReached(Direction.NORTH))
         {
-            minY = y;
+            y = MapUtils.senseFarthest(Direction.NORTH);
+
+            if(y < minY)
+            {
+                minY = y;
+            }
         }
 
-        y = MapUtils.senseFarthest(Direction.SOUTH);
-
-        if (y > maxY)
+        if(!edgeReached(Direction.SOUTH))
         {
-            maxY = y;
+            y = MapUtils.senseFarthest(Direction.SOUTH);
+
+            if(y > maxY)
+            {
+                maxY = y;
+            }
         }
 
-        int x = MapUtils.senseFarthest(Direction.WEST);
-
-        if (x < minX)
+        if(!edgeReached(Direction.WEST))
         {
-            minX = x;
+            x = MapUtils.senseFarthest(Direction.WEST);
+
+            if(x < minX)
+            {
+                minX = x;
+            }
         }
 
-        x = MapUtils.senseFarthest(Direction.EAST);
-
-        if (x > maxX)
+        if(!edgeReached(Direction.EAST))
         {
-            maxX = x;
+            x = MapUtils.senseFarthest(Direction.EAST);
+
+            if(x > maxX)
+            {
+                maxX = x;
+            }
         }
     }
 
@@ -268,5 +285,104 @@ public class MapKnowledge
         }
 
         return null;
+    }
+
+    public void reachEdge(Direction dir)
+    {
+        switch(dir)
+        {
+            case NORTH:
+                exploredEdges[0] = true;
+                break;
+            case SOUTH:
+                exploredEdges[2] = true;
+                break;
+            case EAST:
+                exploredEdges[1] = true;
+                break;
+            case WEST:
+                exploredEdges[3] = true;
+                break;
+        }
+    }
+
+    public boolean edgeReached(Direction dir)
+    {
+        switch(dir)
+        {
+            case NORTH:
+                if(exploredEdges[0])
+                {
+                    return true;
+                }
+                return false;
+            case SOUTH:
+                if(exploredEdges[2])
+                {
+                    return true;
+                }
+                return false;
+            case EAST:
+                if(exploredEdges[1])
+                {
+                    return true;
+                }
+                return false;
+            case WEST:
+                if(exploredEdges[3])
+                {
+                    return true;
+                }
+                return false;
+        }
+
+        return false;
+    }
+
+    public int indicatorToEdge()
+    {
+        int value = 0;
+        if(exploredEdges[0])
+        {
+            value = value | 8;
+        }
+        if(exploredEdges[1])
+        {
+            value = value | 4;
+        }
+        if(exploredEdges[2])
+        {
+            value = value | 2;
+        }
+        if(exploredEdges[3])
+        {
+            value = value | 1;
+        }
+
+        return value;
+    }
+
+    public void edgeToIndicator(int value)
+    {
+        int tempValue = value & 8;
+        if(tempValue != 0)
+        {
+            exploredEdges[0] = true;
+        }
+        tempValue = value & 4;
+        if(tempValue != 0)
+        {
+            exploredEdges[1] = true;
+        }
+        tempValue = value & 2;
+        if(tempValue != 0)
+        {
+            exploredEdges[2] = true;
+        }
+        tempValue = value & 1;
+        if(tempValue != 0)
+        {
+            exploredEdges[3] = true;
+        }
     }
 }
