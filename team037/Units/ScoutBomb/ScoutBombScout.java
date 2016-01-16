@@ -1,14 +1,10 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
-import team037.Enums.CommunicationType;
-import team037.FlyingNavigator;
-import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.SlugNavigator;
-import team037.Unit;
 import team037.Units.BaseUnits.BaseScout;
-import team037.Utilites.PartsUtilities;
+import team037.Utilites.MapUtils;
 
 public class ScoutBombScout extends BaseScout
 {
@@ -23,7 +19,14 @@ public class ScoutBombScout extends BaseScout
 
     @Override
     public boolean updateTarget() throws GameActionException {
+        boolean enemySide = true;
+        if (currentLocation.distanceSquaredTo(MapUtils.getCenterOfMass(alliedArchonStartLocs)) < currentLocation.distanceSquaredTo(MapUtils.getCenterOfMass(enemyArchonStartLocs))) {
+            enemySide = false;
+        }
         if (zombies.length > 0) {
+            if (rc.getZombieInfectedTurns() < 5) {
+
+            }
             
         }
 
