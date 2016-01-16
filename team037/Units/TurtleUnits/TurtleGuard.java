@@ -61,7 +61,7 @@ public class TurtleGuard extends BaseGaurd
         if (zombies.length > 0)
         {
             chasingZombies = true;
-            return closestUnit(zombies);
+            return MapUtils.closestUnit(zombies, currentLocation);
         }
         
         if (turnsArrivedLoc == -1 || chasingZombies)
@@ -122,30 +122,5 @@ public class TurtleGuard extends BaseGaurd
         {
             healing = false;
         }
-    }
-
-    /**
-     * This method calculates the closest unit
-     *
-     * @param units
-     * @return
-     */
-    public MapLocation closestUnit(RobotInfo[] units)
-    {
-        int dist = Integer.MAX_VALUE;
-        MapLocation closest = null;
-
-        for (int i = units.length; --i>=0; )
-        {
-            MapLocation spot = units[i].location;
-            int currentDist = spot.distanceSquaredTo(currentLocation);
-            if (currentDist < dist)
-            {
-                dist = currentDist;
-                closest = units[i].location;
-            }
-        }
-
-        return closest;
     }
 }

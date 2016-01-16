@@ -265,4 +265,29 @@ public class MapUtils
         }
         return false;
     }
+
+    /**
+     * This method calculates the closest unit
+     *
+     * @param units
+     * @return
+     */
+    public static MapLocation closestUnit(RobotInfo[] units, MapLocation currentLocation)
+    {
+        int dist = Integer.MAX_VALUE;
+        MapLocation closest = null;
+
+        for (int i = units.length; --i>=0; )
+        {
+            MapLocation spot = units[i].location;
+            int currentDist = spot.distanceSquaredTo(currentLocation);
+            if (currentDist < dist)
+            {
+                dist = currentDist;
+                closest = units[i].location;
+            }
+        }
+
+        return closest;
+    }
 }

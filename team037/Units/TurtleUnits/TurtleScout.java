@@ -9,9 +9,9 @@ public class TurtleScout extends BaseScout
     // This determines if the scout is going left or right around the turtle location
     private static boolean goingLeft = false;
     // this is the minimum distance that a scout will keep between it and the turtle center at all times
-    private static final int minDist = 25;
+    private static final int minDist = 24;
     // this is the max distance that a scout will keep between it and the turtle center
-    private static final int maxDist = 49;
+    private static final int maxDist = 37;
     private static int directionUpdateTurn = 0;
 
     public TurtleScout(RobotController rc)
@@ -82,6 +82,20 @@ public class TurtleScout extends BaseScout
     }
 
     @Override
+    public void handleMessages() throws GameActionException
+    {
+        // override default behavior
+    }
+
+    @Override
+    public void sendMessages() throws GameActionException
+    {
+        // override default behavior
+        msgTurrets();
+    }
+
+
+    @Override
     public boolean fightZombies() throws GameActionException
     {
         if (zombies.length > 0)
@@ -96,32 +110,37 @@ public class TurtleScout extends BaseScout
                 Direction left = goTo.rotateLeft().rotateLeft();
                 Direction right = goTo.rotateRight().rotateRight();
 
-//                if (rc.canMove(left) && !fightMicro.EnemiesInRangeOfLoc(currentLocation.add(left), zombies))
-//                {
-//                    rc.move(left);
-//                    return true;
-//                }
-//
-//                if (rc.canMove(right) && !fightMicro.EnemiesInRangeOfLoc(currentLocation.add(right), zombies))
-//                {
-//                    rc.move(right);
-//                    return true;
-//                }
+                if (fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation, zombies) == 0)
+                {
+                    return true;
+                }
 
                 if (rc.canMove(left) && fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(left), zombies) < fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(right), zombies))
                 {
                     rc.move(left);
                     return true;
                 }
-
-                if (rc.canMove(right) && fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(left), zombies) > fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(right), zombies))
+                else if (rc.canMove(right))
                 {
                     rc.move(right);
                     return true;
                 }
+                else if (rc.canMove(left))
+                {
+                    rc.move(left);
+                    return true;
+                }
+                else if (rc.canMove(goTo.rotateLeft()))
+                {
+                    rc.move(goTo.rotateLeft());
+                    return true;
+                }
+                else if (rc.canMove(goTo.rotateRight()))
+                {
+                    rc.move(goTo.rotateRight());
+                    return true;
+                }
             }
-
-            return true;
         }
 
 

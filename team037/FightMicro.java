@@ -828,7 +828,16 @@ public class FightMicro
     {
         for (int i = enemies.length; --i>=0; )
         {
-            if (enemies[i].location.distanceSquaredTo(loc) <= enemies[i].type.attackRadiusSquared)
+            switch (enemies[i].type)
+            {
+                case ZOMBIEDEN:
+                case ARCHON:
+                case SCOUT:
+                case TTM:
+                    continue;
+            }
+
+            if (enemies[i].location.distanceSquaredTo(loc) <= 25) //enemies[i].type.attackRadiusSquared)
             {
                 return true;
             }
@@ -849,6 +858,15 @@ public class FightMicro
         int count = 0;
         for (int i = enemies.length; --i>=0; )
         {
+            switch (enemies[i].type)
+            {
+                case ZOMBIEDEN:
+                case ARCHON:
+                case SCOUT:
+                case TTM:
+                    continue;
+            }
+
             if (enemies[i].location.distanceSquaredTo(loc) <= enemies[i].type.attackRadiusSquared)
             {
                 count++;
