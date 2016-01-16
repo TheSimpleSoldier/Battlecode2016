@@ -775,4 +775,45 @@ public class FightMicro
 
         return false;
     }
+
+    /**
+     * THis method determines if there are any enemies in range of a location
+     *
+     * @param loc
+     * @param enemies
+     * @return
+     */
+    public boolean EnemiesInRangeOfLoc(MapLocation loc, RobotInfo[] enemies)
+    {
+        for (int i = enemies.length; --i>=0; )
+        {
+            if (enemies[i].location.distanceSquaredTo(loc) <= enemies[i].type.attackRadiusSquared)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * THis method determines if there are any enemies in range of a location
+     *
+     * @param loc
+     * @param enemies
+     * @return
+     */
+    public int NumbOfEnemiesInRangeOfLoc(MapLocation loc, RobotInfo[] enemies)
+    {
+        int count = 0;
+        for (int i = enemies.length; --i>=0; )
+        {
+            if (enemies[i].location.distanceSquaredTo(loc) <= enemies[i].type.attackRadiusSquared)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

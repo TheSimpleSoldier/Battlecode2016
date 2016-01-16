@@ -7,9 +7,8 @@ import team037.Utilites.MapUtils;
 /**
  * Base Turret is the foundation of all turret units
  *
- * To move all that needs to happen is for the target to be set
- * to a location other than the current location using the updateTarget()
- * and setTarget() methods
+ * To move all that needs to happen is for targetLoc to be set
+ * using setTargetLoc()
  *
  * If you want control over when the Turret turns into a ttm or when a ttm turns into
  * a turret then implement the packIntoTTM() and unpackTTM() methods
@@ -18,15 +17,15 @@ import team037.Utilites.MapUtils;
  */
 public class BaseTurret extends Unit
 {
-    public MapLocation enemyArchonCOM;
+    public MapLocation targetLoc;
     private int turnsAtLoc = 0;
     private boolean arrived = false;
 
     public BaseTurret(RobotController rc)
     {
         super(rc);
-        enemyArchonCOM = MapUtils.getCenterOfMass(enemyArchonStartLocs);
-        enemyArchonCOM = enemyArchonCOM.add(enemyArchonCOM.directionTo(currentLocation), 5);
+//        targetLoc = MapUtils.getCenterOfMass(enemyArchonStartLocs);
+//        targetLoc = targetLoc.add(targetLoc.directionTo(currentLocation), 5);
         type = RobotType.TURRET;
     }
 
@@ -48,6 +47,11 @@ public class BaseTurret extends Unit
     public boolean unpackTTM()
     {
         return false;
+    }
+
+    public void setTargetLoc(MapLocation targetLoc)
+    {
+        this.targetLoc = targetLoc;
     }
 
     // Turrets don't move except if they are ttms
@@ -101,7 +105,8 @@ public class BaseTurret extends Unit
     @Override
     public boolean updateTarget() throws GameActionException
     {
-        if (currentLocation.distanceSquaredTo(enemyArchonCOM) < 25) return true;
+        if (targetLoc == null) return true;
+        if (currentLocation.distanceSquaredTo(targetLoc) < 25) return true;
         MapLocation target = navigator.getTarget();
         if (target == null || target.equals(currentLocation)) return true;
         if (rc.canSense(target) && rc.senseRobotAtLocation(target) != null) return true;
@@ -112,10 +117,10 @@ public class BaseTurret extends Unit
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
-        if (!rc.canSense(enemyArchonCOM))
-            return enemyArchonCOM;
+        if (targetLoc == null || !rc.canSense(targetLoc))
+            return targetLoc;
         else
-            return MapUtils.getClosestUnoccupiedSquare(currentLocation, enemyArchonCOM);
+            return MapUtils.getClosestUnoccupiedSquare(currentLocation, targetLoc);
     }
 
     @Override

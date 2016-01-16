@@ -10,7 +10,6 @@ import team037.Units.BaseUnits.BaseGaurd;
 
 public class TurtleGuard extends BaseGaurd
 {
-    MapLocation turtlePoint;
     private static int turnsArrivedLoc = -1;
     private static boolean arrived = false;
     private boolean chasingZombies = false;
@@ -28,7 +27,7 @@ public class TurtleGuard extends BaseGaurd
         MapLocation target = navigator.getTarget();
         if (zombies.length > 0) return true;
         if (target == null) return true;
-        if (currentLocation.equals(target) && (rc.getRoundNum() - turnsArrivedLoc) > 10) return true;
+        if (currentLocation.equals(target) && (rc.getRoundNum() - turnsArrivedLoc) > 2) return true;
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
         if (rc.getHealth() <= 25) return true;
 
@@ -39,8 +38,8 @@ public class TurtleGuard extends BaseGaurd
     public boolean carryOutAbility() throws GameActionException
     {
         if (!rc.isCoreReady()) return false;
-        if (!currentLocation.equals(navigator.getTarget())) return false;
-        if (zombies.length > 0) return false;
+        if (turnsArrivedLoc == -1) return false;
+        if (zombies.length > 0 || enemies.length > 0) return false;
 
 
         for (int i = dirs.length; --i>=0; )
@@ -75,14 +74,36 @@ public class TurtleGuard extends BaseGaurd
         {
             chasingZombies = false;
             arrived = false;
-            return turtlePoint.add(turtlePoint.directionTo(currentLocation), 3);
+            return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
         }
 
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
 
-            if (possible.distanceSquaredTo(turtlePoint) <= 49 && possible.distanceSquaredTo(turtlePoint) > 10)
+            if (possible.distanceSquaredTo(turtlePoint) <= 49)
+            {
+                arrived = false;
+                return possible;
+            }
+        }
+
+        for (int i = dirs.length; --i>=0; )
+        {
+            MapLocation possible = currentLocation.add(dirs[i], 6);
+
+            if (possible.distanceSquaredTo(turtlePoint) <= 49)
+            {
+                arrived = false;
+                return possible;
+            }
+        }
+
+        for (int i = dirs.length; --i>=0; )
+        {
+            MapLocation possible = currentLocation.add(dirs[i], 10);
+
+            if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
                 return possible;

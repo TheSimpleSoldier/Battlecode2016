@@ -246,4 +246,23 @@ public class MapUtils
 
         return closest;
     }
+
+    /**
+     * This method returns true if the current location is nxt to an edge and false otherwise
+     *
+     * @param current
+     * @return
+     */
+    public static boolean nextToEdge(MapLocation current, RobotController rc) throws GameActionException
+    {
+        for (int i = Unit.dirs.length; --i>=0; )
+        {
+            MapLocation next = current.add(Unit.dirs[i]);
+            if (rc.canSense(next) && !rc.onTheMap(next))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
