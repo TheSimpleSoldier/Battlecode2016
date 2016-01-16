@@ -23,7 +23,7 @@ public class PacManArchon extends Unit implements PacMan {
             {
                     {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
                     {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
-                    {8, 4, 2, 1, 0},            // target constants (attract towards target)
+                    {-8, -4, -2, -1, 0},            // target constants (attract towards target)
                     {1, .5, .5, .5, .5},        // parts weights (move towards parts locations in sensor range)
             };
 
