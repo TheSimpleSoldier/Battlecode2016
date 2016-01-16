@@ -21,19 +21,24 @@ public class ScoutBombScout extends BaseScout
         navigator = new SlugNavigator(rc);
     }
 
-    public boolean takeNextStep() throws GameActionException
-    {
-        return navigator.takeNextStep();
+    @Override
+    public boolean updateTarget() throws GameActionException {
+        if (zombies.length > 0) {
+            
+        }
+
     }
 
+
+    @Override
     public boolean fight() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(enemies, navigator.getTarget());
+        return false;
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(zombies, navigator.getTarget());
+        return false;
     }
 
     public boolean precondition()

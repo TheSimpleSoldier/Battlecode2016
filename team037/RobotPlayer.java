@@ -12,6 +12,7 @@ import team037.Units.CastleUnits.CastleArchon;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.TurtleUnits.TurtleArchon;
 
 public class RobotPlayer
@@ -45,6 +46,9 @@ public class RobotPlayer
             } else if (strategy.equals(Strategies.TURTLE)) {
                 unit = new TurtleArchon(rc);
                 Unit.thisBot = Bots.TURTLEARCHON;
+            } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                unit = new ScoutBombArchon(rc);
+                Unit.thisBot = Bots.SCOUTBOMBARCHON;
             } else { // default to alpha archons
                 unit = new AlphaArchon(rc);
                 Unit.thisBot = Bots.ALPHAARCHON;
