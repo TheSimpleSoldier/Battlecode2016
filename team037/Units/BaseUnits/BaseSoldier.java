@@ -22,7 +22,7 @@ public class BaseSoldier extends Unit
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.basicNetZombieFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
+        return fightMicro.soldierZombieFightMicro(zombies, nearByZombies, allies);
     }
 
     public boolean precondition()
