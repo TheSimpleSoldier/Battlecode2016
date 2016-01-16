@@ -101,7 +101,7 @@ public class FightMicroUtilites
 
         if (nearByEnemies.length > 0)
         {
-            double weakestHealth = 999;
+            double weakestHealth = 99999;
             for (int i = 0; i < nearByEnemies.length; i++)
             {
                 MapLocation enemy = nearByEnemies[i].location;
@@ -147,7 +147,7 @@ public class FightMicroUtilites
         if (target == null)
         {
             MapLocation loc = rc.getLocation();
-            int dist = rc.getType().attackRadiusSquared;
+            int dist = RobotType.TURRET.attackRadiusSquared;
             double coreDelay = 0;
 
             for (int i = communications.length; --i>=0; )
