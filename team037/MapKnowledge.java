@@ -13,7 +13,6 @@ import team037.Utilites.MapUtils;
  */
 public class MapKnowledge
 {
-    public static final int MAP_ADD = 16100;
     private static final int numArchons = 9;
 
     public int minX = Integer.MAX_VALUE;
@@ -40,7 +39,7 @@ public class MapKnowledge
             int width = maxX - minX;
             int height = maxY - minY;
 
-            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX + MAP_ADD, width, minY + MAP_ADD, height});
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.MAP_BOUNDS), minX, width, minY, height});
             return communication;
         }
         return null;
@@ -91,7 +90,7 @@ public class MapKnowledge
     public void updateEdgesFromMessage(Communication communication)
     {
         int[] values = communication.getValues();
-        updateEdgesFromInts(values[1] - MAP_ADD, values[3] - MAP_ADD, values[2], values[4]);
+        updateEdgesFromInts(values[1], values[3], values[2], values[4]);
     }
 
     public void senseAndUpdateEdges() throws GameActionException
