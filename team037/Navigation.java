@@ -23,13 +23,13 @@ import battlecode.common.*;
 
 public class Navigation {
 
-    static Map map;    // Map object to hold the bit arrays and the origin.
+    public static Map map;    // Map object to hold the bit arrays and the origin.
     static Multimap multimap;  // Priority multimap for the current search.
     static boolean searching, reachedGoal;  // Flags for search status
     static final int bytecodeLimit = 1300; // Bytecode limit
     static RobotController rc = null;
     static JumpPoint pathStart, lastPt, myLoc, goalJP;
-    static MapLocation lastScan, currentGoal;
+    public static MapLocation lastScan, currentGoal;
 
     /**
      * Initializes variables navigation relies on. Will only initialize once per game.
