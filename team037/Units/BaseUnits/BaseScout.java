@@ -156,6 +156,9 @@ public class BaseScout extends Unit
 
     private void msgTurrets() throws GameActionException
     {
+        if (rc.getRoundNum() % 5 != 0)
+            return;
+
         for (int i = allies.length; --i >= 0; )
         {
             if (allies[i].type == RobotType.TURRET)
@@ -178,7 +181,7 @@ public class BaseScout extends Unit
                         continue;
 
                     double dist = allyTurrets[j].distanceSquaredTo(enemy);
-                    if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared && msgsSent < 20)
+                    if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared && msgsSent < 10)
                     {
                         Communication communication = new TurretSupportCommunication();
                         communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(enemies[i].coreDelay),enemy.x, enemy.y});
@@ -200,13 +203,19 @@ public class BaseScout extends Unit
                         if (allyTurrets[j] == null)
                             continue;
 
-                        if (allyTurrets[j].distanceSquaredTo(enemy) <= RobotType.TURRET.attackRadiusSquared && msgsSent < 20)
+                        if (allyTurrets[j].distanceSquaredTo(enemy) <= RobotType.TURRET.attackRadiusSquared && msgsSent < 10)
                         {
                             TurretSupportCommunication communication = new TurretSupportCommunication();
                             communication.opcode = CommunicationType.TURRET_SUPPORT;
                             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(zombies[i].coreDelay),enemy.x, enemy.y});
                             communicator.sendCommunication(rc.getLocation().distanceSquaredTo(allyTurrets[j]) + 1, communication);
                             msgsSent++;
+                        }
+
+                        if (msgsSent == 10)
+                        {
+                            i = -1;
+                            j = -1;
                         }
                     }
                 }

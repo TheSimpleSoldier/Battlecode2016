@@ -173,7 +173,6 @@ public class MapUtils
         return new MapLocation(x/len,y/len);
     }
 
-
     public static MapLocation getCenterOfMass(MapLocation[] locations)
     {
         int x = 0;
@@ -209,8 +208,61 @@ public class MapUtils
                 }
             }
         }
-
         return nearest;
     }
 
+    /**
+     * This method returns the closest location to a target that is unoccupied
+     *
+     * @param currentLoc
+     * @return
+     */
+    public static MapLocation getClosestUnoccupiedSquare(MapLocation currentLoc, MapLocation target) throws GameActionException
+    {
+        // precondition
+        if (currentLoc == null || target == null) return null;
+
+        int dist = currentLoc.distanceSquaredTo(target);
+
+        if (dist >= 49) return target;
+
+        MapLocation closest = currentLoc;
+
+        MapLocation[] getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
+
+        int closestDistToTarget = dist;
+
+        for (int i = getLocs.length; --i>=0; )
+        {
+            MapLocation current = getLocs[i];
+            int newDist = current.distanceSquaredTo(target);
+
+            if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)
+            {
+                closestDistToTarget = newDist;
+                closest = current;
+            }
+        }
+
+        return closest;
+    }
+
+    /**
+     * This method returns true if the current location is nxt to an edge and false otherwise
+     *
+     * @param current
+     * @return
+     */
+    public static boolean nextToEdge(MapLocation current, RobotController rc) throws GameActionException
+    {
+        for (int i = Unit.dirs.length; --i>=0; )
+        {
+            MapLocation next = current.add(Unit.dirs[i]);
+            if (rc.canSense(next) && !rc.onTheMap(next))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

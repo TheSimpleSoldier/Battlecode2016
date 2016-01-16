@@ -50,6 +50,7 @@ public abstract class Unit
     public static MapLocation rushTarget;
     public static MapLocation rallyPoint;
     public static MapLocation distressedArchon;
+    public static MapLocation turtlePoint;
 
     public Unit()
     {
@@ -87,11 +88,15 @@ public abstract class Unit
         if (aidDistressedArchon());
         else if (fight() || fightZombies());
         else if (carryOutAbility());
-        else if (updateTarget()) {
-            navigator.setTarget(getNextSpot());
+        else
+        {
+            if (updateTarget()) {
+                navigator.setTarget(getNextSpot());
+            }
+            return takeNextStep();
         }
 
-        return navigator.takeNextStep();
+        return false;
     }
 
     public boolean updateTarget() throws GameActionException
@@ -281,11 +286,11 @@ public abstract class Unit
                     mapKnowledge.updateEdgesFromMessage(communications[k]);
                     if (type == RobotType.SCOUT || type == RobotType.ARCHON)
                     {
-                        if (msgsSent < 20)
-                        {
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
+//                        if (msgsSent < 20)
+//                        {
+//                            communicator.sendCommunication(dist, communications[k]);
+//                            msgsSent++;
+//                        }
                     }
                     else if (type == RobotType.VIPER)
                     {

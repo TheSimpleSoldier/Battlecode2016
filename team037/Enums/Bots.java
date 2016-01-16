@@ -14,10 +14,7 @@ import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
 import team037.Units.Scouts.RegionScout;
 import team037.Units.Scouts.ScoutingScout;
-import team037.Units.TurtleUnits.TurtleArchon;
-import team037.Units.TurtleUnits.TurtleGuard;
-import team037.Units.TurtleUnits.TurtleSoldier;
-import team037.Units.TurtleUnits.TurtleTurret;
+import team037.Units.TurtleUnits.*;
 
 /**
  * Created by joshua on 1/5/16.
@@ -25,9 +22,10 @@ import team037.Units.TurtleUnits.TurtleTurret;
  */
 public enum Bots
 {
-    BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETTM, BASETURRET, BASEVIPER, ALPHAARCHON,
+    BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETURRET, BASEVIPER, ALPHAARCHON,
     SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
-    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER, TURTLEARCHON, TURTLESOLDIER, TURTLETURRET, TURTLEGUARD;
+    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER, TURTLEARCHON, TURTLESOLDIER, TURTLETURRET, TURTLEGUARD,
+    TURTLESCOUT;
 
     public static int toInt(Bots type)
     {
@@ -41,39 +39,39 @@ public enum Bots
                 return 2;
             case BASESOLDIER:
                 return 3;
-            case BASETTM:
-                return 4;
             case BASETURRET:
-                return 5;
+                return 4;
             case BASEVIPER:
-                return 6;
+                return 5;
             case ALPHAARCHON:
-                return 7;
+                return 6;
             case SCOUTINGSCOUT:
-                return 8;
+                return 7;
             case PATROLSCOUT:
-                return 9;
+                return 8;
             case DENKILLERSOLDIER:
-                return 10;
+                return 9;
             case DENKILLERGUARD:
-                return 11;
+                return 10;
             case RUSHINGSOLDIER:
-                return 12;
+                return 11;
             case RUSHINGVIPER:
-                return 13;
+                return 12;
             case REGIONSCOUT:
-                return 14;
+                return 13;
             case HERDINGSCOUT:
-                return 15;
+                return 14;
             case CASTLESOLDIER:
-                return 16;
+                return 15;
             case TURTLEARCHON:
-                return 17;
+                return 16;
             case TURTLEGUARD:
-                return 18;
+                return 17;
             case TURTLESOLDIER:
-                return 19;
+                return 18;
             case TURTLETURRET:
+                return 19;
+            case TURTLESCOUT:
                 return 20;
         }
         return -1;
@@ -92,39 +90,39 @@ public enum Bots
             case 3:
                 return BASESOLDIER;
             case 4:
-                return BASETTM;
-            case 5:
                 return BASETURRET;
-            case 6:
+            case 5:
                 return BASEVIPER;
-            case 7:
+            case 6:
                 return ALPHAARCHON;
-            case 8:
+            case 7:
                 return SCOUTINGSCOUT;
-            case 9:
+            case 8:
                 return PATROLSCOUT;
-            case 10:
+            case 9:
                 return DENKILLERSOLDIER;
-            case 11:
+            case 10:
                 return DENKILLERGUARD;
-            case 12:
+            case 11:
                 return RUSHINGSOLDIER;
-            case 13:
+            case 12:
                 return RUSHINGVIPER;
-            case 14:
+            case 13:
                 return REGIONSCOUT;
-            case 15:
+            case 14:
                 return HERDINGSCOUT;
-            case 16:
+            case 15:
                 return CASTLESOLDIER;
-            case 17:
+            case 16:
                 return TURTLEARCHON;
-            case 18:
+            case 17:
                 return TURTLEGUARD;
-            case 19:
+            case 18:
                 return TURTLESOLDIER;
-            case 20:
+            case 19:
                 return TURTLETURRET;
+            case 20:
+                return TURTLESCOUT;
         }
 
         return null;
@@ -142,6 +140,7 @@ public enum Bots
             case DENKILLERGUARD:
             case BASEGAURD:
                 return RobotType.GUARD;
+            case TURTLESCOUT:
             case REGIONSCOUT:
             case PATROLSCOUT:
             case BASESCOUT:
@@ -154,8 +153,6 @@ public enum Bots
             case DENKILLERSOLDIER:
             case BASESOLDIER:
                 return RobotType.SOLDIER;
-            case BASETTM:
-                return RobotType.TTM;
             case TURTLETURRET:
             case BASETURRET:
                 return RobotType.TURRET;
@@ -182,8 +179,6 @@ public enum Bots
                 return new ScoutingScout(rc);
             case BASESOLDIER:
                 return new BaseSoldier(rc);
-            case BASETTM:
-                return new BaseTTM(rc);
             case BASETURRET:
                 return new BaseTurret(rc);
             case BASEVIPER:
@@ -212,6 +207,8 @@ public enum Bots
                 return new TurtleSoldier(rc);
             case TURTLETURRET:
                 return new TurtleTurret(rc);
+            case TURTLESCOUT:
+                return new TurtleScout(rc);
         }
 
         return null;
