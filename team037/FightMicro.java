@@ -470,11 +470,8 @@ public class FightMicro
                 }
             }
 
-            rc.setIndicatorString(2, "Direction: " + Unit.dirs[highestIndex]);
             runAwaySpot = current.add(Unit.dirs[highestIndex], 4);
         }
-
-        rc.setIndicatorString(1, "x: " + runAwaySpot.x + " y: " + runAwaySpot.y);
 
         return runAwaySpot;
     }
@@ -955,7 +952,7 @@ public class FightMicro
 
         // if an ally is fighting a zombie advance
 
-        if (rc.isCoreReady())
+        if (rc.isCoreReady() && rc.getHealth() > 15)
         {
             boolean allyEngaged = false;
 

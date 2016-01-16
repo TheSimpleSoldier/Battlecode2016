@@ -121,6 +121,8 @@ public class RobotPlayer
                 unit.act();
 
                 unit = unit.getNewStrategy(unit);
+
+                unit.suicide();
             }
             catch (Exception e)
             {
