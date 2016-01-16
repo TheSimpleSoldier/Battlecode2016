@@ -38,7 +38,7 @@ public class BuildOrderCreation
                     {Bots.TURTLETURRET, Bots.TURTLETURRET},
             };
 
-            int[] timesTurtle = {12/multiplier, 4/multiplier, 4/multiplier, 1000};
+            int[] timesTurtle = {8/multiplier, 4/multiplier, 4/multiplier, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }
