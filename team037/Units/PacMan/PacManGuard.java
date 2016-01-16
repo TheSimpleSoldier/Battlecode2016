@@ -1,17 +1,14 @@
 package team037.Units.PacMan;
 
-import battlecode.common.*;
-import team037.Units.Scouts.HerdingScout;
-import team037.Units.Scouts.ScoutingScout;
-import team037.Utilites.MapUtils;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import team037.Units.BaseUnits.BaseGaurd;
 
 /**
- * PacManArchon runs away. PacManScout escorts PacManArchon.
- * Created by davej on 1/13/2016.
+ * Created by davej on 1/15/2016.
  */
-public class PacManScout extends ScoutingScout implements PacMan {
-//    RobotInfo myArchon;
-//    MapLocation archonLocation;
+public class PacManGuard extends BaseGaurd implements PacMan {
 
     // These are the weights.
     static final double[][] PACMAN_WEIGHTS = new double[][]
@@ -19,27 +16,13 @@ public class PacManScout extends ScoutingScout implements PacMan {
                     {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
                     {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
                     {8, 4, 2, 1, 0},            // target constants (attract towards target)
-                    {1, .5, .5, .5, .5},   // friendly unit weights (friendlies in sensor range)
+                    {-1, -.5, -.5, -.5, -.5},   // friendly unit weights (friendlies in sensor range)
                     {16, 8, 4, 2, 0},        // Archon constants (constantly repel from friendly Archons)
             };
 
-
-    public PacManScout(RobotController rc) {
+    public PacManGuard(RobotController rc) {
         super(rc);
-//        nearByAllies = rc.senseNearbyRobots(2,us);
-//        for (int i = nearByAllies.length; --i >= 0;) {
-//            if (nearByAllies[i].type.equals(RobotType.ARCHON)) {
-//                myArchon = nearByAllies[i];
-//                break;
-//            }
-//        }
-//
-//        if (myArchon != null) {
-//            archonLocation = myArchon.location;
-//        }
     }
-
-
 
     public boolean fightZombies() {
         // No need to fight zombies if there aren't any
@@ -78,11 +61,29 @@ public class PacManScout extends ScoutingScout implements PacMan {
 
     public boolean precondition()
     {
+        try {
+            MapLocation[] badArchons = mapKnowledge.getArchonLocations(true);
+            if (updateTarget() && badArchons != null && badArchons.length > 0) {
+                int max = -1;
+                for (int i = badArchons.length; --i >= 0;) {
+                    if (badArchons[i].distanceSquaredTo(currentLocation) > max) {
+                        navigator.setTarget(badArchons[i]);
+                    }
+                }
+            }
+        } catch (Exception e) {}
         return false;
     }
 
     public boolean updateTarget() throws GameActionException
     {
         return false;
+    }
+
+    public boolean aidDistressedArchon() throws GameActionException {return false;}
+    public void handleMessages() throws GameActionException { }
+    public void sendMessages()
+    {
+        return;
     }
 }
