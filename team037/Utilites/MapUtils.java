@@ -189,8 +189,42 @@ public class MapUtils
                 }
             }
         }
-
         return nearest;
     }
 
+    /**
+     * This method returns the closest location to a target that is unoccupied
+     *
+     * @param currentLoc
+     * @return
+     */
+    public static MapLocation getClosestUnoccupiedSquare(MapLocation currentLoc, MapLocation target) throws GameActionException
+    {
+        // precondition
+        if (currentLoc == null || target == null) return null;
+
+        int dist = currentLoc.distanceSquaredTo(target);
+
+        if (dist >= 49) return target;
+
+        MapLocation closest = currentLoc;
+
+        MapLocation[] getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
+
+        int closestDistToTarget = dist;
+
+        for (int i = getLocs.length; --i>=0; )
+        {
+            MapLocation current = getLocs[i];
+            int newDist = current.distanceSquaredTo(target);
+
+            if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)
+            {
+                closestDistToTarget = newDist;
+                closest = current;
+            }
+        }
+
+        return closest;
+    }
 }
