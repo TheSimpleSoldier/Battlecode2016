@@ -15,13 +15,24 @@ public class PacManGuard extends BaseGaurd implements PacMan {
             {
                     {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
                     {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
-                    {8, 4, 2, 1, 0},            // target constants (attract towards target)
-                    {-1, -.5, -.5, -.5, -.5},   // friendly unit weights (friendlies in sensor range)
+                    {-8, -4, -2, -1, 0},            // target constants (attract towards target)
+                    {1, .5, .5, .5, .5},   // friendly unit weights (friendlies in sensor range)
                     {16, 8, 4, 2, 0},        // Archon constants (constantly repel from friendly Archons)
             };
 
     public PacManGuard(RobotController rc) {
         super(rc);
+        try {
+            MapLocation[] badArchons = rc.getInitialArchonLocations(opponent);
+            if (updateTarget() && badArchons != null && badArchons.length > 0) {
+                int max = -1;
+                for (int i = badArchons.length; --i >= 0;) {
+                    if (badArchons[i].distanceSquaredTo(currentLocation) > max) {
+                        navigator.setTarget(badArchons[i]);
+                    }
+                }
+            }
+        } catch (Exception e) {}
     }
 
     public boolean fightZombies() {
@@ -59,25 +70,30 @@ public class PacManGuard extends BaseGaurd implements PacMan {
         return directions;
     }
 
-    public boolean precondition()
+    public boolean updateTarget() throws GameActionException
     {
+        if (target == null || currentLocation.equals(navigator.getTarget())) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public MapLocation getNextSpot() throws GameActionException
+    {
+        MapLocation newTarget = currentLocation;
         try {
-            MapLocation[] badArchons = mapKnowledge.getArchonLocations(true);
-            if (updateTarget() && badArchons != null && badArchons.length > 0) {
+            MapLocation[] badArchons = rc.getInitialArchonLocations(opponent);
+            if (badArchons != null && badArchons.length > 0) {
                 int max = -1;
                 for (int i = badArchons.length; --i >= 0;) {
                     if (badArchons[i].distanceSquaredTo(currentLocation) > max) {
-                        navigator.setTarget(badArchons[i]);
+                        newTarget = badArchons[i];
                     }
                 }
             }
         } catch (Exception e) {}
-        return false;
-    }
-
-    public boolean updateTarget() throws GameActionException
-    {
-        return false;
+        return newTarget;
     }
 
     public boolean aidDistressedArchon() throws GameActionException {return false;}
