@@ -8,6 +8,7 @@ public class BaseViper extends Unit
     public BaseViper(RobotController rc)
     {
         super(rc);
+        archonDistressComs = false;
     }
 
     public boolean takeNextStep() throws GameActionException

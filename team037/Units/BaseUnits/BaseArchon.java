@@ -23,7 +23,6 @@ public class BaseArchon extends Unit
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
     private int retreatCall = 0;
-    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
 
     public BaseArchon(RobotController rc)
     {
@@ -31,7 +30,8 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
-        mapKnowledge = mKnowledge;
+        archonComs = false;
+        archonDistressComs = false;
     }
 
     public boolean precondition()
@@ -152,9 +152,9 @@ public class BaseArchon extends Unit
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
             rc.activate(neutralBots[0].location);
-            for (int j = mKnowledge.dens.length; --j>=0; )
+            for (int j = mapKnowledge.dens.length; --j>=0; )
             {
-                MapLocation den = mKnowledge.dens.array[j];
+                MapLocation den = mapKnowledge.dens.array[j];
 
                 if (den != null)
                 {
@@ -196,14 +196,6 @@ public class BaseArchon extends Unit
     }
 
     /**
-     * This method creates the initial starting map and broadcasts it to the world
-     */
-    public static void updateStartingMap()
-    {
-        try { mKnowledge.senseAndUpdateEdges(); communicator.sendCommunication(2500, mKnowledge.getMapBoundsCommunication(id)); } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    /**
      * This method sends out the initial location of the archons
      */
     public static void sendOutInitialLocation()
@@ -234,13 +226,13 @@ public class BaseArchon extends Unit
             {
                 Communication rushMsg = new AttackCommunication();
 
-                MapLocation[] archons = mKnowledge.getArchonLocations(false);
+                MapLocation[] archons = mapKnowledge.getArchonLocations(false);
                 MapLocation archonCOM = MapUtils.getCenterOfMass(archons);
 
                 rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
                 communicator.sendCommunication(2, rushMsg);
 
-                MapLocation rushLoc = mKnowledge.getOppositeCorner(archonCOM);
+                MapLocation rushLoc = mapKnowledge.getOppositeCorner(archonCOM);
                 rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.ATTACK), rushLoc.x, rushLoc.y} );
                 communicator.sendCommunication(2, rushMsg);
             }
@@ -254,14 +246,14 @@ public class BaseArchon extends Unit
             communication.newBType = nextBot;
             communicator.sendCommunication(2, communication);
 
-            Communication mapBoundsCommunication = mKnowledge.getMapBoundsCommunication(id);
+            Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication(id);
             communicator.sendCommunication(5, mapBoundsCommunication);
 
             if (Bots.typeFromBot(nextBot) == RobotType.GUARD || Bots.typeFromBot(nextBot) == RobotType.SOLDIER)
             {
-                for (int j = mKnowledge.dens.length; --j>=0; )
+                for (int j = mapKnowledge.dens.length; --j>=0; )
                 {
-                    MapLocation den = mKnowledge.dens.array[j];
+                    MapLocation den = mapKnowledge.dens.array[j];
 
                     if (den != null)
                     {
