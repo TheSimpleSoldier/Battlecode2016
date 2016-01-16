@@ -7,7 +7,6 @@ public class ScoutMapKnowledge extends MapKnowledge
 {
 
     public boolean[] exploredRegions = new boolean[16];
-    public boolean[] exploredEdges = new boolean[4];
     public boolean[] edgesBeingExplored = new boolean[4];
     public boolean[][] exploredLocsInRegion;
 

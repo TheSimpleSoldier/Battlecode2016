@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Enums.ReadLevel;
 import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
@@ -43,6 +44,7 @@ public abstract class Unit
     public static boolean repaired;
     public static int msgsSent = 0;
     public static boolean defendingArchon = false;
+    public static ReadLevel readLevel;
 
     public static MapLocation locationLastTurn;
     public static MapLocation previousLocation;
@@ -78,6 +80,7 @@ public abstract class Unit
         repaired = false;
         alliedArchonStartLocs = rc.getInitialArchonLocations(us);
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
+        readLevel = ReadLevel.ALL;
     }
 
     public boolean act() throws GameActionException
@@ -152,8 +155,62 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
+        switch(readLevel)
+        {
+            case ALL:
+                communications = communicator.processCommunications();
+                for(int k = communications.length; --k >= 0;)
+                {
+                    switch(communications[k].opcode)
+                    {
+
+                    }
+                }
+                break;
+            case NONE:
+                break;
+            case US:
+                communications = communicator.processCommunications();
+                for(int k = communications.length; --k >= 0;)
+                {
+                    switch(communications[k].opcode)
+                    {
+
+                    }
+                }
+                break;
+            case ENEMY:
+                communications = communicator.processCommunications();
+                for(int k = communications.length; --k >= 0;)
+                {
+                    switch(communications[k].opcode)
+                    {
+
+                    }
+                }
+                break;
+            case MISSION:
+                communications = communicator.processCommunications();
+                for(int k = communications.length; --k >= 0;)
+                {
+                    switch(communications[k].opcode)
+                    {
+
+                    }
+                }
+                break;
+            case MAP:
+                communications = communicator.processCommunications();
+                for(int k = communications.length; --k >= 0;)
+                {
+                    switch(communications[k].opcode)
+                    {
+
+                    }
+                }
+                break;
+        }
         int rubbleUpdate = 0;
-        communications = communicator.processCommunications();
         int[] values;
         int dist = 0;
 
