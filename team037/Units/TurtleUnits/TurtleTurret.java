@@ -1,27 +1,19 @@
 package team037.Units.TurtleUnits;
 
+import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import battlecode.common.RobotType;
 import team037.Units.BaseUnits.BaseTurret;
+import team037.Utilites.MapUtils;
+import team037.Utilites.PartsUtilities;
 
 public class TurtleTurret extends BaseTurret
 {
     public TurtleTurret(RobotController rc)
     {
         super(rc);
-    }
-
-    @Override
-    public boolean updateTarget()
-    {
-        // TODO: Implement this
-        return false;
-    }
-
-    @Override
-    public MapLocation getNextSpot()
-    {
-        // TODO: Implement this
-        return null;
+        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        setTargetLoc(turtlePoint);
     }
 }

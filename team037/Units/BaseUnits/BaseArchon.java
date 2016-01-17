@@ -87,7 +87,7 @@ public class BaseArchon extends Unit
     {
         super.handleMessages();
 
-        int offennsiveEnemies = 0;
+        int offensiveEnemies = 0;
 
         for (int i = enemies.length; --i>=0;)
         {
@@ -97,13 +97,13 @@ public class BaseArchon extends Unit
                 case GUARD:
                 case SOLDIER:
                 case VIPER:
-                    offennsiveEnemies++;
+                    offensiveEnemies++;
             }
         }
 
-        offennsiveEnemies += zombies.length;
+        offensiveEnemies += zombies.length;
 
-        if (offennsiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25)
+        if (offensiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25)
         {
             retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
@@ -138,7 +138,10 @@ public class BaseArchon extends Unit
         {
             if (weakest != null)
             {
-                rc.repair(weakest.location);
+                if (rc.senseRobotAtLocation(weakest.location) != null)
+                {
+                    rc.repair(weakest.location);
+                }
                 turnHealed = rc.getRoundNum();
                 return true;
             }
@@ -157,6 +160,7 @@ public class BaseArchon extends Unit
         {
             System.out.println("Activating");
             rc.activate(neutralBots[0].location);
+
             for (int j = mKnowledge.dens.length; --j>=0; )
             {
                 MapLocation den = mKnowledge.dens.array[j];
@@ -165,7 +169,7 @@ public class BaseArchon extends Unit
                 {
                     Communication communicationDen = new SimpleBotInfoCommunication();
                     communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
-                    communicator.sendCommunication(2, communicationDen);
+                    communicator.sendCommunication(5, communicationDen);
                 }
             }
         }
