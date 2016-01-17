@@ -430,7 +430,7 @@ public class ScoutBombScout extends BaseScout
     ===============================
      */
     private boolean moveInPositionAroundEnemey() throws GameActionException {
-        if (enemies.length == 0) {
+        if (nonScoutEnemies) {
             return false;
         }
         if (possibleEnemyDamageNextTurn > 0) {
@@ -465,7 +465,7 @@ public class ScoutBombScout extends BaseScout
      */
     private boolean findEnemies() throws GameActionException {
         // precondition
-        if (enemies.length > 0) {
+        if (nonScoutEnemies) {
             return false;
         }
 
