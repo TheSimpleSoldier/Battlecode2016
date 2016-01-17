@@ -29,6 +29,81 @@ public class Map {
     }
 
     /**
+     *
+     * @param currentLoc
+     * @param direction
+     * @param width
+     * @return
+     */
+    public int[] ping(MapLocation currentLoc, int direction, int width) {
+        int[] pingData = new int[width];
+        int x = currentLoc.x - originX + 128;
+        int y = currentLoc.y - originY + 128;
+        switch (direction) {
+            case 0:
+            case 1:
+                x += width/2;
+                y -= 1;
+                // North
+                for (int i = width; --i >= 0;) {
+                    pingData[i] = Navigation.distanceLeft(y,x,mapY);
+                    x -= 1;
+                }
+                break;
+
+            case 2:
+            case 3:
+                y += width/2;
+                x += 1;
+                // East
+                for (int i = width; --i >= 0;) {
+                    pingData[i] = Navigation.distanceRight(x,y,mapX);
+                    y -= 1;
+                }
+                break;
+
+            case 4:
+            case 5:
+                x -= width/2;
+                y += 1;
+                // South
+                for (int i = width; --i >= 0;) {
+                    pingData[i] = Navigation.distanceRight(y,x,mapY);
+                    x += 1;
+                }
+                break;
+
+            case 6:
+            case 7:
+                y -= width/2;
+                x -= 1;
+                // West
+                for (int i = width; --i >= 0;) {
+                    pingData[i] = Navigation.distanceLeft(x,y,mapX);
+                    y += 1;
+                }
+                break;
+        }
+        return pingData;
+    }
+
+    /**
+     * Probe the north, south east, and west for the distances to the nearest rubble.
+     * @param currentLoc current location
+     * @return
+     */
+    public int[] probe(MapLocation currentLoc) {
+        int[] probeData = new int[4];
+        int x = currentLoc.x - originX + 128;
+        int y = currentLoc.y - originY + 128;
+        probeData[0] = Navigation.distanceLeft(y,x,mapY);
+        probeData[1] = Navigation.distanceLeft(x,y,mapX);
+        probeData[2] = Navigation.distanceRight(y,x,mapY);
+        probeData[3] = Navigation.distanceRight(x,y,mapX);
+        return probeData;
+    }
+
+    /**
      * @param location MapLocation at (map) (x,y)
      * @return int[]{(array)x_coordinate,(array)y_coordinate
      */
@@ -1169,7 +1244,7 @@ public class Map {
      * @param offset int subtracted from the center's x and y to get the northwest corner of the scan, and added
      *               to get the southeast corner.
      */
-    private void printMap(MapLocation center, int offset) {
+    public void printMap(MapLocation center, int offset) {
         System.out.println();
         int[] loc = mapToArray(center);
         int xStart = loc[0] - offset;

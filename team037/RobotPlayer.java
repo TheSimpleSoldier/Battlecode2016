@@ -12,7 +12,10 @@ import team037.Units.CastleUnits.CastleArchon;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.PacMan.PacManGuard;
+import team037.Units.PacMan.PacManScout;
 import team037.Units.TurtleUnits.TurtleArchon;
+import team037.Units.PacMan.PacManArchon;
 
 public class RobotPlayer
 {
@@ -45,6 +48,9 @@ public class RobotPlayer
             } else if (strategy.equals(Strategies.TURTLE)) {
                 unit = new TurtleArchon(rc);
                 Unit.thisBot = Bots.TURTLEARCHON;
+            } else if (strategy.equals(Strategies.PACMAN)) {
+                unit = new PacManArchon(rc);
+                Unit.thisBot = Bots.PACMANARCHON;
             } else { // default to alpha archons
                 unit = new AlphaArchon(rc);
                 Unit.thisBot = Bots.ALPHAARCHON;
@@ -52,13 +58,23 @@ public class RobotPlayer
         }
         else if (type == RobotType.GUARD)
         {
-            unit = new BaseGaurd(rc);
-            Unit.thisBot = Bots.BASEGAURD;
+            if (strategy.equals(Strategies.PACMAN)) {
+                unit = new PacManGuard(rc);
+                Unit.thisBot = Bots.PACMANGUARD;
+            } else {
+                unit = new BaseGaurd(rc);
+                Unit.thisBot = Bots.BASEGAURD;
+            }
         }
         else if (type == RobotType.SCOUT)
         {
-            unit = new BaseScout(rc);
-            Unit.thisBot = Bots.BASESCOUT;
+            if (strategy.equals(Strategies.PACMAN)) {
+                unit = new PacManScout(rc);
+                Unit.thisBot = Bots.PACMANSCOUT;
+            } else {
+                unit = new BaseScout(rc);
+                Unit.thisBot = Bots.BASESCOUT;
+            }
         }
         else if (type == RobotType.SOLDIER)
         {

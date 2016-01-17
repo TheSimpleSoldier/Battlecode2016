@@ -52,6 +52,16 @@ public class BuildOrderCreation
             return new BuildOrder(buildOrderSoldiers, times2);
         }
 
+        if (RobotPlayer.strategy.equals(Strategies.PACMAN)) {
+            Bots[][] buildOrderPacMan = {
+                    {Bots.PACMANGUARD, null},
+            };
+
+            int[] timesPacMan = {1000};
+
+            return new BuildOrder(buildOrderPacMan,timesPacMan);
+        }
+
 
         // This is the default strategy
         Bots[][] buildOrder = {
