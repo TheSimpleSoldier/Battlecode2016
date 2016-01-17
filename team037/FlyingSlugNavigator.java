@@ -136,6 +136,34 @@ public class FlyingSlugNavigator extends Navigator
         }
     }
 
+    public Direction getNextStep(MapLocation currentLocation, boolean straight, boolean left) throws GameActionException {
+        Direction toMove = currentLocation.directionTo(target);
+        if (!straight && left) {
+            toMove = toMove.rotateLeft();
+        } else if (!straight && !left) {
+            toMove = toMove.rotateRight();
+        }
+        if (tryMove(toMove, currentLocation)) {
+            return toMove;
+        } else if (tryMove(toMove.rotateLeft(), currentLocation)) {
+            return toMove.rotateLeft();
+        } else if (tryMove(toMove.rotateRight(), currentLocation)) {
+            return toMove.rotateRight();
+        } else if (tryMove(toMove.rotateLeft().rotateLeft(), currentLocation)) {
+            return toMove.rotateLeft().rotateLeft();
+        } else if (tryMove(toMove.rotateRight().rotateRight(), currentLocation)) {
+            return toMove.rotateRight().rotateRight();
+        } else if (tryMove(toMove.rotateLeft().rotateLeft().rotateLeft(), currentLocation)) {
+            return toMove.opposite().rotateRight();
+        } else if (tryMove(toMove.rotateRight().rotateRight().rotateRight(), currentLocation)) {
+            return toMove.opposite().rotateLeft();
+        } else {
+            // we couldn't move anywhere! reset the tail and try again
+            resetTail();
+            return Direction.NONE;
+        }
+    }
+
 
     @Override
     public boolean takeNextStep() throws GameActionException {
@@ -175,12 +203,7 @@ public class FlyingSlugNavigator extends Navigator
             return false;
         }
 
-        Direction toMove = getNextStep(currentLocation);
-        if (!straight && left) {
-            toMove = toMove.rotateLeft();
-        } else if (!straight && !left) {
-            toMove = toMove.rotateRight();
-        }
+        Direction toMove = getNextStep(currentLocation, straight, left);
 
         if (toMove.equals(Direction.NONE)) {
             return false;

@@ -1,6 +1,7 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
+import team037.Enums.Bots;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
@@ -22,7 +23,10 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         if (enemies.length == 0) {
             return false;
         }
-        return runAway(null);
+        if (enemies.length > 3) {
+            return runAway(null);
+        }
+        return false;
     }
 
 
