@@ -65,7 +65,7 @@ public class BaseTurret extends Unit
         }
 
         // otherwise we are a ttm
-        return navigator.takeNextStep();
+        return navigator.takeNextStepTTM();
     }
 
     @Override

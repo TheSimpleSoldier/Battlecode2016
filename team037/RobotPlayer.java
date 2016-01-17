@@ -36,7 +36,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.PACMAN;
+        strategy = Strategies.NORMAL;
 
 
         RobotType type = rc.getType();
