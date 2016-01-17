@@ -23,6 +23,7 @@ public class MapKnowledge
     public SimpleRobotInfo[] ourArchons;
     public SimpleRobotInfo[] theirArchons;
     public AppendOnlyMapLocationSet dens;
+    public boolean updated = false;
 
     public MapKnowledge()
     {
@@ -31,7 +32,7 @@ public class MapKnowledge
         dens = new AppendOnlyMapLocationSet();
     }
 
-    public Communication getMapBoundsCommunication(int id)
+    public Communication getMapBoundsCommunication()
     {
         Communication communication = new MapBoundsCommunication();
 
@@ -53,18 +54,22 @@ public class MapKnowledge
         if(x < minX)
         {
             minX = x;
+            updated = true;
         }
         if(y < minY)
         {
             minY = y;
+            updated = true;
         }
         if(x > maxX)
         {
             maxX = x;
+            updated = true;
         }
         if(y > maxY)
         {
             maxY = y;
+            updated = true;
         }
     }
 
@@ -73,18 +78,22 @@ public class MapKnowledge
         if(minX < this.minX)
         {
             this.minX = minX;
+            updated = true;
         }
         if(minY < this.minY)
         {
             this.minY = minY;
+            updated = true;
         }
         if(minX + width > this.maxX)
         {
             this.maxX = minX + width;
+            updated = true;
         }
         if(minY + height > this.maxY)
         {
             this.maxY = minY + height;
+            updated = true;
         }
     }
 
@@ -384,5 +393,10 @@ public class MapKnowledge
         {
             exploredEdges[3] = true;
         }
+    }
+
+    public static int getRange()
+    {
+        return Unit.type.sensorRadiusSquared * 2;
     }
 }
