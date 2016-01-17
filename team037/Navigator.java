@@ -31,4 +31,8 @@ public class Navigator
     {
         return Navigation.move(target);
     }
+
+    public Direction getNextStep(MapLocation currentLocation) throws GameActionException {
+        return Direction.NONE;
+    }
 }

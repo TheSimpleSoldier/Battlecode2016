@@ -153,7 +153,6 @@ public class BaseArchon extends Unit
         // heal doesn't effect core cooldown
         healNearbyAllies();
 
-        System.out.println("Carrying out that ability");
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
             System.out.println("Activating");

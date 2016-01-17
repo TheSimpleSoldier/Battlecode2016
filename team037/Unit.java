@@ -421,12 +421,16 @@ public abstract class Unit
     {
 
         nearByEnemies = rc.senseNearbyRobots(range, opponent);
-        nearByAllies = rc.senseNearbyRobots(range, us);
+        if (type.attackRadiusSquared > 0) {
+            nearByAllies = rc.senseNearbyRobots(range, us);
+        }
 
         enemies = rc.senseNearbyRobots(sightRange, opponent);
         allies = rc.senseNearbyRobots(sightRange, us);
 
-        nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
+        if (type.attackRadiusSquared > 0) {
+            nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
+        }
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
 
         round = rc.getRoundNum();
