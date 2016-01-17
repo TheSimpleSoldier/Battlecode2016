@@ -20,6 +20,8 @@ package team037;
  */
 
 import battlecode.common.*;
+import battlecode.world.signal.RubbleChangeSignal;
+import team037.Utilites.RubbleUtilities;
 
 public class Navigation {
 
@@ -27,6 +29,7 @@ public class Navigation {
     static Multimap multimap;  // Priority multimap for the current search.
     static boolean searching, reachedGoal;  // Flags for search status
     static final int bytecodeLimit = 1300; // Bytecode limit
+    static int pathLength;
     static RobotController rc = null;
     static JumpPoint pathStart, lastPt, myLoc, goalJP;
     public static MapLocation lastScan, currentGoal;
@@ -52,6 +55,7 @@ public class Navigation {
             int[] getMyLoc = map.mapToArray(lastScan);
             myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
             currentGoal = lastScan;
+            pathLength = Integer.MAX_VALUE;
         }
     }
 
@@ -67,7 +71,7 @@ public class Navigation {
         MapLocation location = rc.getLocation();
         int[] getMyLoc = map.mapToArray(location);
         myLoc = new JumpPoint(getMyLoc[0], getMyLoc[1]);
-        currentGoal = location;
+        pathLength = Integer.MAX_VALUE;
     }
 
     /**
@@ -145,7 +149,7 @@ public class Navigation {
             if (nextPt != null) {
 
                 int direction = myLoc.directionTo(nextPt);
-                Direction forward = intToDirection(direction);
+                Direction forward = Unit.dirs[direction];
 
                 if (rc.canMove(forward)) {
                     rc.move(forward);
@@ -159,14 +163,14 @@ public class Navigation {
         return moved;
     }
 
-    public static void dig(MapLocation currentLoc, MapLocation goal) throws GameActionException {
+    public static boolean dig(MapLocation currentLoc, MapLocation goal) throws GameActionException {
 
         Direction forward = currentLoc.directionTo(goal);
 
         // if we have reached goal then it will try to clear rubble
         // for direction omni which throws an error
         if (forward == Direction.NONE || forward == Direction.OMNI)
-            return;
+            return false;
 
         Direction right = forward.rotateRight();
         Direction left = forward.rotateLeft();
@@ -181,21 +185,16 @@ public class Navigation {
 
         if (rubbleRight > 50 && rubbleRight < rubbleFront) {
             rc.clearRubble(right);
+            return true;
         } else if (rubbleLeft > 50 && rubbleLeft < rubbleFront) {
             rc.clearRubble(left);
+            return true;
         } else if (rubbleFront > 50) {
             rc.clearRubble(forward);
+            return true;
         } else {
-            Direction right90 = right.rotateRight();
-            Direction right135 = right90.rotateRight();
-            double rubbleRight90 = rc.senseRubble(currentLoc.add(right90));
-            double rubbleRight135 = rc.senseRubble(currentLoc.add(right135));
-
-            if (rubbleRight90 > 50) {
-                rc.clearRubble(right90);
-            } else if (rubbleRight135 > 50) {
-                rc.clearRubble(right135);
-            }
+            pathLength = Integer.MAX_VALUE;
+            return false;
         }
     }
 
@@ -205,7 +204,7 @@ public class Navigation {
      * @return True if unit moved, false otherwise
      * @throws GameActionException
      */
-    public static boolean move(MapLocation goal) throws GameActionException {
+    public static boolean moveTTM(MapLocation goal) throws GameActionException {
         boolean moved;
         MapLocation currentLoc = rc.getLocation();
 
@@ -255,19 +254,238 @@ public class Navigation {
                 pathStart = getPath(null, null);
                 moved = false;
             }
-
-            if (rc.isCoreReady()) {
-                // dig
-                try {
-                    dig(currentLoc, goal);
-                } catch (Exception e) {}
-            }
         } else {
-            currentGoal = currentLoc;
             moved = false;
         }
 
         return moved;
+    }
+
+    /**
+     * Attempt to move. Scans local vicinity if unit moves.
+     * @param goal this unit's target location
+     * @return True if unit moved, false otherwise
+     * @throws GameActionException
+     */
+    public static boolean move(MapLocation goal) throws GameActionException {
+        boolean moved;
+        MapLocation currentLoc = rc.getLocation();
+
+        if (!currentLoc.equals(lastScan)) {
+            int bytecodes = Clock.getBytecodesLeft();
+            if (searching || bytecodes < 2500) {
+                map.scanImmediateVicinity(currentLoc);
+                lastScan = currentLoc;
+            } else {
+                map.scan(currentLoc);
+                lastScan = currentLoc;
+            }
+        }
+
+        if (goal != null) { // Only move if we have a goal
+
+            if (currentGoal != null && !goal.equals(currentGoal)) { // Reset the search if our goal has changed
+                reset();
+                currentGoal = goal;
+            } else if (currentLoc.equals(goal)) { // We don't need to move if we're already at the goal.
+                return false;
+            }
+
+            if (!digging()) { // If there is no rubble in our way or it is best to go around, then move
+                if (searching) { // If we are searching for a path around rubble, it is best to wait. Maybe dig?
+                    pathStart = getPath(null, null);
+                    if (rc.isCoreReady() && rc.senseRubble(currentLoc) >= GameConstants.RUBBLE_SLOW_THRESH) {
+                        // Rubble is on our current location; clear it for future bots.
+                        try {
+                            rc.clearRubble(Direction.NONE);
+                            return true;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }
+                    return false;
+                } else if (rc.isCoreReady()) {
+                    // We can move this round; attempt to move.
+                    if ((reachedGoal && tryPath(currentLoc)) || tryBug(currentLoc, goal)) {
+                        // We moved
+                        currentLoc = rc.getLocation();
+                        int[] loc = map.mapToArray(currentLoc);
+                        myLoc = new JumpPoint(loc[0], loc[1]);
+                        moved = true;
+                    } else {
+                        // We did not move; verify location and initiate search.
+                        currentLoc = rc.getLocation();
+                        reset();
+
+                        int[] loc = map.mapToArray(currentLoc);
+                        myLoc = new JumpPoint(loc[0], loc[1]);
+
+                        pathStart = getPath(loc, map.mapToArray(goal));
+                        lastPt = pathStart;
+                        moved = false;
+                    }
+                } else {
+                    // Cannot move this round
+                    moved = false;
+                }
+            } else if (rc.isCoreReady()) {
+                if (searching) {
+                    pathStart = getPath(null, null);
+                }
+                // We are digging.
+                try {
+                    moved = dig(currentLoc, goal);
+                    if (!moved) {
+                        reset();
+                        currentGoal = goal;
+                    }
+                } catch (Exception e) {
+                    moved = false;
+                }
+            } else {
+                // Can't dig this round
+                if (searching) {
+                    pathStart = getPath(null, null);
+                }
+                moved = false;
+            }
+        } else {
+            // No goal, no need to go anywhere
+            moved = false;
+        }
+
+        return moved;
+    }
+
+    private static boolean digging() throws GameActionException {
+
+        if (pathLength == 0 && reachedGoal) {
+            // If pathLength = 0, we have determined that a complete path is the best way to go.
+            return false;
+        }
+
+        double thresh = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+
+        MapLocation currentLoc = Unit.currentLocation;
+
+        Direction toGoal = currentLoc.directionTo(currentGoal);
+        Direction goalRight = toGoal.rotateRight();
+        Direction goalLeft = toGoal.rotateLeft();
+
+        MapLocation forward = currentLoc.add(toGoal);
+        MapLocation right = currentLoc.add(goalRight);
+        MapLocation left = currentLoc.add(goalLeft);
+
+        double rubbleFront = rc.senseRubble(forward);
+        double rubbleRight = rc.senseRubble(right);
+        double rubbleLeft = rc.senseRubble(left);
+
+        boolean blockedFront = rubbleFront >= thresh;
+        boolean blockedRight = rubbleRight >= thresh;
+        boolean blockedLeft = rubbleLeft >= thresh;
+
+        if (!(blockedFront || blockedRight || blockedLeft)) {
+            // If rubble is not blocking us in the 3 forward directions.
+            if (!(rc.canMove(toGoal) || rc.canMove(goalRight) || rc.canMove(goalLeft))) {
+                // ... but if we can't move in the 3 forward directions.
+                thresh = GameConstants.RUBBLE_SLOW_THRESH;
+                if (rubbleFront >= thresh || rubbleRight >= thresh || rubbleLeft >= thresh) {
+                    // Let's clear some rubble under our allies.
+                    return true;
+                }
+            }
+            // No rubble is blocking the way, no need to dig.
+            return false;
+        } else if (blockedFront && blockedRight && blockedLeft) {
+            // Rubble is blocking the way in all 3 forward directions, let's see if it's faster to go around or dig.
+
+            // Get the cheapest three rubble piles in front of me.
+            int turnsToDig, rubblePiles = 0;
+            if (rubbleRight > rubbleFront && rubbleLeft > rubbleFront) { // Start with the front.
+                double nextRubble = rc.senseRubble(forward.add(forward.directionTo(currentGoal)));
+                if (nextRubble >= thresh) { // check for more rubble in the direction of our goal.
+                    rubbleFront += nextRubble;
+                    rubblePiles++;
+                    nextRubble = rc.senseRubble(forward.add(forward.directionTo(currentGoal),2));
+                    if (nextRubble >= thresh) { // check for a 3rd rubble pile in the direction of our goal.
+                        rubbleFront += nextRubble;
+                        rubblePiles++;
+                    }
+                }
+            } else if (rubbleLeft > rubbleRight) { // Front wasn't the smallest pile, check the right.
+                rubbleFront = rubbleRight;
+                double nextRubble = rc.senseRubble(right.add(right.directionTo(currentGoal)));
+                if (nextRubble >= thresh) { // check for a 3rd rubble pile in the direction of our goal.
+                    rubbleFront += nextRubble;
+                    rubblePiles++;
+                    nextRubble = rc.senseRubble(right.add(right.directionTo(currentGoal),2));
+                    if (nextRubble >= thresh) { // check for a 3rd rubble pile in the direction of our goal.
+                        rubbleFront += nextRubble;
+                        rubblePiles++;
+                    }
+                }
+            } else { // Front and right are not the smallest, so it has to be the left.
+                rubbleFront = rubbleLeft;
+                double nextRubble = rc.senseRubble(left.add(left.directionTo(currentGoal)));
+                if (nextRubble >= thresh) { // check for a 3rd rubble pile in the direction of our goal.
+                    rubbleFront += nextRubble;
+                    rubblePiles++;
+                    nextRubble = rc.senseRubble(left.add(left.directionTo(currentGoal),2));
+                    if (nextRubble >= thresh) { // check for a 3rd rubble pile in the direction of our goal.
+                        rubbleFront += nextRubble;
+                        rubblePiles++;
+                    }
+                }
+            }
+
+            // Calculate the number of rounds it will take to dig through the rubble.
+            turnsToDig = RubbleUtilities.calculateClearActionsToPassableButSlow(rubbleFront) - (rubblePiles*RubbleUtilities.OBSTR_TO_ZERO);
+
+            if (turnsToDig > pathLength && reachedGoal) {
+                // We have a path to the goal and it's faster to take it; set pathLength to 0 so we don't check again.
+                pathLength = 0;
+                return false;
+            } else if (turnsToDig < pathLength) {
+                // The incomplete path would already take longer than digging and it cannot improve with more search.
+                searching = false;
+                return true;
+            } else {
+                // Otherwise, set pathLength to max value so we check again next time.
+                pathLength = Integer.MAX_VALUE;
+                return true;
+            }
+        } else if (!blockedFront && !rc.canMove(toGoal)) {
+            // If no rubble is blocking our front and we cannot move, there is a unit blocking the way.
+            if (rc.canMove(goalRight) || rc.canMove(goalLeft)) {
+                // If we can move right or left of the unit, then we don't need to dig.
+                return false;
+            } else {
+                // Otherwise, we should probably dig while we wait for the unit blocking our way.
+                return true;
+            }
+        } else if (!blockedRight && !rc.canMove(goalRight)) {
+            // If no rubble is blocking our right and we cannot move, there is a unit blocking the way.
+            if (rc.canMove(toGoal) || rc.canMove(goalLeft)) {
+                // If we can move left of the unit, then we don't need to dig.
+                return false;
+            } else {
+                // Otherwise, we should probably dig while we wait for the unit blocking our way.
+                return true;
+            }
+        } else if (!blockedLeft && !rc.canMove(goalLeft)) {
+            // If no rubble is blocking our left and we cannot move, there is a unit blocking the way.
+            if (rc.canMove(toGoal) || rc.canMove(goalRight)) {
+                // If we can move right of the unit, then we don't need to dig.
+                return false;
+            } else {
+                // Otherwise, we should probably dig while we wait for the unit blocking our way.
+                return true;
+            }
+        } else {
+            // I think this statement is unreachable, but try to move just in case.
+            pathLength = Integer.MAX_VALUE;
+            return false;
+        }
     }
 
     /**
@@ -297,48 +515,51 @@ public class Navigation {
             rc.move(left);
             myLoc.move((direction-1)%8);
             moved = true;
-        } else if (rc.isLocationOccupied(currentLoc.add(right)) && rc.canMove(right.rotateRight())) {
+        } else if (rc.canMove(right.rotateRight())) {
             rc.move(right.rotateRight());
             myLoc.move((direction+2)%8);
             moved = true;
+        } else if (rc.canMove(left.rotateLeft())) {
+            rc.move(left.rotateLeft());
+            myLoc.move((direction-2) % 8);
+            moved = true;
         }
-
-        if (moved && nextPt.equals(forwardPt)) {
-            JumpPoint nextNextPt = nextPt.mapNext;
+        if (moved && nextPt.equals(forwardPt) && rc.getLocation().isAdjacentTo(forwardLoc)) {
+            lastPt = nextPt;
         }
 
         return moved;
     }
 
-    public static Direction intToDirection(int direction) {
-        Direction d;
+    public static int directionToInt(Direction direction) {
+        int d;
         switch (direction) {
-            case 0:
-                d = Direction.NORTH;
+            case NORTH:
+                d = 0;
                 break;
-            case 1:
-                d = Direction.NORTH_EAST;
+            case NORTH_EAST:
+                d = 1;
                 break;
-            case 2:
-                d = Direction.EAST;
+            case EAST:
+                d = 2;
                 break;
-            case 3:
-                d = Direction.SOUTH_EAST;
+            case SOUTH_EAST:
+                d = 3;
                 break;
-            case 4:
-                d = Direction.SOUTH;
+            case SOUTH:
+                d = 4;
                 break;
-            case 5:
-                d = Direction.SOUTH_WEST;
+            case SOUTH_WEST:
+                d = 5;
                 break;
-            case 6:
-                d = Direction.WEST;
+            case WEST:
+                d = 6;
                 break;
-            case 7:
-                d = Direction.NORTH_WEST;
+            case NORTH_WEST:
+                d = 7;
                 break;
             default:
-                d = Direction.NONE;
+                d = -1;
                 break;
         }
         return d;
@@ -1199,8 +1420,11 @@ public class Navigation {
 
                 // If the bytecode limit has been reached, return current best path
                 if (Clock.getBytecodesLeft() < maxBytecodes) {
-                    JumpPoint out = multimap.retrace(multimap.peek(multimap.peek()));
-//                    JumpPoint out = multimap.dfs;
+                    JumpPoint out = multimap.peek(multimap.peek());
+                    if (pathLength != 0) {
+                        pathLength = out.f;
+                    }
+                    out = multimap.retrace(out);
                     return out;
                 }
             }
@@ -1209,8 +1433,11 @@ public class Navigation {
             // Resume search if multimap still holds nodes.
         } catch (ArrayIndexOutOfBoundsException e1) {
             if (Clock.getBytecodesLeft() < maxBytecodes && multimap.size > 0) {
-                JumpPoint out = multimap.retrace(multimap.peek(multimap.peek()));
-//                JumpPoint out = multimap.dfs;
+                JumpPoint out = multimap.peek(multimap.peek());
+                if (pathLength != 0) {
+                    pathLength = out.f;
+                }
+                out = multimap.retrace(out);
                 return out;
             }
 

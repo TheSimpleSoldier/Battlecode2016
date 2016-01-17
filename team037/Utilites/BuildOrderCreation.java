@@ -46,9 +46,11 @@ public class BuildOrderCreation
                     {Bots.TURTLESCOUT, Bots.TURTLETURRET},
                     {Bots.TURTLETURRET, Bots.TURTLESOLDIER},
                     {Bots.TURTLETURRET, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET, Bots.TURTLESCOUT},
+                    {Bots.TURTLETURRET, Bots.TURTLETURRET},
             };
 
-            int[] timesTurtle = {8/multiplier, 4/multiplier, 4/multiplier, 1000};
+            int[] timesTurtle = {8/multiplier, 4/multiplier, 4/multiplier, 4/multiplier, 4/multiplier, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }

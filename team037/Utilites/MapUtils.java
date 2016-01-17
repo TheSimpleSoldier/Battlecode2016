@@ -235,6 +235,10 @@ public class MapUtils
         for (int i = getLocs.length; --i>=0; )
         {
             MapLocation current = getLocs[i];
+
+            if (!Unit.rc.canSenseLocation(current)) continue;
+            if (!Unit.rc.onTheMap(current)) continue;
+
             int newDist = current.distanceSquaredTo(target);
 
             if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)

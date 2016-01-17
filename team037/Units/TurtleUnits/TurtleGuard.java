@@ -8,7 +8,7 @@ public class TurtleGuard extends BaseGaurd
 {
     private static int turnsArrivedLoc = -1;
     private static boolean arrived = false;
-    private boolean chasingZombies = false;
+    private boolean chasingEnemies = false;
     private boolean healing = false;
 
     public TurtleGuard(RobotController rc)
@@ -21,7 +21,7 @@ public class TurtleGuard extends BaseGaurd
     public boolean updateTarget() throws GameActionException
     {
         MapLocation target = navigator.getTarget();
-        if (zombies.length > 0) return true;
+        if (zombies.length > 0 || enemies.length > 0) return true;
         if (target == null) return true;
         if ((currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) && (rc.getRoundNum() - turnsArrivedLoc) > 2) return true;
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
@@ -60,13 +60,19 @@ public class TurtleGuard extends BaseGaurd
 
         if (zombies.length > 0)
         {
-            chasingZombies = true;
+            chasingEnemies = true;
             return MapUtils.closestUnit(zombies, currentLocation);
         }
-        
-        if (turnsArrivedLoc == -1 || chasingZombies)
+
+        if (enemies.length > 0)
         {
-            chasingZombies = false;
+            chasingEnemies = true;
+            return MapUtils.closestUnit(enemies, currentLocation);
+        }
+        
+        if (turnsArrivedLoc == -1 || chasingEnemies)
+        {
+            chasingEnemies = false;
             arrived = false;
             return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
         }
