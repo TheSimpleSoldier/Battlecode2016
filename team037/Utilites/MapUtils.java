@@ -154,6 +154,25 @@ public class MapUtils
         return toMove;
     }
 
+    /**
+     * This method returns the turtle location which is currently very dumb as the COM of starting allied archons
+     *
+     * @param alliedArchonStartLocs
+     * @return
+     */
+    public static MapLocation getTurtleSpot(MapLocation[] alliedArchonStartLocs)
+    {
+        int x = 0, y = 0, len = alliedArchonStartLocs.length;
+
+        for (int i = len; --i>=0; )
+        {
+            x += alliedArchonStartLocs[i].x;
+            y += alliedArchonStartLocs[i].y;
+        }
+
+        return new MapLocation(x/len,y/len);
+    }
+
     public static MapLocation getCenterOfMass(MapLocation[] locations)
     {
         int x = 0;
@@ -222,6 +241,50 @@ public class MapUtils
             {
                 closestDistToTarget = newDist;
                 closest = current;
+            }
+        }
+
+        return closest;
+    }
+
+    /**
+     * This method returns true if the current location is nxt to an edge and false otherwise
+     *
+     * @param current
+     * @return
+     */
+    public static boolean nextToEdge(MapLocation current, RobotController rc) throws GameActionException
+    {
+        for (int i = Unit.dirs.length; --i>=0; )
+        {
+            MapLocation next = current.add(Unit.dirs[i]);
+            if (rc.canSense(next) && !rc.onTheMap(next))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method calculates the closest unit
+     *
+     * @param units
+     * @return
+     */
+    public static MapLocation closestUnit(RobotInfo[] units, MapLocation currentLocation)
+    {
+        int dist = Integer.MAX_VALUE;
+        MapLocation closest = null;
+
+        for (int i = units.length; --i>=0; )
+        {
+            MapLocation spot = units[i].location;
+            int currentDist = spot.distanceSquaredTo(currentLocation);
+            if (currentDist < dist)
+            {
+                dist = currentDist;
+                closest = units[i].location;
             }
         }
 

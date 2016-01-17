@@ -134,7 +134,10 @@ public class BaseArchon extends Unit
         {
             if (weakest != null)
             {
-                rc.repair(weakest.location);
+                if (rc.senseRobotAtLocation(weakest.location) != null)
+                {
+                    rc.repair(weakest.location);
+                }
                 turnHealed = rc.getRoundNum();
                 return true;
             }
