@@ -10,6 +10,7 @@ public class RushingSoldier extends BaseSoldier
     private MapLocation lastTarget = null;
     private MapLocation[] updatedLocs;
     private int currentIndex = -1;
+    private int dist = Integer.MAX_VALUE;
 
     public RushingSoldier(RobotController rc)
     {
@@ -22,7 +23,28 @@ public class RushingSoldier extends BaseSoldier
         }
 
         rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
+        dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
+        dist = dist / 2;
+        dist = dist*dist;
         rc.setIndicatorString(0, "Rushing Soldier x: " + rushTarget.x + " y: " + rushTarget.y);
+    }
+
+    @Override
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+
+        if (currentLocation != null && rushTarget != null)
+        {
+            if (currentLocation.distanceSquaredTo(rushTarget) < dist)
+            {
+                rushing = true;
+            }
+            else
+            {
+                rushing = false;
+            }
+        }
     }
 
     @Override
