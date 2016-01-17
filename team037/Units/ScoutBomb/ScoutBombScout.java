@@ -172,7 +172,7 @@ public class ScoutBombScout extends BaseScout
             rc.setIndicatorString(0, "core cooldown");
             return false;
         }  else if (suicideCall()) {
-            lastAction = "heard the suicide message";
+            lastAction = "heard the suicideScout message";
         } else if (herdAwayFromArchon()) {
             // if you are near an allied archon and see zombies, help them!
             lastAction = HERD_AWAY_FROM_ARCHON;
@@ -406,7 +406,7 @@ public class ScoutBombScout extends BaseScout
 
     private boolean turnASAP() throws GameActionException {
         if (rc.getInfectedTurns() > 0) {
-            suicide();
+            suicideScout();
             return true;
         }
         Direction toZombie = currentLocation.directionTo(closestZombieLoc);
@@ -435,12 +435,12 @@ public class ScoutBombScout extends BaseScout
     private void suicideIfNeeded() throws GameActionException {
         if (rc.getInfectedTurns() == 1 && rc.getHealth() < type.maxHealth / 2) {
             if (closestEnemy < closestAlliedArchon) {
-                suicide();
+                suicideScout();
             }
         }
     }
 
-    private void suicide() throws GameActionException {
+    private void suicideScout() throws GameActionException {
         int i = 0;
         while (Clock.getBytecodesLeft() > 200 && i < 20) {
             rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);
