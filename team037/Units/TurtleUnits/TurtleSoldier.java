@@ -23,9 +23,11 @@ public class TurtleSoldier extends BaseSoldier
     @Override
     public boolean updateTarget() throws GameActionException
     {
-        MapLocation target = navigator.getTarget();
         if (zombies.length > 0) return true;
+        MapLocation target = navigator.getTarget();
+
         if (target == null) return true;
+
         if ((currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) && (rc.getRoundNum() - turnsArrivedLoc) > 2) return true;
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
         if (rc.getHealth() <= 25) return true;
@@ -55,7 +57,7 @@ public class TurtleSoldier extends BaseSoldier
     @Override
     public MapLocation getNextSpot()
     {
-        if (healing || rc.getHealth() <= 25)
+        if (healing || rc.getHealth() <= 15)
         {
             healing = true;
             return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
@@ -115,13 +117,13 @@ public class TurtleSoldier extends BaseSoldier
     {
         super.collectData();
 
-        if (!arrived && currentLocation.equals(navigator.getTarget()))
+        if (!arrived && (currentLocation.equals(turtlePoint) || currentLocation.isAdjacentTo(turtlePoint)))
         {
             turnsArrivedLoc = rc.getRoundNum();
             arrived = true;
         }
 
-        if (healing && rc.getHealth() > 100)
+        if (healing && rc.getHealth() > (type.maxHealth - 20))
         {
             healing = false;
         }

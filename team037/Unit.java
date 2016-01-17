@@ -192,7 +192,7 @@ public abstract class Unit
                     {
                         mapKnowledge.dens.add(den);
 
-                        if (type == RobotType.SCOUT || type == RobotType.ARCHON && msgsSent < 20)
+                        if (type == RobotType.SCOUT && msgsSent < 20)
                         {
                             Communication communication = new SimpleBotInfoCommunication();
                             communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), values[1], values[2], values[3]});
@@ -203,7 +203,7 @@ public abstract class Unit
 
                     break;
                 case PARTS:
-                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+                    if (type == RobotType.SCOUT)
                     {
                         // if we get a new msg about parts then send it out
                         ScoutMapKnowledge tempKnow = (ScoutMapKnowledge)mapKnowledge;
@@ -225,7 +225,7 @@ public abstract class Unit
                     break;
 
                 case NEUTRAL:
-                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
+                    if (type == RobotType.SCOUT)
                     {
                         ScoutMapKnowledge tempKnow = (ScoutMapKnowledge)mapKnowledge;
                         values = communications[k].getValues();
@@ -301,7 +301,7 @@ public abstract class Unit
 
                 case EXPLORE_EDGE:
 
-                    if(type == RobotType.SCOUT || type == RobotType.ARCHON)
+                    if(type == RobotType.SCOUT)
                     {
                         ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
                         values = communications[k].getValues();
@@ -324,7 +324,7 @@ public abstract class Unit
                     break;
 
                 case EDGE_EXPLORED:
-                    if(type == RobotType.SCOUT || type == RobotType.ARCHON)
+                    if(type == RobotType.SCOUT)
                     {
                         ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
                         values = communications[k].getValues();
@@ -443,5 +443,40 @@ public abstract class Unit
         }
 
         currentLocation = newLoc;
+    }
+
+    /**
+     * If we are not infected and about to die to enemy zombies then we should
+     * disintigrate to not turn into a zombie
+     */
+    public void suicide()
+    {
+        if (rc.getHealth() <= 15)
+        {
+            if (zombies.length > 0 && type != RobotType.ARCHON)
+            {
+                if (!rc.isInfected())
+                {
+                    for (int i = zombies.length; --i>=0;)
+                    {
+                        // if we are in range
+                        if (currentLocation.distanceSquaredTo(zombies[i].location) <= zombies[i].type.attackRadiusSquared)
+                        {
+                            // if zombie has a weapon cool down less than or equal to 1
+                            if (zombies[i].weaponDelay <= 1)
+                            {
+                                // don't want to stop from becoming a zombie in enemy base
+                                if (enemies.length < allies.length)
+                                {
+                                    System.out.println("WE disintegrated to avoid turning into a zombie");
+                                    rc.setIndicatorDot(currentLocation, 1, 1, 1);
+                                    rc.disintegrate();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
