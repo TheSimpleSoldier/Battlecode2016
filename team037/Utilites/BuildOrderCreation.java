@@ -18,6 +18,13 @@ public class BuildOrderCreation
         //                                                                          //
         //////////////////////////////////////////////////////////////////////////////
 
+        if (RobotPlayer.strategy.equals(Strategies.SCOUT_BOMB)) {
+            Bots[][] buildOrderBombs = {
+                    {Bots.SCOUTBOMBSCOUT}
+            };
+            int[] times2 = {10000};
+            return new BuildOrder(buildOrderBombs, times2);
+        }
 
         if (RobotPlayer.strategy.equals(Strategies.RUSH))
         {

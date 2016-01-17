@@ -49,6 +49,10 @@ public class BaseArchon extends Unit
         super.collectData();
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        if (sortedParts.contains(currentLocation)) {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
+        }
+
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0)
         {
