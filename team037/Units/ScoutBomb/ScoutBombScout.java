@@ -15,6 +15,9 @@ public class ScoutBombScout extends BaseScout
     private static int closestZombie;
     private static MapLocation closestZombieLoc;
     private static RobotInfo closestZombieInfo;
+    private static int closestRangedZombie;
+    private static MapLocation closestRangedZombieLoc;
+    private static RobotInfo closestRangedZombieInfo;
     private static int possibleEnemyDamageNextTurn;
     private static int idxForEnemyLocations = -1;
     private static MapLocation enemyCore;
@@ -26,14 +29,16 @@ public class ScoutBombScout extends BaseScout
     private static final int MIN_AVOID_DIST = (int)(RobotType.RANGEDZOMBIE.attackRadiusSquared * 1.5);
 
 
-    private static final int ZERO_MELEE_HERD_DIST = 2;
-    private static final int MIN_MELEE_HERD_DIST = 4;
-    private static final int MAX_MELEE_HERD_DIST = 8;
-    private static final int MELEE_MOVE_IN_HERD_DIST = 16; // range at which is it safe to close gap with melee enemy
-    private static final int ZERO_RANGED_HERD_DIST = 8;
-    private static final int MIN_RANGED_HERD_DIST = 16;
-    private static final int MAX_RANGED_HERD_DIST = 25;
-    private static final int RANGED_MOVE_IN_HERD_DIST = 36;
+    // see https://docs.google.com/spreadsheets/d/1BK9TgwPGKFMwqvOIgQjwwkYKi8Say01jNNd7MB6syXA/edit#gid=210938007
+    private static final int MELEE_MOVE_AWAY_DISTANCE = 2; // if you are less than this, move away
+    private static final int MELEE_DONT_MOVE_DISTANCE = 8; // if you are here, don't move
+    private static final int MELEE_MOVE_TOWARD_DISTANCE = 9;  // if you are here, move toward to herd
+    private static final int MELEE_AVOID_DISTANCE = MELEE_MOVE_TOWARD_DISTANCE;
+
+    private static final int RANGED_MOVE_AWAY_DISTANCE = 13; // if you are less than this, move away
+    private static final int RANGED_DONT_MOVE_DISTANCE = 25; // if you are here, don't move
+    private static final int RANGED_MOVE_TOWARD_DISTANCE = 26;  // if you are here, move toward to herd
+    private static final int RANGED_AVOID_DISTANCE = RANGED_MOVE_TOWARD_DISTANCE;
 
     private static RobotInfo[] veryCloseZombies;
 
@@ -69,20 +74,31 @@ public class ScoutBombScout extends BaseScout
 
         // zombie info
         // for now only look at close zombies
-        veryCloseZombies = rc.senseNearbyRobots(RANGED_MOVE_IN_HERD_DIST, Team.ZOMBIE);
+        veryCloseZombies = rc.senseNearbyRobots(RANGED_AVOID_DISTANCE, Team.ZOMBIE);
         nonDenZombies = false;
         closestZombie = Integer.MAX_VALUE;
         closestZombieLoc = null;
+        closestZombieInfo = null;
+        closestRangedZombie = Integer.MAX_VALUE;
+        closestRangedZombieLoc = null;
+        closestRangedZombieInfo = null;
         for (int i = veryCloseZombies.length; --i >= 0;) {
             RobotInfo zombie = veryCloseZombies[i];
+            int dist = zombie.location.distanceSquaredTo(currentLocation);
             if (!zombie.type.equals(RobotType.ZOMBIEDEN)) {
-                int dist = zombie.location.distanceSquaredTo(currentLocation);
                 if (dist < closestZombie) {
                     closestZombie = dist;
                     closestZombieLoc = zombie.location;
                     closestZombieInfo = zombie;
                 }
                 nonDenZombies = true;
+            }
+            if (zombie.type.equals(RobotType.RANGEDZOMBIE)) {
+                if (dist < closestRangedZombie) {
+                    closestRangedZombie = dist;
+                    closestRangedZombieLoc = zombie.location;
+                    closestRangedZombieInfo = zombie;
+                }
             }
         }
 
@@ -108,13 +124,13 @@ public class ScoutBombScout extends BaseScout
                     break;
                 case GUARD:
                     nonScoutEnemies = true;
-                    if (distance <= 2 * RobotType.GUARD.attackRadiusSquared) {
+                    if (distance <= 7 + RobotType.GUARD.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.GUARD.attackPower;
                     }
                     break;
                 case SOLDIER:
                     nonScoutEnemies = true;
-                    if (distance <= RobotType.SOLDIER.attackRadiusSquared + 8) {
+                    if (distance <= 2 * RobotType.SOLDIER.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.SOLDIER.attackPower;
                     }
                     break;
@@ -123,7 +139,7 @@ public class ScoutBombScout extends BaseScout
                     break;
                 case TURRET:
                     nonScoutEnemies = true;
-                    if (distance <= RobotType.TURRET.attackRadiusSquared + 1) {
+                    if (distance <= 30 + RobotType.TURRET.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.TURRET.attackPower;
                     }
             }
@@ -194,6 +210,7 @@ public class ScoutBombScout extends BaseScout
             return false;
         }
         rc.setIndicatorString(0, lastAction);
+        rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 255);
         return true;
     }
 
@@ -241,28 +258,31 @@ public class ScoutBombScout extends BaseScout
             return false;
         }
 
-        int distToZombie = currentLocation.distanceSquaredTo(closestZombieLoc);
-        RobotInfo[] friends = rc.senseNearbyRobots(closestZombieLoc, distToZombie - 1, us);
+        RobotInfo[] friends = rc.senseNearbyRobots(closestZombieLoc, closestZombie - 1, us);
 
         if (friends.length > 0) {
             return avoid(closestZombieLoc);
         } else {
-            return herd(distToZombie);
+            return herd();
         }
 
     }
 
-    public boolean herd(int distToZombie) throws GameActionException {
-        if (distToZombie > MELEE_MOVE_IN_HERD_DIST) {
-            rc.setIndicatorString(1, "moving to herd " + String.valueOf(closestZombieLoc));
-            if (rc.canMove(currentLocation.directionTo(closestZombieLoc))) {
-                rc.move(currentLocation.directionTo(closestZombieLoc));
+
+    public boolean herdZombie(int distToZombie, MapLocation zombieLoc, RobotInfo zombieInfo, int moveAwayDistance, int dontMoveDistance, int moveTowardDistance) throws GameActionException {
+        rc.setIndicatorLine(currentLocation, zombieLoc, 0, 255, 0);
+        MapLocation target = navigator.getTarget();
+
+        if (distToZombie > moveTowardDistance) {
+            rc.setIndicatorString(1, "moving to herd " + String.valueOf(zombieLoc));
+            if (rc.canMove(currentLocation.directionTo(zombieLoc))) {
+                rc.move(currentLocation.directionTo(zombieLoc));
                 return true;
             }
-        } else if (distToZombie <= ZERO_MELEE_HERD_DIST && (closestZombieInfo.coreDelay <= 2 || closestZombieInfo.weaponDelay <= 2)) {
-            rc.setIndicatorString(1, "moving away from " + String.valueOf(closestZombieLoc));
-            Direction toMove = currentLocation.directionTo(navigator.getTarget());
-            Direction away = closestZombieLoc.directionTo(currentLocation);
+        } else if (distToZombie <= moveAwayDistance && zombieInfo.weaponDelay <= 2) {
+            rc.setIndicatorString(1, "moving away from " + String.valueOf(zombieLoc));
+            Direction toMove = currentLocation.directionTo(target);
+            Direction away = zombieLoc.directionTo(currentLocation);
             toMove = MapUtils.addDirections(toMove, away);
             if (toMove.equals(Direction.NONE)) {
                 toMove = MapUtils.addDirections(toMove, away);
@@ -295,28 +315,111 @@ public class ScoutBombScout extends BaseScout
             }
             return false;
         } else {
-            rc.setIndicatorString(1, "chillin " + String.valueOf(closestZombieLoc));
-            return true;
+            if (MapUtils.canZombieMoveTowardMe(rc, currentLocation, zombieLoc)) {
+                // if we are on the right side of the zombie
+                rc.setIndicatorString(1, "waiting for zombie to move " + String.valueOf(zombieLoc));
+                return true;
+            } else {
+                if (zombieLoc.distanceSquaredTo(target) < currentLocation.distanceSquaredTo(target)) {
+                    rc.setIndicatorString(1, "zombie can't move toward me and is in my way!");
+                    Direction toMove = MapUtils.addDirections(currentLocation.directionTo(target), zombieLoc.directionTo(currentLocation));
+                    if (!toMove.equals(Direction.NONE)) {
+                        if (rc.canMove(toMove)) {
+                            int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
+                            if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                                rc.move(toMove);
+                                return true;
+                            }
+                        }
+                    }
+                    toMove = currentLocation.directionTo(target);
+                    if (id % 2 == 0) {
+                        toMove.rotateLeft().rotateLeft();
+                    } else {
+                        toMove.rotateRight().rotateRight();
+                    }
+                    if (rc.canMove(toMove)) {
+                        int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
+                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                            rc.move(toMove);
+                            return true;
+                        }
+                    }
+                    rc.setIndicatorString(1, "zombie can't move toward me and is in my way! (no way around)");
+                    return true;
+                } else {
+                    rc.setIndicatorString(1, "zombie can't move toward me but I should be good!");
+                    Direction toMove = currentLocation.directionTo(target);
+                    if (rc.canMove(toMove)) {
+                        int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
+                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                            rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
+                            rc.move(toMove);
+                            return true;
+                        }
+                    }
+                    toMove = toMove.rotateLeft();
+                    if (rc.canMove(toMove)) {
+                        int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
+                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                            rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
+                            rc.move(toMove);
+                            return true;
+                        }
+                    }
+                    toMove = toMove.rotateRight().rotateRight();
+                    if (rc.canMove(toMove)) {
+                        int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
+                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                            rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
+                            rc.move(toMove);
+                            return true;
+                        }
+                    }
+                    return true;
+                }
+            }
         }
         return false;
+    }
 
+
+    public boolean herd() throws GameActionException {
+        rc.setIndicatorLine(currentLocation, closestZombieLoc, 0, 255, 0);
+        if (closestZombieInfo.type.equals(RobotType.BIGZOMBIE) && closestZombie < MELEE_AVOID_DISTANCE) {
+            rc.setIndicatorString(2, "melee");
+            return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
+        }
+        if (closestRangedZombie < RANGED_AVOID_DISTANCE) {
+            rc.setIndicatorString(2, "ranged");
+            return herdZombie(closestRangedZombie, closestRangedZombieLoc, closestRangedZombieInfo, RANGED_MOVE_AWAY_DISTANCE, RANGED_DONT_MOVE_DISTANCE, RANGED_MOVE_TOWARD_DISTANCE);
+        }
+
+        rc.setIndicatorString(2, "melee");
+        return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
     }
 
     private boolean avoid(MapLocation zombieCenter) throws GameActionException {
         Direction toMove = currentLocation.directionTo(navigator.getTarget());
         Direction away = closestZombieLoc.directionTo(currentLocation);
         toMove = MapUtils.addDirections(toMove, away);
-        if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
-            rc.move(toMove);
-            return true;
+        if (!toMove.equals(Direction.NONE)) {
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
+                rc.move(toMove);
+                return true;
+            }
+        } else {
+            toMove = MapUtils.addDirections(toMove, away);
+            if (id % 2 == 0) {
+                toMove = toMove.rotateLeft();
+            } else {
+                toMove = toMove.rotateRight();
+            }
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
+                rc.move(toMove);
+                return true;
+            }
         }
-
-        toMove = MapUtils.addDirections(toMove, away);
-        if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
-            rc.move(toMove);
-            return true;
-        }
-
         return false;
     }
 
@@ -326,7 +429,30 @@ public class ScoutBombScout extends BaseScout
     MOVE INTO POSITION AROUND ENEMY
     ===============================
      */
-    private boolean moveInPositionAroundEnemey() {
+    private boolean moveInPositionAroundEnemey() throws GameActionException {
+        if (enemies.length == 0) {
+            return false;
+        }
+        if (possibleEnemyDamageNextTurn > 0) {
+            Direction toMove = Direction.NONE;
+            // need to move away
+            for (int i = enemies.length; --i >= 0;) {
+                if (currentLocation.distanceSquaredTo(enemies[i].location) <= enemies[i].type.attackRadiusSquared) {
+                    toMove = MapUtils.addDirections(toMove, enemies[i].location.directionTo(currentLocation));
+                }
+            }
+            if (!toMove.equals(Direction.NONE)) {
+                if (rc.canMove(toMove)) {
+                    rc.move(toMove);
+                    return true;
+                }
+            }
+            if (rc.canMove(closestEnemyLoc.directionTo(currentLocation))) {
+                rc.move(closestEnemyLoc.directionTo(currentLocation));
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -399,8 +525,7 @@ public class ScoutBombScout extends BaseScout
             }
         } else {
             rc.setIndicatorString(1, "good to go " + possibleEnemyDamageNextTurn);
-            int distToZombie = currentLocation.distanceSquaredTo(closestZombieLoc);
-            return herd(distToZombie);
+            return herd();
         }
     }
 
