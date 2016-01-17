@@ -1,13 +1,11 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
-import team037.Enums.Bots;
-import team037.Navigation;
 import team037.Units.BaseUnits.BaseArchon;
+import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
 
-public class ScoutBombArchon extends BaseArchon
-{
+public class ScoutBombArchon extends BaseArchon implements PacMan {
 
     ZombieSpawnSchedule schedule;
     Direction last;
@@ -15,6 +13,25 @@ public class ScoutBombArchon extends BaseArchon
     public ScoutBombArchon(RobotController rc) {
         super(rc);
         schedule = rc.getZombieSpawnSchedule();
+    }
+
+
+
+    @Override
+    public boolean fight() throws GameActionException {
+        if (enemies.length == 0) {
+            return false;
+        }
+        return runAway(null);
+    }
+
+
+    @Override
+    public boolean fightZombies() throws GameActionException {
+        if (zombies.length == 0) {
+            return false;
+        }
+        return runAway(null);
     }
 
 
