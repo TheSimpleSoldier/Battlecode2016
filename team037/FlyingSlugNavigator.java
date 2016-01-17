@@ -1,6 +1,7 @@
 package team037;
 
 import battlecode.common.*;
+import scala.reflect.internal.TypeDebugging;
 
 public class FlyingSlugNavigator extends Navigator
 {
@@ -152,6 +153,35 @@ public class FlyingSlugNavigator extends Navigator
         }
 
         Direction toMove = getNextStep(currentLocation);
+        if (toMove.equals(Direction.NONE)) {
+            return false;
+        } else {
+            rc.move(toMove);
+            return true;
+        }
+    }
+
+    public boolean takeNextStep(boolean straight, boolean left) throws GameActionException {
+        if (!rc.isCoreReady()) {
+            return false;
+        }
+
+        if (target == null) {
+            return false;
+        }
+
+        MapLocation currentLocation = rc.getLocation();
+        if (currentLocation.equals(target)) {
+            return false;
+        }
+
+        Direction toMove = getNextStep(currentLocation);
+        if (!straight && left) {
+            toMove = toMove.rotateLeft();
+        } else if (!straight && !left) {
+            toMove = toMove.rotateRight();
+        }
+
         if (toMove.equals(Direction.NONE)) {
             return false;
         } else {

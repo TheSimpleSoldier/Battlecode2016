@@ -12,6 +12,7 @@ public class ScoutBombScout extends BaseScout
     private static MapLocation closestEnemyLoc;
     private static int closestAlliedArchon;
     private static MapLocation closestAlliedArchonLoc;
+    private static RobotInfo closestAlliedArchonInfo;
     private static int closestZombie;
     private static MapLocation closestZombieLoc;
     private static RobotInfo closestZombieInfo;
@@ -55,6 +56,7 @@ public class ScoutBombScout extends BaseScout
 
 
     public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
+    public static FlyingSlugNavigator navigator;
 
     public ScoutBombScout(RobotController rc)
     {
@@ -154,6 +156,7 @@ public class ScoutBombScout extends BaseScout
                 if (distance < closestAlliedArchon) {
                     closestAlliedArchon = distance;
                     closestAlliedArchonLoc = allies[i].location;
+                    closestAlliedArchonInfo = allies[i];
                 }
             }
         }
@@ -228,7 +231,7 @@ public class ScoutBombScout extends BaseScout
             rushForward = true;
         }
         if (rc.getInfectedTurns() > 5) {
-            navigator.takeNextStep();
+            navigator.takeNextStep(id % 5 <= 1, id % 2 == 0);
         }
         return true;
     }
@@ -473,7 +476,7 @@ public class ScoutBombScout extends BaseScout
             navigator.setTarget(nextPlaceToLookForEnemies());
         }
 
-        return navigator.takeNextStep();
+        return navigator.takeNextStep(id % 5 <= 1, id % 2 == 0);
     }
 
     private MapLocation nextPlaceToLookForEnemies() {
@@ -550,7 +553,22 @@ public class ScoutBombScout extends BaseScout
         return false;
     }
 
+
+    /*
+    ===============================
+    HERD AWAY FROM ARCHON
+    ===============================
+     */
     public boolean herdAwayFromArchon() {
+        // preconditions
+        if (closestAlliedArchon == Integer.MAX_VALUE) {
+            return false;
+        }
+        RobotInfo[] zambies = rc.senseNearbyRobots(closestAlliedArchonLoc, closestAlliedArchon + 3, Team.ZOMBIE);
+        if (zombies.length == 0) {
+            return false;
+        }
+
         return false;
     }
 

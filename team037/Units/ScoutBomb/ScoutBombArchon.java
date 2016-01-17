@@ -38,7 +38,6 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     @Override
     public boolean updateTarget() throws GameActionException
     {
-        // TODO: if we see enemies, run away
         if (currentLocation.equals(navigator.getTarget())) {
             navigator.setTarget(null);
             return true;
