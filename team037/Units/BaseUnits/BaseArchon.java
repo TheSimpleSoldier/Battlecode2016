@@ -49,6 +49,10 @@ public class BaseArchon extends Unit
         super.collectData();
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        if (sortedParts.contains(currentLocation)) {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
+        }
+
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0)
         {
@@ -81,7 +85,7 @@ public class BaseArchon extends Unit
     @Override
     public void sendMessages() throws GameActionException
     {
-        int offennsiveEnemies = 0;
+        int offensiveEnemies = 0;
 
         for (int i = enemies.length; --i>=0;)
         {
@@ -91,13 +95,13 @@ public class BaseArchon extends Unit
                 case GUARD:
                 case SOLDIER:
                 case VIPER:
-                    offennsiveEnemies++;
+                    offensiveEnemies++;
             }
         }
 
-        offennsiveEnemies += zombies.length;
+        offensiveEnemies += zombies.length;
 
-        if (offennsiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25 && msgsSent < 20)
+        if (offensiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25 && msgsSent < 20)
         {
             retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
@@ -141,7 +145,10 @@ public class BaseArchon extends Unit
         {
             if (weakest != null)
             {
-                rc.repair(weakest.location);
+                if (rc.senseRobotAtLocation(weakest.location) != null)
+                {
+                    rc.repair(weakest.location);
+                }
                 turnHealed = rc.getRoundNum();
                 return true;
             }

@@ -470,11 +470,8 @@ public class FightMicro
                 }
             }
 
-            rc.setIndicatorString(2, "Direction: " + Unit.dirs[highestIndex]);
             runAwaySpot = current.add(Unit.dirs[highestIndex], 4);
         }
-
-        rc.setIndicatorString(1, "x: " + runAwaySpot.x + " y: " + runAwaySpot.y);
 
         return runAwaySpot;
     }
@@ -675,6 +672,327 @@ public class FightMicro
             return false;
 
         FightMicroUtilites.moveDir(rc, direction, false);
+
+        return true;
+    }
+
+    /**
+     * This is basic fight micro against zombies
+     *
+     * @param zombies
+     * @param nearByZombies
+     * @return
+     */
+    public boolean guardZombieMicro(RobotInfo[] zombies, RobotInfo[] nearByZombies, RobotInfo[] allies) throws GameActionException
+    {
+        int len = zombies.length;
+        if (len == 0) return false;
+
+        int x = 0, y = 0;
+        MapLocation enemyCOM;
+        MapLocation currentLoc = rc.getLocation();
+
+        for (int i = len; --i>=0; )
+        {
+            MapLocation spot = zombies[i].location;
+            x += spot.x;
+            y += spot.y;
+
+
+        }
+
+        enemyCOM = new MapLocation(x / len, y / len);
+
+        int dist = 0;
+        Direction fleeDir = null;
+
+        for (int i = Unit.dirs.length; --i>=0; )
+        {
+            if (!rc.canMove(Unit.dirs[i])) continue;
+
+            MapLocation newLoc = currentLoc.add(Unit.dirs[i]);
+            boolean safe = true;
+
+            for (int j = zombies.length; --j >=0; )
+            {
+                if (zombies[j].location.distanceSquaredTo(newLoc) <= zombies[j].type.attackRadiusSquared)
+                {
+                    safe = false;
+                    break;
+                }
+            }
+
+            if (safe)
+            {
+                int newDist = newLoc.distanceSquaredTo(enemyCOM);
+                if (newDist > dist)
+                {
+                    dist = newDist;
+                    fleeDir = Unit.dirs[i];
+                }
+            }
+        }
+
+        // don't turn into zombie so flee if you have low health
+        if (rc.getHealth() <= 50 && rc.isCoreReady())
+        {
+            if (fleeDir != null)
+            {
+                rc.move(fleeDir);
+                return true;
+            }
+        }
+
+        if (rc.isWeaponReady() && nearByZombies.length > 0)
+        {
+            RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByZombies);
+
+            if (rc.canAttackLocation(weakest.location))
+            {
+                rc.attackLocation(weakest.location);
+                return true;
+            }
+        }
+
+        // if there are enemy zombies in range of us kite back
+        if (rc.isCoreReady() && nearByZombies.length > 0)
+        {
+            if (fleeDir != null)
+            {
+                rc.move(fleeDir);
+                return true;
+            }
+        }
+
+        // if we are outranged then rush them!!!
+        if (rc.isCoreReady())
+        {
+            boolean outRanged = false;
+            boolean alliesEngaged = false;
+            MapLocation rushLoc = null;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                if (zombies[i].type == RobotType.RANGEDZOMBIE)
+                {
+
+                    outRanged = true;
+                    rushLoc = zombies[i].location;
+                    break;
+                }
+            }
+
+            if (!outRanged)
+            {
+                for (int i = allies.length; --i>=0; )
+                {
+                    for (int j = zombies.length; --j>=0; )
+                    {
+                        MapLocation ally = allies[i].location;
+                        MapLocation enemy = zombies[j].location;
+
+                        if (ally.distanceSquaredTo(enemy) < zombies[j].type.attackRadiusSquared)
+                        {
+                            rushLoc = ally;
+                            alliesEngaged = true;
+
+                            // break out of both loops
+                            i = -1;
+                            j = -1;
+                        }
+                    }
+                }
+            }
+
+            if (outRanged || alliesEngaged)
+            {
+                FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), false);
+                return true;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * THis method determines if there are any enemies in range of a location
+     *
+     * @param loc
+     * @param enemies
+     * @return
+     */
+    public boolean EnemiesInRangeOfLoc(MapLocation loc, RobotInfo[] enemies)
+    {
+        for (int i = enemies.length; --i>=0; )
+        {
+            switch (enemies[i].type)
+            {
+                case ZOMBIEDEN:
+                case ARCHON:
+                case SCOUT:
+                case TTM:
+                    continue;
+            }
+
+            if (enemies[i].location.distanceSquaredTo(loc) <= 25) //enemies[i].type.attackRadiusSquared)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * THis method determines if there are any enemies in range of a location
+     *
+     * @param loc
+     * @param enemies
+     * @return
+     */
+    public int NumbOfEnemiesInRangeOfLoc(MapLocation loc, RobotInfo[] enemies)
+    {
+        int count = 0;
+        for (int i = enemies.length; --i>=0; )
+        {
+            switch (enemies[i].type)
+            {
+                case ZOMBIEDEN:
+                case ARCHON:
+                case SCOUT:
+                case TTM:
+                    continue;
+            }
+
+            if (enemies[i].location.distanceSquaredTo(loc) <= enemies[i].type.attackRadiusSquared)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public boolean soldierZombieFightMicro(RobotInfo[] zombies, RobotInfo[] nearByZombies, RobotInfo[] allies) throws GameActionException
+    {
+        if (zombies.length == 0) return false;
+
+        int enemiesInRange = 0;
+
+        MapLocation currentLoc = rc.getLocation();
+
+        if (nearByZombies.length > 0)
+        {
+            for (int i = nearByZombies.length; --i>=0; )
+            {
+                if (nearByZombies[i].location.distanceSquaredTo(currentLoc) <= nearByZombies[i].type.attackRadiusSquared)
+                {
+                    enemiesInRange++;
+                }
+            }
+
+            if (rc.isCoreReady() && enemiesInRange > 0)
+            {
+                int zombiesICanAttack = 0;
+                int fewestEnemies = 999;
+                Direction bestDir = null;
+
+                for (int i = Unit.dirs.length; --i>=0; )
+                {
+                    if (!rc.canMove(Unit.dirs[i])) continue;
+
+                    MapLocation next = currentLoc.add(Unit.dirs[i]);
+                    int enemiesAttacking = NumbOfEnemiesInRangeOfLoc(next, zombies);
+
+                    if (enemiesAttacking == 0)
+                    {
+                        fewestEnemies = 0;
+                        int zombiesInRange = 0;
+
+                        for (int j = zombies.length; --j>=0; )
+                        {
+                            MapLocation zombie = zombies[j].location;
+                            if (zombie.distanceSquaredTo(currentLoc) <= 13)
+                            {
+                                zombiesInRange++;
+                            }
+                        }
+
+                        if (zombiesInRange > zombiesICanAttack)
+                        {
+                            zombiesICanAttack = zombiesInRange;
+                            bestDir = Unit.dirs[i];
+                        }
+                    }
+                    else if (enemiesAttacking < fewestEnemies)
+                    {
+                        fewestEnemies = enemiesAttacking;
+                        bestDir = Unit.dirs[i];
+                    }
+                }
+
+                if (bestDir != null)
+                {
+                    rc.move(bestDir);
+                }
+            }
+
+            if (rc.isWeaponReady())
+            {
+                RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByZombies);
+
+                if (weakest != null && rc.canAttackLocation(weakest.location))
+                {
+                    rc.attackLocation(weakest.location);
+                }
+            }
+
+            return true;
+        }
+
+        // if an ally is fighting a zombie advance
+
+        if (rc.isCoreReady() && rc.getHealth() > 15)
+        {
+            boolean allyEngaged = false;
+
+            for (int i = allies.length; --i>=0; )
+            {
+                for (int j = zombies.length; --j>=0; )
+                {
+                    if (zombies[j].location.distanceSquaredTo(allies[i].location) <= allies[i].type.attackRadiusSquared)
+                    {
+                        allyEngaged = true;
+                        i = -1;
+                        j = -1;
+                    }
+                }
+            }
+
+            if (allyEngaged)
+            {
+                int bestNumb = 9999;
+                Direction bestDir = null;
+
+                for (int i = Unit.dirs.length; --i>=0; )
+                {
+                    if (!rc.canMove(Unit.dirs[i])) continue;
+
+                    MapLocation nxt = currentLoc.add(Unit.dirs[i]);
+                    int numbOfEnemies = NumbOfEnemiesInRangeOfLoc(nxt, zombies);
+                    if (numbOfEnemies < bestNumb)
+                    {
+                        bestNumb = numbOfEnemies;
+                        bestDir = Unit.dirs[i];
+                    }
+                }
+
+                if (bestDir != null)
+                {
+                    rc.move(bestDir);
+                }
+            }
+        }
 
         return true;
     }

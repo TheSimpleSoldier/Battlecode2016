@@ -154,21 +154,54 @@ public class MapUtils
         return toMove;
     }
 
+    /**
+     * This method returns the turtle location which is currently very dumb as the COM of starting allied archons
+     *
+     * @param alliedArchonStartLocs
+     * @return
+     */
+    public static MapLocation getTurtleSpot(MapLocation[] alliedArchonStartLocs)
+    {
+        int x = 0, y = 0, len = alliedArchonStartLocs.length;
+
+        for (int i = len; --i>=0; )
+        {
+            x += alliedArchonStartLocs[i].x;
+            y += alliedArchonStartLocs[i].y;
+        }
+
+        return new MapLocation(x/len,y/len);
+    }
+
     public static MapLocation getCenterOfMass(MapLocation[] locations)
     {
         int x = 0;
         int y = 0;
-        int count = 0;
         for(int k = locations.length; --k >= 0;)
         {
-            count++;
             x += locations[k].x;
             y += locations[k].y;
         }
 
-        if(count > 0)
+        if(locations.length > 0)
         {
-            return new MapLocation(x / count, y / count);
+            return new MapLocation(x / locations.length, y / locations.length);
+        }
+        return null;
+    }
+
+    public static MapLocation getCenterOfRobotInfoMass(RobotInfo[] bots) {
+        int x = 0;
+        int y = 0;
+        for(int k = bots.length; --k >= 0;)
+        {
+            x += bots[k].location.x;
+            y += bots[k].location.y;
+        }
+
+        if(bots.length > 0)
+        {
+            return new MapLocation(x / bots.length, y / bots.length);
         }
         return null;
     }
@@ -216,6 +249,10 @@ public class MapUtils
         for (int i = getLocs.length; --i>=0; )
         {
             MapLocation current = getLocs[i];
+
+            if (!Unit.rc.canSenseLocation(current)) continue;
+            if (!Unit.rc.onTheMap(current)) continue;
+
             int newDist = current.distanceSquaredTo(target);
 
             if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)
@@ -226,5 +263,79 @@ public class MapUtils
         }
 
         return closest;
+    }
+
+    /**
+     * This method returns true if the current location is nxt to an edge and false otherwise
+     *
+     * @param current
+     * @return
+     */
+    public static boolean nextToEdge(MapLocation current, RobotController rc) throws GameActionException
+    {
+        for (int i = Unit.dirs.length; --i>=0; )
+        {
+            MapLocation next = current.add(Unit.dirs[i]);
+            if (rc.canSense(next) && !rc.onTheMap(next))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method calculates the closest unit
+     *
+     * @param units
+     * @return
+     */
+    public static MapLocation closestUnit(RobotInfo[] units, MapLocation currentLocation)
+    {
+        int dist = Integer.MAX_VALUE;
+        MapLocation closest = null;
+
+        for (int i = units.length; --i>=0; )
+        {
+            MapLocation spot = units[i].location;
+            int currentDist = spot.distanceSquaredTo(currentLocation);
+            if (currentDist < dist)
+            {
+                dist = currentDist;
+                closest = units[i].location;
+            }
+        }
+
+        return closest;
+    }
+
+    public static Direction addDirections(Direction d1, Direction d2) {
+        int dx = d1.dx + d2.dx;
+        int dy = d1.dy + d2.dy;
+        if (dx > 0) {
+            if (dy > 0) {
+                return Direction.SOUTH_EAST;
+            } else if (dy < 0) {
+                return Direction.NORTH_EAST;
+            } else {
+                return Direction.EAST;
+            }
+        } else if (dx < 0) {
+            if (dy > 0) {
+                return Direction.SOUTH_WEST;
+            } else if (dy < 0) {
+                return Direction.NORTH_WEST;
+            } else {
+                return Direction.WEST;
+            }
+        } else {
+            if (dy > 0) {
+                return Direction.SOUTH;
+            } else if (dy < 0) {
+                return Direction.NORTH;
+            } else {
+                return Direction.NONE;
+            }
+        }
     }
 }

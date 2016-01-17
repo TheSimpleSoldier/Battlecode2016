@@ -54,6 +54,7 @@ public abstract class Unit
     public static MapLocation rushTarget;
     public static MapLocation rallyPoint;
     public static MapLocation distressedArchon;
+    public static MapLocation turtlePoint;
 
     public Unit()
     {
@@ -91,11 +92,15 @@ public abstract class Unit
         if (aidDistressedArchon());
         else if (fight() || fightZombies());
         else if (carryOutAbility());
-        else if (updateTarget()) {
-            navigator.setTarget(getNextSpot());
+        else
+        {
+            if (updateTarget()) {
+                navigator.setTarget(getNextSpot());
+            }
+            return takeNextStep();
         }
 
-        return takeNextStep();
+        return false;
     }
 
     public boolean updateTarget() throws GameActionException
@@ -243,14 +248,16 @@ public abstract class Unit
     public void collectData() throws GameActionException
     {
 
-        nearByEnemies = rc.senseNearbyRobots(range, opponent);
-        nearByAllies = rc.senseNearbyRobots(range, us);
-
         enemies = rc.senseNearbyRobots(sightRange, opponent);
         allies = rc.senseNearbyRobots(sightRange, us);
-
-        nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
+
+        if (type.attackRadiusSquared > 0) {
+            nearByAllies = rc.senseNearbyRobots(range, us);
+            nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
+            nearByEnemies = rc.senseNearbyRobots(range, opponent);
+        }
+
 
         round = rc.getRoundNum();
 
@@ -421,10 +428,45 @@ public abstract class Unit
         switch(communication.opcode)
         {
             case ARCHON_DISTRESS:
-                BotInfoCommunication com = (BotInfoCommunication)communication;
+                BotInfoCommunication com = (BotInfoCommunication) communication;
                 distressedArchon = new MapLocation(com.x, com.y);
                 navigator.setTarget(distressedArchon);
                 break;
+        }
+    }
+
+    /**
+     * If we are not infected and about to die to enemy zombies then we should
+     * disintigrate to not turn into a zombie
+     */
+    public void suicide()
+    {
+        if (rc.getHealth() <= 15)
+        {
+            if (zombies.length > 0 && type != RobotType.ARCHON)
+            {
+                if (!rc.isInfected())
+                {
+                    for (int i = zombies.length; --i>=0;)
+                    {
+                        // if we are in range
+                        if (currentLocation.distanceSquaredTo(zombies[i].location) <= zombies[i].type.attackRadiusSquared)
+                        {
+                            // if zombie has a weapon cool down less than or equal to 1
+                            if (zombies[i].weaponDelay <= 1)
+                            {
+                                // don't want to stop from becoming a zombie in enemy base
+                                if (enemies.length < allies.length)
+                                {
+                                    System.out.println("WE disintegrated to avoid turning into a zombie");
+                                    rc.setIndicatorDot(currentLocation, 1, 1, 1);
+                                    rc.disintegrate();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

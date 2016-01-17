@@ -18,13 +18,11 @@ public class BaseGaurd extends Unit
     public boolean fight() throws GameActionException
     {
         return fightMicro.basicFightMicro(nearByEnemies);
-        //return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
-        //return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
+        return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
     }
 
     public boolean precondition()

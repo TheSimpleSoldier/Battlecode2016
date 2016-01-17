@@ -14,6 +14,8 @@ import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManGuard;
 import team037.Units.PacMan.PacManScout;
+import team037.Units.ScoutBomb.ScoutBombArchon;
+import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Units.PacMan.PacManArchon;
 
@@ -36,7 +38,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.PACMAN;
+        strategy = Strategies.TURTLE;
 
 
         RobotType type = rc.getType();
@@ -48,6 +50,9 @@ public class RobotPlayer
             } else if (strategy.equals(Strategies.TURTLE)) {
                 unit = new TurtleArchon(rc);
                 Unit.thisBot = Bots.TURTLEARCHON;
+            } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                unit = new ScoutBombArchon(rc);
+                Unit.thisBot = Bots.SCOUTBOMBARCHON;
             } else if (strategy.equals(Strategies.PACMAN)) {
                 unit = new PacManArchon(rc);
                 Unit.thisBot = Bots.PACMANARCHON;
@@ -71,6 +76,9 @@ public class RobotPlayer
             if (strategy.equals(Strategies.PACMAN)) {
                 unit = new PacManScout(rc);
                 Unit.thisBot = Bots.PACMANSCOUT;
+            } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                unit = new ScoutBombScout(rc);
+                Unit.thisBot = Bots.SCOUTBOMBSCOUT;
             } else {
                 unit = new BaseScout(rc);
                 Unit.thisBot = Bots.BASESCOUT;
@@ -137,6 +145,8 @@ public class RobotPlayer
                 unit.act();
 
                 unit = unit.getNewStrategy(unit);
+
+                unit.suicide();
             }
             catch (Exception e)
             {
