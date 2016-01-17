@@ -470,11 +470,8 @@ public class FightMicro
                 }
             }
 
-            rc.setIndicatorString(2, "Direction: " + Unit.dirs[highestIndex]);
             runAwaySpot = current.add(Unit.dirs[highestIndex], 4);
         }
-
-        rc.setIndicatorString(1, "x: " + runAwaySpot.x + " y: " + runAwaySpot.y);
 
         return runAwaySpot;
     }
@@ -874,5 +871,129 @@ public class FightMicro
         }
 
         return count;
+    }
+
+    public boolean soldierZombieFightMicro(RobotInfo[] zombies, RobotInfo[] nearByZombies, RobotInfo[] allies) throws GameActionException
+    {
+        if (zombies.length == 0) return false;
+
+        int enemiesInRange = 0;
+
+        MapLocation currentLoc = rc.getLocation();
+
+        if (nearByZombies.length > 0)
+        {
+            for (int i = nearByZombies.length; --i>=0; )
+            {
+                if (nearByZombies[i].location.distanceSquaredTo(currentLoc) <= nearByZombies[i].type.attackRadiusSquared)
+                {
+                    enemiesInRange++;
+                }
+            }
+
+            if (rc.isCoreReady() && enemiesInRange > 0)
+            {
+                int zombiesICanAttack = 0;
+                int fewestEnemies = 999;
+                Direction bestDir = null;
+
+                for (int i = Unit.dirs.length; --i>=0; )
+                {
+                    if (!rc.canMove(Unit.dirs[i])) continue;
+
+                    MapLocation next = currentLoc.add(Unit.dirs[i]);
+                    int enemiesAttacking = NumbOfEnemiesInRangeOfLoc(next, zombies);
+
+                    if (enemiesAttacking == 0)
+                    {
+                        fewestEnemies = 0;
+                        int zombiesInRange = 0;
+
+                        for (int j = zombies.length; --j>=0; )
+                        {
+                            MapLocation zombie = zombies[j].location;
+                            if (zombie.distanceSquaredTo(currentLoc) <= 13)
+                            {
+                                zombiesInRange++;
+                            }
+                        }
+
+                        if (zombiesInRange > zombiesICanAttack)
+                        {
+                            zombiesICanAttack = zombiesInRange;
+                            bestDir = Unit.dirs[i];
+                        }
+                    }
+                    else if (enemiesAttacking < fewestEnemies)
+                    {
+                        fewestEnemies = enemiesAttacking;
+                        bestDir = Unit.dirs[i];
+                    }
+                }
+
+                if (bestDir != null)
+                {
+                    rc.move(bestDir);
+                }
+            }
+
+            if (rc.isWeaponReady())
+            {
+                RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByZombies);
+
+                if (weakest != null && rc.canAttackLocation(weakest.location))
+                {
+                    rc.attackLocation(weakest.location);
+                }
+            }
+
+            return true;
+        }
+
+        // if an ally is fighting a zombie advance
+
+        if (rc.isCoreReady() && rc.getHealth() > 15)
+        {
+            boolean allyEngaged = false;
+
+            for (int i = allies.length; --i>=0; )
+            {
+                for (int j = zombies.length; --j>=0; )
+                {
+                    if (zombies[j].location.distanceSquaredTo(allies[i].location) <= allies[i].type.attackRadiusSquared)
+                    {
+                        allyEngaged = true;
+                        i = -1;
+                        j = -1;
+                    }
+                }
+            }
+
+            if (allyEngaged)
+            {
+                int bestNumb = 9999;
+                Direction bestDir = null;
+
+                for (int i = Unit.dirs.length; --i>=0; )
+                {
+                    if (!rc.canMove(Unit.dirs[i])) continue;
+
+                    MapLocation nxt = currentLoc.add(Unit.dirs[i]);
+                    int numbOfEnemies = NumbOfEnemiesInRangeOfLoc(nxt, zombies);
+                    if (numbOfEnemies < bestNumb)
+                    {
+                        bestNumb = numbOfEnemies;
+                        bestDir = Unit.dirs[i];
+                    }
+                }
+
+                if (bestDir != null)
+                {
+                    rc.move(bestDir);
+                }
+            }
+        }
+
+        return true;
     }
 }
