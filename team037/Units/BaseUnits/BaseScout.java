@@ -156,9 +156,6 @@ public class BaseScout extends Unit
 
     public void msgTurrets() throws GameActionException
     {
-        if (rc.getRoundNum() % 5 != 0)
-            return;
-
         for (int i = allies.length; --i >= 0; )
         {
             if (allies[i].type == RobotType.TURRET)

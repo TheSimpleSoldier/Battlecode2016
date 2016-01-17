@@ -126,47 +126,6 @@ public class SortedParts
 
         locs[index] = null;
         score[index] = 0;
-
-//        if (index == start)
-//        {
-//            score[start] = 0;
-//            locs[start] = null;
-//            start++;
-//        }
-//        else if (index == end)
-//        {
-//            score[end-1] = 0;
-//            locs[end-1] = null;
-//            end--;
-//        }
-//        // if we are ahead of center push everything forward
-//        else if (start + (end - start) / 2 <= index)
-//        {
-//            int iterator = index;
-//            while (iterator < end)
-//            {
-//                locs[iterator] = locs[iterator+1];
-//                score[iterator] = score[iterator+1];
-//                iterator++;
-//            }
-//            locs[end-1] = null;
-//            score[end-1] = 0;
-//            end--;
-//        }
-//        // push everything ahead
-//        else
-//        {
-//            int iterator = index;
-//            while (iterator > start)
-//            {
-//                locs[iterator] = locs[iterator-1];
-//                score[iterator] = score[iterator-1];
-//                iterator--;
-//            }
-//            locs[start] = null;
-//            score[start] = 0;
-//            start++;
-//        }
     }
 
 
@@ -275,7 +234,7 @@ public class SortedParts
         RobotType type = rc.getType();
         int sensorRadiusSquared = type.sensorRadiusSquared;
 
-        MapLocation[] parts = rc.sensePartLocations(rc.getType().sensorRadiusSquared);
+        MapLocation[] parts = rc.sensePartLocations(sensorRadiusSquared);
 
         for (int i = parts.length; --i>=0; )
         {
