@@ -43,6 +43,14 @@ public class BaseScout extends Unit
     @Override
     public void sendMessages() throws GameActionException
     {
+        if(mKnowledge.firstFoundEdge && msgsSent < 20)
+        {
+            Communication com = mKnowledge.getMapBoundsCommunication();
+            communicator.sendCommunication(mKnowledge.getMaxRange(), com);
+            msgsSent++;
+            mKnowledge.firstFoundEdge = false;
+            mKnowledge.updated = false;
+        }
         if(mKnowledge.updated && msgsSent < 20)
         {
             Communication com = mKnowledge.getMapBoundsCommunication();

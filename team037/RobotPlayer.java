@@ -125,9 +125,8 @@ public class RobotPlayer
 
         if (rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
         {
-            BaseArchon.updateStartingMap();
             BaseArchon.sendOutInitialLocation();
-            BaseArchon.mKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
+            BaseArchon.mapKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
         }
 
 
@@ -137,6 +136,9 @@ public class RobotPlayer
             Unit.msgsSent = 0;
             try
             {
+                rc.setIndicatorString(0, "(" + Unit.mapKnowledge.minX + ", " + Unit.mapKnowledge.minY + "), (" + Unit.mapKnowledge.maxX + ", " +
+                Unit.mapKnowledge.maxY + "), " + Unit.mapKnowledge.exploredEdges[0] + Unit.mapKnowledge.exploredEdges[1] + Unit.mapKnowledge.exploredEdges[2] +
+                Unit.mapKnowledge.exploredEdges[3]);
                 unit.collectData();
                 unit.handleMessages();
                 unit.sendMessages();

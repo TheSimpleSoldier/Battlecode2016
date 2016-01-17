@@ -24,6 +24,7 @@ public class MapKnowledge
     public SimpleRobotInfo[] theirArchons;
     public AppendOnlyMapLocationSet dens;
     public boolean updated = false;
+    public boolean firstFoundEdge = false;
 
     public MapKnowledge()
     {
@@ -315,8 +316,21 @@ public class MapKnowledge
         }
     }
 
+    public boolean allEdgesReached()
+    {
+        if(exploredEdges[0] && exploredEdges[1] && exploredEdges[2] && exploredEdges[3])
+        {
+            return true;
+        }
+        return false;
+    }
+
     public boolean edgeReached(Direction dir)
     {
+        if(dir == null)
+        {
+            return false;
+        }
         switch(dir)
         {
             case NORTH:
@@ -398,5 +412,10 @@ public class MapKnowledge
     public static int getRange()
     {
         return Unit.type.sensorRadiusSquared * 2;
+    }
+
+    public static int getMaxRange()
+    {
+        return 12800;
     }
 }

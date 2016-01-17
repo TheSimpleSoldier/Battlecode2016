@@ -11,13 +11,17 @@ import team037.Messages.ExploringMapEdge;
 import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.MapUtils;
 
+import java.util.Random;
+
 public class ScoutingScout extends BaseScout
 {
     public static Direction scoutDirection;
     public static int dir = -1;
+    private Random random;
 
     public ScoutingScout(RobotController rc)  {
         super(rc);
+        random = new Random(id);
     }
 
     @Override
@@ -33,14 +37,8 @@ public class ScoutingScout extends BaseScout
         if (mKnowledge.inRegionMode())
             nextBot = Bots.REGIONSCOUT;
 
-        int edge = MapUtils.senseEdge(rc, scoutDirection);
-        if (edge != Integer.MIN_VALUE && !mKnowledge.exploredEdges[dir])
+        if(mKnowledge.edgeReached(scoutDirection))
         {
-            mKnowledge.setValueInDirection(edge, scoutDirection);
-
-            if (dir >= 0)
-                mKnowledge.exploredEdges[dir] = true;
-
             scoutDirection = null;
         }
     }
@@ -54,32 +52,39 @@ public class ScoutingScout extends BaseScout
     @Override
     public boolean updateTarget() throws GameActionException
     {
-        if (scoutDirection != null) return false;
+        if(scoutDirection != null) return false;
 
-        dir = mKnowledge.getClosestDir(currentLocation);
-        if (dir == 0) {
-            rc.setIndicatorString(0, "Going north");
-            scoutDirection = Direction.NORTH;
-        } else if (dir == 1) {
-            rc.setIndicatorString(0, "Going West");
-            scoutDirection = Direction.WEST;
-        } else if (dir == 2) {
-            rc.setIndicatorString(0, "Going South");
-            scoutDirection = Direction.SOUTH;
-        } else if (dir == 3) {
-            rc.setIndicatorString(0, "Going East");
-            scoutDirection = Direction.EAST;
-        }
-
-        if (dir != -1)
+        Direction[] dirs = new Direction[4];
+        int num = 0;
+        if(!mKnowledge.edgeReached(Direction.NORTH))
         {
-            Communication communication = new ExploringMapEdge();
-            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.EXPLORE_EDGE), 0, dir});
-            communicator.sendCommunication(2500, communication);
-            return true;
+            dirs[num] = Direction.NORTH;
+            num++;
+        }
+        if(!mKnowledge.edgeReached(Direction.EAST))
+        {
+            dirs[num] = Direction.EAST;
+            num++;
+        }
+        if(!mKnowledge.edgeReached(Direction.SOUTH))
+        {
+            dirs[num] = Direction.SOUTH;
+            num++;
+        }
+        if(!mKnowledge.edgeReached(Direction.WEST))
+        {
+            dirs[num] = Direction.WEST;
+            num++;
         }
 
-        return false;
+        if(num == 0)
+        {
+            return false;
+        }
+
+        scoutDirection = dirs[Math.abs(random.nextInt()) % num];
+
+        return true;
     }
 
     public static void updateScoutDirection()

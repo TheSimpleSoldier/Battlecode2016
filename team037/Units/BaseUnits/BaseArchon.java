@@ -110,6 +110,14 @@ public class BaseArchon extends Unit
             msgsSent++;
         }
 
+        if(mapKnowledge.firstFoundEdge && msgsSent < 20)
+        {
+            Communication com = mapKnowledge.getMapBoundsCommunication();
+            communicator.sendCommunication(mapKnowledge.getMaxRange(), com);
+            msgsSent++;
+            mapKnowledge.firstFoundEdge = false;
+            mapKnowledge.updated = false;
+        }
         if(mapKnowledge.updated && msgsSent < 20)
         {
             Communication com = mapKnowledge.getMapBoundsCommunication();

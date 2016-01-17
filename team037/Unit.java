@@ -7,6 +7,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.*;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.Scouts.ScoutingScout;
+import team037.Utilites.MapUtils;
 
 public abstract class Unit
 {
@@ -83,6 +84,13 @@ public abstract class Unit
         repaired = false;
         alliedArchonStartLocs = rc.getInitialArchonLocations(us);
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
+
+        mapKnowledge.updateEdgesFromLocation(currentLocation);
+        for(int k = alliedArchonStartLocs.length; --k >= 0;)
+        {
+            mapKnowledge.updateEdgesFromLocation(alliedArchonStartLocs[k]);
+            mapKnowledge.updateEdgesFromLocation(enemyArchonStartLocs[k]);
+        }
     }
 
     public boolean act() throws GameActionException
@@ -267,6 +275,51 @@ public abstract class Unit
             previousLocation = currentLocation;
         }
 
+        if(!mapKnowledge.allEdgesReached())
+        {
+            int edge;
+            if(!mapKnowledge.edgeReached(Direction.NORTH))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.NORTH);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.NORTH);
+                    mapKnowledge.minY = edge;
+                }
+            }
+            if(!mapKnowledge.edgeReached(Direction.EAST))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.EAST);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.EAST);
+                    mapKnowledge.maxX = edge;
+                }
+            }
+            if(!mapKnowledge.edgeReached(Direction.SOUTH))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.SOUTH);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.SOUTH);
+                    mapKnowledge.maxY = edge;
+                }
+            }
+            if(!mapKnowledge.edgeReached(Direction.WEST))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.WEST);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.WEST);
+                    mapKnowledge.minX = edge;
+                }
+            }
+        }
+
         currentLocation = newLoc;
     }
 
@@ -374,6 +427,7 @@ public abstract class Unit
                 mapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
                         new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
                 mapKnowledge.updateEdgesFromLocation(new MapLocation(com.x, com.y));
+                break;
             case ENEMY:
                 BotInfoCommunication botCom = (BotInfoCommunication) communication;
                 if(botCom.type == RobotType.ARCHON)
@@ -382,6 +436,7 @@ public abstract class Unit
                             new MapLocation(botCom.x, botCom.y), RobotType.ARCHON,
                             opponent), false);
                 }
+                break;
         }
     }
 
@@ -439,7 +494,7 @@ public abstract class Unit
      * If we are not infected and about to die to enemy zombies then we should
      * disintigrate to not turn into a zombie
      */
-    public void suicide()
+    public void suicide() throws GameActionException
     {
         if (rc.getHealth() <= 15)
         {
