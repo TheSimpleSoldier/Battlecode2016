@@ -158,7 +158,6 @@ public class BaseArchon extends Unit
 
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
-            System.out.println("Activating");
             rc.activate(neutralBots[0].location);
 
             for (int j = mKnowledge.dens.length; --j>=0; )
