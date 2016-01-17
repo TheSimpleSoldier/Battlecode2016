@@ -19,6 +19,16 @@ public class BuildOrderCreation
         //////////////////////////////////////////////////////////////////////////////
 
 
+        if (RobotPlayer.strategy.equals(Strategies.RUSH))
+        {
+            Bots[][] buildOrderRush = {
+                    {Bots.RUSHINGSOLDIER},
+            };
+
+            int[] timesRush = {1000};
+
+            return new BuildOrder(buildOrderRush, timesRush);
+        }
 
         if (RobotPlayer.strategy.equals(Strategies.CASTLE))
         {

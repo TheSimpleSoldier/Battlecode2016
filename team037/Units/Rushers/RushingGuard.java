@@ -1,19 +1,17 @@
 package team037.Units.Rushers;
 
-import battlecode.common.*;
-import team037.Units.BaseUnits.BaseSoldier;
-import team037.Utilites.MapUtils;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import team037.Units.BaseUnits.BaseGaurd;
 
-public class RushingSoldier extends BaseSoldier
+public class RushingGuard extends BaseGaurd
 {
-    private boolean rushing = false;
-    private MapLocation lastTarget = null;
+    private boolean rushing = true;
 
-    public RushingSoldier(RobotController rc)
+    public RushingGuard(RobotController rc)
     {
         super(rc);
-        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
-        rc.setIndicatorString(0, "Rushing Soldier x: " + rushTarget.x + " y: " + rushTarget.y);
     }
 
     @Override
