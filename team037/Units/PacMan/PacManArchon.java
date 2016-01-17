@@ -70,7 +70,7 @@ public class PacManArchon extends Unit implements PacMan {
             navigator.setTarget(sortedParts.getBestSpot(currentLocation));
         }
 
-        return ability || fightZombies();
+        return ability || fightZombies() || runAway(PACMAN_WEIGHTS);
     }
 
     public boolean takeNextStep() throws GameActionException {

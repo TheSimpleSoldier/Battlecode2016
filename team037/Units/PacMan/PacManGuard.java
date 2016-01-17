@@ -35,6 +35,11 @@ public class PacManGuard extends BaseGaurd implements PacMan {
         } catch (Exception e) {}
     }
 
+    public boolean fight() throws GameActionException {
+        return fightMicro.basicNetFightMicro(nearByEnemies,nearByAllies,enemies,allies,navigator.getTarget());
+    }
+
+
     public boolean fightZombies() {
         // No need to fight zombies if there aren't any
         if (zombies == null || zombies.length == 0) {
