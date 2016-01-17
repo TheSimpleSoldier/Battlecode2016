@@ -4,9 +4,12 @@ import team037.DataStructures.BuildOrder;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.RobotPlayer;
+import team037.Unit;
 
 public class BuildOrderCreation
 {
+    private static final int multiplier = Unit.alliedArchonStartLocs.length;
+
     public static BuildOrder createBuildOrder()
     {
         //////////////////////////////////////////////////////////////////////////////
@@ -29,13 +32,13 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.TURTLE))
         {
             Bots[][] buildOrderTurtle = {
-                    {Bots.CASTLESOLDIER},
-                    {Bots.BASETURRET, Bots.CASTLESOLDIER},
-                    {Bots.PATROLSCOUT, Bots.BASETURRET},
-                    {Bots.CASTLESOLDIER, Bots.BASETURRET},
+                    {Bots.TURTLEGUARD, Bots.TURTLESOLDIER},
+                    {Bots.TURTLESCOUT, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET, Bots.TURTLESOLDIER},
+                    {Bots.TURTLETURRET, Bots.TURTLETURRET},
             };
 
-            int[] timesTurtle = {3, 1, 1, 1000};
+            int[] timesTurtle = {8/multiplier, 4/multiplier, 4/multiplier, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }
