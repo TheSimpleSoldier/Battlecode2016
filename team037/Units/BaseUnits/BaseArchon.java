@@ -228,7 +228,13 @@ public class BaseArchon extends Unit
 
     private boolean build(Direction dir) throws GameActionException
     {
-        nextBot = changeBuildOrder(nextBot);
+        Bots changeTo = changeBuildOrder(nextBot);
+
+        if (!changeTo.equals(nextBot))
+        {
+            nextType = Bots.typeFromBot(changeTo);
+            nextBot = changeTo;
+        }
 
         if (rc.canBuild(dir, nextType))
         {

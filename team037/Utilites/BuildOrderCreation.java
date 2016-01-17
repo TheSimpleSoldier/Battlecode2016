@@ -22,7 +22,7 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.RUSH))
         {
             Bots[][] buildOrderRush = {
-                    {Bots.RUSHINGVIPER},
+                    {Bots.RUSHGUARD, Bots.RUSHINGVIPER},
             };
 
             int[] timesRush = {1000};

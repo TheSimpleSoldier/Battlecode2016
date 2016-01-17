@@ -3,6 +3,7 @@ package team037.Units;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
@@ -57,5 +58,11 @@ public class AlphaArchon extends BaseArchon
             communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
             communicator.sendCommunication(400, communication);
         }
+    }
+
+    @Override
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        return Bots.RUSHINGSOLDIER;
     }
 }
