@@ -16,10 +16,12 @@ public class ScoutBombScout extends BaseScout
     private static MapLocation closestZombieLoc;
     private static RobotInfo closestZombieInfo;
     private static int possibleEnemyDamageNextTurn;
-    private static int idxForEnemyLocations = 0;
+    private static int idxForEnemyLocations = -1;
     private static MapLocation enemyCore;
     private static boolean nonDenZombies = false;
     private static boolean nonScoutEnemies = false;
+    private static boolean rushForward = false;
+    private static MapLocation alliedCenter;
 
     private static final int MIN_AVOID_DIST = (int)(RobotType.RANGEDZOMBIE.attackRadiusSquared * 1.5);
 
@@ -54,8 +56,10 @@ public class ScoutBombScout extends BaseScout
         super(rc);
         mapKnowledge = mKnowledge;
         navigator = new FlyingSlugNavigator(rc);
-        navigator.setTarget(nextPlaceToLookForEnemies());
         enemyCore = MapUtils.getCenterOfMass(enemyArchonStartLocs);
+        alliedCenter = MapUtils.getCenterOfMass(alliedArchonStartLocs);
+        navigator.setTarget(nextPlaceToLookForEnemies());
+
     }
 
 
@@ -141,7 +145,18 @@ public class ScoutBombScout extends BaseScout
 
     @Override
     public void handleMessages() {
-        return;
+        Signal[] signals = rc.emptySignalQueue();
+        for (int i = signals.length; --i >= 0;) {
+            if (signals[i].getTeam().equals(us)) {
+                int[] message = signals[i].getMessage();
+                if (message[0] == Integer.MIN_VALUE && message[1] == Integer.MIN_VALUE) {
+                    rc.setIndicatorDot(currentLocation, 255, 0, 0);
+                    rushForward = true;
+                    return;
+                }
+            }
+
+        }
     }
 
     @Override
@@ -156,10 +171,14 @@ public class ScoutBombScout extends BaseScout
         if (!rc.isCoreReady()) {
             rc.setIndicatorString(0, "core cooldown");
             return false;
+        }  else if (suicideCall()) {
+            lastAction = "heard the suicide message";
         } else if (herdAwayFromArchon()) {
             // if you are near an allied archon and see zombies, help them!
             lastAction = HERD_AWAY_FROM_ARCHON;
-        } else if (herdAndFindEnemy()) {
+        } else if (herdFastZombies()) {
+            lastAction = "heardingFastZombie";
+        }  else if (herdAndFindEnemy()) {
             lastAction = HERD_AND_FIND_ENEMIES;
         } else if (bringZombiesToEnemy()) {
             // if you are near the enemy and see a zombie, let's do it!
@@ -178,6 +197,44 @@ public class ScoutBombScout extends BaseScout
         return true;
     }
 
+    /*
+    ===============================
+    HRED FAST ZOMBIES
+    ===============================
+     */
+    private boolean herdFastZombies() throws GameActionException {
+        // precondition
+        if (!nonDenZombies || !RobotType.FASTZOMBIE.equals(closestZombieInfo.type)) {
+            return false;
+        }
+        if (nonScoutEnemies) {
+            rushForward = true;
+        }
+        if (rc.getInfectedTurns() > 5) {
+            navigator.takeNextStep();
+        }
+        return true;
+    }
+
+    /*
+    ===============================
+    SUICIDE CALL
+    ===============================
+     */
+    private boolean suicideCall() throws GameActionException {
+        if (!rushForward) {
+            return false;
+        }
+        return turnASAP();
+    }
+
+
+
+    /*
+    ===============================
+    HERD AND FIND ENEMY
+    ===============================
+     */
     private boolean herdAndFindEnemy() throws GameActionException {
         // precontidions
         if (!nonDenZombies || nonScoutEnemies) {
@@ -206,19 +263,23 @@ public class ScoutBombScout extends BaseScout
             rc.setIndicatorString(1, "moving away from " + String.valueOf(closestZombieLoc));
             Direction toMove = currentLocation.directionTo(navigator.getTarget());
             Direction away = closestZombieLoc.directionTo(currentLocation);
-            toMove = MapUtils.getDirectionFromDxDy(toMove.dx + away.dx, toMove.dy + away.dy);
+            toMove = MapUtils.addDirections(toMove, away);
             if (toMove.equals(Direction.NONE)) {
-                toMove = MapUtils.getDirectionFromDxDy(toMove.dx + away.dx, toMove.dy + away.dy);
+                toMove = MapUtils.addDirections(toMove, away);
+                if (!toMove.equals(away) && rc.canMove(toMove)) {
+                    rc.move(toMove);
+                    return true;
+                }
+                if (rc.canMove(toMove.rotateLeft())) {
+                    rc.move(toMove.rotateLeft());
+                    return true;
+                }
+                if (rc.canMove(toMove.rotateRight())) {
+                    rc.move(toMove.rotateRight());
+                    return true;
+                }
                 if (rc.canMove(away)) {
                     rc.move(away);
-                    return true;
-                }
-                if (rc.canMove(away.rotateLeft())) {
-                    rc.move(away.rotateLeft());
-                    return true;
-                }
-                if (rc.canMove(away.rotateRight())) {
-                    rc.move(away.rotateRight());
                     return true;
                 }
             } else {
@@ -242,43 +303,20 @@ public class ScoutBombScout extends BaseScout
     }
 
     private boolean avoid(MapLocation zombieCenter) throws GameActionException {
-        Direction toMove;
-        boolean left = true;
-        if (left) {
-            toMove = currentLocation.directionTo(zombieCenter).rotateLeft().rotateLeft();
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
-                rc.move(toMove);
-                return true;
-            }
-            toMove = toMove.rotateLeft();
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
-                rc.move(toMove);
-                return true;
-            }
-            toMove = toMove.rotateLeft();
-            if (rc.canMove(toMove)) {
-                rc.move(toMove);
-                return true;
-            }
-        } else {
-            toMove = currentLocation.directionTo(zombieCenter).rotateRight().rotateRight();
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
-                rc.move(toMove);
-                return true;
-            }
-
-            toMove = toMove.rotateRight();
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
-                rc.move(toMove);
-                return true;
-            }
-
-            toMove = toMove.rotateRight();
-            if (rc.canMove(toMove)) {
-                rc.move(toMove);
-                return true;
-            }
+        Direction toMove = currentLocation.directionTo(navigator.getTarget());
+        Direction away = closestZombieLoc.directionTo(currentLocation);
+        toMove = MapUtils.addDirections(toMove, away);
+        if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
+            rc.move(toMove);
+            return true;
         }
+
+        toMove = MapUtils.addDirections(toMove, away);
+        if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
+            rc.move(toMove);
+            return true;
+        }
+
         return false;
     }
 
@@ -323,22 +361,68 @@ public class ScoutBombScout extends BaseScout
         return enemyArchonStartLocs[idxForEnemyLocations];
     }
 
+    /*
+    ===============================
+    BRING ZOMBIES TO ENEMY
+    ===============================
+     */
     private boolean bringZombiesToEnemy() throws GameActionException {
         // precondition
         if (!(nonDenZombies && nonScoutEnemies)) {
             return false;
         }
+        // if the zombies are closer to the enemy than I am, turn!
+        if (rc.senseNearbyRobots(closestEnemyLoc, closestEnemy, Team.ZOMBIE).length > 1) {
+            return turnASAP();
+        }
         if (possibleEnemyDamageNextTurn > 0 && rc.getInfectedTurns() < 5) {
-            rc.setIndicatorDot(currentLocation, 255, 0, 0);
-            rc.setIndicatorString(1, "waiting for infection");
-            // wait for zombie to catch up!
-            return true;
+            if (possibleEnemyDamageNextTurn < rc.getHealth()) {
+                // wait for zombie to catch up!
+                rc.setIndicatorString(1, "waiting for infection");
+                return true;
+            } else {
+                rc.setIndicatorString(1, "scared, moving to infection");
+                Direction toZombie = currentLocation.directionTo(closestZombieLoc);
+                if (rc.canMove(toZombie)) {
+                    rc.move(toZombie);
+                    return true;
+                }
+                if (rc.canMove(toZombie.rotateLeft())) {
+                    rc.move(toZombie.rotateLeft());
+                    return true;
+                }
+                if (rc.canMove(toZombie.rotateRight())) {
+                    rc.move(toZombie.rotateRight());
+                    return true;
+                }
+                return false;
+            }
         } else {
-            rc.setIndicatorDot(currentLocation, 0, 0, 255);
             rc.setIndicatorString(1, "good to go " + possibleEnemyDamageNextTurn);
             int distToZombie = currentLocation.distanceSquaredTo(closestZombieLoc);
             return herd(distToZombie);
         }
+    }
+
+    private boolean turnASAP() throws GameActionException {
+        if (rc.getInfectedTurns() > 0) {
+            suicide();
+            return true;
+        }
+        Direction toZombie = currentLocation.directionTo(closestZombieLoc);
+        if (rc.canMove(toZombie)) {
+            rc.move(toZombie);
+            return true;
+        }
+        if (rc.canMove(toZombie.rotateLeft())) {
+            rc.move(toZombie.rotateLeft());
+            return true;
+        }
+        if (rc.canMove(toZombie.rotateRight())) {
+            rc.move(toZombie.rotateRight());
+            return true;
+        }
+        return false;
     }
 
     public boolean herdAwayFromArchon() {
@@ -346,14 +430,23 @@ public class ScoutBombScout extends BaseScout
     }
 
 
-    private void suicideIfNeeded() {
+
+
+    private void suicideIfNeeded() throws GameActionException {
         if (rc.getInfectedTurns() == 1 && rc.getHealth() < type.maxHealth / 2) {
             if (closestEnemy < closestAlliedArchon) {
-                // TODO: Spam messages here before dying?
-                rc.disintegrate();
+                suicide();
             }
         }
+    }
 
+    private void suicide() throws GameActionException {
+        int i = 0;
+        while (Clock.getBytecodesLeft() > 200 && i < 20) {
+            rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);
+            i++;
+        }
+        rc.disintegrate();
     }
 
 

@@ -242,7 +242,9 @@ public class MapUtils
         return closest;
     }
 
-    public static Direction getDirectionFromDxDy(int dx, int dy) {
+    public static Direction addDirections(Direction d1, Direction d2) {
+        int dx = d1.dx + d2.dx;
+        int dy = d1.dy + d2.dy;
         if (dx > 0) {
             if (dy > 0) {
                 return Direction.SOUTH_EAST;
