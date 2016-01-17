@@ -177,17 +177,31 @@ public class MapUtils
     {
         int x = 0;
         int y = 0;
-        int count = 0;
         for(int k = locations.length; --k >= 0;)
         {
-            count++;
             x += locations[k].x;
             y += locations[k].y;
         }
 
-        if(count > 0)
+        if(locations.length > 0)
         {
-            return new MapLocation(x / count, y / count);
+            return new MapLocation(x / locations.length, y / locations.length);
+        }
+        return null;
+    }
+
+    public static MapLocation getCenterOfRobotInfoMass(RobotInfo[] bots) {
+        int x = 0;
+        int y = 0;
+        for(int k = bots.length; --k >= 0;)
+        {
+            x += bots[k].location.x;
+            y += bots[k].location.y;
+        }
+
+        if(bots.length > 0)
+        {
+            return new MapLocation(x / bots.length, y / bots.length);
         }
         return null;
     }
@@ -293,5 +307,35 @@ public class MapUtils
         }
 
         return closest;
+    }
+
+    public static Direction addDirections(Direction d1, Direction d2) {
+        int dx = d1.dx + d2.dx;
+        int dy = d1.dy + d2.dy;
+        if (dx > 0) {
+            if (dy > 0) {
+                return Direction.SOUTH_EAST;
+            } else if (dy < 0) {
+                return Direction.NORTH_EAST;
+            } else {
+                return Direction.EAST;
+            }
+        } else if (dx < 0) {
+            if (dy > 0) {
+                return Direction.SOUTH_WEST;
+            } else if (dy < 0) {
+                return Direction.NORTH_WEST;
+            } else {
+                return Direction.WEST;
+            }
+        } else {
+            if (dy > 0) {
+                return Direction.SOUTH;
+            } else if (dy < 0) {
+                return Direction.NORTH;
+            } else {
+                return Direction.NONE;
+            }
+        }
     }
 }
