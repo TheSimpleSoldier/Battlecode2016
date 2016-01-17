@@ -10,15 +10,21 @@ public class ScoutBombScout extends BaseScout
 {
     private static int closestEnemy;
     private static MapLocation closestEnemyLoc;
+    private static int closestEnemyArchon;
+    private static MapLocation closestEnemyArchonLoc;
+
     private static int closestAlliedArchon;
     private static MapLocation closestAlliedArchonLoc;
     private static RobotInfo closestAlliedArchonInfo;
+
     private static int closestZombie;
     private static MapLocation closestZombieLoc;
     private static RobotInfo closestZombieInfo;
+
     private static int closestRangedZombie;
     private static MapLocation closestRangedZombieLoc;
     private static RobotInfo closestRangedZombieInfo;
+
     private static int possibleEnemyDamageNextTurn;
     private static int idxForEnemyLocations = -1;
     private static MapLocation enemyCore;
@@ -110,6 +116,8 @@ public class ScoutBombScout extends BaseScout
         possibleEnemyDamageNextTurn = 0;
         closestEnemy = Integer.MAX_VALUE;
         closestEnemyLoc = null;
+        closestEnemyArchon = Integer.MAX_VALUE;
+        closestEnemyArchonLoc = null;
         boolean archon = false;
         for (int i = enemies.length; --i>=0;) {
             int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
@@ -120,6 +128,7 @@ public class ScoutBombScout extends BaseScout
             switch(enemies[i].type) {
                 case ARCHON:
                     nonScoutEnemies = true;
+                    rc.setIndicatorLine(currentLocation, enemies[i].location, 0, 0, 0);
                     navigator.setTarget(enemies[i].location);
                     break;
                 case SCOUT:
@@ -144,6 +153,14 @@ public class ScoutBombScout extends BaseScout
                     if (distance <= 30 + RobotType.TURRET.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.TURRET.attackPower;
                     }
+                    break;
+                case VIPER:
+                    nonScoutEnemies = true;
+                    if (distance <= 30 + RobotType.VIPER.attackRadiusSquared) {
+                        possibleEnemyDamageNextTurn += RobotType.VIPER.attackPower + 20;
+                    }
+                    break;
+
             }
         }
 
@@ -433,10 +450,11 @@ public class ScoutBombScout extends BaseScout
     ===============================
      */
     private boolean moveInPositionAroundEnemey() throws GameActionException {
-        if (nonScoutEnemies) {
+        if (!nonScoutEnemies) {
             return false;
         }
         if (possibleEnemyDamageNextTurn > 0) {
+            rc.setIndicatorString(1, "Trying to move away");
             Direction toMove = Direction.NONE;
             // need to move away
             for (int i = enemies.length; --i >= 0;) {
@@ -454,9 +472,11 @@ public class ScoutBombScout extends BaseScout
                 rc.move(closestEnemyLoc.directionTo(currentLocation));
                 return true;
             }
+        } else {
+            rc.setIndicatorString(1, "We are fine!");
         }
 
-        return false;
+        return true;
     }
 
 
@@ -536,6 +556,9 @@ public class ScoutBombScout extends BaseScout
         if (rc.getInfectedTurns() > 0) {
             suicideScout();
             return true;
+        }
+        if (closestZombieLoc == null) {
+            return false;
         }
         Direction toZombie = currentLocation.directionTo(closestZombieLoc);
         if (rc.canMove(toZombie)) {

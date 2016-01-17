@@ -10,6 +10,7 @@ import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.Scouts.ScoutingScout;
+import team037.Utilites.MapUtils;
 
 public abstract class Unit
 {
@@ -51,6 +52,7 @@ public abstract class Unit
     public static MapLocation rallyPoint;
     public static MapLocation distressedArchon;
     public static MapLocation turtlePoint;
+    public static MapLocation enemyArchonCenterOfMass;
 
     public Unit()
     {
@@ -79,6 +81,7 @@ public abstract class Unit
         repaired = false;
         alliedArchonStartLocs = rc.getInitialArchonLocations(us);
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
+        enemyArchonCenterOfMass = MapUtils.getCenterOfMass(enemyArchonStartLocs);
     }
 
     public boolean act() throws GameActionException
