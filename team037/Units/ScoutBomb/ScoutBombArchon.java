@@ -120,9 +120,4 @@ public class ScoutBombArchon extends BaseArchon
         return;
     }
 
-    @Override
-    public Bots changeBuildOrder(Bots nextBot)
-    {
-        return Bots.SCOUTBOMBSCOUT;
-    }
 }
