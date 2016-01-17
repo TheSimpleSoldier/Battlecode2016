@@ -60,9 +60,9 @@ public class AlphaArchon extends BaseArchon
         }
     }
 
-    @Override
-    public Bots changeBuildOrder(Bots nextBot)
-    {
-        return Bots.RUSHINGSOLDIER;
-    }
+//    @Override
+//    public Bots changeBuildOrder(Bots nextBot)
+//    {
+//        return Bots.RUSHINGSOLDIER;
+//    }
 }

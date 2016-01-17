@@ -26,7 +26,6 @@ public class RushingSoldier extends BaseSoldier
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;
-        rc.setIndicatorString(0, "Rushing Soldier x: " + rushTarget.x + " y: " + rushTarget.y);
     }
 
     @Override
