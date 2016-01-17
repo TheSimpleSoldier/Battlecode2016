@@ -31,4 +31,10 @@ public class Navigator
     {
         return Navigation.move(target);
     }
+
+    // This method returns true if we moved and false otherwise
+    public boolean takeNextStepTTM() throws GameActionException
+    {
+        return Navigation.moveTTM(target);
+    }
 }
