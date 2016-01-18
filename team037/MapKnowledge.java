@@ -206,6 +206,18 @@ public class MapKnowledge
             toReturn[k] = all[k];
         }
 
+        if(last == 0)
+        {
+            if(us)
+            {
+                return Unit.alliedArchonStartLocs;
+            }
+            else
+            {
+                return Unit.enemyArchonStartLocs;
+            }
+        }
+
         return toReturn;
     }
 

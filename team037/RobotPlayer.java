@@ -136,9 +136,6 @@ public class RobotPlayer
             Unit.msgsSent = 0;
             try
             {
-                rc.setIndicatorString(0, "(" + Unit.mapKnowledge.minX + ", " + Unit.mapKnowledge.minY + "), (" + Unit.mapKnowledge.maxX + ", " +
-                Unit.mapKnowledge.maxY + "), " + Unit.mapKnowledge.exploredEdges[0] + Unit.mapKnowledge.exploredEdges[1] + Unit.mapKnowledge.exploredEdges[2] +
-                Unit.mapKnowledge.exploredEdges[3]);
                 unit.collectData();
                 unit.handleMessages();
                 unit.sendMessages();

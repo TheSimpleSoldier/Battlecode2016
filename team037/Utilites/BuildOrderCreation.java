@@ -18,15 +18,6 @@ public class BuildOrderCreation
         //                                                                          //
         //////////////////////////////////////////////////////////////////////////////
 
-        if(true)
-        {
-            Bots[][] build = {
-                    {Bots.SCOUTINGSCOUT}
-            };
-
-            return new BuildOrder(build, new int[]{1});
-        }
-
         if (RobotPlayer.strategy.equals(Strategies.SCOUT_BOMB)) {
             Bots[][] buildOrderBombs = {
                     {Bots.SCOUTBOMBSCOUT}
