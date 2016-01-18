@@ -4,10 +4,7 @@ import battlecode.common.*;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
-import team037.Messages.BotInfoCommunication;
-import team037.Messages.Communication;
-import team037.Messages.MissionCommunication;
-import team037.Messages.SimpleBotInfoCommunication;
+import team037.Messages.*;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.Scouts.ScoutingScout;
 import team037.Utilites.MapUtils;
@@ -44,6 +41,13 @@ public abstract class Unit
     public static boolean repaired;
     public static int msgsSent = 0;
     public static boolean defendingArchon = false;
+    int rubbleUpdate = 0;
+
+    public static boolean enemyComs = true;
+    public static boolean archonComs = true;
+    public static boolean archonDistressComs = true;
+    public static boolean mapComs = true;
+    public static boolean missionComs = true;
 
     public static MapLocation locationLastTurn;
     public static MapLocation previousLocation;
@@ -82,6 +86,13 @@ public abstract class Unit
         alliedArchonStartLocs = rc.getInitialArchonLocations(us);
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
         enemyArchonCenterOfMass = MapUtils.getCenterOfMass(enemyArchonStartLocs);
+
+        mapKnowledge.updateEdgesFromLocation(currentLocation);
+        for(int k = alliedArchonStartLocs.length; --k >= 0;)
+        {
+            mapKnowledge.updateEdgesFromLocation(alliedArchonStartLocs[k]);
+            mapKnowledge.updateEdgesFromLocation(enemyArchonStartLocs[k]);
+        }
     }
 
     public boolean act() throws GameActionException
@@ -160,244 +171,63 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
-        int rubbleUpdate = 0;
+        rubbleUpdate = 0;
+
         communications = communicator.processCommunications();
-        int[] values;
-        int dist = 0;
-
-        if (type == RobotType.SCOUT || type == RobotType.ARCHON)
-            dist = Math.max(type.sensorRadiusSquared * 2, Math.min(type.sensorRadiusSquared * 7, rc.getLocation().distanceSquaredTo(start)));
-
-        for(int k = 0; k < communications.length; k++)
+        for(int k = communications.length; --k >= 0;)
         {
-            switch (communications[k].opcode)
+            switch(communications[k].opcode)
             {
-                case CHANGEMISSION:
-                    MissionCommunication comm = (MissionCommunication) communications[k];
-                    if(comm.id == rc.getID())
-                    {
-                        nextBot = comm.newBType;
-                    }
-                    else if(comm.id == 0 && comm.bType == thisBot)
-                    {
-                        nextBot = comm.newBType;
-                    }
-                    else if(comm.id == 0 && comm.rType == rc.getType())
-                    {
-                        nextBot = comm.newBType;
-                    }
-                    break;
+                case MAP_BOUNDS:
                 case SDEN:
-                    values = communications[k].getValues();
-                    MapLocation den = new MapLocation(values[2], values[3]);
-
-                    if (!mapKnowledge.dens.contains(den))
-                    {
-                        mapKnowledge.dens.add(den);
-
-                        if (type == RobotType.SCOUT && msgsSent < 20)
-                        {
-                            Communication communication = new SimpleBotInfoCommunication();
-                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), values[1], values[2], values[3]});
-                            communicator.sendCommunication(dist, communication);
-                            msgsSent++;
-                        }
-                    }
-
-                    break;
-                case PARTS:
-                    if (type == RobotType.SCOUT)
-                    {
-                        // if we get a new msg about parts then send it out
-                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge)mapKnowledge;
-                        values = communications[k].getValues();
-                        MapLocation loc = new MapLocation(values[2], values[3]);
-
-                        if (!tempKnow.partListed(loc) && msgsSent < 20)
-                        {
-                            tempKnow.addPartsAndNeutrals(loc);
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
-
-                        if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
-                        {
-                            BaseArchon.sortedParts.addParts(loc, values[1], false);
-                        }
-                    }
-                    break;
-
-                case NEUTRAL:
-                    if (type == RobotType.SCOUT)
-                    {
-                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge)mapKnowledge;
-                        values = communications[k].getValues();
-                        MapLocation loc = new MapLocation(values[2], values[3]);
-
-                        if (!tempKnow.partListed(loc) && msgsSent < 20)
-                        {
-                            tempKnow.addPartsAndNeutrals(loc);
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
-
-                        if (type == RobotType.ARCHON && !BaseArchon.sortedParts.contains(loc))
-                        {
-                            BaseArchon.sortedParts.addParts(loc, values[1], true);
-                        }
-                    }
-                    break;
-
-                case GOING_AFTER_PARTS:
-
-                    if (type == RobotType.ARCHON)
-                    {
-                        values = communications[k].getValues();
-                        if (id < values[3])
-                        {
-                            MapLocation loc = new MapLocation(values[4], values[5]);
-                            int index = BaseArchon.sortedParts.getIndexOfMapLocation(loc);
-                            BaseArchon.sortedParts.remove(index);
-                            navigator.setTarget(BaseArchon.getNextPartLocation());
-                        }
-                        else
-                        {
-                        }
-                    }
-
-                    break;
-
                 case SKILLED_DEN:
                 case DEAD_DEN:
-                    values = communications[k].getValues();
-                    MapLocation spot = new MapLocation(values[2], values[3]);
-
-                    if(mapKnowledge.dens.contains(spot))
-                    {
-                        mapKnowledge.dens.remove(spot);
-
-                        if (type == RobotType.SCOUT && msgsSent < 20)
-                        {
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
-                    }
-
-                    break;
-
-                case MAP_BOUNDS:
-                    mapKnowledge.updateEdgesFromMessage(communications[k]);
-                    if (type == RobotType.SCOUT || type == RobotType.ARCHON)
-                    {
-//                        if (msgsSent < 20)
-//                        {
-//                            communicator.sendCommunication(dist, communications[k]);
-//                            msgsSent++;
-//                        }
-                    }
-                    else if (type == RobotType.VIPER)
-                    {
-                        rushTarget = mapKnowledge.getOppositeCorner(start);
-                    }
-
-                    break;
-
-                case EXPLORE_EDGE:
-
-                    if(type == RobotType.SCOUT)
-                    {
-                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
-                        values = communications[k].getValues();
-
-                        if(rc.getRoundNum() < 30)
-                        {
-
-                            if(type == RobotType.SCOUT)
-                            {
-                                if(ScoutingScout.getScoutDir() == values[2] && id > values[1])
-                                {
-                                    ScoutingScout.updateScoutDirection();
-                                }
-                            }
-
-                            tempKnow.setEdgesBeingExplored(values[2]);
-                        }
-                    }
-
-                    break;
-
-                case EDGE_EXPLORED:
-                    if(type == RobotType.SCOUT)
-                    {
-                        ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
-                        values = communications[k].getValues();
-
-                        if(type == RobotType.SCOUT && !tempKnow.exploredEdges[values[2]] && msgsSent < 20)
-                        {
-                            communicator.sendCommunication(dist, communications[k]);
-                            msgsSent++;
-                        }
-
-                        tempKnow.exploredEdges[values[2]] = true;
-                    }
-                    break;
-
-                case ATTACK:
-
-                    values = communications[k].getValues();
-
-
-                    rushTarget = new MapLocation(values[1], values[2]);
-
-                    break;
-
-                case SARCHON:
-
-                    values = communications[k].getValues();
-                    MapLocation archon = new MapLocation(values[2], values[3]);
-
-                    mapKnowledge.addArchon(new SimpleRobotInfo(-1, archon, RobotType.ARCHON, opponent), false);
-
-                    break;
-
-                case RALLY_POINT:
-                    values = communications[k].getValues();
-                    rallyPoint = new MapLocation(values[1], values[2]);
-
-                    break;
-
                 case RUBBLE:
-                    if (type != RobotType.SCOUT && rubbleUpdate < 2) {
-                        rubbleUpdate++;
-                        Navigation.map.updateFromComms(communications[k]);
+                    if(mapComs)
+                    {
+                        interpretMapKnowlege(communications[k]);
                     }
                     break;
-
-                case ARCHON_DISTRESS:
-
-                    // archons and vipers don't respond to distress calls
-                    if (type != RobotType.ARCHON && type != RobotType.VIPER)
+                case PARTS:
+                case GOING_AFTER_PARTS:
+                case NEUTRAL:
+                    if(type == RobotType.ARCHON)
                     {
-                        values = communications[k].getValues();
-                        distressedArchon = new MapLocation(values[4], values[5]);
-                        navigator.setTarget(distressedArchon);
+                        interpretArchonMapKnowledge(communications[k]);
                     }
-
                     break;
-                case ENEMY:
-                    BotInfoCommunication communication = (BotInfoCommunication) communications[k];
-                    if(communication.type == RobotType.ARCHON)
+                case EXPLORE_EDGE:
+                    if(type == RobotType.SCOUT)
                     {
-                        mapKnowledge.addArchon(new SimpleRobotInfo(communication.id,
-                                new MapLocation(communication.x, communication.y), RobotType.ARCHON,
-                                opponent), false);
+                        interpretScoutMapKnowledge(communications[k]);
                     }
                     break;
                 case OENEMY:
-                    SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communications[k];
-                    mapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
-                            new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
-                    mapKnowledge.updateEdgesFromLocation(new MapLocation(com.x, com.y));
+                case ENEMY:
+                    if(enemyComs)
+                    {
+                        interpretEnemy(communications[k]);
+                    }
+                    break;
+                case CHANGEMISSION:
+                    if(missionComs)
+                    {
+                        interpretMissionChange(communications[k]);
+                    }
+                    break;
+                case ATTACK:
+                case RALLY_POINT:
+                    if(archonComs)
+                    {
+                        interpretLocFromArchon(communications[k]);
+                    }
+                    break;
+                case ARCHON_DISTRESS:
+                    if(archonDistressComs)
+                    {
+                        interpretDistressFromArchon(communications[k]);
+                    }
+                    break;
             }
         }
     }
@@ -447,14 +277,226 @@ public abstract class Unit
             previousLocation = currentLocation;
         }
 
+        if(!mapKnowledge.allEdgesReached())
+        {
+            int edge;
+            if(!mapKnowledge.edgeReached(Direction.NORTH))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.NORTH);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.NORTH);
+                    mapKnowledge.minY = edge;
+                }
+            }
+            if(!mapKnowledge.edgeReached(Direction.EAST))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.EAST);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.EAST);
+                    mapKnowledge.maxX = edge;
+                }
+            }
+            if(!mapKnowledge.edgeReached(Direction.SOUTH))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.SOUTH);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.SOUTH);
+                    mapKnowledge.maxY = edge;
+                }
+            }
+            if(!mapKnowledge.edgeReached(Direction.WEST))
+            {
+                edge = MapUtils.senseEdge(rc, Direction.WEST);
+                if(edge != Integer.MIN_VALUE)
+                {
+                    mapKnowledge.firstFoundEdge = true;
+                    mapKnowledge.reachEdge(Direction.WEST);
+                    mapKnowledge.minX = edge;
+                }
+            }
+        }
+
         currentLocation = newLoc;
+    }
+
+    private void interpretMapKnowlege(Communication communication)
+    {
+        switch(communication.opcode)
+        {
+            case MAP_BOUNDS:
+                mapKnowledge.updateEdgesFromMessage(communication);
+                break;
+            case SDEN:
+                SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communication;
+                MapLocation den = new MapLocation(com.x, com.y);
+                if (!mapKnowledge.dens.contains(den))
+                {
+                    mapKnowledge.dens.add(den);
+                }
+                break;
+            case SKILLED_DEN:
+            case DEAD_DEN:
+                com = (SimpleBotInfoCommunication) communication;
+                MapLocation spot = new MapLocation(com.x, com.y);
+
+                if(mapKnowledge.dens.contains(spot))
+                {
+                    mapKnowledge.dens.remove(spot);
+                }
+            case RUBBLE:
+                if (type != RobotType.SCOUT && rubbleUpdate < 2) {
+                    rubbleUpdate++;
+                    Navigation.map.updateFromComms(communication);
+                }
+                break;
+        }
+    }
+
+    private void interpretArchonMapKnowledge(Communication communication)
+    {
+        switch(communication.opcode)
+        {
+            case PARTS:
+                PartsCommunication com = (PartsCommunication) communication;
+                MapLocation loc = new MapLocation(com.x, com.y);
+
+                if(!BaseArchon.sortedParts.contains(loc))
+                {
+                    BaseArchon.sortedParts.addParts(loc, com.parts, false);
+                }
+                break;
+
+            case NEUTRAL:
+                com = (PartsCommunication) communication;
+                loc = new MapLocation(com.x, com.y);
+
+                if(!BaseArchon.sortedParts.contains(loc))
+                {
+                    BaseArchon.sortedParts.addParts(loc, com.parts, true);
+                }
+                break;
+            case GOING_AFTER_PARTS:
+                BotInfoCommunication comm = (BotInfoCommunication) communication;
+                if (id < comm.id)
+                {
+                    loc = new MapLocation(comm.x, comm.y);
+                    int index = BaseArchon.sortedParts.getIndexOfMapLocation(loc);
+                    BaseArchon.sortedParts.remove(index);
+                    navigator.setTarget(BaseArchon.getNextPartLocation());
+                }
+                break;
+        }
+    }
+
+    private void interpretScoutMapKnowledge(Communication communication)
+    {
+
+        switch(communication.opcode)
+        {
+            case EXPLORE_EDGE:
+                ExploringMapEdge com = (ExploringMapEdge)communication;
+                ScoutMapKnowledge tempKnow = (ScoutMapKnowledge) mapKnowledge;
+
+                if(rc.getRoundNum() < 30)
+                {
+
+                    if(type == RobotType.SCOUT)
+                    {
+                        if(ScoutingScout.getScoutDir() == com.edge && id > com.id)
+                        {
+                            ScoutingScout.updateScoutDirection();
+                        }
+                    }
+
+                    tempKnow.setEdgesBeingExplored(com.edge);
+                }
+                break;
+        }
+    }
+
+    private void interpretEnemy(Communication communication)
+    {
+        switch(communication.opcode)
+        {
+            case OENEMY:
+                SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communication;
+                mapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
+                        new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
+                mapKnowledge.updateEdgesFromLocation(new MapLocation(com.x, com.y));
+                break;
+            case ENEMY:
+                BotInfoCommunication botCom = (BotInfoCommunication) communication;
+                if(botCom.type == RobotType.ARCHON)
+                {
+                    mapKnowledge.addArchon(new SimpleRobotInfo(botCom.id,
+                            new MapLocation(botCom.x, botCom.y), RobotType.ARCHON,
+                            opponent), false);
+                }
+                break;
+        }
+    }
+
+    private void interpretMissionChange(Communication communication)
+    {
+        switch(communication.opcode)
+        {
+            case CHANGEMISSION:
+                MissionCommunication comm = (MissionCommunication) communication;
+                if(comm.id == rc.getID())
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.bType == thisBot)
+                {
+                    nextBot = comm.newBType;
+                }
+                else if(comm.id == 0 && comm.rType == rc.getType())
+                {
+                    nextBot = comm.newBType;
+                }
+                break;
+        }
+    }
+
+    private void interpretLocFromArchon(Communication communication)
+    {
+
+        switch(communication.opcode)
+        {
+            case ATTACK:
+                AttackCommunication com = (AttackCommunication)communication;
+                rushTarget = new MapLocation(com.x, com.y);
+                break;
+            case RALLY_POINT:
+                com = (AttackCommunication)communication;
+                rallyPoint = new MapLocation(com.x, com.y);
+                break;
+        }
+    }
+
+    private void interpretDistressFromArchon(Communication communication)
+    {
+        switch(communication.opcode)
+        {
+            case ARCHON_DISTRESS:
+                BotInfoCommunication com = (BotInfoCommunication) communication;
+                distressedArchon = new MapLocation(com.x, com.y);
+                navigator.setTarget(distressedArchon);
+                break;
+        }
     }
 
     /**
      * If we are not infected and about to die to enemy zombies then we should
      * disintigrate to not turn into a zombie
      */
-    public void suicide()
+    public void suicide() throws GameActionException
     {
         if (rc.getHealth() <= 15)
         {

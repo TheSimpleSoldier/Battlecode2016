@@ -5,8 +5,8 @@ import team037.Utilites.CommunicationUtilities;
 
 public class AttackCommunication extends Communication
 {
-    private int x;
-    private int y;
+    public int x;
+    public int y;
 
     public AttackCommunication()
     {

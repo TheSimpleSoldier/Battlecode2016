@@ -1,10 +1,12 @@
 package team037.Units.Rushers;
 
-import battlecode.common.*;
-import team037.Units.BaseUnits.BaseSoldier;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import team037.Units.BaseUnits.BaseTurret;
 import team037.Utilites.MapUtils;
 
-public class RushingSoldier extends BaseSoldier
+public class RushingTurret extends BaseTurret
 {
     private boolean rushing = false;
     private MapLocation lastTarget = null;
@@ -12,7 +14,7 @@ public class RushingSoldier extends BaseSoldier
     private int currentIndex = -1;
     private int dist = Integer.MAX_VALUE;
 
-    public RushingSoldier(RobotController rc)
+    public RushingTurret(RobotController rc)
     {
         super(rc);
         updatedLocs = new MapLocation[enemyArchonStartLocs.length];
@@ -23,6 +25,7 @@ public class RushingSoldier extends BaseSoldier
         }
 
         rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
+        rushTarget.add(rushTarget.directionTo(currentLocation), 3);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;
@@ -74,28 +77,10 @@ public class RushingSoldier extends BaseSoldier
     @Override
     public boolean updateTarget() throws GameActionException
     {
+        if (zombies.length > 0 || enemies.length > 0) return false;
         MapLocation target = navigator.getTarget();
         if (target == null) return true;
         if (currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) return true;
         return false;
-    }
-
-    @Override
-    public boolean fight() throws GameActionException
-    {
-        if (rushing)
-        {
-            return fightMicro.aggressiveFightMicro(nearByEnemies, enemies, nearByAllies);
-        }
-        return super.fight();
-    }
-
-    @Override
-    public boolean fightZombies() throws GameActionException
-    {
-        if (rushing)
-            return false;
-
-        return super.fightZombies();
     }
 }
