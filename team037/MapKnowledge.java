@@ -346,29 +346,13 @@ public class MapKnowledge
         switch(dir)
         {
             case NORTH:
-                if(exploredEdges[0])
-                {
-                    return true;
-                }
-                return false;
+                return exploredEdges[0];
             case SOUTH:
-                if(exploredEdges[2])
-                {
-                    return true;
-                }
-                return false;
+                return exploredEdges[2];
             case EAST:
-                if(exploredEdges[1])
-                {
-                    return true;
-                }
-                return false;
+                return exploredEdges[1];
             case WEST:
-                if(exploredEdges[3])
-                {
-                    return true;
-                }
-                return false;
+                return exploredEdges[3];
         }
 
         return false;
