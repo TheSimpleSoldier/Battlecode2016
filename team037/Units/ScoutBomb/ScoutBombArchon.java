@@ -9,10 +9,6 @@ import team037.Utilites.MapUtils;
 public class ScoutBombArchon extends BaseArchon implements PacMan {
 
 
-    private static int closestZombie;
-    private static MapLocation closestZombieLoc;
-    private static RobotInfo closestZombieInfo;
-
 
 
     private static String previousLastAction = "none";
@@ -35,9 +31,9 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         move = new SlugNavigator(rc);
     }
 
-
     @Override
     public boolean act() throws GameActionException {
+        healNearbyAllies();
 
         if (!rc.isCoreReady()) {
             rc.setIndicatorString(0, "waiting on core");
@@ -69,16 +65,20 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     ===============================
      */
     private boolean runAwayFromCrowd() {
-        if (enemies.length < 1 && zombies.length < 4) {
-            return false;
+        // preconditions
+        if (enemies.length > 0 || zombies.length > 3) {
+            return runAway(null);
         }
-        return runAway(null);
+        if (rc.getHealth() < .2 * type.maxHealth && (enemies.length > 0 || zombies.length > 3)) {
+            return runAway(null);
+        }
+        return false;
     }
 
     /*
     ===============================
-    LET_SCOUNT_HELP
-    There are a couple zombies nearby, if we don't have a scout, spawn one, if we have a scout, move away from the zombie
+    LET_SCOUT_HELP
+    There are a couple zombies nearby, if we have a unit just move away
     ===============================
      */
     private boolean letScoutHelp() throws GameActionException {
@@ -214,13 +214,32 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     ===============================
     */
     private boolean spawn() throws GameActionException {
-        if (rc.hasBuildRequirements(RobotType.SCOUT)) {
-            Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
-            if (!toSpawn.equals(Direction.NONE)) {
-                rc.build(toSpawn, RobotType.SCOUT);
-                return true;
+        int numGuards = 0;
+        for (int i = allies.length; --i > 0;) {
+            if (allies[i].type.equals(RobotType.GUARD)) {
+                numGuards++;
             }
         }
+        if (zombies.length > 0 || numGuards < Math.min(8, round / 100)) {
+            if (rc.hasBuildRequirements(RobotType.GUARD)) {
+                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                if (!toSpawn.equals(Direction.NONE)) {
+                    rc.build(toSpawn, RobotType.GUARD);
+                    rc.setIndicatorString(1, "zombies are about, best spawn a guard");
+                    return true;
+                }
+            }
+        } else {
+            if (rc.hasBuildRequirements(RobotType.SCOUT)) {
+                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                if (!toSpawn.equals(Direction.NONE)) {
+                    rc.build(toSpawn, RobotType.SCOUT);
+                    rc.setIndicatorString(1, "all clear, spawn a scout");
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 

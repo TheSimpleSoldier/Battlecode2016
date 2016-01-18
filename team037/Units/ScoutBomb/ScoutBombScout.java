@@ -118,7 +118,6 @@ public class ScoutBombScout extends BaseScout
         closestEnemyLoc = null;
         closestEnemyArchon = Integer.MAX_VALUE;
         closestEnemyArchonLoc = null;
-        boolean archon = false;
         for (int i = enemies.length; --i>=0;) {
             int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
             if (distance < closestEnemy) {
@@ -187,7 +186,9 @@ public class ScoutBombScout extends BaseScout
                 int[] message = signals[i].getMessage();
                 if (message[0] == Integer.MIN_VALUE && message[1] == Integer.MIN_VALUE) {
                     rc.setIndicatorDot(currentLocation, 255, 0, 0);
-                    rushForward = true;
+                    if (closestAlliedArchonLoc == null) {
+                        rushForward = true;
+                    }
                     return;
                 }
             }
@@ -533,7 +534,9 @@ public class ScoutBombScout extends BaseScout
         }
         // if the zombies are closer to the enemy than I am, turn!
         if (rc.senseNearbyRobots(closestEnemyLoc, closestEnemy, Team.ZOMBIE).length > 1) {
-            return turnASAP();
+            if (closestEnemyArchon < Integer.MAX_VALUE) {
+                return turnASAP();
+            }
         }
         if (possibleEnemyDamageNextTurn > 0 && rc.getInfectedTurns() < 5) {
             if (possibleEnemyDamageNextTurn < rc.getHealth()) {
