@@ -180,16 +180,13 @@ public class SortedParts
 
         for (int i = neutralBots.length; --i>=0; )
         {
-            if (!contains(neutralBots[i].location))
+            if (neutralBots[i].type == RobotType.ARCHON)
             {
-                if (neutralBots[i].type == RobotType.ARCHON)
-                {
-                    addParts(neutralBots[i].location, 1000, true);
-                }
-                else
-                {
-                    addParts(neutralBots[i].location, neutralBots[i].type.partCost, true);
-                }
+                addParts(neutralBots[i].location, 1000, true);
+            }
+            else
+            {
+                addParts(neutralBots[i].location, neutralBots[i].type.partCost, true);
             }
         }
     }

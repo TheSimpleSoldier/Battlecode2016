@@ -172,6 +172,7 @@ public class BaseArchon extends Unit
     }
 
     // maybe spawn a unit or repair a damaged unit
+    @Override
     public boolean carryOutAbility() throws GameActionException
     {
         // heal doesn't effect core cooldown
@@ -180,7 +181,7 @@ public class BaseArchon extends Unit
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
             rc.activate(neutralBots[0].location);
-            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
+//            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
         }
 
         if (enemies.length > allies.length)

@@ -252,6 +252,7 @@ public class MapUtils
 
             if (!Unit.rc.canSenseLocation(current)) continue;
             if (!Unit.rc.onTheMap(current)) continue;
+            if (Unit.rc.senseRubble(current) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
 
             int newDist = current.distanceSquaredTo(target);
 

@@ -15,6 +15,7 @@ import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManGuard;
 import team037.Units.PacMan.PacManScout;
 import team037.Units.PacMan.PacManViper;
+import team037.Units.Rushers.RushingViper;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
@@ -110,8 +111,13 @@ public class RobotPlayer
         }
         else if (type == RobotType.VIPER)
         {
-            unit = new BaseViper(rc);
-            Unit.thisBot = Bots.BASEVIPER;
+            if (strategy.equals(Strategies.TURTLE)) {
+                unit = new RushingViper(rc);
+                Unit.thisBot = Bots.RUSHINGVIPER;
+            } else {
+                unit = new BaseViper(rc);
+                Unit.thisBot = Bots.BASEVIPER;
+            }
         }
 
         // initial update to strategy

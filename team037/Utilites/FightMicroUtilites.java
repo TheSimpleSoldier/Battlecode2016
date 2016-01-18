@@ -211,4 +211,26 @@ public class FightMicroUtilites
             }
         }
     }
+
+    public static boolean offensiveEnemies(RobotInfo[] enemies)
+    {
+        for (int i = enemies.length; --i>=0;)
+        {
+            switch(enemies[i].type)
+            {
+                case STANDARDZOMBIE:
+                case FASTZOMBIE:
+                case BIGZOMBIE:
+                case RANGEDZOMBIE:
+                case SOLDIER:
+                case VIPER:
+                case GUARD:
+                case TURRET:
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
 }
