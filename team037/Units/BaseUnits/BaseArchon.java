@@ -8,8 +8,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
-import team037.Utilites.BuildOrderCreation;
-import team037.Utilites.MapUtils;
+import team037.Utilites.*;
 
 
 public class BaseArchon extends Unit
@@ -24,6 +23,7 @@ public class BaseArchon extends Unit
     private int turnHealed = 0;
     private int retreatCall = 0;
     public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
+    public static ZombieTracker zombieTracker;
 
     public BaseArchon(RobotController rc)
     {
@@ -32,6 +32,7 @@ public class BaseArchon extends Unit
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
         mapKnowledge = mKnowledge;
+        zombieTracker = new ZombieTracker(rc);
     }
 
     public boolean precondition()
@@ -58,6 +59,9 @@ public class BaseArchon extends Unit
         {
             sortedParts.findPartsAndNeutralsICanSense(rc);
         }
+
+        rc.setIndicatorString(0, "Archon zombie score: " + zombieTracker.getNextZombieRoundStrength());
+        rc.setIndicatorString(1, "Next Round: " + zombieTracker.getNextZombieRound());
     }
 
     public boolean fight() throws GameActionException
