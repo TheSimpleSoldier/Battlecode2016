@@ -23,7 +23,6 @@ public class BaseArchon extends Unit
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
     private int retreatCall = 0;
-    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
 
     public BaseArchon(RobotController rc)
     {
@@ -31,7 +30,8 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
-        mapKnowledge = mKnowledge;
+        archonComs = false;
+        archonDistressComs = false;
     }
 
     public boolean precondition()
@@ -82,11 +82,9 @@ public class BaseArchon extends Unit
         return true;
     }
 
-    // additional methods with default behavior
-    public void handleMessages() throws GameActionException
+    @Override
+    public void sendMessages() throws GameActionException
     {
-        super.handleMessages();
-
         int offensiveEnemies = 0;
 
         for (int i = enemies.length; --i>=0;)
@@ -103,12 +101,29 @@ public class BaseArchon extends Unit
 
         offensiveEnemies += zombies.length;
 
-        if (offensiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25)
+        if (offensiveEnemies > allies.length && (rc.getRoundNum() - retreatCall) > 25 && msgsSent < 20)
         {
             retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
-            communicator.sendCommunication(400, distressCall);
+            communicator.sendCommunication(mapKnowledge.getRange(), distressCall);
+            msgsSent++;
+        }
+
+        if(mapKnowledge.firstFoundEdge && msgsSent < 20)
+        {
+            Communication com = mapKnowledge.getMapBoundsCommunication();
+            communicator.sendCommunication(mapKnowledge.getMaxRange(), com);
+            msgsSent++;
+            mapKnowledge.firstFoundEdge = false;
+            mapKnowledge.updated = false;
+        }
+        if(mapKnowledge.updated && msgsSent < 20)
+        {
+            Communication com = mapKnowledge.getMapBoundsCommunication();
+            communicator.sendCommunication(mapKnowledge.getRange(), com);
+            msgsSent++;
+            mapKnowledge.updated = false;
         }
     }
 
@@ -159,18 +174,7 @@ public class BaseArchon extends Unit
         if (neutralBots.length > 0 && rc.isCoreReady())
         {
             rc.activate(neutralBots[0].location);
-
-            for (int j = mKnowledge.dens.length; --j>=0; )
-            {
-                MapLocation den = mKnowledge.dens.array[j];
-
-                if (den != null)
-                {
-                    Communication communicationDen = new SimpleBotInfoCommunication();
-                    communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
-                    communicator.sendCommunication(5, communicationDen);
-                }
-            }
+            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
         }
 
         if (enemies.length > allies.length)
@@ -178,37 +182,61 @@ public class BaseArchon extends Unit
             return false;
         }
 
+        nextBot = changeBuildOrder(nextBot);
         if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
         {
-            double rubble = Double.MAX_VALUE;
-            Direction least = dirs[0];
-            for (int i = dirs.length; --i>=0; )
+            Direction dir = build();
+            if(dir != Direction.NONE)
             {
-                if(build(dirs[i]))
-                {
-                    return true;
-                }
-                double tempRubble = rc.senseRubble(currentLocation.add(dirs[i]));
-                if(tempRubble < rubble && tempRubble > 0)
-                {
-                    rubble = tempRubble;
-                    least = dirs[i];
-                }
+                sendInitialMessages(dir);
+                nextBot = buildOrder.nextBot();
+                nextType = Bots.typeFromBot(nextBot);
+                return true;
             }
-            try {
-                rc.clearRubble(least);
-            } catch (Exception e) {}
         }
 
         return false;
     }
 
-    /**
-     * This method creates the initial starting map and broadcasts it to the world
-     */
-    public static void updateStartingMap()
+    private static void sendInitialMessages(Direction dir) throws GameActionException
     {
-        try { mKnowledge.senseAndUpdateEdges(); communicator.sendCommunication(2500, mKnowledge.getMapBoundsCommunication(id)); } catch (Exception e) { e.printStackTrace(); }
+        MapLocation[] archons = mapKnowledge.getArchonLocations(false);
+
+        for(int k = archons.length; --k >= 0;)
+        {
+            if(archons[k] != null)
+            {
+                BotInfoCommunication communication = new BotInfoCommunication();
+                communication.id = 0;
+                communication.x = archons[k].x;
+                communication.y = archons[k].y;
+                communicator.sendCommunication(2, communication);
+            }
+        }
+
+        int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
+        MissionCommunication communication = new MissionCommunication();
+        communication.opcode = CommunicationType.CHANGEMISSION;
+        communication.id = id;
+        communication.rType = nextType;
+        communication.bType = nextBot;
+        communication.newBType = nextBot;
+        communicator.sendCommunication(2, communication);
+
+        Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication();
+        communicator.sendCommunication(2, mapBoundsCommunication);
+
+        for (int j = mapKnowledge.dens.length; --j>=0; )
+        {
+            MapLocation den = mapKnowledge.dens.array[j];
+
+            if (den != null)
+            {
+                Communication communicationDen = new SimpleBotInfoCommunication();
+                communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                communicator.sendCommunication(2, communicationDen);
+            }
+        }
     }
 
     /**
@@ -230,64 +258,32 @@ public class BaseArchon extends Unit
         return sortedParts.getBestSpot(currentLocation);
     }
 
-    private boolean build(Direction dir) throws GameActionException
+    private Direction build() throws GameActionException
     {
-        Bots changeTo = changeBuildOrder(nextBot);
-
-        if (!changeTo.equals(nextBot))
+        double rubble = Double.MAX_VALUE;
+        Direction least = dirs[0];
+        for (int i = dirs.length; --i>=0; )
         {
-            nextType = Bots.typeFromBot(changeTo);
-            nextBot = changeTo;
-        }
-
-        if (rc.canBuild(dir, nextType))
-        {
-            rc.build(dir, nextType);
-
-            int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
-            MissionCommunication communication = new MissionCommunication();
-            communication.opcode = CommunicationType.CHANGEMISSION;
-            communication.id = id;
-            communication.rType = Bots.typeFromBot(nextBot);
-            communication.bType = nextBot;
-            communication.newBType = nextBot;
-            communicator.sendCommunication(2, communication);
-
-            Communication mapBoundsCommunication = mKnowledge.getMapBoundsCommunication(id);
-            communicator.sendCommunication(5, mapBoundsCommunication);
-
-            for (int j = mKnowledge.exploredEdges.length; --j>=0; )
+            if(rc.onTheMap(currentLocation.add(dirs[i])))
             {
-                if (mKnowledge.exploredEdges[j])
+                if(rc.canBuild(dirs[i], nextType))
                 {
-                    Communication mapBoundDiscovered = new EdgeDiscovered();
-                    mapBoundDiscovered.setValues(new int[]{CommunicationType.toInt(CommunicationType.EDGE_EXPLORED), id, j});
-                    communicator.sendCommunication(5, mapBoundDiscovered);
+                    rc.build(dirs[i], nextType);
+                    return dirs[i];
+                }
+                double tempRubble = rc.senseRubble(currentLocation.add(dirs[i]));
+                if(tempRubble < rubble && tempRubble > 0)
+                {
+                    rubble = tempRubble;
+                    least = dirs[i];
                 }
             }
-
-
-            if (Bots.typeFromBot(nextBot) == RobotType.GUARD || Bots.typeFromBot(nextBot) == RobotType.SOLDIER)
-            {
-                for (int j = mKnowledge.dens.length; --j>=0; )
-                {
-                    MapLocation den = mKnowledge.dens.array[j];
-
-                    if (den != null)
-                    {
-                        Communication communicationDen = new SimpleBotInfoCommunication();
-                        communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
-                        communicator.sendCommunication(2, communicationDen);
-                    }
-                }
-            }
-
-            nextBot = buildOrder.nextBot();
-            nextType = Bots.typeFromBot(nextBot);
-            return true;
         }
+        try {
+            rc.clearRubble(least);
+        } catch (Exception e) {}
 
-        return false;
+        return Direction.NONE;
     }
 
     public Bots changeBuildOrder(Bots nextBot)

@@ -17,9 +17,9 @@ public class CommunicationUtilities
     public static int valSize = 15;
     public static int typeSize = 4;
     public static int botSize = 8;
-    public static int locationSize = 15;
+    public static int locationSize = 10;
     public static int mapSpanSize = 7;
-    public static int mapIndicatorSize = 2;
+    public static int mapIndicatorSize = 4;
     public static int teamSize = 2;
 
     public static Communication readCommunication(Signal signal)

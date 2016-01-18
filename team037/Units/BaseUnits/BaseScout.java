@@ -6,6 +6,7 @@ import team037.FlyingNavigator;
 import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
+import team037.Utilites.CommunicationUtilities;
 import team037.Utilites.PartsUtilities;
 
 public class BaseScout extends Unit
@@ -42,6 +43,21 @@ public class BaseScout extends Unit
     @Override
     public void sendMessages() throws GameActionException
     {
+        if(mKnowledge.firstFoundEdge && msgsSent < 20)
+        {
+            Communication com = mKnowledge.getMapBoundsCommunication();
+            communicator.sendCommunication(mKnowledge.getMaxRange(), com);
+            msgsSent++;
+            mKnowledge.firstFoundEdge = false;
+            mKnowledge.updated = false;
+        }
+        if(mKnowledge.updated && msgsSent < 20)
+        {
+            Communication com = mKnowledge.getMapBoundsCommunication();
+            communicator.sendCommunication(mKnowledge.getRange(), com);
+            msgsSent++;
+            mKnowledge.updated = false;
+        }
         msgArchons();
         msgTurrets();
         msgParts();
@@ -51,7 +67,6 @@ public class BaseScout extends Unit
 
     public void msgArchons() throws GameActionException
     {
-        int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
         for(int k = 0; k < enemies.length; k++)
         {
             if(enemies[k].type == RobotType.ARCHON && msgsSent < 20)
@@ -63,7 +78,7 @@ public class BaseScout extends Unit
                 communication.type = RobotType.ARCHON;
                 communication.x = enemies[k].location.x;
                 communication.y = enemies[k].location.y;
-                communicator.sendCommunication(dist, communication);
+                communicator.sendCommunication(mKnowledge.getRange(), communication);
                 msgsSent++;
             }
         }
@@ -71,7 +86,6 @@ public class BaseScout extends Unit
 
     public void msgDens() throws GameActionException
     {
-        int dist = -1;
         for (int i = zombies.length; --i>=0; )
         {
             if (zombies[i].type == RobotType.ZOMBIEDEN)
@@ -79,13 +93,10 @@ public class BaseScout extends Unit
                 MapLocation zombieDen = zombies[i].location;
                 if (!mKnowledge.dens.contains(zombieDen) && msgsSent < 20)
                 {
-                    if (dist == -1)
-                        dist = 2500; //Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
-
                     mKnowledge.dens.add(zombieDen);
                     Communication communication = new SimpleBotInfoCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), zombies[i].ID, zombieDen.x, zombieDen.y});
-                    communicator.sendCommunication(dist, communication);
+                    communicator.sendCommunication(mKnowledge.getRange(), communication);
                     msgsSent++;
                 }
             }
@@ -95,16 +106,13 @@ public class BaseScout extends Unit
         {
             MapLocation deadDen = mKnowledge.updateDens(rc);
 
-            if (dist == -1)
-                dist = Math.max(type.sensorRadiusSquared * 2, Math.min(2500, rc.getLocation().distanceSquaredTo(start)));
-
             // if a den has been destroyed send it out
             if (deadDen != null && msgsSent < 20)
             {
                 Communication communication = new SimpleBotInfoCommunication();
                 communication.opcode = CommunicationType.DEAD_DEN;
                 communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, deadDen.x, deadDen.y});
-                communicator.sendCommunication(dist, communication);
+                communicator.sendCommunication(mKnowledge.getRange(), communication);
                 msgsSent++;
             }
         }
@@ -128,13 +136,12 @@ public class BaseScout extends Unit
                     bot = rc.senseRobotAtLocation(spot);
                 }
 
-                int dist = Math.max(type.sensorRadiusSquared * 2, Math.min(400, rc.getLocation().distanceSquaredTo(start)));
                 if (rc.senseParts(spot) > 0 && msgsSent < 20)
                 {
                     // create parts msg
                     Communication communication = new PartsCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), (int) rc.senseParts(spot), spot.x, spot.y});
-                    communicator.sendCommunication(dist, communication);
+                    communicator.sendCommunication(mKnowledge.getRange(), communication);
                     msgsSent++;
                 }
                 else if (bot != null && bot.team == Team.NEUTRAL && msgsSent < 20)
@@ -147,7 +154,7 @@ public class BaseScout extends Unit
                         parts = 1000;
                     }
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), parts, spot.x, spot.y});
-                    communicator.sendCommunication(dist, communication);
+                    communicator.sendCommunication(mKnowledge.getRange(), communication);
                     msgsSent++;
                 }
             }
@@ -475,7 +482,7 @@ public class BaseScout extends Unit
             Communication communication = new RubbleCommunication();
             communication.opcode = CommunicationType.RUBBLE;
             communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.RUBBLE),hi,lo});
-            communicator.sendCommunication(212, communication);
+            communicator.sendCommunication(mKnowledge.getRange(), communication);
             msgsSent++;
         } catch (GameActionException e) {
 
