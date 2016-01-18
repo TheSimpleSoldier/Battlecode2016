@@ -440,6 +440,7 @@ public class ScoutBombScout extends BaseScout
         }
     }
 
+    @Override
     public void suicide() throws GameActionException {
         int i = 0;
         while (Clock.getBytecodesLeft() > 200 && i < 20) {

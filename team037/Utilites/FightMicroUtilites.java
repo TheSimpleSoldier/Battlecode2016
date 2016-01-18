@@ -53,7 +53,7 @@ public class FightMicroUtilites
 
         if (weakest != null)
         {
-            return  weakest;
+            return weakest;
         }
 
         // else look to infect an ally right before death
