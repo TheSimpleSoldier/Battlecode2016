@@ -4,6 +4,9 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
+import team037.Enums.CommunicationType;
+import team037.Messages.AttackCommunication;
+import team037.Messages.Communication;
 import team037.Units.PacMan.PacMan;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
@@ -14,11 +17,14 @@ import team037.Units.BaseUnits.BaseArchon;
 public class TurtleArchon extends BaseArchon implements PacMan
 {
     private boolean reachedTurtleSpot = false;
+    private boolean updatedTurtleSpot = false;
+    private MapLocation origionalTurtleSpot;
 
     public TurtleArchon(RobotController rc)
     {
         super(rc);
         turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        origionalTurtleSpot = new MapLocation(turtlePoint.x, turtlePoint.y);
         turtlePoint = turtlePoint.add(turtlePoint.directionTo(currentLocation), 3);
         rc.setIndicatorString(0, "Turtle archon");
     }
@@ -53,6 +59,12 @@ public class TurtleArchon extends BaseArchon implements PacMan
 //                    rc.setIndicatorDot(mapKnowledge.dens.array[i], 255, 0, 0);
                 }
             }
+        }
+
+        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
+        {
+            updatedTurtleSpot = true;
+            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
         }
     }
 

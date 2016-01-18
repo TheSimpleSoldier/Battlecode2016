@@ -13,6 +13,7 @@ public class TurtleScout extends BaseScout
     // this is the max distance that a scout will keep between it and the turtle center
     private static final int maxDist = 37;
     private static int directionUpdateTurn = 0;
+    private boolean updatedTurtleSpot = false;
 
     public TurtleScout(RobotController rc)
     {
@@ -145,5 +146,17 @@ public class TurtleScout extends BaseScout
 
 
         return false;
+    }
+
+    @Override
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+
+        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
+        {
+            updatedTurtleSpot = true;
+            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
+        }
     }
 }

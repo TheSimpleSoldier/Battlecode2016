@@ -120,7 +120,8 @@ public class BaseTurret extends Unit
         if (targetLoc == null || !rc.canSense(targetLoc))
             return targetLoc;
         else
-            return MapUtils.getClosestUnoccupiedSquare(currentLocation, targetLoc);
+            return MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, targetLoc);
+            //return MapUtils.getClosestUnoccupiedSquare(currentLocation, targetLoc);
     }
 
     @Override
