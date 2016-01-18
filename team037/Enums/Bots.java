@@ -15,6 +15,7 @@ import team037.Units.Rushers.RushingSoldier;
 import team037.Units.Rushers.RushingTurret;
 import team037.Units.Rushers.RushingViper;
 import team037.Units.ScoutBomb.ScoutBombScout;
+import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
 import team037.Units.Scouts.RegionScout;
@@ -27,10 +28,34 @@ import team037.Units.TurtleUnits.*;
  */
 public enum Bots
 {
-    BASEARCHON, BASEGAURD, BASESCOUT, BASESOLDIER, BASETURRET, BASEVIPER, ALPHAARCHON,
-    SCOUTINGSCOUT, PATROLSCOUT, DENKILLERSOLDIER, DENKILLERGUARD, RUSHINGSOLDIER, RUSHINGVIPER,
-    REGIONSCOUT, HERDINGSCOUT, CASTLESOLDIER, TURTLEARCHON, TURTLESOLDIER, TURTLETURRET, TURTLEGUARD,
-    TURTLESCOUT, PACMANARCHON, PACMANSCOUT, PACMANGUARD, RUSHGUARD, RUSHTURRET, SCOUTBOMBARCHON,
+    BASEARCHON,
+    BASEGAURD,
+    BASESCOUT,
+    BASESOLDIER,
+    BASETURRET,
+    BASEVIPER,
+    ALPHAARCHON,
+    SCOUTINGSCOUT,
+    PATROLSCOUT,
+    DENKILLERSOLDIER,
+    DENKILLERGUARD,
+    RUSHINGSOLDIER,
+    RUSHINGVIPER,
+    REGIONSCOUT,
+    HERDINGSCOUT,
+    CASTLESOLDIER,
+    TURTLEARCHON,
+    TURTLESOLDIER,
+    TURTLETURRET,
+    TURTLEGUARD,
+    TURTLESCOUT,
+    PACMANARCHON,
+    PACMANSCOUT,
+    PACMANGUARD,
+    SCOUTBOMBARCHON,
+    RUSHGUARD,
+    RUSHTURRET,
+    SCOUTBOMBGUARD,
     SCOUTBOMBSCOUT;
 
     public static int toInt(Bots type)
@@ -89,8 +114,10 @@ public enum Bots
                 return 24;
             case RUSHTURRET:
                 return 25;
-            case SCOUTBOMBSCOUT:
+            case SCOUTBOMBGUARD:
                 return 26;
+            case SCOUTBOMBSCOUT:
+                return 27;
         }
         return -1;
     }
@@ -152,6 +179,8 @@ public enum Bots
             case 25:
                 return RUSHTURRET;
             case 26:
+                return SCOUTBOMBGUARD;
+            case 27:
                 return SCOUTBOMBSCOUT;
         }
 
@@ -171,6 +200,7 @@ public enum Bots
             case TURTLEGUARD:
             case DENKILLERGUARD:
             case BASEGAURD:
+            case SCOUTBOMBGUARD:
             case PACMANGUARD:
                 return RobotType.GUARD;
             case TURTLESCOUT:
@@ -257,6 +287,8 @@ public enum Bots
                 return new RushingTurret(rc);
             case SCOUTBOMBSCOUT:
                 return new ScoutBombScout(rc);
+            case SCOUTBOMBGUARD:
+                return new ScoutBombGuard(rc);
         }
 
         return null;

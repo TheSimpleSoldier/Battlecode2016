@@ -15,6 +15,7 @@ import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManGuard;
 import team037.Units.PacMan.PacManScout;
 import team037.Units.ScoutBomb.ScoutBombArchon;
+import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Units.PacMan.PacManArchon;
@@ -38,7 +39,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.RUSH;
+        strategy = Strategies.SCOUT_BOMB;
 
 
         RobotType type = rc.getType();
@@ -66,6 +67,9 @@ public class RobotPlayer
             if (strategy.equals(Strategies.PACMAN)) {
                 unit = new PacManGuard(rc);
                 Unit.thisBot = Bots.PACMANGUARD;
+            } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                unit = new ScoutBombGuard(rc);
+                Unit.thisBot = Bots.SCOUTBOMBGUARD;
             } else {
                 unit = new BaseGaurd(rc);
                 Unit.thisBot = Bots.BASEGAURD;
