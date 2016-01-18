@@ -53,11 +53,10 @@ public enum Bots
     PACMANSCOUT,
     PACMANGUARD,
     SCOUTBOMBARCHON,
-    SCOUTBOMBSCOUT,
-    SCOUTBOMBGUARD,
     RUSHGUARD,
     RUSHTURRET,
-    SCOUTBOMBARCHON;
+    SCOUTBOMBGUARD,
+    SCOUTBOMBSCOUT;
 
     public static int toInt(Bots type)
     {
