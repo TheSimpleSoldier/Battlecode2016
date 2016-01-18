@@ -1,7 +1,6 @@
 package team037;
 
 import battlecode.common.*;
-import scala.reflect.internal.TypeDebugging;
 
 public class FlyingSlugNavigator extends Navigator
 {
