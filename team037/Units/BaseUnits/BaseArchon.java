@@ -213,19 +213,6 @@ public class BaseArchon extends Unit
                 communicator.sendCommunication(2, communication);
             }
         }
-        if (nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHINGVIPER)
-        {
-            Communication rushMsg = new AttackCommunication();
-
-            MapLocation archonCOM = MapUtils.getCenterOfMass(archons);
-
-            rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
-            communicator.sendCommunication(2, rushMsg);
-
-            MapLocation rushLoc = mapKnowledge.getOppositeCorner(archonCOM);
-            rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.ATTACK), rushLoc.x, rushLoc.y} );
-            communicator.sendCommunication(2, rushMsg);
-        }
 
         int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
         MissionCommunication communication = new MissionCommunication();
