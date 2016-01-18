@@ -6,10 +6,50 @@ import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
 
+/**
+ * Using messages could be improved!
+ *
+ *
+ * WHY DON'T WE USE MESSAGES!!!111!!!!
+ *
+         * There a couple clear scenarios where we should
+         *
+         *  CLEAR SCENARIO #1
+         *    A           S FFFF   A
+         *    if we keep sending scounts, we herd the Fast Zombies (F) back to us
+         *    When S is about to die by the Fs, send a MAX range message, saying the there are Fs at their location
+         *    All Scouts between the fast swarm and the archons (probably just use BornLocation in unit) should discintegrte (if not infected)
+         *       archons should attempt to move away
+         *       or spawn guards
+         *
+         *
+         *    CLEAR SCENARIO
+         *    Message enemy archon locations
+         *    if you are hanging out waiting for zombies (you shouldn't do this much)
+         *    or about to die (message all the things)
+         *    and you see an enemey archon
+         *    message about it!
+         *
+         *
+         * Possible:
+         *   Map Bounds
+         *      (as long as we actually use this information)
+ *
+ *
+ * WHY DON'T WE STOP ACTING LIKE IDIOTS WHEN WE SEE ENEMIES ON THE FIELD
+ * by enemies I mean non-archon, non-scout enemies
+ *
+         * we should try and herd them too!
+         * back to the archon!
+         * everybody let's go!
+         *
+ *
+ *
+ *
+ *
+ *
+ */
 public class ScoutBombArchon extends BaseArchon implements PacMan {
-
-
-
 
     private static String previousLastAction = "none";
     private static String lastAction = "none";
