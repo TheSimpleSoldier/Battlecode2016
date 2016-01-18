@@ -55,7 +55,7 @@ public interface PacMan {
      * @param weights
      * @return
      */
-    default boolean runAway(double[][] weights) {
+    default Direction getRunAwayDirection(double[][] weights) {
         try {
             RobotController rc = Unit.rc;
             MapLocation currentLocation = Unit.currentLocation;
@@ -153,12 +153,27 @@ public interface PacMan {
                 nextLoc = currentLocation.add(dirs[minDir], 1);
             }
             while (!(rc.canMove(dirs[minDir]) || rc.senseRubble(nextLoc) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH || min == Integer.MAX_VALUE));
-            MapLocation saveTarget = navigator.getTarget();
-            navigator.setTarget(nextLoc);
+            return Unit.dirs[minDir];
+        } catch (Exception e) {
+            return Direction.NONE;
+        }
+    }
+
+    default boolean runAway(double[][] weights)  {
+        Navigator navigator = Unit.navigator;
+
+        Direction direction = getRunAwayDirection(weights);
+
+        MapLocation nextLoc = Unit.currentLocation.add(direction);
+
+        MapLocation saveTarget = navigator.getTarget();
+        navigator.setTarget(nextLoc);
+        try {
             boolean out = navigator.takeNextStep();
             navigator.setTarget(saveTarget);
             return out;
         } catch (Exception e) {
+            navigator.setTarget(saveTarget);
             return false;
         }
     }

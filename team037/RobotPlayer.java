@@ -14,7 +14,9 @@ import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManGuard;
 import team037.Units.PacMan.PacManScout;
+import team037.Units.PacMan.PacManViper;
 import team037.Units.ScoutBomb.ScoutBombArchon;
+import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Units.PacMan.PacManArchon;
@@ -38,7 +40,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.RUSH;
+        strategy = Strategies.PACMAN;
 
 
         RobotType type = rc.getType();
@@ -66,6 +68,9 @@ public class RobotPlayer
             if (strategy.equals(Strategies.PACMAN)) {
                 unit = new PacManGuard(rc);
                 Unit.thisBot = Bots.PACMANGUARD;
+            } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                unit = new ScoutBombGuard(rc);
+                Unit.thisBot = Bots.SCOUTBOMBGUARD;
             } else {
                 unit = new BaseGaurd(rc);
                 Unit.thisBot = Bots.BASEGAURD;
@@ -74,8 +79,8 @@ public class RobotPlayer
         else if (type == RobotType.SCOUT)
         {
             if (strategy.equals(Strategies.PACMAN)) {
-                unit = new PacManScout(rc);
-                Unit.thisBot = Bots.PACMANSCOUT;
+                unit = new ScoutBombScout(rc);
+                Unit.thisBot = Bots.SCOUTBOMBSCOUT;
             } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
                 unit = new ScoutBombScout(rc);
                 Unit.thisBot = Bots.SCOUTBOMBSCOUT;
@@ -107,10 +112,6 @@ public class RobotPlayer
         {
             unit = new BaseViper(rc);
             Unit.thisBot = Bots.BASEVIPER;
-        }
-        else if (type == RobotType.VIPER)
-        {
-            unit = new BaseViper(rc);
         }
 
         // initial update to strategy

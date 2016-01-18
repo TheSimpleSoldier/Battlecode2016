@@ -54,6 +54,7 @@ public class BaseArchon extends Unit
         super.collectData();
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        /*
         if (sortedParts.contains(currentLocation)) {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
         }
@@ -66,6 +67,7 @@ public class BaseArchon extends Unit
 
         rc.setIndicatorString(1, "Archon zombie score: " + zombieTracker.getNextZombieRoundStrength());
         rc.setIndicatorString(2, "Next Round: " + zombieTracker.getNextZombieRound());
+        */
     }
 
     public boolean fight() throws GameActionException

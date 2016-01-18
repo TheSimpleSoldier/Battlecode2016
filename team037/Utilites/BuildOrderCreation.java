@@ -62,8 +62,7 @@ public class BuildOrderCreation
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }
 
-        if (RobotPlayer.strategy.equals(Strategies.TURRET_RUSH))
-        {
+        if (RobotPlayer.strategy.equals(Strategies.TURRET_RUSH)) {
             Bots[][] buildOrderSoldiers = {
                     {Bots.BASETURRET}
             };
@@ -73,7 +72,7 @@ public class BuildOrderCreation
 
         if (RobotPlayer.strategy.equals(Strategies.PACMAN)) {
             Bots[][] buildOrderPacMan = {
-                    {Bots.PACMANGUARD, null},
+                    {Bots.PACMANGUARD, Bots.SCOUTBOMBSCOUT}, //Bots.SCOUTBOMBSCOUT
             };
 
             int[] timesPacMan = {1000};

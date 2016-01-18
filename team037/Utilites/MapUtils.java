@@ -309,6 +309,30 @@ public class MapUtils
         return closest;
     }
 
+
+    public static boolean canZombieMoveTowardMe(RobotController rc, MapLocation currentLocation, MapLocation zombieLocation) throws GameActionException {
+        if (!rc.canSense(zombieLocation)) {
+            return true;
+        }
+        Direction towardMe = zombieLocation.directionTo(currentLocation);
+        MapLocation toCheck = zombieLocation.add(towardMe);
+
+        if (rc.senseRobotAtLocation(toCheck) != null && rc.senseRubble(toCheck) < GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+            return true;
+        }
+
+        toCheck = zombieLocation.add(towardMe.rotateLeft());
+        if (rc.senseRobotAtLocation(toCheck) != null && rc.senseRubble(toCheck) < GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+            return true;
+        }
+
+        toCheck = zombieLocation.add(towardMe.rotateLeft());
+        if (rc.senseRobotAtLocation(toCheck) != null && rc.senseRubble(toCheck) < GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+            return true;
+        }
+        return false;
+    }
+
     public static Direction addDirections(Direction d1, Direction d2) {
         int dx = d1.dx + d2.dx;
         int dy = d1.dy + d2.dy;
