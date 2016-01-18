@@ -106,17 +106,8 @@ public class RobotPlayer
         }
         else if (type == RobotType.VIPER)
         {
-            if (strategy.equals(Strategies.PACMAN)) {
-                unit = new PacManViper(rc);
-                Unit.thisBot = Bots.PACMANVIPER;
-            } else {
-                unit = new BaseViper(rc);
-                Unit.thisBot = Bots.BASEVIPER;
-            }
-        }
-        else if (type == RobotType.VIPER)
-        {
             unit = new BaseViper(rc);
+            Unit.thisBot = Bots.BASEVIPER;
         }
 
         // initial update to strategy
