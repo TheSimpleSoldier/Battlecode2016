@@ -38,7 +38,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.TURTLE;
+        strategy = Strategies.RUSH;
 
 
         RobotType type = rc.getType();
@@ -125,9 +125,8 @@ public class RobotPlayer
 
         if (rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
         {
-            BaseArchon.updateStartingMap();
             BaseArchon.sendOutInitialLocation();
-            BaseArchon.mKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
+            BaseArchon.mapKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
         }
 
 

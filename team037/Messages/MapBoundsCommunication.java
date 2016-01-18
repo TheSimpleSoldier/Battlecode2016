@@ -5,10 +5,9 @@ import team037.Utilites.CommunicationUtilities;
 
 public class MapBoundsCommunication extends Communication
 {
-    public int widthIndicator;
+    public int edgeIndicator;
     public int xVal;
     public int maxX;
-    public int heightIndicator;
     public int yVal;
     public int maxY;
 
@@ -25,7 +24,8 @@ public class MapBoundsCommunication extends Communication
                 xVal,
                 maxX,
                 yVal,
-                maxY
+                maxY,
+                edgeIndicator
         };
     }
 
@@ -37,6 +37,7 @@ public class MapBoundsCommunication extends Communication
         maxX = values[2];
         yVal = values[3];
         maxY = values[4];
+        edgeIndicator = values[5];
     }
 
     @Override
@@ -47,7 +48,8 @@ public class MapBoundsCommunication extends Communication
             CommunicationUtilities.locationSize,
             CommunicationUtilities.mapSpanSize,
             CommunicationUtilities.locationSize,
-            CommunicationUtilities.mapSpanSize
+            CommunicationUtilities.mapSpanSize,
+            CommunicationUtilities.mapIndicatorSize
         };
     }
 }

@@ -4,6 +4,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.ZombieSpawnSchedule;
+import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
@@ -62,4 +63,10 @@ public class AlphaArchon extends BaseArchon
             communicator.sendCommunication(400, communication);
         }
     }
+
+//    @Override
+//    public Bots changeBuildOrder(Bots nextBot)
+//    {
+//        return Bots.RUSHINGSOLDIER;
+//    }
 }

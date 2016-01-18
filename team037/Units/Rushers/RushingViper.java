@@ -2,61 +2,82 @@ package team037.Units.Rushers;
 
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseViper;
+import team037.Utilites.MapUtils;
 
 public class RushingViper extends BaseViper
 {
-    private boolean rushing = true;
+    private boolean rushing = false;
     private MapLocation lastTarget = null;
+    private MapLocation[] updatedLocs;
+    private int currentIndex = -1;
+    private int dist = Integer.MAX_VALUE;
 
     public RushingViper(RobotController rc)
     {
         super(rc);
+        updatedLocs = new MapLocation[enemyArchonStartLocs.length];
+
+        for (int i = updatedLocs.length; --i>=0; )
+        {
+            updatedLocs[i] = enemyArchonStartLocs[i];
+        }
+
+        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
+
+        dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
+        dist = dist / 2;
+        dist = dist*dist;
     }
 
     @Override
-    public MapLocation getNextSpot()
+    public void collectData() throws GameActionException
     {
-        if (rushTarget != null)
+        super.collectData();
+
+        if (currentLocation != null && rushTarget != null)
         {
-            lastTarget = rushTarget;
-
-            Direction dir = currentLocation.directionTo(rushTarget).rotateRight();
-
-            return currentLocation.add(dir, 5);
+            if (currentLocation.distanceSquaredTo(rushTarget) < dist)
+            {
+                rushing = true;
+            }
+            else
+            {
+                rushing = false;
+            }
         }
-        else
-        {
-            rushing = true;
-            rushTarget = mapKnowledge.getOppositeCorner(start);
-        }
-
-        return null;
     }
 
     @Override
-    public boolean updateTarget()
+    public MapLocation getNextSpot() {
+        if (currentIndex != -1)
+        {
+            if (currentIndex < updatedLocs.length)
+            {
+                updatedLocs[currentIndex] = null;
+            }
+            else
+            {
+                currentIndex = 0;
+                for (int i = updatedLocs.length; --i>=0; )
+                {
+                    updatedLocs[i] = enemyArchonStartLocs[i];
+                }
+            }
+
+            rushTarget =  MapUtils.getNearestLocation(updatedLocs, currentLocation);
+        }
+
+        currentIndex++;
+        return rushTarget;
+    }
+
+    @Override
+    public boolean updateTarget() throws GameActionException
     {
         MapLocation target = navigator.getTarget();
-
-        if (target == null)
-            return true;
-
-        if (currentLocation.equals(target))
-            return true;
-
-        if (currentLocation.isAdjacentTo(target))
-            return true;
-
-        try {
-            if (rc.canSenseLocation(target) && (rc.senseRubble(target) > GameConstants.RUBBLE_OBSTRUCTION_THRESH || !rc.onTheMap(target)))
-                return true;
-        } catch (Exception e) {}
-
-        if (rushTarget != null && !rushTarget.equals(lastTarget))
-            return true;
-
+        if (target == null) return true;
+        if (currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) return true;
         return false;
-
     }
 
     @Override
@@ -66,7 +87,7 @@ public class RushingViper extends BaseViper
         {
             return fightMicro.aggressiveFightMicro(nearByEnemies, enemies, nearByAllies);
         }
-        return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
+        return super.fight();
     }
 
     @Override
@@ -75,6 +96,6 @@ public class RushingViper extends BaseViper
         if (rushing)
             return false;
 
-        return fightMicro.basicNetFightMicro(nearByZombies, nearByAllies, zombies, allies, target);
+        return super.fightZombies();
     }
 }
