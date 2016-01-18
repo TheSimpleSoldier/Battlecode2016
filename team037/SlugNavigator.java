@@ -148,7 +148,7 @@ public class SlugNavigator extends Navigator
         }
     }
 
-    private boolean tryClear(Direction toMove, MapLocation currentLocation) throws GameActionException {
+    public boolean tryClear(Direction toMove, MapLocation currentLocation) throws GameActionException {
         MapLocation nextLoc = currentLocation.add(toMove);
         if(rc.senseRubble(nextLoc) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
             rc.clearRubble(toMove);
@@ -157,7 +157,7 @@ public class SlugNavigator extends Navigator
         return false;
     }
 
-    private boolean tryMove(Direction toMove, MapLocation currentLocation) throws GameActionException {
+    public boolean tryMove(Direction toMove, MapLocation currentLocation) throws GameActionException {
         MapLocation nextLoc = currentLocation.add(toMove);
         if (rc.canMove(toMove) && !inTail(nextLoc)) {
             if(rc.senseRubble(nextLoc) < GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
