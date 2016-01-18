@@ -117,7 +117,7 @@ public class PacManArchon extends Unit implements PacMan {
 
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0) {
-            sortedParts.findPartsAndNeutralsICanSense(rc);
+//            sortedParts.findPartsAndNeutralsICanSense(rc);
         }
     }
 

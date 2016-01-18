@@ -23,7 +23,7 @@ public class PacManScout extends Unit implements PacMan {
                     {1.5, .5, .125, .25, 1.5},        // enemy weights (enemies in sensor range)
                     {-8, -4, -2, -1, 0},            // target constants (attract towards target)
                     {1, .5, .5, .5, .5},   // friendly unit weights (friendlies in sensor range)
-                    {1, .5, 1, .5, .5},        // Archon weights (constantly repel from friendly Archons)
+                    {1, .5, .15, .2, 1},        // archon weights
             };
 
     static final int ALLIES = 3;
