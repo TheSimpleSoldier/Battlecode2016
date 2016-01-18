@@ -6,9 +6,9 @@ import battlecode.common.ZombieSpawnSchedule;
 
 public class ZombieTracker
 {
-    private static final int BIG_ZOMBIE_SCORE = 10;
+    private static final int BIG_ZOMBIE_SCORE = 8;
     private static final int STANDARD_ZOMBIE_SCORE = 1;
-    private static final int RANGED_ZOMBIE_SCORE = 5;
+    private static final int RANGED_ZOMBIE_SCORE = 10;
     private static final int FAST_ZOMBIE_SCORE = 5;
     private static final double[] multipliers = new double[]{1.00, 1.10, 1.20, 1.30, 1.50, 1.70, 2.00, 2.30, 2.60, 3.00};
 
@@ -90,10 +90,14 @@ public class ZombieTracker
     }
 
     /**
-     * 0 => super easy zombie map
-     * 1 => easy Zombie Map
-     * 2 => medium map
-     * 3 => super hard map
+     * 0 => zombies are a complete non issue
+     * 1 => zombies are irrelevant
+     * 2 => zombies will be easy to deal with
+     * 3 => zombies will be slightly annoying
+     * 4 => zombies will need to be dealt with
+     * 5 => zombies will be very common
+     * 6 => zombies will kill everything
+     * 7 => prepare to die
      *
      * @return
      */
@@ -142,15 +146,17 @@ public class ZombieTracker
             roundCount++;
         }
 
-        if (rounds > 4)
-        {
-            totalStrength /= roundCount;
+        System.out.println("Numb of Rounds: " + roundCount + " total Strength: " + totalStrength);
 
-            if (totalStrength > 20)
+        if (roundCount > 0)
+        {
+            totalStrength /= 5;
+
+            if (totalStrength > 25)
             {
                 strength = 3;
             }
-            else if (totalStrength > 10)
+            else if (totalStrength > 15)
             {
                 strength = 2;
             }
@@ -160,6 +166,9 @@ public class ZombieTracker
             }
         }
 
-        return (rounds + strength) / 2;
+        System.out.println("Rounds: " + rounds + " Strength: " + strength);
+        System.out.println("Score: " + (rounds+strength));
+
+        return rounds + strength;
     }
 }

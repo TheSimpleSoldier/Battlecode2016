@@ -212,17 +212,18 @@ public class BaseArchon extends Unit
     {
         MapLocation[] archons = mapKnowledge.getArchonLocations(false);
 
-        for(int k = archons.length; --k >= 0;)
-        {
-            if(archons[k] != null)
-            {
-                BotInfoCommunication communication = new BotInfoCommunication();
-                communication.id = 0;
-                communication.x = archons[k].x;
-                communication.y = archons[k].y;
-                communicator.sendCommunication(2, communication);
-            }
-        }
+//        for(int k = archons.length; --k >= 0;)
+//        {
+//            if(archons[k] != null)
+//            {
+//                BotInfoCommunication communication = new BotInfoCommunication();
+//                communication.opcode = CommunicationType.SARCHON;
+//                communication.id = 0;
+//                communication.x = archons[k].x;
+//                communication.y = archons[k].y;
+//                communicator.sendCommunication(2, communication);
+//            }
+//        }
 
         int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
         MissionCommunication communication = new MissionCommunication();
