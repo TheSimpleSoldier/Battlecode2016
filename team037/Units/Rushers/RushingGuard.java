@@ -1,10 +1,12 @@
 package team037.Units.Rushers;
 
-import battlecode.common.*;
-import team037.Units.BaseUnits.BaseSoldier;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import team037.Units.BaseUnits.BaseGaurd;
 import team037.Utilites.MapUtils;
 
-public class RushingSoldier extends BaseSoldier
+public class RushingGuard extends BaseGaurd
 {
     private boolean rushing = false;
     private MapLocation lastTarget = null;
@@ -12,7 +14,7 @@ public class RushingSoldier extends BaseSoldier
     private int currentIndex = -1;
     private int dist = Integer.MAX_VALUE;
 
-    public RushingSoldier(RobotController rc)
+    public RushingGuard(RobotController rc)
     {
         super(rc);
         updatedLocs = new MapLocation[enemyArchonStartLocs.length];

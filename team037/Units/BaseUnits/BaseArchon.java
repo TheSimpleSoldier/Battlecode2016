@@ -232,26 +232,17 @@ public class BaseArchon extends Unit
 
     private boolean build(Direction dir) throws GameActionException
     {
-        nextBot = changeBuildOrder(nextBot);
+        Bots changeTo = changeBuildOrder(nextBot);
+
+        if (!changeTo.equals(nextBot))
+        {
+            nextType = Bots.typeFromBot(changeTo);
+            nextBot = changeTo;
+        }
 
         if (rc.canBuild(dir, nextType))
         {
             rc.build(dir, nextType);
-
-            if (nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHINGVIPER)
-            {
-                Communication rushMsg = new AttackCommunication();
-
-                MapLocation[] archons = mKnowledge.getArchonLocations(false);
-                MapLocation archonCOM = MapUtils.getCenterOfMass(archons);
-
-                rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.RALLY_POINT), archonCOM.x, archonCOM.y} );
-                communicator.sendCommunication(2, rushMsg);
-
-                MapLocation rushLoc = mKnowledge.getOppositeCorner(archonCOM);
-                rushMsg.setValues(new int[] {CommunicationType.toInt(CommunicationType.ATTACK), rushLoc.x, rushLoc.y} );
-                communicator.sendCommunication(2, rushMsg);
-            }
 
             int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
             MissionCommunication communication = new MissionCommunication();
