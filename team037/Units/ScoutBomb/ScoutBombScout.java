@@ -410,6 +410,17 @@ public class ScoutBombScout extends BaseScout
             rc.setIndicatorString(2, "melee");
             return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
         }
+        // if you can be attacked by a ranged or melee
+        if (closestRangedZombie <= RobotType.RANGEDZOMBIE.attackRadiusSquared) {
+            rc.setIndicatorString(2, "ranged");
+            return herdZombie(closestRangedZombie, closestRangedZombieLoc, closestRangedZombieInfo, RANGED_MOVE_AWAY_DISTANCE, RANGED_DONT_MOVE_DISTANCE, RANGED_MOVE_TOWARD_DISTANCE);
+        }
+        if (closestZombie <= RobotType.STANDARDZOMBIE.attackRadiusSquared) {
+            rc.setIndicatorString(2, "melee");
+            return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
+        }
+
+
         if (closestRangedZombie < RANGED_AVOID_DISTANCE) {
             rc.setIndicatorString(2, "ranged");
             return herdZombie(closestRangedZombie, closestRangedZombieLoc, closestRangedZombieInfo, RANGED_MOVE_AWAY_DISTANCE, RANGED_DONT_MOVE_DISTANCE, RANGED_MOVE_TOWARD_DISTANCE);
@@ -591,6 +602,8 @@ public class ScoutBombScout extends BaseScout
         if (zombies.length == 0) {
             return false;
         }
+
+
 
         return false;
     }

@@ -1,7 +1,6 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
-import team037.Enums.Bots;
 import team037.SlugNavigator;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.PacMan.PacMan;
@@ -9,11 +8,19 @@ import team037.Utilites.MapUtils;
 
 public class ScoutBombArchon extends BaseArchon implements PacMan {
 
+
+    private static int closestZombie;
+    private static MapLocation closestZombieLoc;
+    private static RobotInfo closestZombieInfo;
+
+
+
     private static String previousLastAction = "none";
     private static String lastAction = "none";
-    private static final String MOVE_AWAY = "moving to better location";
+    private static final String MOVE_TO_BETTER_SPAWN = "moving to better location";
     private static final String SPAWN = "spawning";
-    private static final String RUN_AWAY = "run away";
+    private static final String LET_SCOUT_HELP = "letting scout herd away zombie";
+    private static final String RUN_AWAY_FROM_CROWD = "run away from crowd";
     private static final String FAST_CLOUD = "fast cloud spotted";
 
 
@@ -29,17 +36,23 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     }
 
 
-
     @Override
     public boolean act() throws GameActionException {
-        previousLastAction = lastAction;
 
         if (!rc.isCoreReady()) {
             rc.setIndicatorString(0, "waiting on core");
             return false;
-        } else if (moveAway()) {
-            lastAction = MOVE_AWAY;
+        } else if (runAwayFromCrowd()) {
+            previousLastAction = lastAction;
+            lastAction = RUN_AWAY_FROM_CROWD;
+        } else if (letScoutHelp()) {
+            previousLastAction = lastAction;
+            lastAction = MOVE_TO_BETTER_SPAWN;
+        } else if (moveToBetterSpawn()) {
+            previousLastAction = lastAction;
+            lastAction = MOVE_TO_BETTER_SPAWN;
         } else if (spawn()) {
+            previousLastAction = lastAction;
             lastAction = SPAWN;
         } else {
             rc.setIndicatorString(0, "NOTHING :(");
@@ -49,19 +62,73 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         return true;
     }
 
+    /*
+    ===============================
+    RUN_AWAY_FROM_CROWD
+    If there are lots of zombies/enemies nearby, run away!
+    ===============================
+     */
+    private boolean runAwayFromCrowd() {
+        if (enemies.length < 1 && zombies.length < 4) {
+            return false;
+        }
+        return runAway(null);
+    }
 
     /*
     ===============================
-    MOVE_AWAY
+    LET_SCOUNT_HELP
+    There are a couple zombies nearby, if we don't have a scout, spawn one, if we have a scout, move away from the zombie
+    ===============================
+     */
+    private boolean letScoutHelp() throws GameActionException {
+        if (!(allies.length > 0 && zombies.length > 0)) {
+            return false;
+        }
+        int nearestZ = Integer.MAX_VALUE;
+        MapLocation nearestZombie = null;
+        for (int i = zombies.length; --i >= 0;) {
+            int dist = currentLocation.distanceSquaredTo(zombies[i].location);
+            if (dist < nearestZ) {
+                nearestZ = dist;
+                nearestZombie = zombies[i].location;
+            }
+        }
+
+        Direction away = nearestZombie.directionTo(currentLocation);
+        Direction toMove = away;
+        if (move.getTarget() != null) {
+            toMove = MapUtils.addDirections(away, currentLocation.directionTo(move.getTarget()));
+        }
+        if (toMove.equals(Direction.NONE)) {
+            toMove = away;
+        }
+
+        if (move.tryMove(toMove, currentLocation)) ;
+        else if (move.tryMove(toMove.rotateLeft(), currentLocation)) ;
+        else if (move.tryMove(toMove.rotateRight(), currentLocation)) ;
+        else if (move.tryClear(toMove, currentLocation)) ;
+        else if (move.tryClear(toMove.rotateLeft(), currentLocation)) ;
+        else if (move.tryClear(toMove.rotateRight(), currentLocation)) ;
+        else {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+    ===============================
+    MOVE_TO_BETTER_SPAWN
     Assuming there are no zombies nearby, move to a "better" spawn location
     ===============================
      */
-    public boolean moveAway() throws GameActionException {
+    public boolean moveToBetterSpawn() throws GameActionException {
         // precondition
-        if (lastAction.equals(MOVE_AWAY) && lastAction.equals(MOVE_AWAY)) {
+        if (lastAction.equals(MOVE_TO_BETTER_SPAWN) && lastAction.equals(MOVE_TO_BETTER_SPAWN)) {
             return false;
         }
 
+        // TODO: take into account dens here
 
         if (move.getTarget() == null || currentLocation.isAdjacentTo(move.getTarget())) {
             move.setTarget(getNextBestSpawnLocation());
@@ -72,12 +139,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         }
 
         rc.setIndicatorLine(currentLocation, move.getTarget(), 0, 0, 0);
-        if (move.takeNextStep()) {
-            return true;
-        } else if (move.moveAndClear()) {
-            return true;
-        }
-        return false;
+        return move.moveAndClear();
     }
 
 
