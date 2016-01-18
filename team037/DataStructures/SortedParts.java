@@ -1,6 +1,7 @@
 package team037.DataStructures;
 
 import battlecode.common.*;
+import battlecode.util.SquareArray;
 
 public class SortedParts
 {
@@ -8,9 +9,8 @@ public class SortedParts
     MapLocation[] deleted;
     double[] score;
 
-    int start;
-    int end;
-
+    int count;
+    int size;
     int deleteLength;
 
     /**
@@ -19,12 +19,12 @@ public class SortedParts
      */
     public SortedParts()
     {
-        locs = new MapLocation[2000];
-        score = new double[2000];
-        start = 1000;
-        end = 1000;
-        deleted = new MapLocation[2000];
-        deleteLength = 0;
+        size = 10;
+        locs = new MapLocation[size];
+        score = new double[size];
+        count = 0;
+//        deleted = new MapLocation[2000];
+//        deleteLength = 0;
     }
 
     /**
@@ -34,13 +34,13 @@ public class SortedParts
      */
     public MapLocation getBestSpot(MapLocation current)
     {
-        if (end == start)
+        if (count == 0)
             return null;
 
         double highestScore = 0;
         MapLocation best = null;
 
-        for (int i = start; i < end; i++)
+        for (int i = size; --i>=0; )
         {
             if (locs[i] != null)
             {
@@ -69,8 +69,8 @@ public class SortedParts
         if (m == null)
             return;
 
-        if (deleted(m))
-            return;
+//        if (deleted(m))
+//            return;
 
         double newValue = value;
 
@@ -80,22 +80,53 @@ public class SortedParts
             newValue *= 2;
 
 
-        locs[end] = m;
-        score[end] = newValue;
-        end++;
+        count++;
 
-        //sort(newValue, m);
-    }
-
-    public boolean deleted(MapLocation m)
-    {
-        for (int i = deleteLength; --i>=0; )
+        if (count >= locs.length * 0.7)
         {
-            if (deleted[i] != null && deleted[i].equals(m))
-                return true;
+            IncreaseSize();
         }
-        return false;
+
+        int index = m.hashCode();
+
+        while (locs[index % size] != null) index++;
+
+        locs[index % size] = m;
+        score[index % size] = newValue;
     }
+
+    public void IncreaseSize()
+    {
+        size = locs.length * 2;
+        MapLocation[] newLocs = new MapLocation[locs.length * 2];
+        double[] newScores = new double[locs.length * 2];
+
+        for (int i = locs.length; --i>=0;)
+        {
+            if (locs[i] != null)
+            {
+                int index = locs[i].hashCode();
+
+                while (newLocs[index % size] != null) index++;
+
+                newLocs[index % size] = locs[i];
+                newScores[index % size] = score[i];
+            }
+        }
+
+        locs = newLocs;
+        score = newScores;
+    }
+
+//    public boolean deleted(MapLocation m)
+//    {
+//        for (int i = deleteLength; --i>=0; )
+//        {
+//            if (deleted[i] != null && deleted[i].equals(m))
+//                return true;
+//        }
+//        return false;
+//    }
 
     /**
      * This method returns the index of a mapLocation stored in our array
@@ -105,11 +136,17 @@ public class SortedParts
      */
     public int getIndexOfMapLocation(MapLocation m)
     {
-        for (int i = start; i < end; i++)
+        int index = m.hashCode();
+
+        while (locs[index % size] != null)
         {
-            if (locs[i] != null && locs[i].equals(m))
-                return i;
+            if (locs[index % size].equals(m))
+            {
+                return index % size;
+            }
+            index++;
         }
+
         return -1;
     }
 
@@ -121,8 +158,8 @@ public class SortedParts
         if (index == -1)
             return;
 
-        deleted[deleteLength] = locs[index];
-        deleteLength++;
+//        deleted[deleteLength] = locs[index];
+//        deleteLength++;
 
         locs[index] = null;
         score[index] = 0;
@@ -135,51 +172,51 @@ public class SortedParts
      * @param value
      * @param mapLocation
      */
-    public void sort(double value, MapLocation mapLocation)
-    {
-        int index = getIndex(start, end, value);
-
-        if (index == start)
-        {
-            score[start] = value;
-            locs[start] = mapLocation;
-            start--;
-        }
-        else if (index == end)
-        {
-            score[end] = value;
-            locs[end] = mapLocation;
-            end++;
-        }
-        // if we are ahead of center push everything forward
-        else if (start + (end - start) / 2 <= index)
-        {
-            int iterator = end;
-            while (iterator >= index)
-            {
-                locs[iterator+1] = locs[iterator];
-                score[iterator+1] = score[iterator];
-                iterator--;
-            }
-            locs[iterator] = mapLocation;
-            score[iterator] = value;
-            end++;
-        }
-        // push everything ahead
-        else
-        {
-            int iterator = start;
-            while (iterator <= index)
-            {
-                locs[iterator-1] = locs[iterator];
-                score[iterator-1] = score[iterator];
-                iterator++;
-            }
-            locs[iterator] = mapLocation;
-            score[iterator] = value;
-            start--;
-        }
-    }
+//    public void sort(double value, MapLocation mapLocation)
+//    {
+//        int index = getIndex(start, end, value);
+//
+//        if (index == start)
+//        {
+//            score[start] = value;
+//            locs[start] = mapLocation;
+//            start--;
+//        }
+//        else if (index == end)
+//        {
+//            score[end] = value;
+//            locs[end] = mapLocation;
+//            end++;
+//        }
+//        // if we are ahead of center push everything forward
+//        else if (start + (end - start) / 2 <= index)
+//        {
+//            int iterator = end;
+//            while (iterator >= index)
+//            {
+//                locs[iterator+1] = locs[iterator];
+//                score[iterator+1] = score[iterator];
+//                iterator--;
+//            }
+//            locs[iterator] = mapLocation;
+//            score[iterator] = value;
+//            end++;
+//        }
+//        // push everything ahead
+//        else
+//        {
+//            int iterator = start;
+//            while (iterator <= index)
+//            {
+//                locs[iterator-1] = locs[iterator];
+//                score[iterator-1] = score[iterator];
+//                iterator++;
+//            }
+//            locs[iterator] = mapLocation;
+//            score[iterator] = value;
+//            start--;
+//        }
+//    }
 
     /**
      * This method gets the index where a value should be
@@ -189,20 +226,20 @@ public class SortedParts
      * @param value
      * @return
      */
-    public int getIndex(int start, int stop, double value)
-    {
-        if (start - stop <= 1)
-            return start;
-
-        int middle = start + (stop - start) / 2;
-
-        // score lower than middle
-        if (score[middle] > value)
-            return getIndex(start, middle, value);
-        // score higher than middle
-        else
-            return getIndex(middle, start, value);
-    }
+//    public int getIndex(int start, int stop, double value)
+//    {
+//        if (start - stop <= 1)
+//            return start;
+//
+//        int middle = start + (stop - start) / 2;
+//
+//        // score lower than middle
+//        if (score[middle] > value)
+//            return getIndex(start, middle, value);
+//        // score higher than middle
+//        else
+//            return getIndex(middle, start, value);
+//    }
 
     /**
      * This method determines if a location has already been stored in our parts sorter
@@ -212,15 +249,7 @@ public class SortedParts
      */
     public boolean contains(MapLocation m)
     {
-        for (int i = start; i < end; i++)
-        {
-            if (locs[i] == null)
-                continue;
-
-            if (locs[i].equals(m))
-                return true;
-        }
-        return false;
+        return getIndexOfMapLocation(m) != -1;
     }
 
     /**
