@@ -8,8 +8,7 @@ import team037.Enums.CommunicationType;
 import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
-import team037.Utilites.BuildOrderCreation;
-import team037.Utilites.MapUtils;
+import team037.Utilites.*;
 
 
 public class BaseArchon extends Unit
@@ -23,6 +22,8 @@ public class BaseArchon extends Unit
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
     private int retreatCall = 0;
+    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
+    public static ZombieTracker zombieTracker;
 
     public BaseArchon(RobotController rc)
     {
@@ -30,8 +31,12 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
+        mapKnowledge = mKnowledge;
+        zombieTracker = new ZombieTracker(rc);
         archonComs = false;
         archonDistressComs = false;
+        rc.setIndicatorString(0, "Base Archon zombie Strength: " + zombieTracker.getZombieStrength());
+
     }
 
     public boolean precondition()
@@ -59,6 +64,9 @@ public class BaseArchon extends Unit
         {
             sortedParts.findPartsAndNeutralsICanSense(rc);
         }
+
+        rc.setIndicatorString(1, "Archon zombie score: " + zombieTracker.getNextZombieRoundStrength());
+        rc.setIndicatorString(2, "Next Round: " + zombieTracker.getNextZombieRound());
         */
     }
 
@@ -204,17 +212,18 @@ public class BaseArchon extends Unit
     {
         MapLocation[] archons = mapKnowledge.getArchonLocations(false);
 
-        for(int k = archons.length; --k >= 0;)
-        {
-            if(archons[k] != null)
-            {
-                BotInfoCommunication communication = new BotInfoCommunication();
-                communication.id = 0;
-                communication.x = archons[k].x;
-                communication.y = archons[k].y;
-                communicator.sendCommunication(2, communication);
-            }
-        }
+//        for(int k = archons.length; --k >= 0;)
+//        {
+//            if(archons[k] != null)
+//            {
+//                BotInfoCommunication communication = new BotInfoCommunication();
+//                communication.opcode = CommunicationType.SARCHON;
+//                communication.id = 0;
+//                communication.x = archons[k].x;
+//                communication.y = archons[k].y;
+//                communicator.sendCommunication(2, communication);
+//            }
+//        }
 
         int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
         MissionCommunication communication = new MissionCommunication();
