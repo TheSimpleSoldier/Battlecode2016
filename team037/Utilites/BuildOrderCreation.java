@@ -72,7 +72,7 @@ public class BuildOrderCreation
 
         if (RobotPlayer.strategy.equals(Strategies.PACMAN)) {
             Bots[][] buildOrderPacMan = {
-                    {Bots.PACMANVIPER, Bots.PACMANGUARD}, //Bots.SCOUTBOMBSCOUT
+                    {Bots.PACMANGUARD, Bots.PACMANGUARD}, //Bots.SCOUTBOMBSCOUT
             };
 
             int[] timesPacMan = {1000};
