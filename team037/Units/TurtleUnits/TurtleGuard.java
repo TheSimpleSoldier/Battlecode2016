@@ -10,6 +10,7 @@ public class TurtleGuard extends BaseGaurd
     private static boolean arrived = false;
     private boolean chasingEnemies = false;
     private boolean healing = false;
+    private boolean updatedTurtleSpot = false;
 
     public TurtleGuard(RobotController rc)
     {
@@ -127,6 +128,12 @@ public class TurtleGuard extends BaseGaurd
         if (healing && rc.getHealth() > 100)
         {
             healing = false;
+        }
+
+        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
+        {
+            updatedTurtleSpot = true;
+            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
         }
     }
 }

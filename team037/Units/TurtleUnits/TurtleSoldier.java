@@ -1,9 +1,6 @@
 package team037.Units.TurtleUnits;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
 import team037.Units.BaseUnits.BaseSoldier;
 import team037.Utilites.MapUtils;
 
@@ -13,6 +10,7 @@ public class TurtleSoldier extends BaseSoldier
     private static boolean arrived = false;
     private boolean chasingZombies = false;
     private boolean healing = false;
+    private boolean updatedTurtleSpot = false;
 
     public TurtleSoldier(RobotController rc)
     {
@@ -127,5 +125,12 @@ public class TurtleSoldier extends BaseSoldier
         {
             healing = false;
         }
+
+        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
+        {
+            updatedTurtleSpot = true;
+            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
+        }
+
     }
 }
