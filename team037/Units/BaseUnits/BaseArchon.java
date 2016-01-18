@@ -35,6 +35,8 @@ public class BaseArchon extends Unit
         zombieTracker = new ZombieTracker(rc);
         archonComs = false;
         archonDistressComs = false;
+        rc.setIndicatorString(0, "Base Archon zombie Strength: " + zombieTracker.getZombieStrength());
+
     }
 
     public boolean precondition()
@@ -62,8 +64,8 @@ public class BaseArchon extends Unit
             sortedParts.findPartsAndNeutralsICanSense(rc);
         }
 
-        rc.setIndicatorString(0, "Archon zombie score: " + zombieTracker.getNextZombieRoundStrength());
-        rc.setIndicatorString(1, "Next Round: " + zombieTracker.getNextZombieRound());
+        rc.setIndicatorString(1, "Archon zombie score: " + zombieTracker.getNextZombieRoundStrength());
+        rc.setIndicatorString(2, "Next Round: " + zombieTracker.getNextZombieRound());
     }
 
     public boolean fight() throws GameActionException
