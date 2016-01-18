@@ -6,7 +6,7 @@ public enum CommunicationType
 {
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
     SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT,
-    NEUTRAL, SKILLED_DEN, DEAD_DEN, EXPLORE_EDGE, EDGE_EXPLORED,
+    NEUTRAL, SKILLED_DEN, DEAD_DEN, EXPLORE_EDGE,
     ATTACK, RALLY_POINT, RUBBLE, ARCHON_DISTRESS, GOING_AFTER_PARTS;
 
     public static int toInt(CommunicationType type)
@@ -45,18 +45,16 @@ public enum CommunicationType
                 return 14;
             case EXPLORE_EDGE:
                 return 15;
-            case EDGE_EXPLORED:
-                return 16;
             case ATTACK:
-                return 17;
+                return 16;
             case RALLY_POINT:
-                return 18;
+                return 17;
             case RUBBLE:
-                return 19;
+                return 18;
             case ARCHON_DISTRESS:
-                return 20;
+                return 19;
             case GOING_AFTER_PARTS:
-                return 21;
+                return 20;
         }
         return -1;
     }
@@ -98,16 +96,14 @@ public enum CommunicationType
             case 15:
                 return EXPLORE_EDGE;
             case 16:
-                return EDGE_EXPLORED;
-            case 17:
                 return ATTACK;
-            case 18:
+            case 17:
                 return RALLY_POINT;
-            case 19:
+            case 18:
                 return RUBBLE;
-            case 20:
+            case 19:
                 return ARCHON_DISTRESS;
-            case 21:
+            case 20:
                 return GOING_AFTER_PARTS;
         }
         return null;
@@ -147,10 +143,7 @@ public enum CommunicationType
                 return new TurretSupportCommunication();
             case EXPLORE_EDGE:
                 return new ExploringMapEdge();
-            case EDGE_EXPLORED:
-                return new EdgeDiscovered();
             case ATTACK:
-                return new AttackCommunication();
             case RALLY_POINT:
                 return new AttackCommunication();
             case RUBBLE:
