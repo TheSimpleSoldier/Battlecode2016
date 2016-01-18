@@ -16,8 +16,8 @@ public class PacManGuard extends BaseGaurd implements PacMan {
                     {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
                     {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
                     {-8, -4, -2, -1, 0},            // target constants (attract towards target)
-                    {1, .5, .5, .5, .5},   // friendly unit weights (friendlies in sensor range)
-                    {16, 8, 4, 2, 0},        // Archon constants (constantly repel from friendly Archons)
+//                    {1, .5, .5, .5, .5},   // friendly unit weights (friendlies in sensor range)
+                    {2, .5, 0, 0, 0},        // Archon weights (constantly repel from friendly Archons)
             };
 
     public PacManGuard(RobotController rc) {
@@ -61,19 +61,24 @@ public class PacManGuard extends BaseGaurd implements PacMan {
 
         directions = applyUnitWeights(currentLocation,directions,allies,weights[3]);
 
-        return directions;
-    }
-
-    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
-        MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
-        if (myArchons == null || myArchons.length == 0) {
-            return directions;
-        }
-
-        directions = applyConstants(currentLocation,directions,myArchons,weights[4]);
+//        MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
+//        if (myArchons != null && myArchons.length > 0) {
+//            directions = applyConstants(currentLocation,directions,myArchons,weights[4]);
+//        }
 
         return directions;
     }
+
+//    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
+//        MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
+//        if (myArchons == null || myArchons.length == 0) {
+//            return directions;
+//        }
+//
+//        directions = applyConstants(currentLocation,directions,myArchons,weights[4]);
+//
+//        return directions;
+//    }
 
     public boolean updateTarget() throws GameActionException
     {
@@ -102,7 +107,7 @@ public class PacManGuard extends BaseGaurd implements PacMan {
     }
 
     public boolean aidDistressedArchon() throws GameActionException {return false;}
-    public void handleMessages() throws GameActionException { }
+//    public void handleMessages() throws GameActionException { }
     public void sendMessages()
     {
         return;

@@ -440,7 +440,7 @@ public class ScoutBombScout extends BaseScout
         }
     }
 
-    private void suicide() throws GameActionException {
+    public void suicide() throws GameActionException {
         int i = 0;
         while (Clock.getBytecodesLeft() > 200 && i < 20) {
             rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);

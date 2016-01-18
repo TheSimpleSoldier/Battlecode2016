@@ -451,7 +451,7 @@ public abstract class Unit
      * If we are not infected and about to die to enemy zombies then we should
      * disintigrate to not turn into a zombie
      */
-    public void suicide()
+    public void suicide() throws GameActionException
     {
         if (rc.getHealth() <= 15)
         {
