@@ -145,9 +145,7 @@ public class ZombieTracker
             totalStrength += getCountStrength(zombieSpawnSchedule.getScheduleForRound(zombieRounds[i]));
             roundCount++;
         }
-
-        System.out.println("Numb of Rounds: " + roundCount + " total Strength: " + totalStrength);
-
+        
         if (roundCount > 0)
         {
             totalStrength /= 5;
@@ -165,9 +163,6 @@ public class ZombieTracker
                 strength = 1;
             }
         }
-
-        System.out.println("Rounds: " + rounds + " Strength: " + strength);
-        System.out.println("Score: " + (rounds+strength));
 
         return rounds + strength;
     }
