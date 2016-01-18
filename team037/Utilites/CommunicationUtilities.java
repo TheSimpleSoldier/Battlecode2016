@@ -42,6 +42,11 @@ public class CommunicationUtilities
         int loc = 1;
         for(int k = 0; k < lengths.length; k++)
         {
+            if(loc == 32)
+            {
+                current = message[1];
+                loc = 1;
+            }
             if(loc + lengths[k] > 32)
             {
                 int breakLength = lengths[k] - (32 - loc);

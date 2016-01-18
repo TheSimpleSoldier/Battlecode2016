@@ -71,7 +71,7 @@ public class RushingViper extends BaseViper
             rushTarget =  MapUtils.getNearestLocation(updatedLocs, currentLocation);
         }
 
-        rc.setIndicatorString(1, "Rush Target x: " + rushTarget.x + " y: " + rushTarget.y + " Round numb: " + rc.getRoundNum());
+        //rc.setIndicatorString(1, "Rush Target x: " + rushTarget.x + " y: " + rushTarget.y + " Round numb: " + rc.getRoundNum());
 
         currentIndex++;
         return rushTarget;
