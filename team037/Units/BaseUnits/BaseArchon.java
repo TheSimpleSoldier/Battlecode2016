@@ -5,10 +5,13 @@ import team037.DataStructures.BuildOrder;
 import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
-import team037.Messages.*;
-import team037.ScoutMapKnowledge;
+import team037.Messages.BotInfoCommunication;
+import team037.Messages.Communication;
+import team037.Messages.MissionCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
-import team037.Utilites.*;
+import team037.Utilites.BuildOrderCreation;
+import team037.Utilites.ZombieTracker;
 
 
 public class BaseArchon extends Unit
@@ -22,7 +25,6 @@ public class BaseArchon extends Unit
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
     private int retreatCall = 0;
-    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
     public static ZombieTracker zombieTracker;
 
     public BaseArchon(RobotController rc)
@@ -31,7 +33,6 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
-        mapKnowledge = mKnowledge;
         zombieTracker = new ZombieTracker(rc);
         archonComs = false;
         archonDistressComs = false;
