@@ -58,8 +58,6 @@ public class ZombieTracker
 
     public int getNextZombieRoundStrength()
     {
-        int currentRound = rc.getRoundNum();
-
         int totalStrength = 0;
 
         zombieCounts = zombieSpawnSchedule.getScheduleForRound(getNextZombieRound());
