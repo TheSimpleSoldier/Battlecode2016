@@ -79,8 +79,8 @@ public class RobotPlayer
         else if (type == RobotType.SCOUT)
         {
             if (strategy.equals(Strategies.PACMAN)) {
-                unit = new PacManScout(rc);
-                Unit.thisBot = Bots.PACMANSCOUT;
+                unit = new ScoutBombScout(rc);
+                Unit.thisBot = Bots.SCOUTBOMBSCOUT;
             } else if (strategy.equals(Strategies.SCOUT_BOMB)) {
                 unit = new ScoutBombScout(rc);
                 Unit.thisBot = Bots.SCOUTBOMBSCOUT;
