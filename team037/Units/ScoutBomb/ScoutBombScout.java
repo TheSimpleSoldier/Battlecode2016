@@ -30,6 +30,8 @@ public class ScoutBombScout extends BaseScout
     private static MapLocation enemyCore;
     private static boolean nonDenZombies = false;
     private static boolean nonScoutEnemies = false;
+
+    // changing this to true will make the bots suicidal
     private static boolean rushForward = false;
     private static MapLocation alliedCenter;
 
@@ -79,6 +81,14 @@ public class ScoutBombScout extends BaseScout
     @Override
     public void collectData() throws GameActionException {
         super.collectData();
+
+
+        if (navigator.getTarget() == null) {
+            navigator.setTarget(nextPlaceToLookForEnemies());
+        }
+        if (currentLocation.isAdjacentTo(navigator.getTarget())) {
+            navigator.setTarget(nextPlaceToLookForEnemies());
+        }
 
         // zombie info
         // for now only look at close zombies
@@ -214,7 +224,7 @@ public class ScoutBombScout extends BaseScout
             // if you are near an allied archon and see zombies, help them!
             lastAction = HERD_AWAY_FROM_ARCHON;
         } else if (herdFastZombies()) {
-            lastAction = "heardingFastZombie";
+            lastAction = "herdingFastZombie";
         }  else if (herdAndFindEnemy()) {
             lastAction = HERD_AND_FIND_ENEMIES;
         } else if (bringZombiesToEnemy()) {
@@ -228,6 +238,7 @@ public class ScoutBombScout extends BaseScout
         } else {
             lastAction = NOTHING;
             rc.setIndicatorString(0, "NOTHING! :(");
+            //TODO: randomly moving to "shake" the zombie out of the horrible situation it finds itself in
             return false;
         }
         rc.setIndicatorString(0, lastAction);
@@ -237,7 +248,8 @@ public class ScoutBombScout extends BaseScout
 
     /*
     ===============================
-    HRED FAST ZOMBIES
+    HERD FAST ZOMBIES
+    So if you see fast zombies, drop everything and RUN!
     ===============================
      */
     private boolean herdFastZombies() throws GameActionException {
@@ -260,6 +272,7 @@ public class ScoutBombScout extends BaseScout
     ===============================
      */
     private boolean suicideCall() throws GameActionException {
+        // precondition
         if (!rushForward) {
             return false;
         }
@@ -271,6 +284,9 @@ public class ScoutBombScout extends BaseScout
     /*
     ===============================
     HERD AND FIND ENEMY
+    Assumes that you are herding a zombie and can't see an enemy.
+    Try to make you herd that zombie toward the enemy
+    Probably should call this move towards enemy and herd zombies if needed function
     ===============================
      */
     private boolean herdAndFindEnemy() throws GameActionException {
@@ -278,6 +294,8 @@ public class ScoutBombScout extends BaseScout
         if (!nonDenZombies || nonScoutEnemies) {
             return false;
         }
+
+
 
         RobotInfo[] friends = rc.senseNearbyRobots(closestZombieLoc, closestZombie - 1, us);
 
@@ -300,17 +318,17 @@ public class ScoutBombScout extends BaseScout
                 rc.move(currentLocation.directionTo(zombieLoc));
                 return true;
             }
+            // TODO: consider moving, left, right, left.left, right.right
+
         } else if (distToZombie <= moveAwayDistance && zombieInfo.weaponDelay <= 2) {
+
             rc.setIndicatorString(1, "moving away from " + String.valueOf(zombieLoc));
             Direction toMove = currentLocation.directionTo(target);
             Direction away = zombieLoc.directionTo(currentLocation);
             toMove = MapUtils.addDirections(toMove, away);
+
             if (toMove.equals(Direction.NONE)) {
-                toMove = MapUtils.addDirections(toMove, away);
-                if (!toMove.equals(away) && rc.canMove(toMove)) {
-                    rc.move(toMove);
-                    return true;
-                }
+                toMove = away;
                 if (rc.canMove(toMove.rotateLeft())) {
                     rc.move(toMove.rotateLeft());
                     return true;
@@ -328,6 +346,7 @@ public class ScoutBombScout extends BaseScout
                     rc.move(toMove);
                     return true;
                 }
+                // TODO: consider moving, right, check to see what the distance would be after moving that direction
             }
             toMove = MapUtils.getRCCanMoveDirection(this);
             if (!toMove.equals(Direction.NONE)) {
@@ -336,13 +355,17 @@ public class ScoutBombScout extends BaseScout
             }
             return false;
         } else {
+
             if (MapUtils.canZombieMoveTowardMe(rc, currentLocation, zombieLoc)) {
                 // if we are on the right side of the zombie
                 rc.setIndicatorString(1, "waiting for zombie to move " + String.valueOf(zombieLoc));
                 return true;
             } else {
+                // looks like the zombie is stuck on terrain or other zombies or neutrals
                 if (zombieLoc.distanceSquaredTo(target) < currentLocation.distanceSquaredTo(target)) {
                     rc.setIndicatorString(1, "zombie can't move toward me and is in my way!");
+                    // lets try and move around the zombie!
+                    // lots of real bad code follows
                     Direction toMove = MapUtils.addDirections(currentLocation.directionTo(target), zombieLoc.directionTo(currentLocation));
                     if (!toMove.equals(Direction.NONE)) {
                         if (rc.canMove(toMove)) {
@@ -369,6 +392,8 @@ public class ScoutBombScout extends BaseScout
                     rc.setIndicatorString(1, "zombie can't move toward me and is in my way! (no way around)");
                     return true;
                 } else {
+                    // zombie can't move, but I'm closer to my target than it is.
+                    // let's try and move even CLOSER to my target, without leaving the zone
                     rc.setIndicatorString(1, "zombie can't move toward me but I should be good!");
                     Direction toMove = currentLocation.directionTo(target);
                     if (rc.canMove(toMove)) {
@@ -397,6 +422,7 @@ public class ScoutBombScout extends BaseScout
                             return true;
                         }
                     }
+                    rc.setIndicatorString(1, "can't find a better place to move ");
                     return true;
                 }
             }
@@ -406,17 +432,18 @@ public class ScoutBombScout extends BaseScout
 
 
     public boolean herd() throws GameActionException {
-        rc.setIndicatorLine(currentLocation, closestZombieLoc, 0, 255, 0);
+
         if (closestZombieInfo.type.equals(RobotType.BIGZOMBIE) && closestZombie < MELEE_AVOID_DISTANCE) {
             rc.setIndicatorString(2, "melee");
             return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
         }
+
         // if you can be attacked by a ranged or melee
         if (closestRangedZombie <= RobotType.RANGEDZOMBIE.attackRadiusSquared) {
             rc.setIndicatorString(2, "ranged");
             return herdZombie(closestRangedZombie, closestRangedZombieLoc, closestRangedZombieInfo, RANGED_MOVE_AWAY_DISTANCE, RANGED_DONT_MOVE_DISTANCE, RANGED_MOVE_TOWARD_DISTANCE);
         }
-        if (closestZombie <= RobotType.STANDARDZOMBIE.attackRadiusSquared) {
+        if (closestZombie <= 2) {
             rc.setIndicatorString(2, "melee");
             return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
         }
@@ -431,26 +458,58 @@ public class ScoutBombScout extends BaseScout
         return herdZombie(closestZombie, closestZombieLoc, closestZombieInfo, MELEE_MOVE_AWAY_DISTANCE, MELEE_DONT_MOVE_DISTANCE, MELEE_MOVE_TOWARD_DISTANCE);
     }
 
-    private boolean avoid(MapLocation zombieCenter) throws GameActionException {
+
+    /**
+     * Avoid tries to stay SAFE DISTANCE away from all zombies
+     * // TODO: this HAS NOT been updated to tell the difference between ranged and melee
+     * @param zombieToAvoidLocation
+     * @return
+     * @throws GameActionException
+     *
+     *      Z
+     *
+     *      S               T
+     *        *
+     *
+     * toMove = East
+     * away = South
+     *
+     * toMove + away = SOUTH_EAST
+     *  * = MOVE THERE
+     *
+     *
+     *  Sometimes DIRECTION.NONE
+     *
+     *      S    Z       T
+     *      toMove = East
+     *      away = West
+     *        => NONE
+     *
+     */
+    private boolean avoid(MapLocation zombieToAvoidLocation) throws GameActionException {
         Direction toMove = currentLocation.directionTo(navigator.getTarget());
         Direction away = closestZombieLoc.directionTo(currentLocation);
         toMove = MapUtils.addDirections(toMove, away);
+
+
         if (!toMove.equals(Direction.NONE)) {
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST) {
                 rc.move(toMove);
                 return true;
             }
         } else {
-            toMove = MapUtils.addDirections(toMove, away);
+            toMove = away;
             if (id % 2 == 0) {
                 toMove = toMove.rotateLeft();
             } else {
                 toMove = toMove.rotateRight();
             }
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieCenter) > MIN_AVOID_DIST) {
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST) {
                 rc.move(toMove);
                 return true;
             }
+            // TODO: we should probably try moving left.left and right.right here as well
+
         }
         return false;
     }
@@ -459,12 +518,19 @@ public class ScoutBombScout extends BaseScout
     /*
     ===============================
     MOVE INTO POSITION AROUND ENEMY
+    the idea is:
+        you see some enemies, but there are no zombies! :(
+        you need to wait for zombies to appear
+     //TODO: message if you see an archon?
+     // TODO: get a viper over here?
+     // TODO: try and move in range of an enemy viper?
     ===============================
      */
     private boolean moveInPositionAroundEnemey() throws GameActionException {
         if (!nonScoutEnemies) {
             return false;
         }
+
         if (possibleEnemyDamageNextTurn > 0) {
             rc.setIndicatorString(1, "Trying to move away");
             Direction toMove = Direction.NONE;
@@ -484,8 +550,13 @@ public class ScoutBombScout extends BaseScout
                 rc.move(closestEnemyLoc.directionTo(currentLocation));
                 return true;
             }
+            //TODO: check out barracade. Notice that this code doesn't work very well
+            // TODO: we should definitely try and move in other directions (left, right, left.left, right.right)
         } else {
             rc.setIndicatorString(1, "We are fine!");
+            // TODO: possibly start circling the enemy location?
+            // TODO: possibly "herd" around  the enemy if you don't see an archon?
+            // TODO: more
         }
 
         return true;
@@ -503,15 +574,20 @@ public class ScoutBombScout extends BaseScout
         if (nonScoutEnemies) {
             return false;
         }
+        // TODO: consider a herder, that hugs the edge of the map if able to find the enemy
 
-        if (currentLocation.isAdjacentTo(navigator.getTarget())) {
-            navigator.setTarget(nextPlaceToLookForEnemies());
-        }
 
         return navigator.takeNextStep(id % 5 <= 1, id % 2 == 0);
     }
 
+    /**
+     * Gets the next archon loc to rush
+     * @return
+     */
     private MapLocation nextPlaceToLookForEnemies() {
+        //TODO: play around with randomizing this
+        //TODO: consider changing this to closest archon loc (from map utils)
+        //TODO: consider changing this to furthest archon loc (from map utils)
         idxForEnemyLocations++;
         if (idxForEnemyLocations > enemyArchonStartLocs.length) {
             idxForEnemyLocations = 0;
@@ -525,6 +601,9 @@ public class ScoutBombScout extends BaseScout
     /*
     ===============================
     BRING ZOMBIES TO ENEMY
+    In this code, you have some zombies behind you that you herding
+    and you have some enemies somewhere
+    //TODO: improve this when not around enemy turtles / archons
     ===============================
      */
     private boolean bringZombiesToEnemy() throws GameActionException {
@@ -532,7 +611,7 @@ public class ScoutBombScout extends BaseScout
         if (!(nonDenZombies && nonScoutEnemies)) {
             return false;
         }
-        // if the zombies are closer to the enemy than I am, turn!
+        // if the zombies are closer to the enemy than I am and we see an enemy archon, turn!
         if (rc.senseNearbyRobots(closestEnemyLoc, closestEnemy, Team.ZOMBIE).length > 1) {
             if (closestEnemyArchon < Integer.MAX_VALUE) {
                 return turnASAP();
@@ -574,6 +653,8 @@ public class ScoutBombScout extends BaseScout
         if (closestZombieLoc == null) {
             return false;
         }
+        // TODO: this could probably be improved
+        // instead of just left, right, check left.left, right.right
         Direction toZombie = currentLocation.directionTo(closestZombieLoc);
         if (rc.canMove(toZombie)) {
             rc.move(toZombie);
@@ -598,6 +679,7 @@ public class ScoutBombScout extends BaseScout
      */
     public boolean herdAwayFromArchon() {
         // preconditions
+        /*
         if (closestAlliedArchon == Integer.MAX_VALUE) {
             return false;
         }
@@ -605,7 +687,9 @@ public class ScoutBombScout extends BaseScout
         if (zombies.length == 0) {
             return false;
         }
-
+        */
+        // TODO: should we try to improve this?
+        // the guards drastically negate the necessity of this
 
 
         return false;
