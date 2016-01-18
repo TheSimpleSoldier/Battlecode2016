@@ -49,6 +49,7 @@ public class BaseArchon extends Unit
         super.collectData();
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        /*
         if (sortedParts.contains(currentLocation)) {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
         }
@@ -58,6 +59,7 @@ public class BaseArchon extends Unit
         {
             sortedParts.findPartsAndNeutralsICanSense(rc);
         }
+        */
     }
 
     public boolean fight() throws GameActionException
