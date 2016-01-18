@@ -1,17 +1,14 @@
 package team037.DataStructures;
 
 import battlecode.common.*;
-import battlecode.util.SquareArray;
 
 public class SortedParts
 {
     MapLocation[] locs;
-    MapLocation[] deleted;
     double[] score;
 
     int count;
     int size;
-    int deleteLength;
 
     /**
      * This class is for use of archons and it gives the Archon
@@ -23,8 +20,6 @@ public class SortedParts
         locs = new MapLocation[size];
         score = new double[size];
         count = 0;
-//        deleted = new MapLocation[2000];
-//        deleteLength = 0;
     }
 
     /**
@@ -68,9 +63,6 @@ public class SortedParts
     {
         if (m == null)
             return;
-
-//        if (deleted(m))
-//            return;
 
         double newValue = value;
 
@@ -118,16 +110,6 @@ public class SortedParts
         score = newScores;
     }
 
-//    public boolean deleted(MapLocation m)
-//    {
-//        for (int i = deleteLength; --i>=0; )
-//        {
-//            if (deleted[i] != null && deleted[i].equals(m))
-//                return true;
-//        }
-//        return false;
-//    }
-
     /**
      * This method returns the index of a mapLocation stored in our array
      *
@@ -158,88 +140,9 @@ public class SortedParts
         if (index == -1)
             return;
 
-//        deleted[deleteLength] = locs[index];
-//        deleteLength++;
-
         locs[index] = null;
         score[index] = 0;
     }
-
-
-    /**
-     * This method adds a part to the correct location in an array
-     *
-     * @param value
-     * @param mapLocation
-     */
-//    public void sort(double value, MapLocation mapLocation)
-//    {
-//        int index = getIndex(start, end, value);
-//
-//        if (index == start)
-//        {
-//            score[start] = value;
-//            locs[start] = mapLocation;
-//            start--;
-//        }
-//        else if (index == end)
-//        {
-//            score[end] = value;
-//            locs[end] = mapLocation;
-//            end++;
-//        }
-//        // if we are ahead of center push everything forward
-//        else if (start + (end - start) / 2 <= index)
-//        {
-//            int iterator = end;
-//            while (iterator >= index)
-//            {
-//                locs[iterator+1] = locs[iterator];
-//                score[iterator+1] = score[iterator];
-//                iterator--;
-//            }
-//            locs[iterator] = mapLocation;
-//            score[iterator] = value;
-//            end++;
-//        }
-//        // push everything ahead
-//        else
-//        {
-//            int iterator = start;
-//            while (iterator <= index)
-//            {
-//                locs[iterator-1] = locs[iterator];
-//                score[iterator-1] = score[iterator];
-//                iterator++;
-//            }
-//            locs[iterator] = mapLocation;
-//            score[iterator] = value;
-//            start--;
-//        }
-//    }
-
-    /**
-     * This method gets the index where a value should be
-     *
-     * @param start
-     * @param stop
-     * @param value
-     * @return
-     */
-//    public int getIndex(int start, int stop, double value)
-//    {
-//        if (start - stop <= 1)
-//            return start;
-//
-//        int middle = start + (stop - start) / 2;
-//
-//        // score lower than middle
-//        if (score[middle] > value)
-//            return getIndex(start, middle, value);
-//        // score higher than middle
-//        else
-//            return getIndex(middle, start, value);
-//    }
 
     /**
      * This method determines if a location has already been stored in our parts sorter
