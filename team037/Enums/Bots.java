@@ -10,6 +10,7 @@ import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManScout;
+import team037.Units.PacMan.PacManViper;
 import team037.Units.Rushers.RushingGuard;
 import team037.Units.Rushers.RushingSoldier;
 import team037.Units.Rushers.RushingTurret;

@@ -28,7 +28,7 @@ public class Navigation {
     public static Map map;    // Map object to hold the bit arrays and the origin.
     static Multimap multimap;  // Priority multimap for the current search.
     static boolean searching, reachedGoal;  // Flags for search status
-    static final int bytecodeLimit = 1300; // Bytecode limit
+    static final int bytecodeLimit = 4000; // Bytecode limit
     static int pathLength;
     static RobotController rc = null;
     static JumpPoint pathStart, lastPt, myLoc, goalJP;
