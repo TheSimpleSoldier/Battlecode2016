@@ -38,9 +38,10 @@ public class PacManViper extends RushingViper implements PacMan {
                     return true;
                 }
 
-                if (rc.getHealth() < RobotType.VIPER.maxHealth / 4 && foundArchon != null) {
+                if (rc.getHealth() < RobotType.VIPER.maxHealth / 4 && foundArchon != null || allies.length < enemies.length) {
                     if (rc.canAttackLocation(currentLocation)) {
                         rc.attackLocation(currentLocation);
+                        return true;
                     }
                 }
             } catch (Exception e) {}
@@ -89,7 +90,7 @@ public class PacManViper extends RushingViper implements PacMan {
         if (myArchons == null) {
             myArchons = rc.getInitialArchonLocations(us);
         }
-        directions = applyConstants(currentLocation,directions,myArchons,new double[]{8,4,2,0,0});
+        directions = applyConstants(currentLocation,directions,myArchons,new double[]{16,8,4,0,0});
 
         MapLocation[] badArchons = mapKnowledge.getArchonLocations(false);
         if (badArchons == null) {
