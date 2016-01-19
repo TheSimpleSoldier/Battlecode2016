@@ -93,6 +93,8 @@ public class TurtleScout extends BaseScout
     {
         // override default behavior
         msgTurrets();
+        msgParts();
+        msgDens();
     }
 
 
