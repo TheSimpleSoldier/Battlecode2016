@@ -30,8 +30,6 @@ public class TurtleSoldier extends BaseSoldier
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
         if (rc.getHealth() <= 25) return true;
 
-        Direction dir = currentLocation.directionTo(target);
-
         return false;
     }
 
@@ -123,7 +121,7 @@ public class TurtleSoldier extends BaseSoldier
     {
         super.collectData();
 
-        if (!arrived && (currentLocation.equals(turtlePoint) || currentLocation.isAdjacentTo(turtlePoint)))
+        if (!arrived && (rc.canSense(turtlePoint)))
         {
             turnsArrivedLoc = rc.getRoundNum();
             arrived = true;

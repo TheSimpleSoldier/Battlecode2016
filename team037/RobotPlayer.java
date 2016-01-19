@@ -50,11 +50,12 @@ public class RobotPlayer
             ZombieTracker zombieTracker = new ZombieTracker(rc);
             int[] size = StrategyUtilities.estimatedSize(us, them);
             int[] schedule = rc.getZombieSpawnSchedule().getRounds();
-            if ((StrategyUtilities.averageDistToEnemyArchons(us, them) > 100 || zombieTracker.getZombieStrength() > 3) &&
+
+            if (((StrategyUtilities.averageDistToEnemyArchons(us, them) > 100) &&
                     size[0] * size[1] > 400 &&
                     !StrategyUtilities.enemyBetweenBuddies(us, them) &&
                     schedule[0] < 300 &&
-                    StrategyUtilities.averageRoundsBetweenSpawns(schedule) < 300)
+                zombieTracker.getZombieStrength() >= 2))
             {
                 strategy = Strategies.TURTLE;
             }

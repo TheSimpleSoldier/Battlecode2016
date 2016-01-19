@@ -22,6 +22,8 @@ public class RushingSoldier extends BaseSoldier
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
+        rc.setIndicatorString(0, "Rushing Soldier");
+
         rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;

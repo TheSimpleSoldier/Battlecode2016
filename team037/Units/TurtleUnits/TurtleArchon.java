@@ -73,7 +73,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if ((rc.getRoundNum() - updateRound) < 100)
         {
         }
-        else if (rc.getRoundNum() < 500)
+        else if (rc.getRoundNum() < 300)
         {
         }
         else if (rc.getRoundNum() % 5 != index)
@@ -82,7 +82,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         else if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 25)
         {
         }
-        else if (rc.getRoundNum() > 300 && mapKnowledge.dens.hasLocations())
+        else if (mapKnowledge.dens.hasLocations())
         {
             rc.setIndicatorString(1, "len: " + mapKnowledge.dens.length);
 
@@ -117,7 +117,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (den != null && den.distanceSquaredTo(turtlePoint) > 20)
+            if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 900)
             {
                 rc.setIndicatorString(2, "We have a den location!!! x: " + den.x + " y: " + den.y + " round " + rc.getRoundNum());
                 rc.setIndicatorLine(currentLocation, den, 0, 0, 0);
@@ -129,12 +129,61 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
                 hiding = false;
             }
+            else if (!hiding)
+            {
+                int leftX = mapKnowledge.minX;
+                int rightX = mapKnowledge.maxX;
+                int topY = mapKnowledge.minY;
+                int bottomY = mapKnowledge.maxY;
+
+                int currentX = turtlePoint.x;
+                int currentY = turtlePoint.y;
+
+                int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
+                int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+                int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
+                int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+
+                // go left
+                if (distToTopLeft < distToTopRight)
+                {
+                    if (distToTopLeft < distToBottonLeft)
+                    {
+                        turtlePoint = new MapLocation(leftX, topY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
+                    }
+                    else
+                    {
+                        turtlePoint = new MapLocation(leftX, bottomY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
+                    }
+                }
+                // go right
+                else
+                {
+                    if (distToTopRight < distToBottonRight)
+                    {
+                        turtlePoint = new MapLocation(rightX, topY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
+                    }
+                    else
+                    {
+                        turtlePoint = new MapLocation(rightX, bottomY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
+                    }
+                }
+
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(1600, newRallyPoint);
+
+                // no need to keep updating this
+                hiding = true;
+            }
         }
         else
         {
-            MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
-
-            if (bestParts == null && !hiding && rc.getRoundNum() > 750)
+            if (!hiding)
             {
                 int leftX = mapKnowledge.minX;
                 int rightX = mapKnowledge.maxX;
