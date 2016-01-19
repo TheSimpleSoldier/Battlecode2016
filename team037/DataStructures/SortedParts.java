@@ -99,6 +99,8 @@ public class SortedParts
             {
                 int index = locs[i].hashCode();
 
+                index = Math.abs(index);
+
                 while (newLocs[index % size] != null) index++;
 
                 newLocs[index % size] = locs[i];
@@ -119,6 +121,8 @@ public class SortedParts
     public int getIndexOfMapLocation(MapLocation m)
     {
         int index = m.hashCode();
+
+        index = Math.abs(index);
 
         while (locs[index % size] != null)
         {

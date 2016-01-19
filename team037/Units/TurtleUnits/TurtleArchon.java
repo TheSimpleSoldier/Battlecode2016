@@ -253,7 +253,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             case GUARD:
                 return Bots.TURTLEGUARD;
             case SCOUT:
-                return Bots.TURTLESCOUT;
+                return Bots.SCOUTBOMBSCOUT;
             case ARCHON:
                 return Bots.TURTLEARCHON;
             case VIPER:
@@ -271,6 +271,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (currentLocation.distanceSquaredTo(turtlePoint) >= 100) return false;
 
         nextBot = changeBuildOrder(nextBot);
+
         if (rc.hasBuildRequirements(nextType) && rc.isCoreReady())
         {
             Direction dir = build();
@@ -284,5 +285,18 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
 
         return false;
+    }
+
+    @Override
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+        {
+            nextType = RobotType.SCOUT;
+            return Bots.SCOUTBOMBSCOUT;
+        }
+
+        return nextBot;
     }
 }

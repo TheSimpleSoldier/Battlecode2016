@@ -35,7 +35,7 @@ public class ScoutingScout extends BaseScout
         }
 
         if (mKnowledge.inRegionMode())
-            nextBot = Bots.REGIONSCOUT;
+            nextBot = Bots.SCOUTBOMBSCOUT;
 
         if(mKnowledge.edgeReached(scoutDirection))
         {

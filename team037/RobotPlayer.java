@@ -41,7 +41,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.SCOUT_BOMB;
+        strategy = Strategies.TURTLE;
 
 
         RobotType type = rc.getType();
