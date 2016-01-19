@@ -265,9 +265,13 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     */
     private boolean spawn() throws GameActionException {
         int numGuards = 0;
+        int numVipers = 0;
         for (int i = allies.length; --i > 0;) {
-            if (allies[i].type.equals(RobotType.GUARD)) {
+            RobotType nextAlly = allies[i].type;
+            if (nextAlly.equals(RobotType.GUARD)) {
                 numGuards++;
+            } else if (nextAlly.equals(RobotType.VIPER)) {
+                numVipers++;
             }
         }
         if (zombies.length > 0 || numGuards < Math.min(8, round / 100)) {
@@ -279,6 +283,8 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                     return true;
                 }
             }
+        } else if (numVipers == 0) {
+
         } else {
             if (rc.hasBuildRequirements(RobotType.SCOUT)) {
                 Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
