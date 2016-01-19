@@ -3,8 +3,13 @@ package team037.Units.ScoutBomb;
 import battlecode.common.*;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
+import team037.Utilites.MoveUtils;
 
 public class ScoutBombGuard extends BaseGaurd {
+
+    private static int closestEnemy;
+    private static boolean nonScoutEnemies = false;
+    private static MapLocation closestEnemyLoc;
     private static MapLocation lastArchonLoc;
     private static MapLocation archonLoc;
     private static int archonLastMoved = 0;
@@ -45,56 +50,121 @@ public class ScoutBombGuard extends BaseGaurd {
                 }
             }
         }
+
+        // enemy info
+        closestEnemy = Integer.MAX_VALUE;
+        closestEnemyLoc = null;
+        for (int i = enemies.length; --i>=0;) {
+            int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
+            if (distance < closestEnemy && !enemies[i].type.equals(RobotType.SCOUT)) {
+                nonScoutEnemies = true;
+                closestEnemy = distance;
+                closestEnemyLoc = enemies[i].location;
+            }
+        }
     }
 
     @Override
-    public boolean updateTarget() throws GameActionException {
-        return archonMoved;
-    }
+    public boolean act() throws GameActionException {
+        // attack!
+        if (rc.isWeaponReady() && closestEnemyLoc != null && closestEnemyLoc.isAdjacentTo(currentLocation)) {
+            if (rc.canAttackLocation(closestEnemyLoc)) {
+                rc.attackLocation(closestEnemyLoc);
+                rc.setIndicatorString(0, "attacking enemy");
+                return true;
+            }
+        }
 
-    @Override
-    public boolean carryOutAbility() throws GameActionException {
-
-        if (rc.isCoreReady() && archonLastMoved > 10 && currentLocation.distanceSquaredTo(archonLoc) < 16) {
-
-            // move out the way!
-            if (rc.senseNearbyRobots(2, us).length > 2) {
-                Direction rand = MapUtils.getRCCanMoveDirection(this);
-                if (rc.canMove(rand)) {
-                    rc.move(rand);
+        // if we see zombies, fight 'em!
+        if (zombies.length > 0) {
+            // if our archon is getting attack, move to them
+            if (rc.isCoreReady() && rc.canSenseRobot(archonId) && rc.senseRobot(archonId).zombieInfectedTurns >= 8) {
+                if (MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(archonLoc), false)) {
+                    rc.setIndicatorString(0, "moving to save");
                     return true;
                 }
             }
+            rc.setIndicatorString(0, "fight micro");
+            return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
+        }
 
-            // clear rubble
-            for (int i = dirs.length; --i>=0; ) {
-                MapLocation next = currentLocation.add(dirs[i]);
-                if (rc.canSense(next) && rc.senseRubble(next) > 0) {
-                    rc.clearRubble(dirs[i]);
-                    return true;
-                }
+        if (!rc.isCoreReady()) {
+            rc.setIndicatorString(0, "waiting for core");
+            return false;
+        }
+
+        // if we see enemies charge at them to lead them away from archon (hopefully they kite us)
+        if (nonScoutEnemies) {
+            Direction toMove = currentLocation.directionTo(closestEnemyLoc);
+            if (currentLocation.isAdjacentTo(closestEnemyLoc)) {
             }
+            if (MoveUtils.tryMoveForwardOrSideways(toMove, false)) {
+                rc.setIndicatorString(0, "trying to get to enemy");
+                return true;
+            }
+            if (MoveUtils.tryMoveForwardOrLeftRight(archonLoc.directionTo(currentLocation), false)) {
+                rc.setIndicatorString(0, "can't get to enemy, trying to get away from archon");
+                return true;
+            }
+            if (MoveUtils.tryClearAnywhere(toMove)) {
+                rc.setIndicatorString(0, "can't get anywhere, clearing rubble");
+                return true;
+            }
+        }
 
-            // move randomly
+        if (archonLoc == null) {
+            Direction toMove = currentLocation.directionTo(enemyArchonCenterOfMass);
+            MoveUtils.tryMoveForwardOrSideways(toMove, true);
+            return true;
+        }
+
+        // if we are too far away, move back
+        if (currentLocation.distanceSquaredTo(archonLoc) > 8) {
+            if (MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(archonLoc), true)) {
+                rc.setIndicatorString(0, "moving back to my archon!");
+                return true;
+            }
+        }
+
+        // move out the way!
+        if (rc.senseNearbyRobots(2, us).length > 3) {
             Direction rand = MapUtils.getRCCanMoveDirection(this);
+            rc.setIndicatorString(0, "moving out the way!");
             if (rc.canMove(rand)) {
                 rc.move(rand);
                 return true;
             }
         }
 
+        // clear rubble
+        for (int i = dirs.length; --i>=0; ) {
+            MapLocation next = currentLocation.add(dirs[i]);
+            rc.setIndicatorString(0, "clearing rubble!");
+            if (rc.canSense(next) && rc.senseRubble(next) > 0) {
+                rc.clearRubble(dirs[i]);
+                return true;
+            }
+        }
+
+        // move randomly
+        Direction rand = MapUtils.getRCCanMoveDirection(this);
+        if (rc.canMove(rand)) {
+            rc.setIndicatorString(0, "moving randomly!");
+            rc.move(rand);
+            return true;
+        }
+
         return false;
     }
 
+
     @Override
-    public MapLocation getNextSpot() {
-        if (archonLoc != null) {
-            return archonLoc.add(archonLoc.directionTo(currentLocation), 2);
-        }
-        if (lastArchonLoc != null) {
-            return lastArchonLoc.add(lastArchonLoc.directionTo(currentLocation), 2);
-        }
-        return null;
+    public void sendMessages() {
+        return;
     }
 
+    @Override
+    public void handleMessages() throws GameActionException {
+        return;
+    }
 }
