@@ -15,6 +15,7 @@ import team037.Utilites.MapUtils;
 import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Units.BaseUnits.BaseArchon;
+import team037.Utilites.ZombieTracker;
 
 public class TurtleArchon extends BaseArchon implements PacMan
 {
@@ -51,6 +52,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (target.equals(turtlePoint) && currentLocation.distanceSquaredTo(target) <= 2) return true;
         if (currentLocation.equals(target)) return true;
         if (!target.equals(turtlePoint) && rc.canSenseLocation(target) && rc.senseParts(target) == 0 && (rc.senseRobotAtLocation(target) == null || rc.senseRobotAtLocation(target).team != Team.NEUTRAL)) return true;
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() <= 25) return true;
 
         return false;
     }
@@ -76,7 +78,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
         else if (rc.getRoundNum() % 5 != index)
         {
-
+        }
+        else if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 25)
+        {
         }
         else if (rc.getRoundNum() > 300 && mapKnowledge.dens.hasLocations())
         {
@@ -130,14 +134,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         {
             MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
 
-            if (bestParts != null && turtlePoint.distanceSquaredTo(bestParts) > 100)
-            {
-                turtlePoint = bestParts;
-                Communication newRallyPoint = new AttackCommunication();
-                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(1600, newRallyPoint);
-            }
-            else if (bestParts == null && !hiding && rc.getRoundNum() > 750)
+            if (bestParts == null && !hiding && rc.getRoundNum() > 750)
             {
                 int leftX = mapKnowledge.minX;
                 int rightX = mapKnowledge.maxX;
@@ -199,6 +196,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() <= 25) return turtlePoint;
         if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
         if (!reachedTurtleSpot) reachedTurtleSpot = true;
 

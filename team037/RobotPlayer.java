@@ -20,6 +20,7 @@ import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Utilites.StrategyUtilities;
+import team037.Utilites.ZombieTracker;
 
 public class RobotPlayer
 {
@@ -46,15 +47,16 @@ public class RobotPlayer
 
             MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
+            ZombieTracker zombieTracker = new ZombieTracker(rc);
             int[] size = StrategyUtilities.estimatedSize(us, them);
             int[] schedule = rc.getZombieSpawnSchedule().getRounds();
-            if(StrategyUtilities.averageDistToEnemyArchons(us, them) > 100 &&
-                    size[0] * size[1] > 1600 &&
+            if ((StrategyUtilities.averageDistToEnemyArchons(us, them) > 100 || zombieTracker.getZombieStrength() > 3) &&
+                    size[0] * size[1] > 400 &&
                     !StrategyUtilities.enemyBetweenBuddies(us, them) &&
                     schedule[0] < 300 &&
                     StrategyUtilities.averageRoundsBetweenSpawns(schedule) < 300)
             {
-                strategy = Strategies.SCOUT_BOMB;
+                strategy = Strategies.TURTLE;
             }
             else
             {
