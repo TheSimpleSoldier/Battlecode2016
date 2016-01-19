@@ -10,11 +10,13 @@ import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
+import team037.Units.PacMan.PacMan;
 import team037.Utilites.BuildOrderCreation;
+import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.ZombieTracker;
 
 
-public class BaseArchon extends Unit
+public class BaseArchon extends Unit implements PacMan
 {
     public BuildOrder buildOrder;
     public static Bots nextBot;
@@ -47,6 +49,7 @@ public class BaseArchon extends Unit
 
     public boolean takeNextStep() throws GameActionException
     {
+        rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
         return navigator.takeNextStep();
     }
 
@@ -60,6 +63,12 @@ public class BaseArchon extends Unit
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
         }
 
+        MapLocation target = navigator.getTarget();
+        if (target != null && rc.canSenseLocation(target) && rc.senseParts(target) == 0)
+        {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(target));
+        }
+
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0)
         {
@@ -69,24 +78,20 @@ public class BaseArchon extends Unit
 
     public boolean fight() throws GameActionException
     {
-        MapLocation newTarget = fightMicro.ArchonRunAway(enemies, allies);
-        if (newTarget == null) {
-            return false;
-        }
+        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
 
-        navigator.setTarget(newTarget);
-        return true;
+        rc.setIndicatorDot(currentLocation, 255, 0, 0);
+
+        return runAway(null);
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        MapLocation newTarget = fightMicro.ArchonRunAway(zombies, allies);
-        if (newTarget == null) {
-            return false;
-        }
+        if (!FightMicroUtilites.offensiveEnemies(zombies)) return false;
 
-        navigator.setTarget(newTarget);
-        return true;
+        rc.setIndicatorDot(currentLocation, 255, 0, 0);
+
+        return runAway(null);
     }
 
     @Override
@@ -264,7 +269,20 @@ public class BaseArchon extends Unit
 
     public static MapLocation getNextPartLocation()
     {
-        return sortedParts.getBestSpot(currentLocation);
+        MapLocation next = sortedParts.getBestSpot(currentLocation);
+
+        while (next != null && rc.canSenseLocation(next) && rc.senseParts(next) == 0)
+        {
+            int index = sortedParts.getIndexOfMapLocation(next);
+            if (index == -1)
+            {
+                System.out.println("We didn't find loc x: " + next.x + " y: " + next.y);
+            }
+            sortedParts.remove(index);
+            next = sortedParts.getBestSpot(currentLocation);
+        }
+
+        return next;
     }
 
     private Direction build() throws GameActionException

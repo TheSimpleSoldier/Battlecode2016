@@ -21,12 +21,12 @@ public class TurtleTurret extends BaseTurret
     {
         super.collectData();
 
-        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
-        {
-            updatedTurtleSpot = true;
-            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
-            setTargetLoc(turtlePoint);
-        }
-
+       if (rallyPoint != null)
+       {
+           rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+           rc.setIndicatorString(1, "Going to new rally point");
+           turtlePoint = rallyPoint;
+           setTargetLoc(turtlePoint);
+       }
     }
 }

@@ -6,7 +6,9 @@ import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.Enums.CommunicationType;
 import team037.Messages.AttackCommunication;
+import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Units.PacMan.PacMan;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
@@ -19,6 +21,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean reachedTurtleSpot = false;
     private boolean updatedTurtleSpot = false;
     private MapLocation origionalTurtleSpot;
+    private boolean hiding = false;
 
     public TurtleArchon(RobotController rc)
     {
@@ -47,24 +50,110 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         super.collectData();
 
-        if (mapKnowledge.dens.length > 0)
+        if (rallyPoint != null)
+        {
+            turtlePoint = rallyPoint;
+        }
+
+        if (rc.getRoundNum() > 500 && mapKnowledge.dens.length > 0)
         {
             rc.setIndicatorString(1, "len: " + mapKnowledge.dens.length);
-            for (int i = mapKnowledge.dens.length; --i>=0; )
+
+            int closestDen = 99999;
+            MapLocation den = null;
+
+            for (int i = mapKnowledge.dens.length; --i >= 0; )
             {
                 if (mapKnowledge.dens.array[i] != null)
                 {
-                    rc.setIndicatorString(2, "We have a den location!!! x: " + mapKnowledge.dens.array[i].x + " y: " + mapKnowledge.dens.array[i].y);
-                    rc.setIndicatorLine(currentLocation, mapKnowledge.dens.array[i], 0, 0, 0);
-//                    rc.setIndicatorDot(mapKnowledge.dens.array[i], 255, 0, 0);
+                    MapLocation currentDen = mapKnowledge.dens.array[i];
+
+                    if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
+                    {
+                        mapKnowledge.dens.remove(currentDen);
+
+                        Communication communication = new SimpleBotInfoCommunication();
+                        communication.opcode = CommunicationType.DEAD_DEN;
+                        communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
+                        communicator.sendCommunication(400, communication);
+                    }
+                    else
+                    {
+                        int currentDist = currentDen.distanceSquaredTo(turtlePoint);
+
+                        if (currentDist < closestDen)
+                        {
+                            closestDen = currentDist;
+                            den = currentDen;
+                        }
+                    }
                 }
             }
-        }
 
-        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
-        {
-            updatedTurtleSpot = true;
-            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
+            if (den != null && den.distanceSquaredTo(turtlePoint) > 20)
+            {
+                rc.setIndicatorString(2, "We have a den location!!! x: " + den.x + " y: " + den.y + " round " + rc.getRoundNum());
+                rc.setIndicatorLine(currentLocation, den, 0, 0, 0);
+                turtlePoint = den.add(den.directionTo(turtlePoint), 3);
+
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(400, newRallyPoint);
+
+                hiding = false;
+            }
+            else if (!hiding && rc.getRoundNum() > 750)
+            {
+                int leftX = mapKnowledge.minX;
+                int rightX = mapKnowledge.maxX;
+                int topY = mapKnowledge.minY;
+                int bottomY = mapKnowledge.maxY;
+
+                int currentX = turtlePoint.x;
+                int currentY = turtlePoint.y;
+
+                int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
+                int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+                int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
+                int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+
+                // go left
+                if (distToTopLeft < distToTopRight)
+                {
+                    if (distToTopLeft < distToBottonLeft)
+                    {
+                        turtlePoint = new MapLocation(leftX, topY);
+                    }
+                    else
+                    {
+                        turtlePoint = new MapLocation(leftX, bottomY);
+                    }
+                }
+                // go right
+                else
+                {
+                    if (distToTopRight < distToBottonRight)
+                    {
+                        turtlePoint = new MapLocation(rightX, topY);
+                    }
+                    else
+                    {
+                        turtlePoint = new MapLocation(rightX, bottomY);
+                    }
+                }
+
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(400, newRallyPoint);
+
+                // no need to keep updating this
+                hiding = true;
+            }
+
+            if (hiding)
+            {
+                rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
+            }
         }
     }
 
@@ -74,15 +163,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
         if (!reachedTurtleSpot) reachedTurtleSpot = true;
 
-        MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
+        MapLocation bestParts = getNextPartLocation();
 
         if (bestParts == null) return turtlePoint;
 
         rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 
-        return sortedParts.getBestSpot(currentLocation);
+        return bestParts;
     }
 
+    @Override
     public boolean fight() throws GameActionException
     {
         if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
@@ -91,6 +181,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         return runAway(null);
     }
 
+    @Override
     public boolean fightZombies() throws GameActionException
     {
         if (!FightMicroUtilites.offensiveEnemies(zombies)) return false;

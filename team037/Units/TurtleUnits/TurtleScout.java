@@ -153,10 +153,11 @@ public class TurtleScout extends BaseScout
     {
         super.collectData();
 
-        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
+        if (rallyPoint != null)
         {
-            updatedTurtleSpot = true;
-            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
+            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+            rc.setIndicatorString(1, "Going to new rally point");
+            turtlePoint = rallyPoint;
         }
     }
 }

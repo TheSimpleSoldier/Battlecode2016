@@ -277,6 +277,7 @@ public class MapUtils
         // precondition
         if (currentLoc == null || target == null) return null;
 
+
         int dist = currentLoc.distanceSquaredTo(target);
 
         if (dist >= 49) return target;
@@ -285,7 +286,16 @@ public class MapUtils
 
         MapLocation[] getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
 
-        int closestDistToTarget = dist;
+        int closestDistToTarget;
+
+        if (currentLoc.x % 2 != currentLoc.y % 2)
+        {
+            closestDistToTarget = dist;
+        }
+        else
+        {
+            closestDistToTarget = 99999;
+        }
 
         for (int i = getLocs.length; --i>=0; )
         {

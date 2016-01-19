@@ -130,10 +130,11 @@ public class TurtleGuard extends BaseGaurd
             healing = false;
         }
 
-        if (rc.getRoundNum() > 500 && !updatedTurtleSpot)
+        if (rallyPoint != null)
         {
-            updatedTurtleSpot = true;
-            turtlePoint = turtlePoint.add(Direction.NORTH, 10);
+            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+            rc.setIndicatorString(1, "Going to new rally point");
+            turtlePoint = rallyPoint;
         }
     }
 }

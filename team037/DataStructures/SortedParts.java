@@ -90,10 +90,10 @@ public class SortedParts
     public void IncreaseSize()
     {
         size = locs.length * 2;
-        MapLocation[] newLocs = new MapLocation[locs.length * 2];
-        double[] newScores = new double[locs.length * 2];
+        MapLocation[] newLocs = new MapLocation[size];
+        double[] newScores = new double[size];
 
-        for (int i = locs.length; --i>=0;)
+        for (int i = locs.length; --i>=0; )
         {
             if (locs[i] != null)
             {
@@ -119,7 +119,7 @@ public class SortedParts
     public int getIndexOfMapLocation(MapLocation m)
     {
         int index = m.hashCode();
-
+        
         while (locs[index % size] != null)
         {
             if (locs[index % size].equals(m))
@@ -127,6 +127,14 @@ public class SortedParts
                 return index % size;
             }
             index++;
+        }
+
+        for (int i = locs.length; --i>=0;)
+        {
+            if (locs[i] != null && locs[i].equals(m))
+            {
+                return i;
+            }
         }
 
         return -1;
@@ -142,6 +150,25 @@ public class SortedParts
 
         locs[index] = null;
         score[index] = 0;
+        count--;
+
+        int nextIndex = index+1;
+        int currentEmpty = index;
+
+        // need to re-order hash table
+        while (locs[nextIndex % size] != null)
+        {
+            int hashValue = locs[nextIndex % size].hashCode() % size;
+            if (hashValue <= currentEmpty)
+            {
+                locs[currentEmpty] = locs[nextIndex % size];
+                score[currentEmpty] = score[nextIndex % size];
+                locs[nextIndex % size] = null;
+                score[nextIndex % size] = 0;
+                currentEmpty = nextIndex % size;
+            }
+            nextIndex++;
+        }
     }
 
     /**
