@@ -29,10 +29,11 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.RUSH))
         {
             Bots[][] buildOrderRush = {
-                    {Bots.RUSHINGSOLDIER, Bots.RUSHINGSOLDIER, Bots.RUSHINGVIPER, Bots.RUSHINGSOLDIER},
+                    {Bots.RUSHSCOUT, Bots.RUSHINGSOLDIER, Bots.RUSHINGSOLDIER, Bots.RUSHSCOUT},
+                    {Bots.RUSHGUARD, Bots.RUSHINGSOLDIER, Bots.RUSHINGVIPER, Bots.RUSHINGSOLDIER},
             };
 
-            int[] timesRush = {1000};
+            int[] timesRush = {1,1000};
 
             return new BuildOrder(buildOrderRush, timesRush);
         }
