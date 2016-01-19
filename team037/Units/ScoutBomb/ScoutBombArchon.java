@@ -5,6 +5,7 @@ import team037.SlugNavigator;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
+import team037.Utilites.MoveUtils;
 
 /**
  * Using messages could be improved!
@@ -60,6 +61,12 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     private static final String FAST_CLOUD = "fast cloud spotted";
 
 
+    private static int nearestZombieDist;
+    private static RobotInfo nearestZombieInfo;
+
+    private static int nearestAlliedDist;
+    private static RobotInfo nearestAlliedInfo;
+
     private static SlugNavigator move;
 
     ZombieSpawnSchedule schedule;
@@ -69,6 +76,31 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         super(rc);
         schedule = rc.getZombieSpawnSchedule();
         move = new SlugNavigator(rc);
+    }
+
+    @Override
+    public void collectData() throws GameActionException {
+        super.collectData();
+
+        nearestZombieDist = Integer.MAX_VALUE;
+        nearestZombieInfo = null;
+        for (int i = zombies.length; --i >= 0;) {
+            int dist = currentLocation.distanceSquaredTo(zombies[i].location);
+            if (dist < nearestZombieDist) {
+                nearestZombieDist = dist;
+                nearestZombieInfo = zombies[i];
+            }
+        }
+
+        nearestAlliedDist = Integer.MAX_VALUE;
+        nearestAlliedInfo = null;
+        for (int i = allies.length; --i >= 0;) {
+            int dist = currentLocation.distanceSquaredTo(allies[i].location);
+            if (dist < nearestAlliedDist) {
+                nearestAlliedDist = dist;
+                nearestAlliedInfo = allies[i];
+            }
+        }
     }
 
     @Override
@@ -126,38 +158,47 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     ===============================
      */
     private boolean letScoutHelp() throws GameActionException {
-        if (!(allies.length > 0 && zombies.length > 0)) {
+        if (zombies.length == 0) {
             return false;
         }
-        int nearestZ = Integer.MAX_VALUE;
-        MapLocation nearestZombie = null;
-        for (int i = zombies.length; --i >= 0;) {
-            int dist = currentLocation.distanceSquaredTo(zombies[i].location);
-            if (dist < nearestZ) {
-                nearestZ = dist;
-                nearestZombie = zombies[i].location;
+        if (allies.length == 0 && rc.getTeamParts() >= RobotType.GUARD.partCost) {
+            // if we can build a guard instead of running, do it!
+            return false;
+        }
+
+        if (allies.length > 0) {
+            RobotInfo[] friends = rc.senseNearbyRobots(nearestZombieInfo.location, nearestZombieDist - 1, us);
+            // if we have a unit closer to the nearest zombie than we are, run away from zombie
+            if (friends.length > 0) {
+                Direction away = nearestZombieInfo.location.directionTo(currentLocation);
+                Direction target = currentLocation.directionTo(navigator.getTarget());
+                Direction toMove = MapUtils.addDirections(away, target);
+                if (toMove.equals(Direction.NONE)) {
+                    // zombie is blocking us from where we want to go
+                    if (MoveUtils.tryMoveForwardOrSideways(away, false)) {
+                        return true;
+                    } else if (MoveUtils.tryClearForwardOrSideways(away)) {
+                        return true;
+                    }
+                } else {
+                    // we can sort of move where we want to go
+                    if (MoveUtils.tryMoveForwardOrLeftRight(toMove, false)) {
+                        return true;
+                    } else if (MoveUtils.tryClearForwardOrLeftRight(toMove)) {
+                        return true;
+                    }
+                }
+            } else {
+                // otherwise run toward that unit if it's a guard
+                if (nearestAlliedInfo.type == RobotType.GUARD && !currentLocation.isAdjacentTo(nearestAlliedInfo.location)) {
+                    Direction toMove = currentLocation.directionTo(nearestAlliedInfo.location);
+                    if (MoveUtils.tryMoveForwardOrLeftRight(toMove, false)) {
+                        return true;
+                    }
+                }
             }
         }
-
-        Direction away = nearestZombie.directionTo(currentLocation);
-        Direction toMove = away;
-        if (move.getTarget() != null) {
-            toMove = MapUtils.addDirections(away, currentLocation.directionTo(move.getTarget()));
-        }
-        if (toMove.equals(Direction.NONE)) {
-            toMove = away;
-        }
-
-        if (move.tryMove(toMove, currentLocation)) ;
-        else if (move.tryMove(toMove.rotateLeft(), currentLocation)) ;
-        else if (move.tryMove(toMove.rotateRight(), currentLocation)) ;
-        else if (move.tryClear(toMove, currentLocation)) ;
-        else if (move.tryClear(toMove.rotateLeft(), currentLocation)) ;
-        else if (move.tryClear(toMove.rotateRight(), currentLocation)) ;
-        else {
-            return false;
-        }
-        return true;
+        return runAway(null);
     }
 
     /*
@@ -173,10 +214,14 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     ===============================
      */
     public boolean moveToBetterSpawn() throws GameActionException {
-        // precondition
-        if (lastAction.equals(MOVE_TO_BETTER_SPAWN) && previousLastAction.equals(MOVE_TO_BETTER_SPAWN)) {
-            return false;
+        // preconditions
+        if (rc.getTeamParts() > Math.min(RobotType.GUARD.partCost, RobotType.SCOUT.partCost)) {
+            // we only want to enforce the move, move, spawn if we have parts for spawning
+            if (lastAction.equals(MOVE_TO_BETTER_SPAWN) && previousLastAction.equals(MOVE_TO_BETTER_SPAWN)) {
+                return false;
+            }
         }
+
 
         // TODO: take into account dens here
 
