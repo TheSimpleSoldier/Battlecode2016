@@ -24,7 +24,7 @@ public class TurtleTurret extends BaseTurret
        if (rallyPoint != null)
        {
            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
-           rc.setIndicatorString(1, "Going to new rally point");
+           rc.setIndicatorString(1, "Going to new rally point x: " + rallyPoint.x + " y: " + rallyPoint.y);
            turtlePoint = rallyPoint;
            setTargetLoc(turtlePoint);
        }

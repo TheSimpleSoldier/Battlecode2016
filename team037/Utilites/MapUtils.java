@@ -306,13 +306,13 @@ public class MapUtils
 
         int dist = currentLoc.distanceSquaredTo(target);
 
-        if (dist >= 49) return target;
+        if (dist >= 81) return target;
 
         MapLocation closest = currentLoc;
 
         MapLocation[] getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
 
-        int closestDistToTarget;
+        int closestDistToTarget = dist;
 
         if (currentLoc.x % 2 != currentLoc.y % 2)
         {

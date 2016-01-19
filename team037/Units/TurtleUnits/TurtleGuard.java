@@ -51,7 +51,7 @@ public class TurtleGuard extends BaseGaurd
     }
 
     @Override
-    public MapLocation getNextSpot()
+    public MapLocation getNextSpot() throws GameActionException
     {
         if (healing || rc.getHealth() <= 25)
         {
@@ -82,6 +82,8 @@ public class TurtleGuard extends BaseGaurd
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -93,6 +95,8 @@ public class TurtleGuard extends BaseGaurd
         {
             MapLocation possible = currentLocation.add(dirs[i], 6);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -103,6 +107,8 @@ public class TurtleGuard extends BaseGaurd
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 10);
+
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
 
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {

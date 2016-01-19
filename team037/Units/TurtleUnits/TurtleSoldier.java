@@ -53,7 +53,7 @@ public class TurtleSoldier extends BaseSoldier
     }
 
     @Override
-    public MapLocation getNextSpot()
+    public MapLocation getNextSpot() throws GameActionException
     {
         if (healing || rc.getHealth() <= 15)
         {
@@ -78,6 +78,8 @@ public class TurtleSoldier extends BaseSoldier
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -89,6 +91,8 @@ public class TurtleSoldier extends BaseSoldier
         {
             MapLocation possible = currentLocation.add(dirs[i], 6);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -99,6 +103,8 @@ public class TurtleSoldier extends BaseSoldier
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 10);
+
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
 
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
