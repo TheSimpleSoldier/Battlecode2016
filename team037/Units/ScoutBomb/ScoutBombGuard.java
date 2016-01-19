@@ -67,7 +67,7 @@ public class ScoutBombGuard extends BaseGaurd {
     @Override
     public boolean act() throws GameActionException {
         // attack!
-        if (rc.isWeaponReady() && closestEnemyLoc.isAdjacentTo(currentLocation)) {
+        if (rc.isWeaponReady() && closestEnemyLoc != null && closestEnemyLoc.isAdjacentTo(currentLocation)) {
             if (rc.canAttackLocation(closestEnemyLoc)) {
                 rc.attackLocation(closestEnemyLoc);
                 rc.setIndicatorString(0, "attacking enemy");
@@ -77,6 +77,14 @@ public class ScoutBombGuard extends BaseGaurd {
 
         // if we see zombies, fight 'em!
         if (zombies.length > 0) {
+            // if our archon is getting attack, move to them
+            if (rc.isCoreReady() && rc.canSenseRobot(archonId) && rc.senseRobot(archonId).zombieInfectedTurns >= 8) {
+                if (MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(archonLoc), false)) {
+                    rc.setIndicatorString(0, "moving to save");
+                    return true;
+                }
+            }
+            rc.setIndicatorString(0, "fight micro");
             return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
         }
 
@@ -102,6 +110,12 @@ public class ScoutBombGuard extends BaseGaurd {
                 rc.setIndicatorString(0, "can't get anywhere, clearing rubble");
                 return true;
             }
+        }
+
+        if (archonLoc == null) {
+            Direction toMove = currentLocation.directionTo(enemyArchonCenterOfMass);
+            MoveUtils.tryMoveForwardOrSideways(toMove, true);
+            return true;
         }
 
         // if we are too far away, move back

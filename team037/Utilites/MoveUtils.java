@@ -133,6 +133,9 @@ public class MoveUtils {
      * @throws GameActionException
      */
     private static boolean clear(Direction toClear, int numTurns) throws GameActionException {
+        if (toClear == null) {
+            return false;
+        }
         if (tryClear(toClear)) {
             return true;
         }
@@ -182,6 +185,9 @@ public class MoveUtils {
      * @throws GameActionException
      */
     private static boolean move(Direction toMove, int numTurns) throws GameActionException {
+        if (toMove == null) {
+            return false;
+        }
         if (tryMove(toMove)) {
             return true;
         }

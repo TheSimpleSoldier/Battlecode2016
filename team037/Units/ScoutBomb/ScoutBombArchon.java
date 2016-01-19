@@ -168,10 +168,22 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         }
 
         if (allies.length > 0) {
-            RobotInfo[] friends = rc.senseNearbyRobots(nearestZombieInfo.location, nearestZombieDist - 1, us);
+            RobotInfo[] friends = rc.senseNearbyRobots(nearestZombieInfo.location, nearestZombieDist, us);
             // if we have a unit closer to the nearest zombie than we are, run away from zombie
             if (friends.length > 0) {
+                if (nearestAlliedDist > 10 && nearestZombieDist > 10 && nearestAlliedInfo.type.equals(RobotType.ARCHON.GUARD)) {
+                    //stay and heal
+                    rc.setIndicatorString(1, "staying and healing the guard");
+                    return true;
+                }
                 rc.setIndicatorString(1, "we have help, move away casually");
+                if (nearestZombieDist < 10) {
+                    Direction away = nearestZombieInfo.location.directionTo(currentLocation);
+                    if (MoveUtils.tryMoveForwardOrLeftRight(away, false)) {
+                        rc.setIndicatorString(2, "moving away from zombie");
+                        return true;
+                    }
+                }
                 Direction away = nearestZombieInfo.location.directionTo(currentLocation);
                 Direction target = currentLocation.directionTo(navigator.getTarget());
                 Direction toMove = MapUtils.addDirections(away, target);
@@ -193,7 +205,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
             } else {
                 // otherwise run toward that unit if it's a guard
                 if (nearestAlliedInfo.type == RobotType.GUARD && !currentLocation.isAdjacentTo(nearestAlliedInfo.location)) {
-                    rc.setIndicatorString(1, "save up guard!");
+                    rc.setIndicatorString(1, "save us guard!");
                     Direction toMove = currentLocation.directionTo(nearestAlliedInfo.location);
                     if (MoveUtils.tryMoveForwardOrLeftRight(toMove, false)) {
                         return true;

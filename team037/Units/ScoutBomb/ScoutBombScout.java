@@ -296,8 +296,6 @@ public class ScoutBombScout extends BaseScout
             return false;
         }
 
-
-
         RobotInfo[] friends = rc.senseNearbyRobots(closestZombieLoc, closestZombie - 1, us);
 
         if (friends.length > 0) {
@@ -315,11 +313,9 @@ public class ScoutBombScout extends BaseScout
 
         if (distToZombie > moveTowardDistance) {
             rc.setIndicatorString(1, "moving to herd " + String.valueOf(zombieLoc));
-            if (rc.canMove(currentLocation.directionTo(zombieLoc))) {
-                rc.move(currentLocation.directionTo(zombieLoc));
+            if (MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(zombieLoc), false)) {
                 return true;
             }
-            // TODO: consider moving, left, right, left.left, right.right
 
         } else if (distToZombie <= moveAwayDistance && zombieInfo.weaponDelay <= 2) {
 
@@ -395,11 +391,13 @@ public class ScoutBombScout extends BaseScout
                 } else {
                     // zombie can't move, but I'm closer to my target than it is.
                     // let's try and move even CLOSER to my target, without leaving the zone
+                    int distToTarget= currentLocation.distanceSquaredTo(navigator.getTarget());
                     rc.setIndicatorString(1, "zombie can't move toward me but I should be good!");
                     Direction toMove = currentLocation.directionTo(target);
                     if (rc.canMove(toMove)) {
+                        boolean closer = currentLocation.add(toMove).distanceSquaredTo(navigator.getTarget()) < distToTarget;
                         int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
-                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                        if (closer && dist > moveAwayDistance && dist <= dontMoveDistance ) {
                             rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
                             rc.move(toMove);
                             return true;
@@ -407,8 +405,9 @@ public class ScoutBombScout extends BaseScout
                     }
                     toMove = toMove.rotateLeft();
                     if (rc.canMove(toMove)) {
+                        boolean closer = currentLocation.add(toMove).distanceSquaredTo(navigator.getTarget()) < distToTarget;
                         int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
-                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                        if (closer && dist > moveAwayDistance && dist <= dontMoveDistance ) {
                             rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
                             rc.move(toMove);
                             return true;
@@ -416,8 +415,9 @@ public class ScoutBombScout extends BaseScout
                     }
                     toMove = toMove.rotateRight().rotateRight();
                     if (rc.canMove(toMove)) {
+                        boolean closer = currentLocation.add(toMove).distanceSquaredTo(navigator.getTarget()) < distToTarget;
                         int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
-                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                        if (closer && dist > moveAwayDistance && dist <= dontMoveDistance ) {
                             rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
                             rc.move(toMove);
                             return true;
@@ -425,8 +425,9 @@ public class ScoutBombScout extends BaseScout
                     }
                     toMove = toMove.rotateRight();
                     if (rc.canMove(toMove)) {
+                        boolean closer = currentLocation.add(toMove).distanceSquaredTo(navigator.getTarget()) < distToTarget;
                         int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
-                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                        if (closer && dist > moveAwayDistance && dist <= dontMoveDistance ) {
                             rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
                             rc.move(toMove);
                             return true;
@@ -434,8 +435,9 @@ public class ScoutBombScout extends BaseScout
                     }
                     toMove = toMove.opposite();
                     if (rc.canMove(toMove)) {
+                        boolean closer = currentLocation.add(toMove).distanceSquaredTo(navigator.getTarget()) < distToTarget;
                         int dist = zombieLoc.distanceSquaredTo(currentLocation.add(toMove));
-                        if (dist > moveAwayDistance && dist <= dontMoveDistance ) {
+                        if (closer && dist > moveAwayDistance && dist <= dontMoveDistance ) {
                             rc.setIndicatorString(1, "zombie can't move toward me but I should be good! " + dist);
                             rc.move(toMove);
                             return true;
@@ -532,22 +534,54 @@ public class ScoutBombScout extends BaseScout
 
 
         if (!toMove.equals(Direction.NONE)) {
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST) {
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST + 3) {
                 rc.move(toMove);
                 return true;
             }
         } else {
-            toMove = away;
+
             if (id % 2 == 0) {
-                toMove = toMove.rotateLeft();
+                toMove = away.rotateLeft();
             } else {
-                toMove = toMove.rotateRight();
+                toMove = away.rotateRight();
             }
-            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST) {
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST + 3) {
                 rc.move(toMove);
                 return true;
             }
-            // TODO: we should probably try moving left.left and right.right here as well
+
+            if (id % 2 == 0) {
+                toMove = away.rotateRight();
+            } else {
+                toMove = away.rotateLeft();
+            }
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST + 3) {
+                rc.move(toMove);
+                return true;
+            }
+
+            if (id % 2 == 0) {
+                toMove = away.rotateRight().rotateRight();
+            } else {
+                toMove = away.rotateLeft().rotateLeft();
+            }
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST + 3) {
+                rc.move(toMove);
+                return true;
+            }
+
+            if (id % 2 == 0) {
+                toMove = away.rotateLeft().rotateLeft();
+            } else {
+                toMove = away.rotateRight().rotateRight();
+            }
+            if (rc.canMove(toMove) && currentLocation.add(toMove).distanceSquaredTo(zombieToAvoidLocation) > MIN_AVOID_DIST + 3) {
+                rc.move(toMove);
+                return true;
+            }
+
+
+
 
         }
         return false;
@@ -585,8 +619,8 @@ public class ScoutBombScout extends BaseScout
                     return true;
                 }
             }
-            if (rc.canMove(closestEnemyLoc.directionTo(currentLocation))) {
-                rc.move(closestEnemyLoc.directionTo(currentLocation));
+            toMove = closestEnemyLoc.directionTo(currentLocation);
+            if (MoveUtils.tryMoveForwardOrSideways(toMove, false)) {
                 return true;
             }
             //TODO: check out barracade. Notice that this code doesn't work very well
@@ -694,7 +728,7 @@ public class ScoutBombScout extends BaseScout
     }
 
     private boolean turnASAP() throws GameActionException {
-        if (rc.getInfectedTurns() > 0 && closestEnemyLoc.isAdjacentTo(currentLocation)) {
+        if (rc.getInfectedTurns() > 0 && closestEnemyLoc != null && closestEnemyLoc.isAdjacentTo(currentLocation)) {
             suicideScout();
             return true;
         }
@@ -768,7 +802,7 @@ public class ScoutBombScout extends BaseScout
                 suicideScout();
             }
         }
-        if (rc.getInfectedTurns() == 5 && closestEnemyLoc.isAdjacentTo(currentLocation)) {
+        if (rc.getInfectedTurns() == 5 && closestEnemyLoc != null && closestEnemyLoc.isAdjacentTo(currentLocation)) {
             if (closestEnemy < closestAlliedArchon) {
                 suicideScout();
             }
