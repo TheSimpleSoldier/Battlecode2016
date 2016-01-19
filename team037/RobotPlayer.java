@@ -1,8 +1,6 @@
 package team037;
 
-import battlecode.common.Clock;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
@@ -20,6 +18,8 @@ import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Units.PacMan.PacManArchon;
+import team037.Utilites.StrategyUtilities;
+import team037.Utilites.ZombieTracker;
 
 public class RobotPlayer
 {
@@ -41,6 +41,27 @@ public class RobotPlayer
 
         // hardcode disabled for now
         strategy = Strategies.TURTLE;
+
+        MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
+        MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
+        int[] size = StrategyUtilities.estimatedSize(us, them);
+        int[] schedule = rc.getZombieSpawnSchedule().getRounds();
+        if(StrategyUtilities.averageDistToEnemyArchons(us, them) > 100 &&
+           size[0] * size[1] > 1600 &&
+           !StrategyUtilities.enemyBetweenBuddies(us, them) &&
+           schedule[0] < 300 &&
+           StrategyUtilities.averageRoundsBetweenSpawns(schedule) < 300)
+        {
+            strategy = Strategies.SCOUT_BOMB;
+        }
+        else
+        {
+            strategy = Strategies.RUSH;
+        }
+        if(rc.getRoundNum() == 0)
+        {
+            System.out.println(strategy);
+        }
 
 
         RobotType type = rc.getType();
