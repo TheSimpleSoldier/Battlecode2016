@@ -44,6 +44,9 @@ public class RushingScout extends ScoutingScout implements PacMan {
     public void sendMessages() throws GameActionException {
         int offensiveEnemies = 0;
         MapLocation foundArchon = null;
+        if (enemies.length > 0) {
+            foundArchon = enemies[0].location;
+        }
         for (int i = enemies.length; --i>=0;)
         {
             switch (enemies[i].type)
@@ -66,9 +69,6 @@ public class RushingScout extends ScoutingScout implements PacMan {
         {
             retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
-            if (foundArchon == null) {
-                foundArchon = currentLocation;
-            }
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, foundArchon.x, foundArchon.y});
             communicator.sendCommunication(mapKnowledge.getRange(), distressCall);
             msgsSent++;
@@ -157,7 +157,7 @@ public class RushingScout extends ScoutingScout implements PacMan {
 
         for (int i = length; --i >= 0; ) {
             MapLocation nextUnit = units[i].location;
-            double add = (54 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];
+            double add = (49 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];
             double addAdjacent = add * scalars[1];
             double addPerp = addAdjacent * scalars[2];
             double addPerpAdj = addPerp * scalars[3];
