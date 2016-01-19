@@ -797,6 +797,15 @@ public class ScoutBombScout extends BaseScout
 
 
     private void suicideIfNeeded() throws GameActionException {
+        if (rc.getViperInfectedTurns() > 0) {
+            RobotInfo[] adjacent = rc.senseNearbyRobots(2, us);
+            if (adjacent.length > 2) {
+                suicideScout();
+            }
+        }
+
+
+
         if (rc.getInfectedTurns() == 2 && rc.getHealth() < type.maxHealth / 2) {
             if (closestEnemy < closestAlliedArchon) {
                 suicideScout();

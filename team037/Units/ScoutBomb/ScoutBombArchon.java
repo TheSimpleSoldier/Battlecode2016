@@ -7,6 +7,8 @@ import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
 import team037.Utilites.MoveUtils;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
+
 /**
  * Using messages could be improved!
  *
@@ -60,6 +62,8 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
     private static final String RUN_AWAY_FROM_CROWD = "run away from crowd";
     private static final String FAST_CLOUD = "fast cloud spotted";
 
+
+    private static int vipersSpawned = 0;
 
     private static int nearestZombieDist;
     private static RobotInfo nearestZombieInfo;
@@ -334,7 +338,19 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                 numGuards++;
             }
         }
-        if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
+        System.out.println(centerOfMassDifference);
+        if (start.equals(alliedArchonStartLocs[0]) && centerOfMassDifference < 1000 && vipersSpawned < rc.getRoundNum() / 300 ) {
+            if (rc.hasBuildRequirements(RobotType.VIPER)) {
+                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                if (!toSpawn.equals(Direction.NONE)) {
+                    rc.build(toSpawn, RobotType.VIPER);
+                    vipersSpawned++;
+                    rc.setIndicatorString(1, "spawning viper, distance is " + centerOfMassDifference);
+                }
+            }
+        }
+
+        else if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
             if (rc.hasBuildRequirements(RobotType.GUARD)) {
                 Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
                 if (!toSpawn.equals(Direction.NONE)) {
