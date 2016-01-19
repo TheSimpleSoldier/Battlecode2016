@@ -43,7 +43,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        ArchonDist = MapUtils.getCenterOfMass(alliedArchonStartLocs).distanceSquaredTo(MapUtils.getCenterOfMass(enemyArchonStartLocs));
+        try
+        {
+            ArchonDist = MapUtils.getCenterOfMass(alliedArchonStartLocs).distanceSquaredTo(MapUtils.getCenterOfMass(enemyArchonStartLocs));
+        } catch (Exception e) {e.printStackTrace();}
     }
 
     @Override
@@ -85,36 +88,39 @@ public class TurtleArchon extends BaseArchon implements PacMan
         else if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 25)
         {
         }
-        else if (mapKnowledge.dens.hasLocations())
+        else
         {
             rc.setIndicatorString(1, "len: " + mapKnowledge.dens.length);
 
             int closestDen = 99999;
             MapLocation den = null;
 
-            for (int i = mapKnowledge.dens.length; --i >= 0; )
+            if (mapKnowledge.dens.hasLocations())
             {
-                if (mapKnowledge.dens.array[i] != null)
+                for (int i = mapKnowledge.dens.length; --i >= 0; )
                 {
-                    MapLocation currentDen = mapKnowledge.dens.array[i];
-
-                    if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
+                    if (mapKnowledge.dens.array[i] != null)
                     {
-                        mapKnowledge.dens.remove(currentDen);
+                        MapLocation currentDen = mapKnowledge.dens.array[i];
 
-                        Communication communication = new SimpleBotInfoCommunication();
-                        communication.opcode = CommunicationType.DEAD_DEN;
-                        communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
-                        communicator.sendCommunication(400, communication);
-                    }
-                    else
-                    {
-                        int currentDist = currentDen.distanceSquaredTo(turtlePoint);
-
-                        if (currentDist < closestDen)
+                        if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
                         {
-                            closestDen = currentDist;
-                            den = currentDen;
+                            mapKnowledge.dens.remove(currentDen);
+
+                            Communication communication = new SimpleBotInfoCommunication();
+                            communication.opcode = CommunicationType.DEAD_DEN;
+                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
+                            communicator.sendCommunication(400, communication);
+                        }
+                        else
+                        {
+                            int currentDist = currentDen.distanceSquaredTo(turtlePoint);
+
+                            if (currentDist < closestDen)
+                            {
+                                closestDen = currentDist;
+                                den = currentDen;
+                            }
                         }
                     }
                 }
@@ -132,110 +138,67 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
                 hiding = false;
             }
-            else if (!hiding)
+            else
             {
-                int leftX = mapKnowledge.minX;
-                int rightX = mapKnowledge.maxX;
-                int topY = mapKnowledge.minY;
-                int bottomY = mapKnowledge.maxY;
-
-                int currentX = turtlePoint.x;
-                int currentY = turtlePoint.y;
-
-                int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
-                int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
-                int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
-                int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
-
-                // go left
-                if (distToTopLeft < distToTopRight)
+                MapLocation concentration = null; //sortedParts.getMassivConcentration();
+                if (concentration != null)
                 {
-                    if (distToTopLeft < distToBottonLeft)
+                    turtlePoint = concentration;
+                    Communication newRallyPoint = new AttackCommunication();
+                    newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), concentration.x, concentration.y});
+                    communicator.sendCommunication(1600, newRallyPoint);
+                }
+                else if (!hiding)
+                {
+                    int leftX = mapKnowledge.minX;
+                    int rightX = mapKnowledge.maxX;
+                    int topY = mapKnowledge.minY;
+                    int bottomY = mapKnowledge.maxY;
+
+                    int currentX = turtlePoint.x;
+                    int currentY = turtlePoint.y;
+
+                    int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
+                    int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+                    int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
+                    int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+
+                    // go left
+                    if (distToTopLeft < distToTopRight)
                     {
-                        turtlePoint = new MapLocation(leftX, topY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
+                        if (distToTopLeft < distToBottonLeft)
+                        {
+                            turtlePoint = new MapLocation(leftX, topY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
+                        }
+                        else
+                        {
+                            turtlePoint = new MapLocation(leftX, bottomY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
+                        }
                     }
+                    // go right
                     else
                     {
-                        turtlePoint = new MapLocation(leftX, bottomY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
+                        if (distToTopRight < distToBottonRight)
+                        {
+                            turtlePoint = new MapLocation(rightX, topY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
+                        }
+                        else
+                        {
+                            turtlePoint = new MapLocation(rightX, bottomY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
+                        }
                     }
+
+                    Communication newRallyPoint = new AttackCommunication();
+                    newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                    communicator.sendCommunication(1600, newRallyPoint);
+
+                    // no need to keep updating this
+                    hiding = true;
                 }
-                // go right
-                else
-                {
-                    if (distToTopRight < distToBottonRight)
-                    {
-                        turtlePoint = new MapLocation(rightX, topY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
-                    }
-                    else
-                    {
-                        turtlePoint = new MapLocation(rightX, bottomY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
-                    }
-                }
-
-                Communication newRallyPoint = new AttackCommunication();
-                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(1600, newRallyPoint);
-
-                // no need to keep updating this
-                hiding = true;
-            }
-        }
-        else
-        {
-            if (!hiding)
-            {
-                int leftX = mapKnowledge.minX;
-                int rightX = mapKnowledge.maxX;
-                int topY = mapKnowledge.minY;
-                int bottomY = mapKnowledge.maxY;
-
-                int currentX = turtlePoint.x;
-                int currentY = turtlePoint.y;
-
-                int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
-                int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
-                int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
-                int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
-
-                // go left
-                if (distToTopLeft < distToTopRight)
-                {
-                    if (distToTopLeft < distToBottonLeft)
-                    {
-                        turtlePoint = new MapLocation(leftX, topY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
-                    }
-                    else
-                    {
-                        turtlePoint = new MapLocation(leftX, bottomY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
-                    }
-                }
-                // go right
-                else
-                {
-                    if (distToTopRight < distToBottonRight)
-                    {
-                        turtlePoint = new MapLocation(rightX, topY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
-                    }
-                    else
-                    {
-                        turtlePoint = new MapLocation(rightX, bottomY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
-                    }
-                }
-
-                Communication newRallyPoint = new AttackCommunication();
-                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(1600, newRallyPoint);
-
-                // no need to keep updating this
-                hiding = true;
             }
         }
 
