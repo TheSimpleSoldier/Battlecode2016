@@ -86,6 +86,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         nearestZombieInfo = null;
         for (int i = zombies.length; --i >= 0;) {
             int dist = currentLocation.distanceSquaredTo(zombies[i].location);
+            rc.setIndicatorLine(currentLocation, zombies[i].location, 0, 255, 0);
             if (dist < nearestZombieDist) {
                 nearestZombieDist = dist;
                 nearestZombieInfo = zombies[i];
@@ -170,6 +171,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
             RobotInfo[] friends = rc.senseNearbyRobots(nearestZombieInfo.location, nearestZombieDist - 1, us);
             // if we have a unit closer to the nearest zombie than we are, run away from zombie
             if (friends.length > 0) {
+                rc.setIndicatorString(1, "we have help, move away casually");
                 Direction away = nearestZombieInfo.location.directionTo(currentLocation);
                 Direction target = currentLocation.directionTo(navigator.getTarget());
                 Direction toMove = MapUtils.addDirections(away, target);
@@ -191,6 +193,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
             } else {
                 // otherwise run toward that unit if it's a guard
                 if (nearestAlliedInfo.type == RobotType.GUARD && !currentLocation.isAdjacentTo(nearestAlliedInfo.location)) {
+                    rc.setIndicatorString(1, "save up guard!");
                     Direction toMove = currentLocation.directionTo(nearestAlliedInfo.location);
                     if (MoveUtils.tryMoveForwardOrLeftRight(toMove, false)) {
                         return true;
@@ -198,6 +201,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                 }
             }
         }
+        rc.setIndicatorString(1, "can't figure it out, running away!!");
         return runAway(null);
     }
 
@@ -220,6 +224,9 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
             if (lastAction.equals(MOVE_TO_BETTER_SPAWN) && previousLastAction.equals(MOVE_TO_BETTER_SPAWN)) {
                 return false;
             }
+        }
+        if (zombies.length > 0) {
+            return false;
         }
 
 
@@ -315,12 +322,16 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                 numGuards++;
             }
         }
-        if (zombies.length > 0 || numGuards < Math.min(8, round / 100)) {
+        if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
             if (rc.hasBuildRequirements(RobotType.GUARD)) {
                 Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.GUARD);
-                    rc.setIndicatorString(1, "zombies are about, best spawn a guard");
+                    if (zombies.length > 0) {
+                        rc.setIndicatorString(1, "zombies are about, best spawn a guard");
+                    } else {
+                        rc.setIndicatorString(1, "spawning a guard to keep up min count");
+                    }
                     return true;
                 }
             }

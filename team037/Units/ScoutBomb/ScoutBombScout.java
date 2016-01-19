@@ -698,7 +698,7 @@ public class ScoutBombScout extends BaseScout
             suicideScout();
             return true;
         }
-        if (rc.getInfectedTurns() == 1) {
+        if (rc.getInfectedTurns() == 2) {
             suicideScout();
             return true;
         }
@@ -763,7 +763,7 @@ public class ScoutBombScout extends BaseScout
 
 
     private void suicideIfNeeded() throws GameActionException {
-        if (rc.getInfectedTurns() == 1 && rc.getHealth() < type.maxHealth / 2) {
+        if (rc.getInfectedTurns() == 2 && rc.getHealth() < type.maxHealth / 2) {
             if (closestEnemy < closestAlliedArchon) {
                 suicideScout();
             }
