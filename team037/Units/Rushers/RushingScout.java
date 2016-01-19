@@ -157,7 +157,7 @@ public class RushingScout extends ScoutingScout implements PacMan {
 
         for (int i = length; --i >= 0; ) {
             MapLocation nextUnit = units[i].location;
-            double add = (54 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];
+            double add = (49 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];
             double addAdjacent = add * scalars[1];
             double addPerp = addAdjacent * scalars[2];
             double addPerpAdj = addPerp * scalars[3];

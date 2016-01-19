@@ -1,5 +1,6 @@
 package team037.Units.TurtleUnits;
 
+import _team316.Archon;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
@@ -126,7 +127,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 900)
+            if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 900 && rc.getRoundNum() < 1000)
             {
                 rc.setIndicatorString(2, "We have a den location!!! x: " + den.x + " y: " + den.y + " round " + rc.getRoundNum());
                 rc.setIndicatorLine(currentLocation, den, 0, 0, 0);
@@ -305,8 +306,15 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
 
-        if (Math.max(ArchonDist, zombieTracker.getNextZombieRound()) - rc.getRoundNum() < 30)
-//        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+//        if (Math.max(ArchonDist, zombieTracker.getNextZombieRound()) - rc.getRoundNum() < 30)
+
+
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+        {
+            nextType = RobotType.SCOUT;
+            return Bots.SCOUTBOMBSCOUT;
+        }
+        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - rc.getRoundNum() < 50)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;

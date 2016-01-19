@@ -83,12 +83,6 @@ public class TurtleScout extends BaseScout
     }
 
     @Override
-    public void handleMessages() throws GameActionException
-    {
-        // override default behavior
-    }
-
-    @Override
     public void sendMessages() throws GameActionException
     {
         // override default behavior
