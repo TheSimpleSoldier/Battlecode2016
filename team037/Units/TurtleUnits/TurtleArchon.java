@@ -25,6 +25,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean hiding = false;
     private int updateRound = 0;
     private int index = 0;
+    private int ArchonDist;
 
     public TurtleArchon(RobotController rc)
     {
@@ -41,6 +42,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 break;
             }
         }
+
+        ArchonDist = MapUtils.getCenterOfMass(alliedArchonStartLocs).distanceSquaredTo(MapUtils.getCenterOfMass(enemyArchonStartLocs));
     }
 
     @Override
@@ -338,7 +341,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public Bots changeBuildOrder(Bots nextBot)
     {
         rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
-        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+
+        if (Math.max(ArchonDist, zombieTracker.getNextZombieRound()) - rc.getRoundNum() < 30)
+//        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;

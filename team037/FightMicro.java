@@ -6,6 +6,8 @@ import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.PartsUtilities;
 
+import javax.crypto.spec.GCMParameterSpec;
+
 public class FightMicro
 {
     public static RobotController rc;
@@ -905,5 +907,48 @@ public class FightMicro
         }
 
         return true;
+    }
+
+    /**
+     * This method returns true if an enemy is within range
+     *
+     * @param enemies
+     * @return
+     */
+    public boolean enemiesInMinimumRange(RobotInfo[] enemies)
+    {
+        MapLocation current = rc.getLocation();
+
+        for (int i = enemies.length; --i>=0; )
+        {
+            if (enemies[i].location.distanceSquaredTo(current) <= GameConstants.TURRET_MINIMUM_RANGE)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * This method returns the com of a group of units
+     *
+     * @param bots
+     * @return
+     */
+    public MapLocation COM(RobotInfo[] bots)
+    {
+        int x = 0, y = 0;
+
+        for (int i = bots.length; --i>=0; )
+        {
+            MapLocation loc = bots[i].location;
+            x += loc.x;
+            y += loc.y;
+        }
+
+        if (bots.length == 0) return null;
+
+        return new MapLocation(x/bots.length, y/bots.length);
     }
 }
