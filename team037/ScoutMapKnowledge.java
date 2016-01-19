@@ -497,7 +497,13 @@ public class ScoutMapKnowledge extends MapKnowledge
 
             if (x >= topX && x < bottomX && y >= topY && y < bottomY)
             {
-                exploredLocsInRegion[x-topX][y-topY] = true;
+                int xCoord = x-topX;
+                int yCoord = y-topY;
+
+                if (xCoord < exploredLocsInRegion.length && yCoord < exploredLocsInRegion[xCoord].length)
+                {
+                    exploredLocsInRegion[xCoord][yCoord] = true;
+                }
             }
         }
     }

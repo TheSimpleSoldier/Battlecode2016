@@ -16,6 +16,7 @@ public class RushingViper extends BaseViper
     {
         super(rc);
         updatedLocs = new MapLocation[enemyArchonStartLocs.length];
+        rc.setIndicatorString(0, "rushing viper");
 
         for (int i = updatedLocs.length; --i>=0; )
         {
@@ -23,6 +24,8 @@ public class RushingViper extends BaseViper
         }
 
         rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
+
+        rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
 
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
@@ -36,6 +39,8 @@ public class RushingViper extends BaseViper
 
         if (currentLocation != null && rushTarget != null)
         {
+            rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
+
             if (currentLocation.distanceSquaredTo(rushTarget) < dist)
             {
                 rushing = true;
@@ -63,8 +68,12 @@ public class RushingViper extends BaseViper
                     updatedLocs[i] = enemyArchonStartLocs[i];
                 }
             }
-
             rushTarget =  MapUtils.getNearestLocation(updatedLocs, currentLocation);
+        }
+
+        if (rushTarget != null)
+        {
+            rc.setIndicatorString(1, "Rush Target x: " + rushTarget.x + " y: " + rushTarget.y + " Round numb: " + rc.getRoundNum());
         }
 
         currentIndex++;

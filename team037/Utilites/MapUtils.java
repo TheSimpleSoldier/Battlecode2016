@@ -173,6 +173,32 @@ public class MapUtils
         return new MapLocation(x/len,y/len);
     }
 
+    public static MapLocation getTurtleSpot2(MapLocation[] alliedArchonStartLocs, MapLocation[] enemyArchonStartLocs)
+    {
+        MapLocation enemyCOM = getCenterOfMass(enemyArchonStartLocs);
+
+        int dist = 0;
+        MapLocation best = null;
+
+        for (int i = alliedArchonStartLocs.length; --i>=0; )
+        {
+            int currentDist = alliedArchonStartLocs[i].distanceSquaredTo(enemyCOM);
+
+            if (currentDist > dist)
+            {
+                dist = currentDist;
+                best = alliedArchonStartLocs[i];
+            }
+        }
+
+        if (best == null)
+        {
+            best = getTurtleSpot(alliedArchonStartLocs);
+        }
+
+        return best;
+    }
+
     public static MapLocation getCenterOfMass(MapLocation[] locations)
     {
         int x = 0;
@@ -252,6 +278,59 @@ public class MapUtils
 
             if (!Unit.rc.canSenseLocation(current)) continue;
             if (!Unit.rc.onTheMap(current)) continue;
+            if (Unit.rc.senseRubble(current) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
+
+            int newDist = current.distanceSquaredTo(target);
+
+            if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)
+            {
+                closestDistToTarget = newDist;
+                closest = current;
+            }
+        }
+
+        return closest;
+    }
+
+    /**
+     * This method returns the closest location to a target that is unoccupied
+     *
+     * @param currentLoc
+     * @return
+     */
+    public static MapLocation getClosestUnoccupiedSquareCheckeredBoard(MapLocation currentLoc, MapLocation target) throws GameActionException
+    {
+        // precondition
+        if (currentLoc == null || target == null) return null;
+
+
+        int dist = currentLoc.distanceSquaredTo(target);
+
+        if (dist >= 81) return target;
+
+        MapLocation closest = currentLoc;
+
+        MapLocation[] getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
+
+        int closestDistToTarget = dist;
+
+        if (currentLoc.x % 2 != currentLoc.y % 2)
+        {
+            closestDistToTarget = dist;
+        }
+        else
+        {
+            closestDistToTarget = 99999;
+        }
+
+        for (int i = getLocs.length; --i>=0; )
+        {
+            MapLocation current = getLocs[i];
+
+            if (current.x % 2 == current.y % 2) continue;
+            if (!Unit.rc.canSenseLocation(current)) continue;
+            if (!Unit.rc.onTheMap(current)) continue;
+            if (Unit.rc.senseRubble(current) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
 
             int newDist = current.distanceSquaredTo(target);
 

@@ -13,11 +13,12 @@ public class TurtleScout extends BaseScout
     // this is the max distance that a scout will keep between it and the turtle center
     private static final int maxDist = 37;
     private static int directionUpdateTurn = 0;
+    private boolean updatedTurtleSpot = false;
 
     public TurtleScout(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
         rc.setIndicatorString(0, "Turtle scout x: " + turtlePoint.x + " y: " + turtlePoint.y);
     }
 
@@ -145,5 +146,18 @@ public class TurtleScout extends BaseScout
 
 
         return false;
+    }
+
+    @Override
+    public void collectData() throws GameActionException
+    {
+        super.collectData();
+
+        if (rallyPoint != null)
+        {
+            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+            rc.setIndicatorString(1, "Going to new rally point");
+            turtlePoint = rallyPoint;
+        }
     }
 }

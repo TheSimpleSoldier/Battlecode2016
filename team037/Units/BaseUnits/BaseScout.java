@@ -3,6 +3,7 @@ package team037.Units.BaseUnits;
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
 import team037.FlyingNavigator;
+import team037.MapKnowledge;
 import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
@@ -46,7 +47,7 @@ public class BaseScout extends Unit
         if(mKnowledge.firstFoundEdge && msgsSent < 20)
         {
             Communication com = mKnowledge.getMapBoundsCommunication();
-            communicator.sendCommunication(mKnowledge.getMaxRange(), com);
+            communicator.sendCommunication(ScoutMapKnowledge.getMaxRange(), com);
             msgsSent++;
             mKnowledge.firstFoundEdge = false;
             mKnowledge.updated = false;
@@ -54,7 +55,7 @@ public class BaseScout extends Unit
         if(mKnowledge.updated && msgsSent < 20)
         {
             Communication com = mKnowledge.getMapBoundsCommunication();
-            communicator.sendCommunication(mKnowledge.getRange(), com);
+            communicator.sendCommunication(ScoutMapKnowledge.getRange(), com);
             msgsSent++;
             mKnowledge.updated = false;
         }
@@ -78,7 +79,7 @@ public class BaseScout extends Unit
                 communication.type = RobotType.ARCHON;
                 communication.x = enemies[k].location.x;
                 communication.y = enemies[k].location.y;
-                communicator.sendCommunication(mKnowledge.getRange(), communication);
+                communicator.sendCommunication(ScoutMapKnowledge.getRange(), communication);
                 msgsSent++;
             }
         }
@@ -96,7 +97,7 @@ public class BaseScout extends Unit
                     mKnowledge.dens.add(zombieDen);
                     Communication communication = new SimpleBotInfoCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), zombies[i].ID, zombieDen.x, zombieDen.y});
-                    communicator.sendCommunication(mKnowledge.getRange(), communication);
+                    communicator.sendCommunication(MapKnowledge.getRange(), communication);
                     msgsSent++;
                 }
             }

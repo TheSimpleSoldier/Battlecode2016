@@ -242,6 +242,7 @@ public abstract class Unit
     {
         if(nextBot != null && nextBot != thisBot)
         {
+            rc.setIndicatorString(0, "Changing to: " + nextBot);
             Unit toReturn = Bots.returnUnit(nextBot, rc);
             Unit.thisBot = nextBot;
             Unit.nextBot = null;

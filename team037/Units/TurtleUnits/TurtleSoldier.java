@@ -1,9 +1,6 @@
 package team037.Units.TurtleUnits;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
 import team037.Units.BaseUnits.BaseSoldier;
 import team037.Utilites.MapUtils;
 
@@ -13,11 +10,12 @@ public class TurtleSoldier extends BaseSoldier
     private static boolean arrived = false;
     private boolean chasingZombies = false;
     private boolean healing = false;
+    private boolean updatedTurtleSpot = false;
 
     public TurtleSoldier(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
     }
 
     @Override
@@ -55,7 +53,7 @@ public class TurtleSoldier extends BaseSoldier
     }
 
     @Override
-    public MapLocation getNextSpot()
+    public MapLocation getNextSpot() throws GameActionException
     {
         if (healing || rc.getHealth() <= 15)
         {
@@ -80,6 +78,8 @@ public class TurtleSoldier extends BaseSoldier
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -91,6 +91,8 @@ public class TurtleSoldier extends BaseSoldier
         {
             MapLocation possible = currentLocation.add(dirs[i], 6);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -101,6 +103,8 @@ public class TurtleSoldier extends BaseSoldier
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 10);
+
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
 
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
@@ -126,6 +130,13 @@ public class TurtleSoldier extends BaseSoldier
         if (healing && rc.getHealth() > (type.maxHealth - 20))
         {
             healing = false;
+        }
+
+        if (rallyPoint != null)
+        {
+            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+            rc.setIndicatorString(1, "Going to new rally point");
+            turtlePoint = rallyPoint;
         }
     }
 }
