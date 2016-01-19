@@ -74,6 +74,41 @@ public class BaseArchon extends Unit implements PacMan
         {
             sortedParts.findPartsAndNeutralsICanSense(rc);
         }
+
+        // heal doesn't effect core cooldown
+        healNearbyAllies();
+
+        if (neutralBots.length > 0 && rc.isCoreReady())
+        {
+            rc.activate(neutralBots[0].location);
+            Bots currentBot = nextBot;
+            nextBot = getDefaultBotTypes(neutralBots[0].type);
+            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
+            nextBot = currentBot;
+        }
+    }
+
+    public Bots getDefaultBotTypes(RobotType type)
+    {
+        switch (type)
+        {
+            case SOLDIER:
+                return Bots.BASESOLDIER;
+            case TURRET:
+                return Bots.BASETURRET;
+            case TTM:
+                return Bots.BASETURRET;
+            case GUARD:
+                return Bots.BASEGAURD;
+            case SCOUT:
+                return Bots.BASESCOUT;
+            case ARCHON:
+                return Bots.ALPHAARCHON;
+            case VIPER:
+                return Bots.BASEVIPER;
+            default:
+                return Bots.BASESOLDIER;
+        }
     }
 
     public boolean fight() throws GameActionException
@@ -181,15 +216,6 @@ public class BaseArchon extends Unit implements PacMan
     @Override
     public boolean carryOutAbility() throws GameActionException
     {
-        // heal doesn't effect core cooldown
-        healNearbyAllies();
-
-        if (neutralBots.length > 0 && rc.isCoreReady())
-        {
-            rc.activate(neutralBots[0].location);
-//            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
-        }
-
         if (enemies.length > allies.length)
         {
             return false;
@@ -211,23 +237,8 @@ public class BaseArchon extends Unit implements PacMan
         return false;
     }
 
-    private static void sendInitialMessages(Direction dir) throws GameActionException
+    public void sendInitialMessages(Direction dir) throws GameActionException
     {
-        MapLocation[] archons = mapKnowledge.getArchonLocations(false);
-
-//        for(int k = archons.length; --k >= 0;)
-//        {
-//            if(archons[k] != null)
-//            {
-//                BotInfoCommunication communication = new BotInfoCommunication();
-//                communication.opcode = CommunicationType.SARCHON;
-//                communication.id = 0;
-//                communication.x = archons[k].x;
-//                communication.y = archons[k].y;
-//                communicator.sendCommunication(2, communication);
-//            }
-//        }
-
         int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
         MissionCommunication communication = new MissionCommunication();
         communication.opcode = CommunicationType.CHANGEMISSION;
@@ -285,7 +296,7 @@ public class BaseArchon extends Unit implements PacMan
         return next;
     }
 
-    private Direction build() throws GameActionException
+    public Direction build() throws GameActionException
     {
         double rubble = Double.MAX_VALUE;
         Direction least = dirs[0];

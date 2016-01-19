@@ -111,13 +111,8 @@ public class RobotPlayer
         }
         else if (type == RobotType.VIPER)
         {
-            if (strategy.equals(Strategies.TURTLE)) {
-                unit = new RushingViper(rc);
-                Unit.thisBot = Bots.RUSHINGVIPER;
-            } else {
-                unit = new BaseViper(rc);
-                Unit.thisBot = Bots.BASEVIPER;
-            }
+            unit = new BaseViper(rc);
+            Unit.thisBot = Bots.BASEVIPER;
         }
 
         // initial update to strategy

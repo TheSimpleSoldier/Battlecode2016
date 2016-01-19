@@ -18,7 +18,7 @@ public class TurtleScout extends BaseScout
     public TurtleScout(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
         rc.setIndicatorString(0, "Turtle scout x: " + turtlePoint.x + " y: " + turtlePoint.y);
     }
 

@@ -22,14 +22,24 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean updatedTurtleSpot = false;
     private MapLocation origionalTurtleSpot;
     private boolean hiding = false;
+    private int updateRound = 0;
+    private int index = 0;
 
     public TurtleArchon(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
         origionalTurtleSpot = new MapLocation(turtlePoint.x, turtlePoint.y);
-        turtlePoint = turtlePoint.add(turtlePoint.directionTo(currentLocation), 3);
         rc.setIndicatorString(0, "Turtle archon");
+
+        for (int i = alliedArchonStartLocs.length; --i>=0;)
+        {
+            if (alliedArchonStartLocs[i].equals(currentLocation))
+            {
+                index = i;
+                break;
+            }
+        }
     }
 
     @Override
@@ -50,12 +60,25 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         super.collectData();
 
+        rc.setIndicatorString(0, "TurtlePoint: " + turtlePoint);
+
         if (rallyPoint != null)
         {
             turtlePoint = rallyPoint;
+            updateRound = rc.getRoundNum();
         }
 
-        if (rc.getRoundNum() > 500 && mapKnowledge.dens.length > 0)
+        if ((rc.getRoundNum() - updateRound) < 100)
+        {
+        }
+        else if (rc.getRoundNum() < 500)
+        {
+        }
+        else if (rc.getRoundNum() % 5 != index)
+        {
+
+        }
+        else if (rc.getRoundNum() > 300 && mapKnowledge.dens.hasLocations())
         {
             rc.setIndicatorString(1, "len: " + mapKnowledge.dens.length);
 
@@ -98,11 +121,23 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
                 Communication newRallyPoint = new AttackCommunication();
                 newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(400, newRallyPoint);
+                communicator.sendCommunication(1600, newRallyPoint);
 
                 hiding = false;
             }
-            else if (!hiding && rc.getRoundNum() > 750)
+        }
+        else
+        {
+            MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
+
+            if (bestParts != null && turtlePoint.distanceSquaredTo(bestParts) > 100)
+            {
+                turtlePoint = bestParts;
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(1600, newRallyPoint);
+            }
+            else if (bestParts == null && !hiding && rc.getRoundNum() > 750)
             {
                 int leftX = mapKnowledge.minX;
                 int rightX = mapKnowledge.maxX;
@@ -123,10 +158,12 @@ public class TurtleArchon extends BaseArchon implements PacMan
                     if (distToTopLeft < distToBottonLeft)
                     {
                         turtlePoint = new MapLocation(leftX, topY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
                     }
                     else
                     {
                         turtlePoint = new MapLocation(leftX, bottomY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
                     }
                 }
                 // go right
@@ -135,25 +172,27 @@ public class TurtleArchon extends BaseArchon implements PacMan
                     if (distToTopRight < distToBottonRight)
                     {
                         turtlePoint = new MapLocation(rightX, topY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
                     }
                     else
                     {
                         turtlePoint = new MapLocation(rightX, bottomY);
+                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
                     }
                 }
 
                 Communication newRallyPoint = new AttackCommunication();
                 newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(400, newRallyPoint);
+                communicator.sendCommunication(1600, newRallyPoint);
 
                 // no need to keep updating this
                 hiding = true;
             }
+        }
 
-            if (hiding)
-            {
-                rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
-            }
+        if (hiding)
+        {
+            rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
         }
     }
 
@@ -188,5 +227,62 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (turtlePoint != null) navigator.setTarget(turtlePoint);
 
         return runAway(null);
+    }
+
+    @Override
+    public void sendInitialMessages(Direction dir) throws GameActionException
+    {
+        super.sendInitialMessages(dir);
+        Communication newRallyPoint = new AttackCommunication();
+        newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+        communicator.sendCommunication(2, newRallyPoint);
+
+    }
+
+    @Override
+    public Bots getDefaultBotTypes(RobotType type)
+    {
+        switch (type)
+        {
+            case SOLDIER:
+                return Bots.TURTLESOLDIER;
+            case TURRET:
+                return Bots.TURTLETURRET;
+            case TTM:
+                return Bots.TURTLETURRET;
+            case GUARD:
+                return Bots.TURTLEGUARD;
+            case SCOUT:
+                return Bots.TURTLESCOUT;
+            case ARCHON:
+                return Bots.TURTLEARCHON;
+            case VIPER:
+                return Bots.RUSHINGVIPER;
+            default:
+                return Bots.TURTLESOLDIER;
+        }
+    }
+
+    @Override
+    public boolean carryOutAbility() throws GameActionException
+    {
+        // preconditions
+        if ((enemies.length + zombies.length) > allies.length) return false;
+        if (currentLocation.distanceSquaredTo(turtlePoint) >= 100) return false;
+
+        nextBot = changeBuildOrder(nextBot);
+        if (rc.hasBuildRequirements(nextType) && rc.isCoreReady())
+        {
+            Direction dir = build();
+            if (dir != Direction.NONE)
+            {
+                sendInitialMessages(dir);
+                nextBot = buildOrder.nextBot();
+                nextType = Bots.typeFromBot(nextBot);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

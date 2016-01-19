@@ -15,7 +15,7 @@ public class TurtleGuard extends BaseGaurd
     public TurtleGuard(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
     }
 
     @Override

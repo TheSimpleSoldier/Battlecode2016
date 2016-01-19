@@ -119,7 +119,7 @@ public class SortedParts
     public int getIndexOfMapLocation(MapLocation m)
     {
         int index = m.hashCode();
-        
+
         while (locs[index % size] != null)
         {
             if (locs[index % size].equals(m))

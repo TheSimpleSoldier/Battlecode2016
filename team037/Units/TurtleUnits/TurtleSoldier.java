@@ -15,7 +15,7 @@ public class TurtleSoldier extends BaseSoldier
     public TurtleSoldier(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
     }
 
     @Override

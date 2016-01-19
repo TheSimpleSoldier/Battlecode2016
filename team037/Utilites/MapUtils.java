@@ -173,6 +173,32 @@ public class MapUtils
         return new MapLocation(x/len,y/len);
     }
 
+    public static MapLocation getTurtleSpot2(MapLocation[] alliedArchonStartLocs, MapLocation[] enemyArchonStartLocs)
+    {
+        MapLocation enemyCOM = getCenterOfMass(enemyArchonStartLocs);
+
+        int dist = 0;
+        MapLocation best = null;
+
+        for (int i = alliedArchonStartLocs.length; --i>=0; )
+        {
+            int currentDist = alliedArchonStartLocs[i].distanceSquaredTo(enemyCOM);
+
+            if (currentDist > dist)
+            {
+                dist = currentDist;
+                best = alliedArchonStartLocs[i];
+            }
+        }
+
+        if (best == null)
+        {
+            best = getTurtleSpot(alliedArchonStartLocs);
+        }
+
+        return best;
+    }
+
     public static MapLocation getCenterOfMass(MapLocation[] locations)
     {
         int x = 0;

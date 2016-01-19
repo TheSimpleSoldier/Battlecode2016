@@ -47,7 +47,7 @@ public class BaseScout extends Unit
         if(mKnowledge.firstFoundEdge && msgsSent < 20)
         {
             Communication com = mKnowledge.getMapBoundsCommunication();
-            communicator.sendCommunication(mKnowledge.getMaxRange(), com);
+            communicator.sendCommunication(ScoutMapKnowledge.getMaxRange(), com);
             msgsSent++;
             mKnowledge.firstFoundEdge = false;
             mKnowledge.updated = false;
@@ -55,7 +55,7 @@ public class BaseScout extends Unit
         if(mKnowledge.updated && msgsSent < 20)
         {
             Communication com = mKnowledge.getMapBoundsCommunication();
-            communicator.sendCommunication(mKnowledge.getRange(), com);
+            communicator.sendCommunication(ScoutMapKnowledge.getRange(), com);
             msgsSent++;
             mKnowledge.updated = false;
         }
@@ -79,7 +79,7 @@ public class BaseScout extends Unit
                 communication.type = RobotType.ARCHON;
                 communication.x = enemies[k].location.x;
                 communication.y = enemies[k].location.y;
-                communicator.sendCommunication(mKnowledge.getRange(), communication);
+                communicator.sendCommunication(ScoutMapKnowledge.getRange(), communication);
                 msgsSent++;
             }
         }
