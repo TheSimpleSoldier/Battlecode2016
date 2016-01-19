@@ -38,11 +38,13 @@ public class PacManViper extends RushingViper implements PacMan {
                     return true;
                 }
 
-                if (scouts >= 0 && rc.getHealth() < RobotType.VIPER.maxHealth / 4 && foundArchon != null || allies.length < enemies.length) {
-                    if (rc.canAttackLocation(currentLocation)) {
-                        rc.attackLocation(currentLocation);
-                        return true;
-                    }
+                if (rc.canAttackLocation(currentLocation) &&
+                        !rc.isInfected() &&
+                        scouts >= 0 &&
+                        rc.getHealth() < RobotType.VIPER.maxHealth / 4 &&
+                        foundArchon != null || allies.length < enemies.length) {
+                    rc.attackLocation(currentLocation);
+                    return true;
                 }
             } catch (Exception e) {}
         }
