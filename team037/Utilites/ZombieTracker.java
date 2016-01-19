@@ -25,7 +25,10 @@ public class ZombieTracker
         rc = robotController;
         zombieSpawnSchedule = rc.getZombieSpawnSchedule();
         zombieRounds = zombieSpawnSchedule.getRounds();
-        zombieCounts = zombieSpawnSchedule.getScheduleForRound(zombieRounds[0]);
+        if(zombieRounds.length > 0)
+        {
+            zombieCounts = zombieSpawnSchedule.getScheduleForRound(zombieRounds[0]);
+        }
 
         if (zombieRounds.length > 1)
         {
