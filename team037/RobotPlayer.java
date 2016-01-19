@@ -40,7 +40,7 @@ public class RobotPlayer
         // BUT THEY ARE FIXING IT!
 
         // hardcode disabled for now
-        strategy = Strategies.TURTLE;
+        strategy = Strategies.PACMAN;
 
 
         RobotType type = rc.getType();

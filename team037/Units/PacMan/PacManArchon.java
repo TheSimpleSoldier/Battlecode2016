@@ -24,7 +24,7 @@ public class PacManArchon extends Unit implements PacMan {
             {
                     {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
                     {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
-                    {-8, -4, -2, -1, 0},            // target constants (attract towards target)
+                    {-16, -8, -4, -2, -1},            // target constants (attract towards target)
                     {1, .5, .5, .5, .5},        // parts weights (move towards parts locations in sensor range)
             };
 
@@ -61,9 +61,9 @@ public class PacManArchon extends Unit implements PacMan {
 
         if (sortedParts.contains(currentLocation)) {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
-//            Communication communication = new BotInfoCommunication();
-//            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
-//            communicator.sendCommunication(400, communication);
+            Communication communication = new BotInfoCommunication();
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+            communicator.sendCommunication(400, communication);
         }
 
         if (updateTarget()) {
@@ -117,7 +117,7 @@ public class PacManArchon extends Unit implements PacMan {
 
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0) {
-//            sortedParts.findPartsAndNeutralsICanSense(rc);
+            sortedParts.findPartsAndNeutralsICanSense(rc);
         }
     }
 
@@ -164,17 +164,99 @@ public class PacManArchon extends Unit implements PacMan {
 
         if (rc.hasBuildRequirements(nextType) && rc.isCoreReady()) {
             double rubble = Double.MAX_VALUE;
-            Direction least = dirs[0];
-            for (int i = dirs.length; --i >= 0; ) {
-                if (build(dirs[i])) {
-                    return true;
+            MapLocation myTarget = navigator.getTarget();
+            int startDir;
+            if (myTarget == null || myTarget.equals(currentLocation)) {
+                MapLocation[] badArchons = mKnowledge.getArchonLocations(false);
+                if (badArchons == null) {
+                    startDir = (int) (Math.random() * 8)%8;
+                } else {
+                    startDir = Navigation.directionToInt(currentLocation.directionTo(badArchons[0]));
                 }
-                double tempRubble = rc.senseRubble(currentLocation.add(dirs[i]));
-                if (tempRubble < rubble && tempRubble > 0) {
-                    rubble = tempRubble;
-                    least = dirs[i];
-                }
+            } else {
+                startDir = Navigation.directionToInt(currentLocation.directionTo(myTarget));
             }
+            Direction least = dirs[startDir];
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            double tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir + 1) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir - 1) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir + 2) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir - 2) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir + 3) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir -3) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
+            startDir = (startDir + 4) % 8;
+            if (build(dirs[startDir])) {
+                return true;
+            }
+            tempRubble = rc.senseRubble(currentLocation.add(dirs[startDir]));
+            if (tempRubble < rubble && tempRubble > 0) {
+                rubble = tempRubble;
+                least = dirs[startDir];
+            }
+
             try {
                 rc.clearRubble(least);
             } catch (Exception e) {
@@ -201,9 +283,15 @@ public class PacManArchon extends Unit implements PacMan {
         return nextBot;
     }
 
-    public void handleMessages() throws GameActionException { }
-    public void sendMessages()
+
+    public static MapLocation getNextPartLocation()
     {
-        return;
+        return sortedParts.getBestSpot(currentLocation);
     }
+
+//    public void handleMessages() throws GameActionException { }
+//    public void sendMessages()
+//    {
+//        return;
+//    }
 }
