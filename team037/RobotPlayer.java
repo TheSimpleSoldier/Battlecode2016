@@ -110,8 +110,13 @@ public class RobotPlayer
         }
         else if (type == RobotType.VIPER)
         {
-            unit = new BaseViper(rc);
-            Unit.thisBot = Bots.BASEVIPER;
+            if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                unit = new BaseViper(rc);
+                Unit.thisBot = Bots.DENSHIELDVIPER;
+            } else {
+                unit = new BaseViper(rc);
+                Unit.thisBot = Bots.BASEVIPER;
+            }
         }
 
         // initial update to strategy

@@ -8,6 +8,7 @@ import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.DenShield.DenShieldViper;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManScout;
 import team037.Units.PacMan.PacManViper;
@@ -57,7 +58,8 @@ public enum Bots
     RUSHGUARD,
     RUSHTURRET,
     SCOUTBOMBGUARD,
-    SCOUTBOMBSCOUT;
+    SCOUTBOMBSCOUT,
+    DENSHIELDVIPER;
 
     public static int toInt(Bots type)
     {
@@ -119,6 +121,8 @@ public enum Bots
                 return 26;
             case SCOUTBOMBSCOUT:
                 return 27;
+            case DENSHIELDVIPER:
+                return 28;
         }
         return -1;
     }
@@ -183,6 +187,8 @@ public enum Bots
                 return SCOUTBOMBGUARD;
             case 27:
                 return SCOUTBOMBSCOUT;
+            case 28:
+                return DENSHIELDVIPER;
         }
 
         return null;
@@ -225,6 +231,7 @@ public enum Bots
                 return RobotType.TURRET;
             case RUSHINGVIPER:
             case BASEVIPER:
+            case DENSHIELDVIPER:
                 return RobotType.VIPER;
         }
         return null;
@@ -290,6 +297,8 @@ public enum Bots
                 return new ScoutBombScout(rc);
             case SCOUTBOMBGUARD:
                 return new ScoutBombGuard(rc);
+            case DENSHIELDVIPER:
+                return new DenShieldViper(rc);
         }
 
         return null;
