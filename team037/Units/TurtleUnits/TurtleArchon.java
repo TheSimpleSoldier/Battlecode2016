@@ -127,7 +127,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 900 && rc.getRoundNum() < 1000)
+            if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 400 && rc.getRoundNum() < 1000)
             {
                 rc.setIndicatorString(2, "We have a den location!!! x: " + den.x + " y: " + den.y + " round " + rc.getRoundNum());
                 rc.setIndicatorLine(currentLocation, den, 0, 0, 0);
