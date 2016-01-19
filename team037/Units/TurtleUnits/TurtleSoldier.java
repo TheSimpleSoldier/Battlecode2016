@@ -26,9 +26,11 @@ public class TurtleSoldier extends BaseSoldier
 
         if (target == null) return true;
 
-        if ((currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) && (rc.getRoundNum() - turnsArrivedLoc) > 2) return true;
+        if ((currentLocation.equals(target) || currentLocation.isAdjacentTo(target))) return true;
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
         if (rc.getHealth() <= 25) return true;
+
+        Direction dir = currentLocation.directionTo(target);
 
         return false;
     }
@@ -71,7 +73,7 @@ public class TurtleSoldier extends BaseSoldier
         {
             chasingZombies = false;
             arrived = false;
-            return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
+            return turtlePoint.add(turtlePoint.directionTo(currentLocation), 3);
         }
 
         for (int i = dirs.length; --i>=0; )
@@ -113,7 +115,7 @@ public class TurtleSoldier extends BaseSoldier
             }
         }
 
-        return null;
+        return turtlePoint;
     }
 
     @Override

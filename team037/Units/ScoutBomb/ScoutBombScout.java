@@ -1,7 +1,9 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
+import team037.Enums.Strategies;
 import team037.FlyingSlugNavigator;
+import team037.RobotPlayer;
 import team037.ScoutMapKnowledge;
 import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.MapUtils;
@@ -818,5 +820,15 @@ public class ScoutBombScout extends BaseScout
         rc.disintegrate();
     }
 
+    /**
+     * We WANT to turn into zombies so override this method
+     *
+     * @throws GameActionException
+     */
+    @Override
+    public void suicide() throws GameActionException
+    {
+        return;
+    }
 
 }

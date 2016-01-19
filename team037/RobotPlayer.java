@@ -44,26 +44,26 @@ public class RobotPlayer
             // hardcode disabled for now
             strategy = Strategies.TURTLE;
 
-        MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
-        MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
-        int[] size = StrategyUtilities.estimatedSize(us, them);
-        int[] schedule = rc.getZombieSpawnSchedule().getRounds();
-        if(StrategyUtilities.averageDistToEnemyArchons(us, them) > 100 &&
-           size[0] * size[1] > 1600 &&
-           !StrategyUtilities.enemyBetweenBuddies(us, them) &&
-           schedule[0] < 300 &&
-           StrategyUtilities.averageRoundsBetweenSpawns(schedule) < 300)
-        {
-            strategy = Strategies.SCOUT_BOMB;
-        }
-        else
-        {
-            strategy = Strategies.RUSH;
-        }
-        if(rc.getRoundNum() == 0)
-        {
-            System.out.println(strategy);
-        }
+            MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
+            MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
+            int[] size = StrategyUtilities.estimatedSize(us, them);
+            int[] schedule = rc.getZombieSpawnSchedule().getRounds();
+            if(StrategyUtilities.averageDistToEnemyArchons(us, them) > 100 &&
+                    size[0] * size[1] > 1600 &&
+                    !StrategyUtilities.enemyBetweenBuddies(us, them) &&
+                    schedule[0] < 300 &&
+                    StrategyUtilities.averageRoundsBetweenSpawns(schedule) < 300)
+            {
+                strategy = Strategies.SCOUT_BOMB;
+            }
+            else
+            {
+                strategy = Strategies.RUSH;
+            }
+            if(rc.getRoundNum() == 0)
+            {
+                System.out.println(strategy);
+            }
 
 
             RobotType type = rc.getType();
