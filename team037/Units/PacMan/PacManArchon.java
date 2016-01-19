@@ -61,9 +61,9 @@ public class PacManArchon extends Unit implements PacMan {
 
         if (sortedParts.contains(currentLocation)) {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
-//            Communication communication = new BotInfoCommunication();
-//            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
-//            communicator.sendCommunication(400, communication);
+            Communication communication = new BotInfoCommunication();
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.GOING_AFTER_PARTS), Utilities.intFromType(type), Utilities.intFromTeam(us), id, currentLocation.x, currentLocation.y});
+            communicator.sendCommunication(400, communication);
         }
 
         if (updateTarget()) {
@@ -117,7 +117,7 @@ public class PacManArchon extends Unit implements PacMan {
 
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0) {
-//            sortedParts.findPartsAndNeutralsICanSense(rc);
+            sortedParts.findPartsAndNeutralsICanSense(rc);
         }
     }
 

@@ -110,10 +110,10 @@ public class RobotPlayer
         else if (type == RobotType.VIPER)
         {
             if (strategy.equals(Strategies.SCOUT_BOMB)) {
-                unit = new DenShieldViper(rc);
+                unit = new PacManViper(rc);
                 Unit.thisBot = Bots.PACMANVIPER;
             } else if (strategy.equals(Strategies.PACMAN)) {
-                unit = new RushingViper(rc);
+                unit = new PacManViper(rc);
                 Unit.thisBot = Bots.PACMANVIPER;
             } else {
                 unit = new BaseViper(rc);
