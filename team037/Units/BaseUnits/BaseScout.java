@@ -7,7 +7,6 @@ import team037.MapKnowledge;
 import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
-import team037.Utilites.CommunicationUtilities;
 import team037.Utilites.PartsUtilities;
 
 public class BaseScout extends Unit
@@ -97,7 +96,7 @@ public class BaseScout extends Unit
                     mKnowledge.dens.add(zombieDen);
                     Communication communication = new SimpleBotInfoCommunication();
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), zombies[i].ID, zombieDen.x, zombieDen.y});
-                    communicator.sendCommunication(MapKnowledge.getRange(), communication);
+                    communicator.sendCommunication(MapKnowledge.getMaxRange(), communication);
                     msgsSent++;
                 }
             }
