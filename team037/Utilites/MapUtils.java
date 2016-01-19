@@ -413,6 +413,9 @@ public class MapUtils
     }
 
     public static Direction addDirections(Direction d1, Direction d2) {
+        if (d1 == null || d2 == null) {
+            return Direction.NONE;
+        }
         int dx = d1.dx + d2.dx;
         int dy = d1.dy + d2.dy;
         if (dx > 0) {
