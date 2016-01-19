@@ -3,7 +3,7 @@ package team037;
 import battlecode.common.*;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
-import team037.Enums.CommunicationType;
+import team037.Enums.Strategies;
 import team037.Messages.*;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.Scouts.ScoutingScout;
@@ -241,6 +241,7 @@ public abstract class Unit
     {
         if(nextBot != null && nextBot != thisBot)
         {
+            rc.setIndicatorString(0, "Changing to: " + nextBot);
             Unit toReturn = Bots.returnUnit(nextBot, rc);
             Unit.thisBot = nextBot;
             Unit.nextBot = null;
@@ -498,6 +499,10 @@ public abstract class Unit
      */
     public void suicide() throws GameActionException
     {
+        if (RobotPlayer.strategy.equals(Strategies.SCOUT_BOMB)) {
+            return;
+        }
+
         if (rc.getHealth() <= 15)
         {
             if (zombies.length > 0 && type != RobotType.ARCHON)
