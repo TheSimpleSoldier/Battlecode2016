@@ -67,6 +67,7 @@ public class RobotPlayer
                 System.out.println(strategy);
             }
 
+            strategy = Strategies.RUSH;
 
             RobotType type = rc.getType();
 

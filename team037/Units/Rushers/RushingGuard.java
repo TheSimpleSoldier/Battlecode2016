@@ -4,9 +4,10 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import team037.Units.BaseUnits.BaseGaurd;
+import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
 
-public class RushingGuard extends BaseGaurd
+public class RushingGuard extends BaseGaurd implements PacMan
 {
     private boolean rushing = false;
     private MapLocation lastTarget = null;
