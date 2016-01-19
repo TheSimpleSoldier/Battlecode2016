@@ -33,7 +33,7 @@ public class BuildOrderCreation
                     {Bots.RUSHGUARD, Bots.RUSHINGSOLDIER, Bots.RUSHINGVIPER, Bots.RUSHINGSOLDIER},
             };
 
-            int[] timesRush = {2,1000};
+            int[] timesRush = {1,1000};
 
             return new BuildOrder(buildOrderRush, timesRush);
         }

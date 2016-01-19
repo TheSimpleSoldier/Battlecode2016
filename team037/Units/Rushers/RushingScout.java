@@ -26,11 +26,19 @@ public class RushingScout extends ScoutingScout implements PacMan {
         super(rc);
     }
 
-    public boolean fight() {
+    public boolean fight() throws GameActionException {
         if (enemies.length > 0) {
             return runAway(PACMAN_WEIGHTS);
         }
-        return false;
+        return super.fight();
+    }
+
+    public boolean fightZombies() throws GameActionException {
+        if (zombies.length > 0 && zombies[0].type != RobotType.ZOMBIEDEN) {
+            return runAway(PACMAN_WEIGHTS);
+        }
+
+        return super.fightZombies();
     }
 
     public void sendMessages() throws GameActionException {
