@@ -1,6 +1,5 @@
 package team037.Units.TurtleUnits;
 
-import _team316.Archon;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
