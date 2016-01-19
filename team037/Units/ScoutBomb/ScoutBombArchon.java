@@ -284,7 +284,14 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                 }
             }
         } else if (numVipers == 0) {
-
+            if (rc.hasBuildRequirements(RobotType.VIPER)) {
+                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                if (!toSpawn.equals(Direction.NONE)) {
+                    rc.build(toSpawn, RobotType.VIPER);
+                    rc.setIndicatorString(1, "this game has a serious lack of vipers");
+                    return true;
+                }
+            }
         } else {
             if (rc.hasBuildRequirements(RobotType.SCOUT)) {
                 Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
