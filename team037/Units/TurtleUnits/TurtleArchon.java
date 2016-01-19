@@ -217,7 +217,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         MapLocation bestParts = getNextPartLocation();
 
-        if (bestParts == null) return turtlePoint;
+        if (bestParts == null || turtlePoint.distanceSquaredTo(bestParts) > 400) return turtlePoint;
 
         rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 
