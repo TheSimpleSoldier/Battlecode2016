@@ -302,9 +302,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
 
-//        if (Math.max(ArchonDist, zombieTracker.getNextZombieRound()) - rc.getRoundNum() < 30)
-
-
         if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
         {
             nextType = RobotType.SCOUT;

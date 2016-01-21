@@ -27,6 +27,7 @@ public class TurtleTurret extends BaseTurret
            rc.setIndicatorString(1, "Going to new rally point x: " + rallyPoint.x + " y: " + rallyPoint.y);
            turtlePoint = rallyPoint;
            setTargetLoc(turtlePoint);
+           rallyPoint = null;
        }
     }
 }
