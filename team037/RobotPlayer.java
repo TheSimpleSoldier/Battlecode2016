@@ -15,6 +15,8 @@ import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManGuard;
+import team037.Units.Scavenger.ScavengerArchon;
+import team037.Units.Scavenger.ScavengerScout;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
@@ -68,6 +70,8 @@ public class RobotPlayer
 
             RobotType type = rc.getType();
 
+            strategy = Strategies.PACMAN;
+
             if(type == RobotType.ARCHON)
             {
                 if(strategy.equals(Strategies.CASTLE))
@@ -86,8 +90,8 @@ public class RobotPlayer
                 }
                 else if(strategy.equals(Strategies.PACMAN))
                 {
-                    unit = new PacManArchon(rc);
-                    Unit.thisBot = Bots.PACMANARCHON;
+                    unit = new ScavengerArchon(rc);
+                    Unit.thisBot = Bots.SCAVENGERARCHON;
                 }
                 else
                 { // default to alpha archons
@@ -117,8 +121,8 @@ public class RobotPlayer
             {
                 if(strategy.equals(Strategies.PACMAN))
                 {
-                    unit = new ScoutBombScout(rc);
-                    Unit.thisBot = Bots.SCOUTBOMBSCOUT;
+                    unit = new ScavengerScout(rc);
+                    Unit.thisBot = Bots.SCAVENGERSCOUT;
                 }
                 else if(strategy.equals(Strategies.SCOUT_BOMB))
                 {

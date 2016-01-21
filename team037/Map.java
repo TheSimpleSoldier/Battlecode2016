@@ -261,12 +261,14 @@ public class Map {
      * Scans all MapLocations in a 24 radius squared area around the unit
      * @param currentLoc MapLocation of the unit's current location
      */
-    public void scan(MapLocation currentLoc) {
+    public double[] scan(MapLocation currentLoc) {
         MapLocation[] locations = MapLocation.getAllMapLocationsWithinRadiusSq(currentLoc,24);
 
         long[] x = new long[9];
         long[] y = new long[9];
         double rubbleThresh = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+
+        double[] adjacentRubble = new double[8];
 
         try {
             MapLocation checkLoc = locations[4];
@@ -403,17 +405,20 @@ public class Map {
                 x[6] += 32;
             }
             checkLoc = locations[26];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[5] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[5] >= rubbleThresh) {
                 y[3] += 8;
                 x[5] += 32;
             }
             checkLoc = locations[25];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[6] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[6] >= rubbleThresh) {
                 y[3] += 16;
                 x[4] += 32;
             }
             checkLoc = locations[24];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[7] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[7] >= rubbleThresh) {
                 y[3] += 32;
                 x[3] += 32;
             }
@@ -453,7 +458,8 @@ public class Map {
                 x[6] += 16;
             }
             checkLoc = locations[35];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[4] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[4] >= rubbleThresh) {
                 y[4] += 8;
                 x[5] += 16;
             }
@@ -463,7 +469,8 @@ public class Map {
                 x[4] += 16;
             }
             checkLoc = locations[33];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[0] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[0] >= rubbleThresh) {
                 y[4] += 32;
                 x[3] += 16;
             }
@@ -502,17 +509,20 @@ public class Map {
                 x[6] += 8;
             }
             checkLoc = locations[44];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[3] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[3] >= rubbleThresh) {
                 y[5] += 8;
                 x[5] += 8;
             }
             checkLoc = locations[43];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[2] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[2] >= rubbleThresh) {
                 y[5] += 16;
                 x[4] += 8;
             }
             checkLoc = locations[42];
-            if (!rc.onTheMap(checkLoc) || rc.senseRubble(checkLoc) >= rubbleThresh) {
+            adjacentRubble[1] = rc.senseRubble(checkLoc);
+            if (!rc.onTheMap(checkLoc) || adjacentRubble[1] >= rubbleThresh) {
                 y[5] += 32;
                 x[3] += 8;
             }
@@ -821,6 +831,7 @@ public class Map {
             }
 //            printMap(currentLoc,4);
         } catch (GameActionException e) {}
+        return adjacentRubble;
     }
 
     /**

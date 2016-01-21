@@ -15,6 +15,8 @@ import team037.Units.Rushers.RushingGuard;
 import team037.Units.Rushers.RushingSoldier;
 import team037.Units.Rushers.RushingTurret;
 import team037.Units.Rushers.RushingViper;
+import team037.Units.Scavenger.ScavengerArchon;
+import team037.Units.Scavenger.ScavengerScout;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.Scouts.HerdingScout;
@@ -57,7 +59,9 @@ public enum Bots
     RUSHGUARD,
     RUSHTURRET,
     SCOUTBOMBGUARD,
-    SCOUTBOMBSCOUT;
+    SCOUTBOMBSCOUT,
+    SCAVENGERARCHON,
+    SCAVENGERSCOUT;
 
     public static int toInt(Bots type)
     {
@@ -119,6 +123,10 @@ public enum Bots
                 return 26;
             case SCOUTBOMBSCOUT:
                 return 27;
+            case SCAVENGERARCHON:
+                return 28;
+            case SCAVENGERSCOUT:
+                return 29;
         }
         return -1;
     }
@@ -183,6 +191,10 @@ public enum Bots
                 return SCOUTBOMBGUARD;
             case 27:
                 return SCOUTBOMBSCOUT;
+            case 28:
+                return SCAVENGERARCHON;
+            case 29:
+                return SCAVENGERSCOUT;
         }
 
         return null;
@@ -196,6 +208,7 @@ public enum Bots
             case ALPHAARCHON:
             case BASEARCHON:
             case PACMANARCHON:
+            case SCAVENGERARCHON:
                 return RobotType.ARCHON;
             case RUSHGUARD:
             case TURTLEGUARD:
@@ -212,6 +225,7 @@ public enum Bots
             case SCOUTINGSCOUT:
             case HERDINGSCOUT:
             case PACMANSCOUT:
+            case SCAVENGERSCOUT:
                 return RobotType.SCOUT;
             case TURTLESOLDIER:
             case CASTLESOLDIER:
@@ -290,6 +304,10 @@ public enum Bots
                 return new ScoutBombScout(rc);
             case SCOUTBOMBGUARD:
                 return new ScoutBombGuard(rc);
+            case SCAVENGERARCHON:
+                return new ScavengerArchon(rc);
+            case SCAVENGERSCOUT:
+                return new ScavengerScout(rc);
         }
 
         return null;
