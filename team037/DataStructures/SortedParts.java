@@ -92,6 +92,8 @@ public class SortedParts
         if (m == null)
             return;
 
+        if (contains(m)) return;
+
         double newValue = value;
 
         // b/c neutral parts don't have a build time
@@ -161,14 +163,6 @@ public class SortedParts
             index++;
         }
 
-        for (int i = locs.length; --i>=0;)
-        {
-            if (locs[i] != null && locs[i].equals(m))
-            {
-                return i;
-            }
-        }
-
         return -1;
     }
 
@@ -211,7 +205,7 @@ public class SortedParts
      */
     public boolean contains(MapLocation m)
     {
-        return getIndexOfMapLocation(m) != -1;
+        return getIndexOfMapLocation(m) > -1;
     }
 
     /**
