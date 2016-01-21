@@ -66,7 +66,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
 
         super.collectData();
-        
+
         if (rallyPoint != null)
         {
             turtlePoint = rallyPoint;
@@ -203,8 +203,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
         {
             rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
         }
-
-//        System.out.println("Bytecodes: " + (Clock.getBytecodeNum() - bytecodes) + " Rounds: " + (rc.getRoundNum() - round));
     }
 
     @Override
