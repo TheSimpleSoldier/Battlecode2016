@@ -6,8 +6,6 @@ import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.PartsUtilities;
 
-import javax.crypto.spec.GCMParameterSpec;
-
 public class FightMicro
 {
     public static RobotController rc;
