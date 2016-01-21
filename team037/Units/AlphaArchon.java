@@ -14,7 +14,6 @@ public class AlphaArchon extends BaseArchon
     public AlphaArchon(RobotController rc)
     {
         super(rc);
-        navigator.setTarget(getNextPartLocation());
         ZombieSpawnSchedule schedule = rc.getZombieSpawnSchedule();
     }
 
