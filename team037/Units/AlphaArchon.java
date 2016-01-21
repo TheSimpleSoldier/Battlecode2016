@@ -16,8 +16,6 @@ public class AlphaArchon extends BaseArchon
         super(rc);
         navigator.setTarget(getNextPartLocation());
         ZombieSpawnSchedule schedule = rc.getZombieSpawnSchedule();
-
-
     }
 
     @Override

@@ -59,8 +59,8 @@ public class BaseArchon extends Unit implements PacMan
     public void collectData() throws GameActionException
     {
         super.collectData();
-        neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
         if (sortedParts.contains(currentLocation)) {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
@@ -89,6 +89,7 @@ public class BaseArchon extends Unit implements PacMan
             sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
             nextBot = currentBot;
         }
+
     }
 
     public Bots getDefaultBotTypes(RobotType type)

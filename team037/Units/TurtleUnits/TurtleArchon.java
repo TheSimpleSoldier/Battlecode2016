@@ -6,7 +6,6 @@ import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.Enums.CommunicationType;
 import team037.Messages.AttackCommunication;
-import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Units.PacMan.PacMan;
@@ -15,7 +14,6 @@ import team037.Utilites.MapUtils;
 import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Units.BaseUnits.BaseArchon;
-import team037.Utilites.ZombieTracker;
 
 public class TurtleArchon extends BaseArchon implements PacMan
 {
@@ -66,9 +64,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public void collectData() throws GameActionException
     {
-        super.collectData();
 
-        rc.setIndicatorString(0, "TurtlePoint: " + turtlePoint);
+        super.collectData();
 
         if (rallyPoint != null)
         {
