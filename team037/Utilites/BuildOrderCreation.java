@@ -29,10 +29,11 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.RUSH))
         {
             Bots[][] buildOrderRush = {
-                    {Bots.RUSHINGSOLDIER},
+                    {Bots.RUSHINGSOLDIER, Bots.RUSHINGSOLDIER, Bots.RUSHSCOUT, Bots.RUSHINGVIPER},
+                    {Bots.RUSHGUARD, Bots.RUSHINGSOLDIER, Bots.RUSHINGVIPER, Bots.RUSHINGSOLDIER},
             };
 
-            int[] timesRush = {1000};
+            int[] timesRush = {1,1000};
 
             return new BuildOrder(buildOrderRush, timesRush);
         }
@@ -56,9 +57,10 @@ public class BuildOrderCreation
                     {Bots.TURTLETURRET, Bots.TURTLETURRET},
                     {Bots.TURTLETURRET, Bots.TURTLESCOUT},
                     {Bots.TURTLETURRET, Bots.TURTLESOLDIER},
+                    {Bots.TURTLETURRET, Bots.RUSHINGVIPER},
             };
 
-            int[] timesTurtle = {4/multiplier, 4/multiplier, 4/multiplier, 1, 4/multiplier, 4/multiplier, 1000};
+            int[] timesTurtle = {4/multiplier, 4/multiplier, 4/multiplier, 1, 4/multiplier, 4/multiplier, 8/multiplier, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }

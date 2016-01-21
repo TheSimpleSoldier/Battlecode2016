@@ -22,6 +22,34 @@ public class SortedParts
         count = 0;
     }
 
+    public MapLocation getMassivConcentration()
+    {
+        for (int i = locs.length; --i>=0; )
+        {
+            if (locs[i] != null)
+            {
+                MapLocation[] nearBySquares = MapLocation.getAllMapLocationsWithinRadiusSq(locs[i], 25);
+                int count = 0;
+
+                for (int j = nearBySquares.length; --j>=0; )
+                {
+                    if (contains(nearBySquares[j]))
+                    {
+                        count++;
+                    }
+                }
+
+                // there are 10 or more squares with parts/neutrals in this area
+                if (count > 10)
+                {
+                    return locs[i];
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * This method gets the location with the highest score
      *

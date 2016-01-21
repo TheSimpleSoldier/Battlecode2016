@@ -49,7 +49,10 @@ public class BaseArchon extends Unit implements PacMan
 
     public boolean takeNextStep() throws GameActionException
     {
-        rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
+        if (currentLocation != null && navigator.getTarget() != null)
+        {
+            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
+        }
         return navigator.takeNextStep();
     }
 

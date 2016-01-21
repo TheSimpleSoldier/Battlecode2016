@@ -125,7 +125,7 @@ public class TurtleGuard extends BaseGaurd
     {
         super.collectData();
 
-        if (!arrived && currentLocation.equals(navigator.getTarget()))
+        if (!arrived && (rc.canSense(turtlePoint)))
         {
             turnsArrivedLoc = rc.getRoundNum();
             arrived = true;
