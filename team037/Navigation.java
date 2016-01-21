@@ -1421,6 +1421,10 @@ public class Navigation {
                 // If the bytecode limit has been reached, return current best path
                 if (Clock.getBytecodesLeft() < maxBytecodes) {
                     JumpPoint out = multimap.peek(multimap.peek());
+                    if (out == null) {
+                        pathLength = Integer.MAX_VALUE;
+                        return out;
+                    }
                     if (pathLength != 0) {
                         pathLength = out.f;
                     }
@@ -1434,6 +1438,10 @@ public class Navigation {
         } catch (ArrayIndexOutOfBoundsException e1) {
             if (Clock.getBytecodesLeft() < maxBytecodes && multimap.size > 0) {
                 JumpPoint out = multimap.peek(multimap.peek());
+                if (out == null) {
+                    pathLength = Integer.MAX_VALUE;
+                    return out;
+                }
                 if (pathLength != 0) {
                     pathLength = out.f;
                 }
