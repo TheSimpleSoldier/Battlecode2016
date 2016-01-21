@@ -282,11 +282,11 @@ public class BaseArchon extends Unit implements PacMan
         }
     }
 
-    public static MapLocation getNextPartLocation()
+    public static MapLocation getNextPartLocation() throws GameActionException
     {
         MapLocation next = sortedParts.getBestSpot(currentLocation);
 
-        while (next != null && rc.canSenseLocation(next) && rc.senseParts(next) == 0)
+        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
         {
             int index = sortedParts.getIndexOfMapLocation(next);
             if (index == -1)
