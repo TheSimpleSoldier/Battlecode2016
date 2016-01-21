@@ -223,10 +223,7 @@ public class SortedParts
 
         for (int i = parts.length; --i>=0; )
         {
-            if (!contains(parts[i]))
-            {
-                addParts(parts[i], (int)rc.senseParts(parts[i]), false);
-            }
+            addParts(parts[i], (int)rc.senseParts(parts[i]), false);
         }
 
         RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);
