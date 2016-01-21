@@ -1452,6 +1452,7 @@ public class Navigation {
             return getPath(null, null);
         }
 
+        pathLength = Integer.MAX_VALUE;
         searching = false;
         return null;
     }
