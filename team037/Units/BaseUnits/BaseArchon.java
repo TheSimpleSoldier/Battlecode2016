@@ -53,6 +53,23 @@ public class BaseArchon extends Unit implements PacMan
         {
             rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
         }
+
+        try
+        {
+            MapLocation navigatorTarget = navigator.getTarget();
+            if (currentLocation.isAdjacentTo(navigatorTarget) && enemies.length == 0 && zombies.length == 0)
+            {
+                if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                {
+                    
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         return navigator.takeNextStep();
     }
 
@@ -315,6 +332,7 @@ public class BaseArchon extends Unit implements PacMan
             int index = sortedParts.getIndexOfMapLocation(next);
             if (index < 0)
             {
+                sortedParts.hardRemove(next);
                 lastTarget = new MapLocation(next.x, next.y);
             }
             sortedParts.remove(index);

@@ -166,6 +166,11 @@ public class SortedParts
         return -1;
     }
 
+    /**
+     * This method will iterate over the entire array and do a hard remove
+     *
+     * @param m
+     */
     public void hardRemove(MapLocation m)
     {
         for (int i = locs.length; --i>=0; )
