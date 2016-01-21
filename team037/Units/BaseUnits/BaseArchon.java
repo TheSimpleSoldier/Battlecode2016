@@ -225,23 +225,29 @@ public class BaseArchon extends Unit implements PacMan
             return false;
         }
 
+        return buildNextUnit();
+    }
+
+    public boolean buildNextUnit() throws GameActionException
+    {
         Bots temp = changeBuildOrder(nextBot);
 
-        if (Bots.toInt(temp) !=  Bots.toInt(nextBot))
+        if (!temp.equals(nextBot))
         {
-            System.out.println("we have a changed build order");
-            Bots temp2 = nextBot;
-            nextBot = temp;
-
-            Direction dir = build();
-            if(dir != Direction.NONE)
+            if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())
             {
-                sendInitialMessages(dir);
-                nextBot = temp2;
-                nextType = Bots.typeFromBot(nextBot);
-                return true;
-            }
+                Bots temp2 = nextBot;
+                nextBot = temp;
 
+                Direction dir = build();
+                if(dir != Direction.NONE)
+                {
+                    sendInitialMessages(dir);
+                    nextBot = temp2;
+                    nextType = Bots.typeFromBot(nextBot);
+                    return true;
+                }
+            }
         }
         else if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
         {
@@ -302,16 +308,22 @@ public class BaseArchon extends Unit implements PacMan
     public static MapLocation getNextPartLocation() throws GameActionException
     {
         MapLocation next = sortedParts.getBestSpot(currentLocation);
+        MapLocation lastTarget = null;
 
         while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
         {
             int index = sortedParts.getIndexOfMapLocation(next);
-            if (index == -1)
+            if (index < 0)
             {
-                System.out.println("We didn't find loc x: " + next.x + " y: " + next.y);
+                lastTarget = new MapLocation(next.x, next.y);
             }
             sortedParts.remove(index);
             next = sortedParts.getBestSpot(currentLocation);
+
+            if (lastTarget != null && lastTarget.equals(next))
+            {
+                System.out.println("we have a problem");
+            }
         }
 
         return next;

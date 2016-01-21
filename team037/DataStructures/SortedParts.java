@@ -166,6 +166,18 @@ public class SortedParts
         return -1;
     }
 
+    public void hardRemove(MapLocation m)
+    {
+        for (int i = locs.length; --i>=0; )
+        {
+            if (locs[i] != null && locs[i].equals(m))
+            {
+                locs[i] = null;
+                score[i] = 0;
+            }
+        }
+    }
+
     /**
      * This method adds a part to the correct location in an array
      */

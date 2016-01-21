@@ -280,21 +280,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if ((enemies.length + zombies.length) > allies.length) return false;
         if (currentLocation.distanceSquaredTo(turtlePoint) >= 100) return false;
 
-        nextBot = changeBuildOrder(nextBot);
-
-        if (rc.hasBuildRequirements(nextType) && rc.isCoreReady())
-        {
-            Direction dir = build();
-            if (dir != Direction.NONE)
-            {
-                sendInitialMessages(dir);
-                nextBot = buildOrder.nextBot();
-                nextType = Bots.typeFromBot(nextBot);
-                return true;
-            }
-        }
-
-        return false;
+        return buildNextUnit();
     }
 
     @Override
