@@ -36,6 +36,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         turretsSighted = 0;
         fastZombies = 0;
         bigZombies = 0;
+        myScouts = 0;
         turretLocations = new AppendOnlyMapLocationSet();
         lastTurret = null;
         messageBuffer = new MessageBuffer();
@@ -47,7 +48,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
 //    }
 
     public boolean fight() {
-        if (offensiveEnemies == 0) {
+        if (offensiveEnemies == 0 || zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN)) {
             return false;
         }
         return runAway(null);
@@ -180,17 +181,17 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
             }
         }
 
-        if (scout1 == null || !rc.canSenseRobot(scout1.ID) || currentLocation.distanceSquaredTo(scout1.location) > 10) {
+        if (scout1 != null && (!rc.canSenseRobot(scout1.ID) || currentLocation.distanceSquaredTo(scout1.location) > 13)) {
             scout1 = null;
             myScouts--;
         }
 
-        if (scout2 == null || !rc.canSenseRobot(scout2.ID) || currentLocation.distanceSquaredTo(scout2.location) > 10) {
+        if (scout2 != null && (!rc.canSenseRobot(scout2.ID) || currentLocation.distanceSquaredTo(scout2.location) > 13)) {
             scout2 = null;
             myScouts--;
         }
 
-        if (scout3 == null || !rc.canSenseRobot(scout3.ID) || currentLocation.distanceSquaredTo(scout3.location) > 10) {
+        if (scout3 != null && (!rc.canSenseRobot(scout3.ID) || currentLocation.distanceSquaredTo(scout3.location) > 13)) {
             scout3 = null;
             myScouts--;
         }
@@ -216,7 +217,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         // Let's see if we need to deploy countermeasures or can build a scout
         switch (zombies.length) {
             case 0:
-                if (myScouts < 2) {
+                if (myScouts < 3) {
                     nextBot = Bots.SCAVENGERSCOUT;
                     int direction = 0;
                     if (scout1 != null) {
@@ -245,7 +246,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
                 break;
             case 1:
                     RobotType zombie = zombies[0].type;
-                    if (zombie.equals(RobotType.ZOMBIEDEN) && myScouts < 2) {
+                    if (zombie.equals(RobotType.ZOMBIEDEN) && myScouts < 3) {
                         nextBot = Bots.SCAVENGERSCOUT;
                         toSpawn = currentLocation.directionTo(zombies[0].location);
                     } else {
