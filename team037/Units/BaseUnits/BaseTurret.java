@@ -2,6 +2,7 @@ package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Unit;
+import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
 /**
@@ -79,14 +80,29 @@ public class BaseTurret extends Unit
         {
             if (zombies.length > 0 || enemies.length > 0)
             {
-                rc.unpack();
-                return true;
+                if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies))
+                {
+                    return false;
+                }
+                else
+                {
+                    rc.unpack();
+                    return true;
+                }
             }
 
             return false;
         }
 
-        return fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
+        boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
+
+        if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && allies.length == 0 && !fought && rc.isWeaponReady())
+        {
+            rc.unpack();
+            return false;
+        }
+
+        return fought;
     }
 
     // zombie fight micro happens in fight()

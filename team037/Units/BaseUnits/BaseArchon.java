@@ -49,15 +49,18 @@ public class BaseArchon extends Unit implements PacMan
 
     public boolean takeNextStep() throws GameActionException
     {
-        rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
+        if (currentLocation != null && navigator.getTarget() != null)
+        {
+            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
+        }
         return navigator.takeNextStep();
     }
 
     public void collectData() throws GameActionException
     {
         super.collectData();
-        neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
+        neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
         if (sortedParts.contains(currentLocation)) {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
@@ -86,6 +89,7 @@ public class BaseArchon extends Unit implements PacMan
             sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
             nextBot = currentBot;
         }
+
     }
 
     public Bots getDefaultBotTypes(RobotType type)
@@ -278,11 +282,11 @@ public class BaseArchon extends Unit implements PacMan
         }
     }
 
-    public static MapLocation getNextPartLocation()
+    public static MapLocation getNextPartLocation() throws GameActionException
     {
         MapLocation next = sortedParts.getBestSpot(currentLocation);
 
-        while (next != null && rc.canSenseLocation(next) && rc.senseParts(next) == 0)
+        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
         {
             int index = sortedParts.getIndexOfMapLocation(next);
             if (index == -1)

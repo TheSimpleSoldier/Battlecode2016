@@ -22,6 +22,34 @@ public class SortedParts
         count = 0;
     }
 
+    public MapLocation getMassivConcentration()
+    {
+        for (int i = locs.length; --i>=0; )
+        {
+            if (locs[i] != null)
+            {
+                MapLocation[] nearBySquares = MapLocation.getAllMapLocationsWithinRadiusSq(locs[i], 25);
+                int count = 0;
+
+                for (int j = nearBySquares.length; --j>=0; )
+                {
+                    if (contains(nearBySquares[j]))
+                    {
+                        count++;
+                    }
+                }
+
+                // there are 10 or more squares with parts/neutrals in this area
+                if (count > 10)
+                {
+                    return locs[i];
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * This method gets the location with the highest score
      *
@@ -63,6 +91,8 @@ public class SortedParts
     {
         if (m == null)
             return;
+
+        if (contains(m)) return;
 
         double newValue = value;
 
@@ -133,14 +163,6 @@ public class SortedParts
             index++;
         }
 
-        for (int i = locs.length; --i>=0;)
-        {
-            if (locs[i] != null && locs[i].equals(m))
-            {
-                return i;
-            }
-        }
-
         return -1;
     }
 
@@ -183,7 +205,7 @@ public class SortedParts
      */
     public boolean contains(MapLocation m)
     {
-        return getIndexOfMapLocation(m) != -1;
+        return getIndexOfMapLocation(m) > -1;
     }
 
     /**
@@ -201,10 +223,7 @@ public class SortedParts
 
         for (int i = parts.length; --i>=0; )
         {
-            if (!contains(parts[i]))
-            {
-                addParts(parts[i], (int)rc.senseParts(parts[i]), false);
-            }
+            addParts(parts[i], (int)rc.senseParts(parts[i]), false);
         }
 
         RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);
