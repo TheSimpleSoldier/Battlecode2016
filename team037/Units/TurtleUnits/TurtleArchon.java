@@ -278,7 +278,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         // preconditions
         if ((enemies.length + zombies.length) > allies.length) return false;
-        if (currentLocation.distanceSquaredTo(turtlePoint) >= 100) return false;
+        if (currentLocation.distanceSquaredTo(turtlePoint) >= 100 && rc.getTeamParts() < 500) return false;
 
         return buildNextUnit();
     }

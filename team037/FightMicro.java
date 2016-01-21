@@ -662,7 +662,7 @@ public class FightMicro
     {
         if (enemies.length == 0) return false;
 
-        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        if (rc.isWeaponReady() && nearByEnemies != null && nearByEnemies.length > 0)
         {
             RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
 

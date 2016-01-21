@@ -79,7 +79,7 @@ public class BaseArchon extends Unit implements PacMan
                 e.printStackTrace();
             }
 
-            MapLocation parts = sortedParts.getBestSpotInSightRange(currentLocation);
+            MapLocation parts = getNextPartLocationInSight();
 
             if (parts != null)
             {
@@ -273,6 +273,14 @@ public class BaseArchon extends Unit implements PacMan
 
     public boolean buildNextUnit() throws GameActionException
     {
+        // if there are multiple archons and we have limited parts and we see
+        // either parts or neutrals we should let the other archon's build while
+        // we pick them up
+        if (alliedArchonStartLocs.length > 1 && rc.getTeamParts() < 200 && (rc.sensePartLocations(sightRange).length > 0 || rc.senseNearbyRobots(sightRange, Team.NEUTRAL).length > 0))
+        {
+            return false;
+        }
+
         Bots temp = changeBuildOrder(nextBot);
 
         if (!temp.equals(nextBot))
@@ -361,8 +369,41 @@ public class BaseArchon extends Unit implements PacMan
                 sortedParts.hardRemove(next);
                 lastTarget = new MapLocation(next.x, next.y);
             }
-            sortedParts.remove(index);
+            else
+            {
+                sortedParts.remove(index);
+            }
+
             next = sortedParts.getBestSpot(currentLocation);
+
+            if (lastTarget != null && lastTarget.equals(next))
+            {
+                System.out.println("we have a problem");
+            }
+        }
+
+        return next;
+    }
+
+    public static MapLocation getNextPartLocationInSight() throws GameActionException
+    {
+        MapLocation next = sortedParts.getBestSpotInSightRange(currentLocation);
+        MapLocation lastTarget = null;
+
+        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
+        {
+            int index = sortedParts.getIndexOfMapLocation(next);
+            if (index < 0)
+            {
+                sortedParts.hardRemove(next);
+                lastTarget = new MapLocation(next.x, next.y);
+            }
+            else
+            {
+                sortedParts.remove(index);
+            }
+
+            next = sortedParts.getBestSpotInSightRange(currentLocation);
 
             if (lastTarget != null && lastTarget.equals(next))
             {

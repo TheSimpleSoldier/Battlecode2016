@@ -283,7 +283,7 @@ public class SortedParts
         {
             if (neutralBots[i].type == RobotType.ARCHON)
             {
-                addParts(neutralBots[i].location, 1000, true);
+                addParts(neutralBots[i].location, 99999, true);
             }
             else
             {
