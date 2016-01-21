@@ -1,6 +1,7 @@
 package team037.Units.BaseUnits;
 
 import battlecode.common.*;
+import com.sun.org.apache.bcel.internal.generic.FMUL;
 import team037.DataStructures.BuildOrder;
 import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
@@ -51,23 +52,41 @@ public class BaseArchon extends Unit implements PacMan
     {
         if (currentLocation != null && navigator.getTarget() != null)
         {
-            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
+            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 0, 0);
         }
 
-        try
+
+        // if there are no visible zombies then we should move to collect parts
+        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies))
         {
-            MapLocation navigatorTarget = navigator.getTarget();
-            if (currentLocation.isAdjacentTo(navigatorTarget) && enemies.length == 0 && zombies.length == 0)
+            MapLocation navigatorTarget;
+
+            // if we are trying to get to parts and the location has rubble on it we should clear it
+            try
             {
-                if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                navigatorTarget = navigator.getTarget();
+                if (currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget))
                 {
-                    
+                    if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                    {
+                        rc.clearRubble(currentLocation.directionTo(navigatorTarget));
+                        return true;
+                    }
                 }
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            MapLocation parts = sortedParts.getBestSpotInSightRange(currentLocation);
+
+            if (parts != null)
+            {
+                navigator.setTarget(parts);
+                rc.setIndicatorLine(currentLocation, parts, 0, 0, 255);
+                rc.setIndicatorString(2, "Parts loc x: " + parts.x + " y: " + parts.y + " round: " + rc.getRoundNum());
+            }
         }
 
         return navigator.takeNextStep();
@@ -87,6 +106,13 @@ public class BaseArchon extends Unit implements PacMan
         if (target != null && rc.canSenseLocation(target) && rc.senseParts(target) == 0)
         {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(target));
+        }
+
+        int index = sortedParts.getIndexOfMapLocation(currentLocation);
+
+        if (index >= 0)
+        {
+            sortedParts.remove(index);
         }
 
         // don't need to check every round
