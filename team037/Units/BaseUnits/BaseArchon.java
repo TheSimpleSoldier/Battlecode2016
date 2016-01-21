@@ -62,15 +62,9 @@ public class BaseArchon extends Unit implements PacMan
 
         neutralBots = rc.senseNearbyRobots(2, Team.NEUTRAL);
 
-        int bytecodes = Clock.getBytecodeNum();
-        int round = rc.getRoundNum();
-
         if (sortedParts.contains(currentLocation)) {
-            System.out.println("remove loc");
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
         }
-
-        System.out.println("Bytecodes: " + (Clock.getBytecodeNum() - bytecodes) + " Rounds: " + (rc.getRoundNum() - round));
 
         MapLocation target = navigator.getTarget();
         if (target != null && rc.canSenseLocation(target) && rc.senseParts(target) == 0)

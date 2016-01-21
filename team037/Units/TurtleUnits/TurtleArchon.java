@@ -65,13 +65,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public void collectData() throws GameActionException
     {
 
-//        int bytecodes = Clock.getBytecodeNum();
-//        int round = rc.getRoundNum();
-
         super.collectData();
-
-        rc.setIndicatorString(0, "TurtlePoint: " + turtlePoint);
-
+        
         if (rallyPoint != null)
         {
             turtlePoint = rallyPoint;
