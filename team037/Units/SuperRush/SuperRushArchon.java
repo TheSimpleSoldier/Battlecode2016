@@ -20,21 +20,23 @@ public class SuperRushArchon extends Unit
     public SuperRushArchon(RobotController rc)
     {
         super(rc);
+        first = RobotType.GUARD;
+        unitProportion = new UnitProportion(0, 1, 0, 0, 0);
+
+        spawnedFirst = false;
+        dirTo = Direction.EAST;
     }
 
     @Override
     public void collectData() throws GameActionException
     {
         super.collectData();
-        first = RobotType.GUARD;
-        unitProportion = new UnitProportion(0, 1, 0, 0, 0);
-
-        spawnedFirst = false;
     }
 
     @Override
     public boolean act() throws GameActionException
     {
+        rc.setIndicatorString(0, "" + spawnedFirst);
         if(!rc.isCoreReady())
         {
             return false;
@@ -226,6 +228,8 @@ public class SuperRushArchon extends Unit
             if(rc.canBuild(dir, toSpawn))
             {
                 rc.build(dir, toSpawn);
+                spawnedFirst = true;
+                unitProportion.addBot(toSpawn);
                 return -100;
             }
             else
