@@ -48,7 +48,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
 //    }
 
     public boolean fight() {
-        if (offensiveEnemies == 0 || zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN)) {
+        if (offensiveEnemies == 0 || (offensiveEnemies == 1 && zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
             return false;
         }
         return runAway(null);
@@ -68,6 +68,11 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
 //        }
 //        middle = false;
         return navigator.takeNextStep();
+    }
+
+    public int[] applyAdditionalWeights(int[] directions, double[][] weights) {
+        directions = applyUnitWeights(currentLocation,directions, new RobotInfo[] {}, weights[0]);
+        return directions;
     }
 
 //    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
@@ -92,7 +97,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
 
         MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
 
-        if (!bestParts.equals(currentTarget))
+        if (bestParts != null && !bestParts.equals(currentTarget))
             return true;
 
 
@@ -139,6 +144,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         if (!currentLocation.equals(lastScan)) {
             adjacentRubble = Navigation.map.scan(currentLocation);
             lastScan = currentLocation;
+            Navigation.lastScan = lastScan;
         }
 
         // Check for significant enemies
@@ -246,11 +252,14 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
                 break;
             case 1:
                     RobotType zombie = zombies[0].type;
-                    if (zombie.equals(RobotType.ZOMBIEDEN) && myScouts < 3) {
+                    if (zombie.equals(RobotType.FASTZOMBIE)) {
+                        nextBot = Bots.PACMANGUARD;
+                        toSpawn = currentLocation.directionTo(zombies[0].location);
+                    } else if (zombie.equals(RobotType.ZOMBIEDEN) && myScouts < 3) {
                         nextBot = Bots.SCAVENGERSCOUT;
                         toSpawn = currentLocation.directionTo(zombies[0].location);
-                    } else {
-                        nextBot = Bots.PACMANGUARD;
+                    } else if (navigator.getTarget() == null && !zombie.equals(RobotType.BIGZOMBIE)) {
+                        nextBot = Bots.SCOUTBOMBSCOUT;
                         toSpawn = currentLocation.directionTo(zombies[0].location);
                     }
                 break;
@@ -273,6 +282,9 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
                 return false;
         }
 
+        if (nextBot == null) {
+            return false;
+        }
         RobotType nextType = Bots.typeFromBot(nextBot);
 
         if (nextBot != null) {

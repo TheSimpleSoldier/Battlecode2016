@@ -22,7 +22,6 @@ public class ScavengerScout extends ScoutBombScout {
             BOMB = false;
             try {
                 myArchon = null;
-                int scouts = 0;
                 for (int i = 8; --i >= 0; ) {
                     MapLocation loc = currentLocation.add(dirs[i]);
                     if (rc.isLocationOccupied(loc)) {
@@ -34,13 +33,8 @@ public class ScavengerScout extends ScoutBombScout {
                                 myArchon = null;
                                 break;
                             }
-                        } else if (checkBot.type.equals(RobotType.SCOUT)) {
-                            scouts++;
                         }
                     }
-                }
-                if (scouts > 4) {
-                    BOMB = true;
                 }
             } catch (Exception e) {}
 
@@ -48,6 +42,20 @@ public class ScavengerScout extends ScoutBombScout {
                 BOMB = true;
             } else {
                 archonLastLoc = myArchon.location;
+                int scouts = 0;
+
+                allies = rc.senseNearbyRobots(24, rc.getTeam());
+
+                for (int i = allies.length; --i >=0;) {
+                    if (allies[i].equals(RobotType.SCOUT) && allies[i].location.distanceSquaredTo(archonLastLoc) < 14) {
+                        scouts++;
+                    }
+                }
+
+                if (scouts > 3) {
+                    BOMB = true;
+                }
+
                 if (rc.isCoreReady() && rc.canMove(currentLocation.directionTo(archonLastLoc).opposite())) {
                     try {
                         rc.move(currentLocation.directionTo(archonLastLoc).opposite());

@@ -9,6 +9,7 @@ import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManArchon;
+import team037.Units.PacMan.PacManGuard;
 import team037.Units.PacMan.PacManScout;
 import team037.Units.Scavenger.ScavengerArchon;
 import team037.Units.Scavenger.ScavengerScout;
@@ -297,7 +298,7 @@ public enum Bots
             case PACMANSCOUT:
                 return new PacManScout(rc);
             case PACMANGUARD:
-                return new PacManScout(rc);
+                return new PacManGuard(rc);
             case RUSHGUARD:
                 return new RushingGuard(rc);
             case RUSHTURRET:

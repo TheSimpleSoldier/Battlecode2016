@@ -1,9 +1,6 @@
 package team037;
 
-import battlecode.common.Clock;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
@@ -73,7 +70,9 @@ public class RobotPlayer
 
             RobotType type = rc.getType();
 
-            strategy = Strategies.PACMAN;
+            if (rc.getTeam().equals(Team.A)) {
+                strategy = Strategies.PACMAN;
+            }
 
             if(type == RobotType.ARCHON)
             {
