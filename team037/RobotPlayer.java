@@ -43,7 +43,7 @@ public class RobotPlayer
             // BUT THEY ARE FIXING IT!
 
             // hardcode disabled for now
-            strategy = Strategies.TURTLE;
+            strategy = Strategies.SCOUT_BOMB;
 
             MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
@@ -65,6 +65,7 @@ public class RobotPlayer
             {
                 System.out.println(strategy);
             }
+            strategy = Strategies.SCOUT_BOMB;
 
 
             RobotType type = rc.getType();
@@ -159,8 +160,13 @@ public class RobotPlayer
             }
             else if(type == RobotType.VIPER)
             {
-                unit = new BaseViper(rc);
-                Unit.thisBot = Bots.BASEVIPER;
+                if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                    unit = new ScoutBombViper(rc);
+                    Unit.thisBot = Bots.SCOUTBOMBVIPER;
+                } else {
+                    unit = new BaseViper(rc);
+                    Unit.thisBot = Bots.BASEVIPER;
+                }
             }
 
             // initial update to strategy
@@ -168,17 +174,7 @@ public class RobotPlayer
             {
                 unit = unit.getNewStrategy(unit);
             }
-        }
-        else if (type == RobotType.VIPER)
-        {
-            if (strategy.equals(Strategies.SCOUT_BOMB)) {
-                unit = new ScoutBombViper(rc);
-                Unit.thisBot = Bots.SCOUTBOMBVIPER;
-            } else {
-                unit = new BaseViper(rc);
-                Unit.thisBot = Bots.BASEVIPER;
-            }
-        }
+
             catch(Exception e)
             {
                 e.printStackTrace();
