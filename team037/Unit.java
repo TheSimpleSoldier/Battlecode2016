@@ -393,7 +393,7 @@ public abstract class Unit
                     loc = new MapLocation(comm.x, comm.y);
                     int index = BaseArchon.sortedParts.getIndexOfMapLocation(loc);
                     BaseArchon.sortedParts.remove(index);
-                    navigator.setTarget(BaseArchon.getNextPartLocation());
+                    try { navigator.setTarget(BaseArchon.getNextPartLocation()); } catch (Exception e) {e.printStackTrace();}
                 }
                 break;
         }

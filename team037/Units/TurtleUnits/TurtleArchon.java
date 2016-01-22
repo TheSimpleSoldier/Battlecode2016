@@ -6,7 +6,6 @@ import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.Enums.CommunicationType;
 import team037.Messages.AttackCommunication;
-import team037.Messages.BotInfoCommunication;
 import team037.Messages.Communication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Units.PacMan.PacMan;
@@ -24,6 +23,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean hiding = false;
     private int updateRound = 0;
     private int index = 0;
+    private int ArchonDist;
 
     public TurtleArchon(RobotController rc)
     {
@@ -40,6 +40,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 break;
             }
         }
+
+        try
+        {
+            ArchonDist = MapUtils.getCenterOfMass(alliedArchonStartLocs).distanceSquaredTo(MapUtils.getCenterOfMass(enemyArchonStartLocs));
+        } catch (Exception e) {e.printStackTrace();}
     }
 
     @Override
@@ -51,6 +56,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (target.equals(turtlePoint) && currentLocation.distanceSquaredTo(target) <= 2) return true;
         if (currentLocation.equals(target)) return true;
         if (!target.equals(turtlePoint) && rc.canSenseLocation(target) && rc.senseParts(target) == 0 && (rc.senseRobotAtLocation(target) == null || rc.senseRobotAtLocation(target).team != Team.NEUTRAL)) return true;
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() <= 25) return true;
 
         return false;
     }
@@ -58,9 +64,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public void collectData() throws GameActionException
     {
-        super.collectData();
 
-        rc.setIndicatorString(0, "TurtlePoint: " + turtlePoint);
+        super.collectData();
 
         if (rallyPoint != null)
         {
@@ -71,49 +76,54 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if ((rc.getRoundNum() - updateRound) < 100)
         {
         }
-        else if (rc.getRoundNum() < 500)
+        else if (rc.getRoundNum() < 300)
         {
         }
         else if (rc.getRoundNum() % 5 != index)
         {
-
         }
-        else if (rc.getRoundNum() > 300 && mapKnowledge.dens.hasLocations())
+        else if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 25)
+        {
+        }
+        else
         {
             rc.setIndicatorString(1, "len: " + mapKnowledge.dens.length);
 
             int closestDen = 99999;
             MapLocation den = null;
 
-            for (int i = mapKnowledge.dens.length; --i >= 0; )
+            if (mapKnowledge.dens.hasLocations())
             {
-                if (mapKnowledge.dens.array[i] != null)
+                for (int i = mapKnowledge.dens.length; --i >= 0; )
                 {
-                    MapLocation currentDen = mapKnowledge.dens.array[i];
-
-                    if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
+                    if (mapKnowledge.dens.array[i] != null)
                     {
-                        mapKnowledge.dens.remove(currentDen);
+                        MapLocation currentDen = mapKnowledge.dens.array[i];
 
-                        Communication communication = new SimpleBotInfoCommunication();
-                        communication.opcode = CommunicationType.DEAD_DEN;
-                        communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
-                        communicator.sendCommunication(400, communication);
-                    }
-                    else
-                    {
-                        int currentDist = currentDen.distanceSquaredTo(turtlePoint);
-
-                        if (currentDist < closestDen)
+                        if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
                         {
-                            closestDen = currentDist;
-                            den = currentDen;
+                            mapKnowledge.dens.remove(currentDen);
+
+                            Communication communication = new SimpleBotInfoCommunication();
+                            communication.opcode = CommunicationType.DEAD_DEN;
+                            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
+                            communicator.sendCommunication(400, communication);
+                        }
+                        else
+                        {
+                            int currentDist = currentDen.distanceSquaredTo(turtlePoint);
+
+                            if (currentDist < closestDen)
+                            {
+                                closestDen = currentDist;
+                                den = currentDen;
+                            }
                         }
                     }
                 }
             }
 
-            if (den != null && den.distanceSquaredTo(turtlePoint) > 20)
+            if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 400 && rc.getRoundNum() < 1000)
             {
                 rc.setIndicatorString(2, "We have a den location!!! x: " + den.x + " y: " + den.y + " round " + rc.getRoundNum());
                 rc.setIndicatorLine(currentLocation, den, 0, 0, 0);
@@ -125,68 +135,67 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
                 hiding = false;
             }
-        }
-        else
-        {
-            MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
-
-            if (bestParts != null && turtlePoint.distanceSquaredTo(bestParts) > 100)
+            else
             {
-                turtlePoint = bestParts;
-                Communication newRallyPoint = new AttackCommunication();
-                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(1600, newRallyPoint);
-            }
-            else if (bestParts == null && !hiding && rc.getRoundNum() > 750)
-            {
-                int leftX = mapKnowledge.minX;
-                int rightX = mapKnowledge.maxX;
-                int topY = mapKnowledge.minY;
-                int bottomY = mapKnowledge.maxY;
-
-                int currentX = turtlePoint.x;
-                int currentY = turtlePoint.y;
-
-                int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
-                int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
-                int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
-                int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
-
-                // go left
-                if (distToTopLeft < distToTopRight)
+                MapLocation concentration = null; //sortedParts.getMassivConcentration();
+                if (concentration != null)
                 {
-                    if (distToTopLeft < distToBottonLeft)
+                    turtlePoint = concentration;
+                    Communication newRallyPoint = new AttackCommunication();
+                    newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), concentration.x, concentration.y});
+                    communicator.sendCommunication(1600, newRallyPoint);
+                }
+                else if (!hiding)
+                {
+                    int leftX = mapKnowledge.minX;
+                    int rightX = mapKnowledge.maxX;
+                    int topY = mapKnowledge.minY;
+                    int bottomY = mapKnowledge.maxY;
+
+                    int currentX = turtlePoint.x;
+                    int currentY = turtlePoint.y;
+
+                    int distToTopLeft = (leftX - currentX) * (leftX - currentX) + (topY - currentY) * (topY - currentY);
+                    int distToBottonLeft = (leftX - currentX) * (leftX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+                    int distToTopRight = (rightX - currentX) * (rightX - currentX) + (topY - currentY) * (topY - currentY);
+                    int distToBottonRight = (rightX - currentX) * (rightX - currentX) + (bottomY - currentY) * (bottomY - currentY);
+
+                    // go left
+                    if (distToTopLeft < distToTopRight)
                     {
-                        turtlePoint = new MapLocation(leftX, topY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
+                        if (distToTopLeft < distToBottonLeft)
+                        {
+                            turtlePoint = new MapLocation(leftX, topY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, bottomY)), 5);
+                        }
+                        else
+                        {
+                            turtlePoint = new MapLocation(leftX, bottomY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
+                        }
                     }
+                    // go right
                     else
                     {
-                        turtlePoint = new MapLocation(leftX, bottomY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(rightX, topY)), 5);
+                        if (distToTopRight < distToBottonRight)
+                        {
+                            turtlePoint = new MapLocation(rightX, topY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
+                        }
+                        else
+                        {
+                            turtlePoint = new MapLocation(rightX, bottomY);
+                            turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
+                        }
                     }
-                }
-                // go right
-                else
-                {
-                    if (distToTopRight < distToBottonRight)
-                    {
-                        turtlePoint = new MapLocation(rightX, topY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, bottomY)), 5);
-                    }
-                    else
-                    {
-                        turtlePoint = new MapLocation(rightX, bottomY);
-                        turtlePoint = turtlePoint.add(turtlePoint.directionTo(new MapLocation(leftX, topY)), 5);
-                    }
-                }
 
-                Communication newRallyPoint = new AttackCommunication();
-                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(1600, newRallyPoint);
+                    Communication newRallyPoint = new AttackCommunication();
+                    newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                    communicator.sendCommunication(1600, newRallyPoint);
 
-                // no need to keep updating this
-                hiding = true;
+                    // no need to keep updating this
+                    hiding = true;
+                }
             }
         }
 
@@ -199,12 +208,13 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() <= 25) return turtlePoint;
         if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
         if (!reachedTurtleSpot) reachedTurtleSpot = true;
 
         MapLocation bestParts = getNextPartLocation();
 
-        if (bestParts == null) return turtlePoint;
+        if (bestParts == null || turtlePoint.distanceSquaredTo(bestParts) > 400) return turtlePoint;
 
         rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 
@@ -291,7 +301,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public Bots changeBuildOrder(Bots nextBot)
     {
         rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
+
+//        if (Math.max(ArchonDist, zombieTracker.getNextZombieRound()) - rc.getRoundNum() < 30)
+
+
         if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+        {
+            nextType = RobotType.SCOUT;
+            return Bots.SCOUTBOMBSCOUT;
+        }
+        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - rc.getRoundNum() < 50)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;

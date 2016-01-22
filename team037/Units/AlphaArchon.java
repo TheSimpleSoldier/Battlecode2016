@@ -1,9 +1,6 @@
 package team037.Units;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.ZombieSpawnSchedule;
+import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
 import team037.Messages.BotInfoCommunication;
@@ -17,10 +14,7 @@ public class AlphaArchon extends BaseArchon
     public AlphaArchon(RobotController rc)
     {
         super(rc);
-        navigator.setTarget(getNextPartLocation());
         ZombieSpawnSchedule schedule = rc.getZombieSpawnSchedule();
-
-
     }
 
     @Override
@@ -64,9 +58,17 @@ public class AlphaArchon extends BaseArchon
         }
     }
 
-//    @Override
-//    public Bots changeBuildOrder(Bots nextBot)
-//    {
-//        return Bots.RUSHINGSOLDIER;
-//    }
+    @Override
+    public Bots changeBuildOrder(Bots nextBot)
+    {
+        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
+
+        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+        {
+            nextType = RobotType.SCOUT;
+            return Bots.SCOUTBOMBSCOUT;
+        }
+
+        return nextBot;
+    }
 }
