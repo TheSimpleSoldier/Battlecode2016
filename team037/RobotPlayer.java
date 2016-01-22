@@ -1,7 +1,6 @@
 package team037;
 
 import battlecode.common.Clock;
-import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.DataStructures.SimpleRobotInfo;
@@ -18,9 +17,8 @@ import team037.Units.PacMan.PacManGuard;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
+import team037.Units.SuperRush.SuperRushArchon;
 import team037.Units.TurtleUnits.TurtleArchon;
-import team037.Utilites.StrategyUtilities;
-import team037.Utilites.ZombieTracker;
 
 public class RobotPlayer
 {
@@ -45,7 +43,7 @@ public class RobotPlayer
             // hardcode disabled for now
             strategy = Strategies.TURTLE;
 
-            MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
+            /*MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
             ZombieTracker zombieTracker = new ZombieTracker(rc);
             int[] size = StrategyUtilities.estimatedSize(us, them);
@@ -62,7 +60,8 @@ public class RobotPlayer
             else
             {
                 strategy = Strategies.RUSH;
-            }
+            }*/
+            strategy = Strategies.RUSH;
 
             if(rc.getRoundNum() == 0)
             {
@@ -92,6 +91,11 @@ public class RobotPlayer
                     unit = new PacManArchon(rc);
                     Unit.thisBot = Bots.PACMANARCHON;
                 }
+                else if(strategy.equals(Strategies.RUSH))
+                {
+                    unit = new SuperRushArchon(rc);
+                    Unit.thisBot = Bots.SUPERRUSHARCHON;
+                }
                 else
                 { // default to alpha archons
                     unit = new AlphaArchon(rc);
@@ -113,7 +117,7 @@ public class RobotPlayer
                 else
                 {
                     unit = new BaseGaurd(rc);
-                    Unit.thisBot = Bots.BASEGAURD;
+                    Unit.thisBot = Bots.RUSHGUARD;
                 }
             }
             else if(type == RobotType.SCOUT)
@@ -143,7 +147,7 @@ public class RobotPlayer
                 else
                 {
                     unit = new DenKillerSoldier(rc);
-                    Unit.thisBot = Bots.DENKILLERSOLDIER;
+                    Unit.thisBot = Bots.RUSHINGSOLDIER;
                 }
 
             }
