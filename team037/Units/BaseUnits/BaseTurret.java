@@ -98,7 +98,7 @@ public class BaseTurret extends Unit
 
         if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && allies.length == 0 && !fought && rc.isWeaponReady())
         {
-            rc.unpack();
+            rc.pack();
             return false;
         }
 
@@ -126,6 +126,7 @@ public class BaseTurret extends Unit
         MapLocation target = navigator.getTarget();
         if (target == null || target.equals(currentLocation)) return true;
         if (rc.canSense(target) && rc.senseRobotAtLocation(target) != null) return true;
+        if (currentLocation.x % 2 == currentLocation.y % 2) return true;
 
         return false;
     }
@@ -136,7 +137,13 @@ public class BaseTurret extends Unit
         if (targetLoc == null || !rc.canSense(targetLoc))
             return targetLoc;
         else
-            return MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, targetLoc);
+        {
+            MapLocation target = MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, targetLoc);
+            rc.setIndicatorString(1, "Target x: " + target.x + " y: " + target.y);
+            rc.setIndicatorLine(currentLocation, target, 255, 0, 255);
+            return target;
+        }
+
             //return MapUtils.getClosestUnoccupiedSquare(currentLocation, targetLoc);
     }
 

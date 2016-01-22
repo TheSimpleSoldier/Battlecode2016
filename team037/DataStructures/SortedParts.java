@@ -81,6 +81,41 @@ public class SortedParts
     }
 
     /**
+     * This method returns the bets location within sight range of the archon
+     *
+     * @return
+     */
+    public MapLocation getBestSpotInSightRange(MapLocation current)
+    {
+       if (count == 0)
+           return null;
+
+        double highestScore = 0;
+        MapLocation best = null;
+
+        for (int i = size; --i>=0; )
+        {
+            if (locs[i] != null)
+            {
+                int dist = current.distanceSquaredTo(locs[i]) + 1;
+
+                if (dist <= 25)
+                {
+                    double value = (score[i] / dist);
+
+                    if (value > highestScore)
+                    {
+                        best = locs[i];
+                        highestScore = value;
+                    }
+                }
+            }
+        }
+
+        return best;
+    }
+
+    /**
      * This method adds a part location to the array
      *
      * @param m
@@ -167,6 +202,24 @@ public class SortedParts
     }
 
     /**
+     * This method will iterate over the entire array and do a hard remove
+     *
+     * @param m
+     */
+    public void hardRemove(MapLocation m)
+    {
+        System.out.println("Hard remove");
+
+        for (int i = locs.length; --i>=0; )
+        {
+            if (locs[i] != null && locs[i].equals(m))
+            {
+                remove(i);
+            }
+        }
+    }
+
+    /**
      * This method adds a part to the correct location in an array
      */
     public void remove(int index)
@@ -179,20 +232,18 @@ public class SortedParts
         count--;
 
         int nextIndex = index+1;
-        int currentEmpty = index;
 
         // need to re-order hash table
         while (locs[nextIndex % size] != null)
         {
-            int hashValue = locs[nextIndex % size].hashCode() % size;
-            if (hashValue <= currentEmpty)
-            {
-                locs[currentEmpty] = locs[nextIndex % size];
-                score[currentEmpty] = score[nextIndex % size];
-                locs[nextIndex % size] = null;
-                score[nextIndex % size] = 0;
-                currentEmpty = nextIndex % size;
-            }
+            int currentIndex = nextIndex % size;
+            MapLocation temp = locs[currentIndex];
+            double tempScore = score[currentIndex];
+
+            locs[currentIndex] = null;
+            score[currentIndex] = 0;
+
+            addParts(temp, (int) tempScore, false);
             nextIndex++;
         }
     }
@@ -232,7 +283,7 @@ public class SortedParts
         {
             if (neutralBots[i].type == RobotType.ARCHON)
             {
-                addParts(neutralBots[i].location, 1000, true);
+                addParts(neutralBots[i].location, 99999, true);
             }
             else
             {

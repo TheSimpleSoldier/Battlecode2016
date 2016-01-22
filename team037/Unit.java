@@ -258,7 +258,6 @@ public abstract class Unit
 
     public void collectData() throws GameActionException
     {
-
         enemies = rc.senseNearbyRobots(sightRange, opponent);
         allies = rc.senseNearbyRobots(sightRange, us);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);

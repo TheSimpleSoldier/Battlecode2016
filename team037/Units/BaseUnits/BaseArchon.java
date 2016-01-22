@@ -51,8 +51,43 @@ public class BaseArchon extends Unit implements PacMan
     {
         if (currentLocation != null && navigator.getTarget() != null)
         {
-            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
+            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 0, 0);
         }
+
+
+        // if there are no visible zombies then we should move to collect parts
+        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation navigatorTarget;
+
+            // if we are trying to get to parts and the location has rubble on it we should clear it
+            try
+            {
+                navigatorTarget = navigator.getTarget();
+                if (currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget))
+                {
+                    if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                    {
+                        rc.clearRubble(currentLocation.directionTo(navigatorTarget));
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            MapLocation parts = getNextPartLocationInSight();
+
+            if (parts != null)
+            {
+                navigator.setTarget(parts);
+                rc.setIndicatorLine(currentLocation, parts, 0, 0, 255);
+                rc.setIndicatorString(2, "Parts loc x: " + parts.x + " y: " + parts.y + " round: " + rc.getRoundNum());
+            }
+        }
+
         return navigator.takeNextStep();
     }
 
@@ -70,6 +105,13 @@ public class BaseArchon extends Unit implements PacMan
         if (target != null && rc.canSenseLocation(target) && rc.senseParts(target) == 0)
         {
             sortedParts.remove(sortedParts.getIndexOfMapLocation(target));
+        }
+
+        int index = sortedParts.getIndexOfMapLocation(currentLocation);
+
+        if (index >= 0)
+        {
+            sortedParts.remove(index);
         }
 
         // don't need to check every round
@@ -225,8 +267,39 @@ public class BaseArchon extends Unit implements PacMan
             return false;
         }
 
-        nextBot = changeBuildOrder(nextBot);
-        if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
+        return buildNextUnit();
+    }
+
+    public boolean buildNextUnit() throws GameActionException
+    {
+        // if there are multiple archons and we have limited parts and we see
+        // either parts or neutrals we should let the other archon's build while
+        // we pick them up
+        if (alliedArchonStartLocs.length > 1 && rc.getTeamParts() < 200 && (rc.sensePartLocations(sightRange).length > 0 || rc.senseNearbyRobots(sightRange, Team.NEUTRAL).length > 0))
+        {
+            return false;
+        }
+
+        Bots temp = changeBuildOrder(nextBot);
+
+        if (!temp.equals(nextBot))
+        {
+            if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())
+            {
+                Bots temp2 = nextBot;
+                nextBot = temp;
+
+                Direction dir = build();
+                if(dir != Direction.NONE)
+                {
+                    sendInitialMessages(dir);
+                    nextBot = temp2;
+                    nextType = Bots.typeFromBot(nextBot);
+                    return true;
+                }
+            }
+        }
+        else if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
         {
             Direction dir = build();
             if(dir != Direction.NONE)
@@ -285,16 +358,56 @@ public class BaseArchon extends Unit implements PacMan
     public static MapLocation getNextPartLocation() throws GameActionException
     {
         MapLocation next = sortedParts.getBestSpot(currentLocation);
+        MapLocation lastTarget = null;
 
         while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
         {
             int index = sortedParts.getIndexOfMapLocation(next);
-            if (index == -1)
+            if (index < 0)
             {
-                System.out.println("We didn't find loc x: " + next.x + " y: " + next.y);
+                sortedParts.hardRemove(next);
+                lastTarget = new MapLocation(next.x, next.y);
             }
-            sortedParts.remove(index);
+            else
+            {
+                sortedParts.remove(index);
+            }
+
             next = sortedParts.getBestSpot(currentLocation);
+
+            if (lastTarget != null && lastTarget.equals(next))
+            {
+                System.out.println("we have a problem");
+            }
+        }
+
+        return next;
+    }
+
+    public static MapLocation getNextPartLocationInSight() throws GameActionException
+    {
+        MapLocation next = sortedParts.getBestSpotInSightRange(currentLocation);
+        MapLocation lastTarget = null;
+
+        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
+        {
+            int index = sortedParts.getIndexOfMapLocation(next);
+            if (index < 0)
+            {
+                sortedParts.hardRemove(next);
+                lastTarget = new MapLocation(next.x, next.y);
+            }
+            else
+            {
+                sortedParts.remove(index);
+            }
+
+            next = sortedParts.getBestSpotInSightRange(currentLocation);
+
+            if (lastTarget != null && lastTarget.equals(next))
+            {
+                System.out.println("we have a problem");
+            }
         }
 
         return next;
