@@ -460,6 +460,12 @@ public abstract class Unit
                 {
                     nextBot = comm.newBType;
                 }
+
+                if (nextBot != null && Bots.typeFromBot(nextBot) != type)
+                {
+                    System.out.println("Trying to be the wrong type");
+                    nextBot = null;
+                }
                 break;
         }
     }

@@ -436,7 +436,9 @@ public class BaseArchon extends Unit implements PacMan
         }
         try {
             rc.clearRubble(least);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return Direction.NONE;
     }

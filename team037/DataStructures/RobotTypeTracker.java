@@ -70,7 +70,7 @@ public class RobotTypeTracker
         MapLocation[] newLocs = new MapLocation[size];
         int[] newIds = new int[size];
 
-        for (int i = size; --i>=0; )
+        for (int i = locations.length; --i>=0; )
         {
             if (locations[i] != null)
             {
