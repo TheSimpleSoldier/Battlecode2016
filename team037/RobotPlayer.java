@@ -65,7 +65,6 @@ public class RobotPlayer
             {
                 System.out.println(strategy);
             }
-            strategy = Strategies.SCOUT_BOMB;
 
 
             RobotType type = rc.getType();
