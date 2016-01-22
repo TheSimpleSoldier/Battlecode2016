@@ -7,7 +7,6 @@ import team037.Units.PacMan.PacMan;
 import team037.Utilites.MapUtils;
 import team037.Utilites.MoveUtils;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
 
 /**
  * Using messages could be improved!
