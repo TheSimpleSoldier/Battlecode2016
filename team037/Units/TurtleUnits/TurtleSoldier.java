@@ -11,6 +11,7 @@ public class TurtleSoldier extends BaseSoldier
     private boolean chasingZombies = false;
     private boolean healing = false;
     private boolean updatedTurtleSpot = false;
+    private int[] enemySightings = new int[8];
 
     public TurtleSoldier(RobotController rc)
     {
@@ -74,6 +75,13 @@ public class TurtleSoldier extends BaseSoldier
             return turtlePoint.add(turtlePoint.directionTo(currentLocation), 3);
         }
 
+        MapLocation defensePoint = getDefensePoint();
+
+        if (defensePoint != null)
+        {
+            return defensePoint;
+        }
+
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
@@ -116,6 +124,34 @@ public class TurtleSoldier extends BaseSoldier
         return turtlePoint;
     }
 
+    /**
+     * This method returns the side that we have seen the most enemies on
+     *
+     * @return
+     */
+    private MapLocation getDefensePoint()
+    {
+        int highestCount = 0;
+        Direction direction = null;
+
+        for (int i = enemySightings.length; --i>=0; )
+        {
+            if (enemySightings[i] > highestCount)
+            {
+                highestCount = enemySightings[i];
+                direction = dirs[i];
+            }
+        }
+
+        if (direction == null)
+        {
+            return null;
+        }
+
+        return turtlePoint.add(direction, 3);
+    }
+
+
     @Override
     public void collectData() throws GameActionException
     {
@@ -125,6 +161,24 @@ public class TurtleSoldier extends BaseSoldier
         {
             turnsArrivedLoc = rc.getRoundNum();
             arrived = true;
+        }
+
+        if (turtlePoint != null)
+        {
+            for (int i = zombies.length; --i>=0; )
+            {
+                MapLocation zombie = zombies[i].location;
+
+                Direction dir = turtlePoint.directionTo(zombie);
+
+                for (int j = dirs.length; --j >= 0; )
+                {
+                    if (dirs[i].equals(dir))
+                    {
+                        enemySightings[i]++;
+                    }
+                }
+            }
         }
 
         if (healing && rc.getHealth() > (type.maxHealth - 20))
@@ -137,6 +191,7 @@ public class TurtleSoldier extends BaseSoldier
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
             rc.setIndicatorString(1, "Going to new rally point");
             turtlePoint = rallyPoint;
+            enemySightings = new int[8];
         }
     }
 }

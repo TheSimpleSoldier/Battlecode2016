@@ -3,6 +3,7 @@ package team037.Units.TurtleUnits;
 import battlecode.common.*;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
+import team037.Utilites.FightMicroUtilites;
 
 public class TurtleGuard extends BaseGaurd
 {
@@ -11,6 +12,7 @@ public class TurtleGuard extends BaseGaurd
     private boolean chasingEnemies = false;
     private boolean healing = false;
     private boolean updatedTurtleSpot = false;
+    private int[] enemySightings = new int[8];
 
     public TurtleGuard(RobotController rc)
     {
@@ -78,6 +80,13 @@ public class TurtleGuard extends BaseGaurd
             return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
         }
 
+        MapLocation defensePoint = getDefensePoint();
+
+        if (defensePoint != null)
+        {
+            return defensePoint;
+        }
+
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
@@ -120,6 +129,33 @@ public class TurtleGuard extends BaseGaurd
         return null;
     }
 
+    /**
+     * This method returns the side that we have seen the most enemies on
+     *
+     * @return
+     */
+    private MapLocation getDefensePoint()
+    {
+        int highestCount = 0;
+        Direction direction = null;
+
+        for (int i = enemySightings.length; --i>=0; )
+        {
+            if (enemySightings[i] > highestCount)
+            {
+                highestCount = enemySightings[i];
+                direction = dirs[i];
+            }
+        }
+
+        if (direction == null)
+        {
+            return null;
+        }
+
+        return turtlePoint.add(direction, 3);
+    }
+
     @Override
     public void collectData() throws GameActionException
     {
@@ -141,6 +177,39 @@ public class TurtleGuard extends BaseGaurd
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
             rc.setIndicatorString(1, "Going to new rally point");
             turtlePoint = rallyPoint;
+            enemySightings = new int[8];
+        }
+
+        if (turtlePoint != null)
+        {
+            for (int i = zombies.length; --i>=0; )
+            {
+                MapLocation zombie = zombies[i].location;
+
+                Direction dir = turtlePoint.directionTo(zombie);
+
+                for (int j = dirs.length; --j >= 0; )
+                {
+                    if (dirs[i].equals(dir))
+                    {
+                        enemySightings[i]++;
+                    }
+                }
+            }
+        }
+
+        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            for (int i = allies.length; --i>=0; )
+            {
+                // if we see a turret that has just shot then we should go support it
+                if (allies[i].type == RobotType.TURRET && allies[i].weaponDelay > 1)
+                {
+                    MapLocation ally = allies[i].location;
+                    navigator.setTarget(ally.add(currentLocation.directionTo(ally)));
+                    break;
+                }
+            }
         }
     }
 }
