@@ -55,7 +55,8 @@ public enum Bots
     RUSHTURRET,
     SCOUTBOMBGUARD,
     SCOUTBOMBSCOUT,
-    RUSHSCOUT;
+    RUSHSCOUT,
+    SCOUTBOMBVIPER;
 
     public static int toInt(Bots type)
     {
@@ -119,6 +120,8 @@ public enum Bots
                 return 27;
             case RUSHSCOUT:
                 return 28;
+            case SCOUTBOMBVIPER:
+                return 29;
         }
         return -1;
     }
@@ -185,6 +188,8 @@ public enum Bots
                 return SCOUTBOMBSCOUT;
             case 28:
                 return RUSHSCOUT;
+            case 29:
+                return SCOUTBOMBVIPER;
         }
 
         return null;

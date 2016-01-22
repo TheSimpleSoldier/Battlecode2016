@@ -96,8 +96,6 @@ public class ScoutBombGuard extends BaseGaurd {
         // if we see enemies charge at them to lead them away from archon (hopefully they kite us)
         if (nonScoutEnemies) {
             Direction toMove = currentLocation.directionTo(closestEnemyLoc);
-            if (currentLocation.isAdjacentTo(closestEnemyLoc)) {
-            }
             if (MoveUtils.tryMoveForwardOrSideways(toMove, false)) {
                 rc.setIndicatorString(0, "trying to get to enemy");
                 return true;
