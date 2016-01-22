@@ -52,12 +52,13 @@ public class BuildOrderCreation
                     {Bots.TURTLEGUARD, Bots.TURTLESOLDIER},
                     {Bots.TURTLESCOUT, Bots.TURTLETURRET},
                     {Bots.TURTLETURRET, Bots.TURTLESOLDIER},
+                    {Bots.SCOUTINGSCOUT, Bots.TURTLESOLDIER},
                     {Bots.TURTLETURRET, Bots.TURTLETURRET},
                     {Bots.TURTLETURRET, Bots.TURTLESCOUT},
-                    {Bots.TURTLETURRET, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET, Bots.TURTLESOLDIER},
             };
 
-            int[] timesTurtle = {8/multiplier, 4/multiplier, 4/multiplier, 4/multiplier, 4/multiplier, 1000};
+            int[] timesTurtle = {4/multiplier, 4/multiplier, 4/multiplier, 1, 4/multiplier, 4/multiplier, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }

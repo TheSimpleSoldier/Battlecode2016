@@ -5,13 +5,18 @@ import team037.DataStructures.BuildOrder;
 import team037.DataStructures.SortedParts;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
-import team037.Messages.*;
-import team037.ScoutMapKnowledge;
+import team037.Messages.BotInfoCommunication;
+import team037.Messages.Communication;
+import team037.Messages.MissionCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
-import team037.Utilites.*;
+import team037.Units.PacMan.PacMan;
+import team037.Utilites.BuildOrderCreation;
+import team037.Utilites.FightMicroUtilites;
+import team037.Utilites.ZombieTracker;
 
 
-public class BaseArchon extends Unit
+public class BaseArchon extends Unit implements PacMan
 {
     public BuildOrder buildOrder;
     public static Bots nextBot;
@@ -22,7 +27,6 @@ public class BaseArchon extends Unit
     private boolean sentRushSignal = false;
     private int turnHealed = 0;
     private int retreatCall = 0;
-    public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
     public static ZombieTracker zombieTracker;
 
     public BaseArchon(RobotController rc)
@@ -31,7 +35,6 @@ public class BaseArchon extends Unit
         buildOrder = BuildOrderCreation.createBuildOrder();
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
-        mapKnowledge = mKnowledge;
         zombieTracker = new ZombieTracker(rc);
         archonComs = false;
         archonDistressComs = false;
@@ -46,6 +49,7 @@ public class BaseArchon extends Unit
 
     public boolean takeNextStep() throws GameActionException
     {
+        rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 0);
         return navigator.takeNextStep();
     }
 
@@ -59,33 +63,70 @@ public class BaseArchon extends Unit
             sortedParts.remove(sortedParts.getIndexOfMapLocation(currentLocation));
         }
 
+        MapLocation target = navigator.getTarget();
+        if (target != null && rc.canSenseLocation(target) && rc.senseParts(target) == 0)
+        {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(target));
+        }
+
         // don't need to check every round
         if (rc.getRoundNum() % 5 == 0)
         {
             sortedParts.findPartsAndNeutralsICanSense(rc);
         }
+
+        // heal doesn't effect core cooldown
+        healNearbyAllies();
+
+        if (neutralBots.length > 0 && rc.isCoreReady())
+        {
+            rc.activate(neutralBots[0].location);
+            Bots currentBot = nextBot;
+            nextBot = getDefaultBotTypes(neutralBots[0].type);
+            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
+            nextBot = currentBot;
+        }
+    }
+
+    public Bots getDefaultBotTypes(RobotType type)
+    {
+        switch (type)
+        {
+            case SOLDIER:
+                return Bots.BASESOLDIER;
+            case TURRET:
+                return Bots.BASETURRET;
+            case TTM:
+                return Bots.BASETURRET;
+            case GUARD:
+                return Bots.BASEGAURD;
+            case SCOUT:
+                return Bots.BASESCOUT;
+            case ARCHON:
+                return Bots.ALPHAARCHON;
+            case VIPER:
+                return Bots.BASEVIPER;
+            default:
+                return Bots.BASESOLDIER;
+        }
     }
 
     public boolean fight() throws GameActionException
     {
-        MapLocation newTarget = fightMicro.ArchonRunAway(enemies, allies);
-        if (newTarget == null) {
-            return false;
-        }
+        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
 
-        navigator.setTarget(newTarget);
-        return true;
+        rc.setIndicatorDot(currentLocation, 255, 0, 0);
+
+        return runAway(null);
     }
 
     public boolean fightZombies() throws GameActionException
     {
-        MapLocation newTarget = fightMicro.ArchonRunAway(zombies, allies);
-        if (newTarget == null) {
-            return false;
-        }
+        if (!FightMicroUtilites.offensiveEnemies(zombies)) return false;
 
-        navigator.setTarget(newTarget);
-        return true;
+        rc.setIndicatorDot(currentLocation, 255, 0, 0);
+
+        return runAway(null);
     }
 
     @Override
@@ -172,17 +213,9 @@ public class BaseArchon extends Unit
     }
 
     // maybe spawn a unit or repair a damaged unit
+    @Override
     public boolean carryOutAbility() throws GameActionException
     {
-        // heal doesn't effect core cooldown
-        healNearbyAllies();
-
-        if (neutralBots.length > 0 && rc.isCoreReady())
-        {
-            rc.activate(neutralBots[0].location);
-            sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
-        }
-
         if (enemies.length > allies.length)
         {
             return false;
@@ -204,23 +237,8 @@ public class BaseArchon extends Unit
         return false;
     }
 
-    private static void sendInitialMessages(Direction dir) throws GameActionException
+    public void sendInitialMessages(Direction dir) throws GameActionException
     {
-        MapLocation[] archons = mapKnowledge.getArchonLocations(false);
-
-//        for(int k = archons.length; --k >= 0;)
-//        {
-//            if(archons[k] != null)
-//            {
-//                BotInfoCommunication communication = new BotInfoCommunication();
-//                communication.opcode = CommunicationType.SARCHON;
-//                communication.id = 0;
-//                communication.x = archons[k].x;
-//                communication.y = archons[k].y;
-//                communicator.sendCommunication(2, communication);
-//            }
-//        }
-
         int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
         MissionCommunication communication = new MissionCommunication();
         communication.opcode = CommunicationType.CHANGEMISSION;
@@ -262,10 +280,23 @@ public class BaseArchon extends Unit
 
     public static MapLocation getNextPartLocation()
     {
-        return sortedParts.getBestSpot(currentLocation);
+        MapLocation next = sortedParts.getBestSpot(currentLocation);
+
+        while (next != null && rc.canSenseLocation(next) && rc.senseParts(next) == 0)
+        {
+            int index = sortedParts.getIndexOfMapLocation(next);
+            if (index == -1)
+            {
+                System.out.println("We didn't find loc x: " + next.x + " y: " + next.y);
+            }
+            sortedParts.remove(index);
+            next = sortedParts.getBestSpot(currentLocation);
+        }
+
+        return next;
     }
 
-    private Direction build() throws GameActionException
+    public Direction build() throws GameActionException
     {
         double rubble = Double.MAX_VALUE;
         Direction least = dirs[0];

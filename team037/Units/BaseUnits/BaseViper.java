@@ -9,6 +9,7 @@ public class BaseViper extends Unit
     {
         super(rc);
         archonDistressComs = false;
+        rc.setIndicatorString(0, "Base ARchon");
     }
 
     public boolean takeNextStep() throws GameActionException

@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
+import team037.Utilites.PartsUtilities;
 
 public class FightMicro
 {
@@ -312,168 +313,6 @@ public class FightMicro
         }
 
         return true;
-    }
-
-    public boolean runPassiveFightMicro(RobotInfo[] enemies, RobotInfo[] nearByAllies, RobotInfo[] allies, MapLocation target, RobotInfo[] nearByEnemies) throws GameActionException
-    {
-        if (enemies.length == 0)
-        {
-            return false;
-        }
-
-        double[] inputs = getInputs1(enemies,allies, nearByEnemies);
-        int enemy_x = (int) inputs[6];
-        int enemy_y = (int) inputs[7];
-        int ally_x = (int) inputs[8];
-        int ally_y = (int) inputs[9];
-
-        Direction dir;
-
-        boolean retreat = false;
-        boolean advance = false;
-        boolean cluster = false;
-        double[] output = net.compute(new double[]{inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5]});
-
-        // retreat
-        if (output[0] > 0.5)
-        {
-            retreat = true;
-        }
-
-        // advance
-        if (output[1] > 0.5) {
-            advance = true;
-        }
-
-        // cluster
-        if (output[2] > 0.5) {
-            cluster = true;
-        }
-
-        if (rc.isCoreReady()) {
-            if (retreat) {
-                MapLocation enemy = new MapLocation(enemy_x, enemy_y);
-                dir = rc.getLocation().directionTo(enemy).opposite();
-                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-            }
-
-//            if (rc.isCoreReady() && cluster) {
-//                MapLocation ally = new MapLocation(ally_x, ally_y);
-//                dir = rc.getLocation().directionTo(ally);
-//                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-//            }
-//
-//            if (rc.isCoreReady() && advance) {
-//                dir = FightMicroUtilites.getDir(rc, target);
-//                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-//            }
-
-            if (rc.isCoreReady()) {
-                MapLocation enemy = new MapLocation(enemy_x, enemy_y);
-                dir = rc.getLocation().directionTo(enemy).opposite();
-                FightMicroUtilites.moveDir(rc, dir, nearByEnemies.length == 0);
-            }
-        }
-
-        return true;
-    }
-
-    public MapLocation ArchonRunAway(RobotInfo[] enemies, RobotInfo[] allies) throws GameActionException
-    {
-        int len = enemies.length;
-        if (len == 0)
-            return null;
-
-        int offensiveEnemies = 0;
-        int enemiesInRangeOfUs = 0, x = 0, y = 0;
-        MapLocation current = rc.getLocation();
-
-        for (int i = len; --i>=0; )
-        {
-            RobotType type = enemies[i].type;
-            switch (type)
-            {
-                case TURRET:
-                case GUARD:
-                case SOLDIER:
-                case VIPER:
-                case RANGEDZOMBIE:
-                case STANDARDZOMBIE:
-                case FASTZOMBIE:
-                case BIGZOMBIE:
-                    offensiveEnemies++;
-                    MapLocation enemy = enemies[i].location;
-                    x += enemy.x;
-                    y += enemy.y;
-                    if (current.distanceSquaredTo(enemy) <= type.attackRadiusSquared)
-                    {
-                        enemiesInRangeOfUs++;
-                    }
-                    break;
-            }
-        }
-
-        if (offensiveEnemies == 0)
-            return null;
-
-
-        int offensiveAllies = 0;
-
-        for (int i = allies.length; --i>=0;)
-        {
-            switch (allies[i].type)
-            {
-                case VIPER:
-                case SOLDIER:
-                case GUARD:
-                case TURRET:
-                    offensiveAllies++;
-            }
-        }
-
-        if (enemiesInRangeOfUs == 0 && offensiveAllies > len)
-            return current;
-
-        x /= len;
-        y /= len;
-
-        MapLocation enemyCOM = new MapLocation(x,y);
-        MapLocation runAwaySpot = current.add(enemyCOM.directionTo(current), 4);
-
-        if (enemyCOM.equals(current) || !rc.onTheMap(runAwaySpot))
-        {
-            int[] totalDist = new int[8];
-
-            for (int i = totalDist.length; --i >= 0; )
-            {
-                MapLocation tempTarget = current.add(Unit.dirs[i], 4);
-                totalDist[i] = 0;
-
-                if (rc.onTheMap(tempTarget))
-                {
-                    for (int j = enemies.length; --j>=0; )
-                    {
-                        totalDist[i] += Math.sqrt(tempTarget.distanceSquaredTo(enemies[j].location));
-                    }
-                }
-            }
-
-            int highestDist = 0;
-            int highestIndex = 0;
-
-            for (int i = totalDist.length; --i>=0; )
-            {
-                if (highestDist < totalDist[i])
-                {
-                    highestDist = totalDist[i];
-                    highestIndex = i;
-                }
-            }
-
-            runAwaySpot = current.add(Unit.dirs[highestIndex], 4);
-        }
-
-        return runAwaySpot;
     }
 
     /**
@@ -806,11 +645,82 @@ public class FightMicro
 
             if (outRanged || alliesEngaged)
             {
-                FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), false);
+                FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), true);
                 return true;
             }
         }
 
+        return true;
+    }
+
+    /**
+     * This is some basic guard micro for fighting enemy units
+     *
+     * @return
+     */
+    public boolean basicGuardMicro(RobotInfo[] enemies, RobotInfo[] nearByEnemies, RobotInfo[] allies) throws GameActionException
+    {
+        if (enemies.length == 0) return false;
+
+        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        {
+            RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+
+            if (rc.canAttackLocation(weakest.location))
+            {
+                rc.attackLocation(weakest.location);
+                return true;
+            }
+        }
+
+        if (rc.isCoreReady())
+        {
+            MapLocation closestTurret = null;
+            MapLocation current = rc.getLocation();
+            int bestDist = 99999;
+
+            for (int i = allies.length; --i>=0; )
+            {
+                if (allies[i].type == RobotType.TURRET)
+                {
+                    MapLocation turret = allies[i].location;
+                    int currentDist = turret.distanceSquaredTo(current);
+                    if (currentDist < bestDist)
+                    {
+                        bestDist = currentDist;
+                        closestTurret = turret;
+                    }
+                }
+            }
+
+            if (closestTurret != null)
+            {
+                // hide behind the apron strings of the closest turret
+                FightMicroUtilites.moveDir(rc, current.directionTo(closestTurret), true);
+            }
+            else
+            {
+                // charge the enemy for death or glory!!!
+                MapLocation closestEnemy = null;
+
+                for (int i = enemies.length; --i>=0; )
+                {
+                    MapLocation enemy = enemies[i].location;
+                    int currentDist = enemy.distanceSquaredTo(current);
+
+                    if (currentDist < bestDist)
+                    {
+                        bestDist = currentDist;
+                        closestEnemy = enemy;
+                    }
+                }
+
+                if (closestEnemy != null)
+                {
+                    FightMicroUtilites.moveDir(rc, current.directionTo(closestEnemy), true);
+                }
+            }
+        }
         return true;
     }
 

@@ -10,11 +10,12 @@ public class TurtleGuard extends BaseGaurd
     private static boolean arrived = false;
     private boolean chasingEnemies = false;
     private boolean healing = false;
+    private boolean updatedTurtleSpot = false;
 
     public TurtleGuard(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot(alliedArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class TurtleGuard extends BaseGaurd
     }
 
     @Override
-    public MapLocation getNextSpot()
+    public MapLocation getNextSpot() throws GameActionException
     {
         if (healing || rc.getHealth() <= 25)
         {
@@ -81,6 +82,8 @@ public class TurtleGuard extends BaseGaurd
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -92,6 +95,8 @@ public class TurtleGuard extends BaseGaurd
         {
             MapLocation possible = currentLocation.add(dirs[i], 6);
 
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
+
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
                 arrived = false;
@@ -102,6 +107,8 @@ public class TurtleGuard extends BaseGaurd
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 10);
+
+            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
 
             if (possible.distanceSquaredTo(turtlePoint) <= 49)
             {
@@ -127,6 +134,13 @@ public class TurtleGuard extends BaseGaurd
         if (healing && rc.getHealth() > 100)
         {
             healing = false;
+        }
+
+        if (rallyPoint != null)
+        {
+            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+            rc.setIndicatorString(1, "Going to new rally point");
+            turtlePoint = rallyPoint;
         }
     }
 }
