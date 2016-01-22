@@ -65,6 +65,11 @@ public class ScavengerScout extends ScoutBombScout {
         }
     }
 
+    public void collectDat() throws GameActionException {
+        super.collectData();
+
+    }
+
     public boolean act() throws GameActionException
     {
         if (BOMB || zombies.length > 0 && !zombies[0].type.equals(RobotType.ZOMBIEDEN)) {
@@ -73,6 +78,10 @@ public class ScavengerScout extends ScoutBombScout {
         }
 
         boolean moved = scavengerMove();
+
+        if (moved) {
+            sendArchonMessages();
+        }
 
         return moved;
     }
@@ -102,26 +111,37 @@ public class ScavengerScout extends ScoutBombScout {
             return true;
         } else {
             MapLocation adjacent = currentLocation.add(moved.rotateRight());
-            if (adjacent.distanceSquaredTo(myArchon.location) < 11 && rc.canMove(currentLocation.directionTo(adjacent))) {
+            if (adjacent.distanceSquaredTo(myArchon.location) < 13 && rc.canMove(currentLocation.directionTo(adjacent))) {
                 rc.move(currentLocation.directionTo(adjacent));
                 archonLastLoc = myArchon.location;
                 return true;
             }
             adjacent = currentLocation.add(moved.rotateLeft());
-            if (adjacent.distanceSquaredTo(myArchon.location) < 11 && rc.canMove(currentLocation.directionTo(adjacent))) {
+            if (adjacent.distanceSquaredTo(myArchon.location) < 13 && rc.canMove(currentLocation.directionTo(adjacent))) {
+                rc.move(currentLocation.directionTo(adjacent));
+                archonLastLoc = myArchon.location;
+                return true;
+            }
+            adjacent = currentLocation.add(moved.rotateRight().rotateRight());
+            if (adjacent.distanceSquaredTo(myArchon.location) < 13 && rc.canMove(currentLocation.directionTo(adjacent))) {
+                rc.move(currentLocation.directionTo(adjacent));
+                archonLastLoc = myArchon.location;
+                return true;
+            }
+            adjacent = currentLocation.add(moved.rotateLeft().rotateLeft());
+            if (adjacent.distanceSquaredTo(myArchon.location) < 13 && rc.canMove(currentLocation.directionTo(adjacent))) {
                 rc.move(currentLocation.directionTo(adjacent));
                 archonLastLoc = myArchon.location;
                 return true;
             }
         }
-
+        archonLastLoc = myArchon.location;
         return false;
     }
 
-//    @Override
-//    public void sendMessages()
-//    {
-//        try {
+    public void sendArchonMessages()
+    {
+        try {
 //            if (mKnowledge.firstFoundEdge && msgsSent < 20) {
 //                Communication com = mKnowledge.getMapBoundsCommunication();
 //                communicator.sendCommunication(ScoutMapKnowledge.getMaxRange(), com);
@@ -135,10 +155,10 @@ public class ScavengerScout extends ScoutBombScout {
 //                msgsSent++;
 //                mKnowledge.updated = false;
 //            }
-//            msgArchons();
-//            msgParts();
-//            msgDens();
-//            msgRubble();
-//        } catch (GameActionException e) {}
-//    }
+            msgArchons();
+            msgParts();
+            msgDens();
+            msgRubble();
+        } catch (GameActionException e) {}
+    }
 }

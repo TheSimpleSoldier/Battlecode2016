@@ -12,6 +12,7 @@ import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManGuard;
+import team037.Units.Scavenger.CountermeasureGuard;
 import team037.Units.Scavenger.ScavengerArchon;
 import team037.Units.Scavenger.ScavengerScout;
 import team037.Units.ScoutBomb.ScoutBombArchon;
@@ -105,8 +106,8 @@ public class RobotPlayer
             {
                 if(strategy.equals(Strategies.PACMAN))
                 {
-                    unit = new PacManGuard(rc);
-                    Unit.thisBot = Bots.PACMANGUARD;
+                    unit = new CountermeasureGuard(rc);
+                    Unit.thisBot = Bots.COUNTERMEASUREGUARD;
                 }
                 else if(strategy.equals(Strategies.SCOUT_BOMB))
                 {
