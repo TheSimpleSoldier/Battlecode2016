@@ -10,6 +10,7 @@ import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
+import team037.MapKnowledge;
 import team037.Units.PacMan.PacMan;
 import team037.Utilites.BuildOrderCreation;
 import team037.Utilites.FightMicroUtilites;
@@ -28,6 +29,7 @@ public class BaseArchon extends Unit implements PacMan
     private int turnHealed = 0;
     private int retreatCall = 0;
     public static ZombieTracker zombieTracker;
+    private static int distToFurthestArchon;
 
     public BaseArchon(RobotController rc)
     {
@@ -40,6 +42,16 @@ public class BaseArchon extends Unit implements PacMan
         archonDistressComs = false;
         rc.setIndicatorString(0, "Base Archon zombie Strength: " + zombieTracker.getZombieStrength());
 
+        distToFurthestArchon = 0;
+        for (int i = alliedArchonStartLocs.length; --i>=0; )
+        {
+            int currentDist = currentLocation.distanceSquaredTo(alliedArchonStartLocs[i]);
+            if (currentDist > distToFurthestArchon)
+            {
+                distToFurthestArchon = currentDist;
+            }
+        }
+
     }
 
     public boolean precondition()
@@ -49,8 +61,7 @@ public class BaseArchon extends Unit implements PacMan
 
     public boolean takeNextStep() throws GameActionException
     {
-        if (currentLocation != null && navigator.getTarget() != null)
-        {
+        if (currentLocation != null && navigator.getTarget() != null) {
             rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 0, 0);
         }
 
@@ -78,13 +89,16 @@ public class BaseArchon extends Unit implements PacMan
                 e.printStackTrace();
             }
 
-            MapLocation parts = getNextPartLocationInSight();
-
-            if (parts != null)
+            if (!sortedParts.contains(navigator.getTarget()))
             {
-                navigator.setTarget(parts);
-                rc.setIndicatorLine(currentLocation, parts, 0, 0, 255);
-                rc.setIndicatorString(2, "Parts loc x: " + parts.x + " y: " + parts.y + " round: " + rc.getRoundNum());
+                MapLocation parts = getNextPartLocationInSight();
+
+                if (parts != null)
+                {
+                    navigator.setTarget(parts);
+                    rc.setIndicatorLine(currentLocation, parts, 0, 0, 255);
+                    rc.setIndicatorString(2, "Parts loc x: " + parts.x + " y: " + parts.y + " round: " + rc.getRoundNum());
+                }
             }
         }
 
@@ -114,11 +128,7 @@ public class BaseArchon extends Unit implements PacMan
             sortedParts.remove(index);
         }
 
-        // don't need to check every round
-        if (rc.getRoundNum() % 5 == 0)
-        {
-            sortedParts.findPartsAndNeutralsICanSense(rc);
-        }
+        sortedParts.findPartsAndNeutralsICanSense(rc);
 
         // heal doesn't effect core cooldown
         healNearbyAllies();
@@ -199,14 +209,14 @@ public class BaseArchon extends Unit implements PacMan
             retreatCall = rc.getRoundNum();
             Communication distressCall = new BotInfoCommunication();
             distressCall.setValues(new int[]{CommunicationType.toInt(CommunicationType.ARCHON_DISTRESS), 0, 0, id, currentLocation.x, currentLocation.y});
-            communicator.sendCommunication(mapKnowledge.getRange(), distressCall);
+            communicator.sendCommunication(MapKnowledge.getRange(), distressCall);
             msgsSent++;
         }
 
         if(mapKnowledge.firstFoundEdge && msgsSent < 20)
         {
             Communication com = mapKnowledge.getMapBoundsCommunication();
-            communicator.sendCommunication(mapKnowledge.getMaxRange(), com);
+            communicator.sendCommunication(distToFurthestArchon, com);
             msgsSent++;
             mapKnowledge.firstFoundEdge = false;
             mapKnowledge.updated = false;
@@ -214,7 +224,7 @@ public class BaseArchon extends Unit implements PacMan
         if(mapKnowledge.updated && msgsSent < 20)
         {
             Communication com = mapKnowledge.getMapBoundsCommunication();
-            communicator.sendCommunication(mapKnowledge.getRange(), com);
+            communicator.sendCommunication(MapKnowledge.getRange(), com);
             msgsSent++;
             mapKnowledge.updated = false;
         }
@@ -341,26 +351,12 @@ public class BaseArchon extends Unit implements PacMan
         }
     }
 
-    /**
-     * This method sends out the initial location of the archons
-     */
-    public static void sendOutInitialLocation()
-    {
-        try {
-            Communication communication = new SimpleBotInfoCommunication();
-            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.SARCHON), id, rc.getLocation().x, rc.getLocation().y});
-            communicator.sendCommunication(2500, communication);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static MapLocation getNextPartLocation() throws GameActionException
     {
         MapLocation next = sortedParts.getBestSpot(currentLocation);
         MapLocation lastTarget = null;
 
-        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
+        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || !rc.senseRobotAtLocation(next).team.equals(Team.NEUTRAL))))
         {
             int index = sortedParts.getIndexOfMapLocation(next);
             if (index < 0)
@@ -389,7 +385,7 @@ public class BaseArchon extends Unit implements PacMan
         MapLocation next = sortedParts.getBestSpotInSightRange(currentLocation);
         MapLocation lastTarget = null;
 
-        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 && (rc.senseRobotAtLocation(next) == null || rc.senseRobotAtLocation(next).team != Team.NEUTRAL)))
+        while (next != null && (rc.canSenseLocation(next) && rc.senseParts(next) == 0 &&  (rc.senseRobotAtLocation(next) == null || !rc.senseRobotAtLocation(next).team.equals(Team.NEUTRAL))))
         {
             int index = sortedParts.getIndexOfMapLocation(next);
             if (index < 0)
@@ -410,6 +406,10 @@ public class BaseArchon extends Unit implements PacMan
             }
         }
 
+        if (next != null)
+        {
+            rc.setIndicatorString(1, "x: " + next.x + " y: " + next.y);
+        }
         return next;
     }
 

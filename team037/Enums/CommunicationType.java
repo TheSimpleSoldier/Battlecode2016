@@ -7,7 +7,8 @@ public enum CommunicationType
     DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
     SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT,
     NEUTRAL, SKILLED_DEN, DEAD_DEN, EXPLORE_EDGE,
-    ATTACK, RALLY_POINT, RUBBLE, ARCHON_DISTRESS, GOING_AFTER_PARTS;
+    ATTACK, RALLY_POINT, RUBBLE, ARCHON_DISTRESS, GOING_AFTER_PARTS,
+    TURRET_UNDER_ATTACK;
 
     public static int toInt(CommunicationType type)
     {
@@ -55,6 +56,8 @@ public enum CommunicationType
                 return 19;
             case GOING_AFTER_PARTS:
                 return 20;
+            case TURRET_UNDER_ATTACK:
+                return 21;
         }
         return -1;
     }
@@ -105,6 +108,8 @@ public enum CommunicationType
                 return ARCHON_DISTRESS;
             case 20:
                 return GOING_AFTER_PARTS;
+            case 21:
+                return TURRET_UNDER_ATTACK;
         }
         return null;
     }
@@ -118,6 +123,7 @@ public enum CommunicationType
             case ENEMY:
             case ARCHON_DISTRESS:
             case GOING_AFTER_PARTS:
+            case TURRET_UNDER_ATTACK:
                 return new BotInfoCommunication();
             //SimpleBotInfoCommunication
             case OENEMY:
