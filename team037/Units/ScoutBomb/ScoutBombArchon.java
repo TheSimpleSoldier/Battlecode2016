@@ -338,7 +338,6 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                 numGuards++;
             }
         }
-        System.out.println(centerOfMassDifference);
         if (start.equals(alliedArchonStartLocs[0]) && centerOfMassDifference < 1000 && vipersSpawned < rc.getRoundNum() / 300 ) {
             if (rc.hasBuildRequirements(RobotType.VIPER)) {
                 Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
