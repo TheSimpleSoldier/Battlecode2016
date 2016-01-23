@@ -9,11 +9,11 @@ public class TurtleScout extends BaseScout
     // This determines if the scout is going left or right around the turtle location
     private static boolean goingLeft = false;
     // this is the minimum distance that a scout will keep between it and the turtle center at all times
-    private static final int minDist = 24;
+    private static final int minDist = 5;
     // this is the max distance that a scout will keep between it and the turtle center
-    private static final int maxDist = 37;
+    private static final int maxDist = 6;
     private static int directionUpdateTurn = 0;
-    private boolean updatedTurtleSpot = false;
+    private static int furthestTurret = 0;
 
     public TurtleScout(RobotController rc)
     {
@@ -31,10 +31,29 @@ public class TurtleScout extends BaseScout
         if (currentLocation.equals(target)) return true;
         if (rc.canSense(target) && !rc.onTheMap(target)) return true;
         if (rc.canSense(target) && rc.senseRobotAtLocation(target) != null) return true;
-        if (currentLocation.distanceSquaredTo(target) < minDist) return true;
-        if (currentLocation.distanceSquaredTo(target) > maxDist) return true;
+        if (currentLocation.distanceSquaredTo(target) < getMinDist()) return true;
+        if (currentLocation.distanceSquaredTo(target) > getMaxDist()) return true;
 
         return false;
+    }
+
+    /**
+     * This method gets the closest dist to the turtle point that the scout should be
+     * @return
+     */
+    public int getMinDist()
+    {
+        return (minDist + furthestTurret) * (minDist + furthestTurret) - 1;
+    }
+
+    /**
+     * This method returns the furthest distance a turtle scout should ever be from the
+     * turtle point
+     * @return
+     */
+    public int getMaxDist()
+    {
+        return (maxDist + furthestTurret) * (maxDist + furthestTurret) + 1;
     }
 
     @Override
@@ -154,6 +173,19 @@ public class TurtleScout extends BaseScout
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
             rc.setIndicatorString(1, "Going to new rally point");
             turtlePoint = rallyPoint;
+        }
+
+        for (int i = allies.length; --i>=0;)
+        {
+            if (allies[i].type == RobotType.TURRET)
+            {
+                int newDist = (int) Math.sqrt(allies[i].location.distanceSquaredTo(turtlePoint));
+
+                if (newDist > furthestTurret)
+                {
+                    furthestTurret = newDist;
+                }
+            }
         }
     }
 }
