@@ -31,7 +31,6 @@ public class FightMicroUtilites
         }
 
         return bestTarget;
-
     }
 
     /**
