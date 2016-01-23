@@ -18,6 +18,7 @@ import team037.Units.PacMan.PacManGuard;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
+import team037.Units.ScoutBomb.ScoutBombViper;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Utilites.StrategyUtilities;
 import team037.Utilites.ZombieTracker;
@@ -43,7 +44,7 @@ public class RobotPlayer
             // BUT THEY ARE FIXING IT!
 
             // hardcode disabled for now
-            strategy = Strategies.TURTLE;
+            strategy = Strategies.SCOUT_BOMB;
 
             MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
@@ -161,8 +162,13 @@ public class RobotPlayer
             }
             else if(type == RobotType.VIPER)
             {
-                unit = new BaseViper(rc);
-                Unit.thisBot = Bots.BASEVIPER;
+                if (strategy.equals(Strategies.SCOUT_BOMB)) {
+                    unit = new ScoutBombViper(rc);
+                    Unit.thisBot = Bots.SCOUTBOMBVIPER;
+                } else {
+                    unit = new BaseViper(rc);
+                    Unit.thisBot = Bots.BASEVIPER;
+                }
             }
 
             // initial update to strategy
@@ -170,6 +176,7 @@ public class RobotPlayer
             {
                 unit = unit.getNewStrategy(unit);
             }
+
             catch(Exception e)
             {
                 e.printStackTrace();
