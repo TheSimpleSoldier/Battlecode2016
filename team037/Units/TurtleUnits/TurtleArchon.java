@@ -283,22 +283,22 @@ public class TurtleArchon extends BaseArchon implements PacMan
         return buildNextUnit();
     }
 
-    @Override
-    public Bots changeBuildOrder(Bots nextBot)
-    {
-        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
-
-        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
-        {
-            nextType = RobotType.SCOUT;
-            return Bots.SCOUTBOMBSCOUT;
-        }
-        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - rc.getRoundNum() < 50)
-        {
-            nextType = RobotType.SCOUT;
-            return Bots.SCOUTBOMBSCOUT;
-        }
-
-        return nextBot;
-    }
+//    @Override
+//    public Bots changeBuildOrder(Bots nextBot)
+//    {
+//        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
+//
+//        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+//        {
+//            nextType = RobotType.SCOUT;
+//            return Bots.SCOUTBOMBSCOUT;
+//        }
+//        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - rc.getRoundNum() < 50)
+//        {
+//            nextType = RobotType.SCOUT;
+//            return Bots.SCOUTBOMBSCOUT;
+//        }
+//
+//        return nextBot;
+//    }
 }

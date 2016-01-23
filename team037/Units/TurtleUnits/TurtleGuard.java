@@ -190,9 +190,9 @@ public class TurtleGuard extends BaseGaurd
 
                 for (int j = dirs.length; --j >= 0; )
                 {
-                    if (dirs[i].equals(dir))
+                    if (dirs[j].equals(dir))
                     {
-                        enemySightings[i]++;
+                        enemySightings[j]++;
                     }
                 }
             }
