@@ -2,6 +2,7 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseScout;
+import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
 public class TurtleScout extends BaseScout
@@ -57,6 +58,11 @@ public class TurtleScout extends BaseScout
             directionUpdateTurn = rc.getRoundNum();
         }
 
+        return goToLocation();
+    }
+
+    private MapLocation goToLocation()
+    {
         Direction goTo = currentLocation.directionTo(turtlePoint);
 
         if (goTo != null)
@@ -95,7 +101,7 @@ public class TurtleScout extends BaseScout
     @Override
     public boolean fightZombies() throws GameActionException
     {
-        if (zombies.length > 0)
+        if (FightMicroUtilites.offensiveEnemies(zombies))
         {
             rc.setIndicatorString(1, "");
 
@@ -138,8 +144,116 @@ public class TurtleScout extends BaseScout
                     return true;
                 }
             }
-        }
+            else
+            {
+                boolean herding = false;
 
+                for (int i = zombies.length; --i>=0; )
+                {
+                    switch (zombies[i].type)
+                    {
+                        case FASTZOMBIE:
+                        case STANDARDZOMBIE:
+                        case RANGEDZOMBIE:
+                        case BIGZOMBIE:
+
+                            MapLocation zombie = zombies[i].location;
+                            int ourDist = currentLocation.distanceSquaredTo(zombie);
+
+                            for (int j = allies.length; --j>=0;)
+                            {
+                                if (allies[j].type == RobotType.SCOUT)
+                                {
+                                    MapLocation ally = allies[j].location;
+                                    int theirDist = ally.distanceSquaredTo(zombie);
+
+                                    // check to see if we are herding
+                                    if (theirDist >= ourDist)
+                                    {
+                                        herding = true;
+
+                                        // break out of for loops
+                                        i = -1;
+                                        j = -1;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                if (!herding)
+                {
+                    MapLocation navigatorTarget = navigator.getTarget();
+                    Direction dir = currentLocation.directionTo(navigatorTarget);
+                    navigatorTarget = currentLocation.add(dir);
+
+                    boolean keepGoing = true;
+                    int ourDist = currentLocation.distanceSquaredTo(navigatorTarget);
+
+                    for (int i = zombies.length; --i>=0; )
+                    {
+                        switch (zombies[i].type)
+                        {
+                            case FASTZOMBIE:
+                            case STANDARDZOMBIE:
+                            case RANGEDZOMBIE:
+                            case BIGZOMBIE:
+                                if (ourDist > zombies[i].location.distanceSquaredTo(navigatorTarget))
+                                {
+                                    keepGoing = false;
+                                    break;
+                                }
+                                break;
+                        }
+                    }
+
+                    // if we should just keep going around the circle
+                    if (keepGoing)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        Direction current = currentLocation.directionTo(navigatorTarget).opposite();
+
+                        MapLocation goal = currentLocation.add(current);
+
+                        keepGoing = true;
+                        ourDist = currentLocation.distanceSquaredTo(goal);
+
+                        for (int i = zombies.length; --i>=0; )
+                        {
+                            switch (zombies[i].type)
+                            {
+                                case FASTZOMBIE:
+                                case STANDARDZOMBIE:
+                                case RANGEDZOMBIE:
+                                case BIGZOMBIE:
+                                    if (ourDist > zombies[i].location.distanceSquaredTo(goal))
+                                    {
+                                        keepGoing = false;
+                                        break;
+                                    }
+                                    break;
+                            }
+                        }
+
+                        // if we should go the opposite way then do it
+                        if (keepGoing)
+                        {
+                            goingLeft = !goingLeft;
+                            navigator.setTarget(goToLocation());
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
 
         return false;
     }
