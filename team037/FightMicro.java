@@ -159,7 +159,7 @@ public class FightMicro
 
                 for (int j = enemies.length; --j>=0; )
                 {
-                    currentDist += enemies[i].location.distanceSquaredTo(next);
+                    currentDist += enemies[j].location.distanceSquaredTo(next);
                 }
 
                 if (currentDist < closestDir)
