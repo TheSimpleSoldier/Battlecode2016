@@ -339,7 +339,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         }
         if (start.equals(alliedArchonStartLocs[0]) && centerOfMassDifference < 1000 && vipersSpawned < rc.getRoundNum() / 300 ) {
             if (rc.hasBuildRequirements(RobotType.VIPER)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.VIPER);
                     vipersSpawned++;
@@ -350,7 +350,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
 
         else if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
             if (rc.hasBuildRequirements(RobotType.GUARD)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.GUARD);
                     if (zombies.length > 0) {
@@ -363,7 +363,7 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
             }
         } else {
             if (rc.hasBuildRequirements(RobotType.SCOUT)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.SCOUT);
                     rc.setIndicatorString(1, "all clear, spawn a scout");

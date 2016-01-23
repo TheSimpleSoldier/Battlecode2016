@@ -347,7 +347,7 @@ public class ScoutBombScout extends BaseScout
                 }
                 // TODO: consider moving, right, check to see what the distance would be after moving that direction
             }
-            toMove = MapUtils.getRCCanMoveDirection(this);
+            toMove = MapUtils.getRCCanMoveDirection();
             if (!toMove.equals(Direction.NONE)) {
                 rc.move(toMove);
                 return true;

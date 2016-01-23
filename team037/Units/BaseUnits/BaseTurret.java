@@ -69,8 +69,12 @@ public class BaseTurret extends Unit
             return false;
         }
 
+        rc.setIndicatorString(0, "Navigation: " + rc.getRoundNum() + " bytecodes: " + Clock.getBytecodeNum());
+
         // otherwise we are a ttm
-        return navigator.takeNextStepTTM();
+        boolean returnVal = navigator.takeNextStepTTM();
+        rc.setIndicatorString(1, "After navigations: " + rc.getRoundNum() + " bytecodes: " + Clock.getBytecodeNum());
+        return returnVal;
     }
 
     @Override
@@ -138,8 +142,9 @@ public class BaseTurret extends Unit
             return targetLoc;
         else
         {
+            rc.setIndicatorString(1, "setting target: " + rc.getRoundNum());
             MapLocation target = MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, targetLoc);
-            rc.setIndicatorString(1, "Target x: " + target.x + " y: " + target.y);
+            rc.setIndicatorString(2, "Target x: " + target.x + " y: " + target.y + " round: " + rc.getRoundNum());
             rc.setIndicatorLine(currentLocation, target, 255, 0, 255);
             return target;
         }

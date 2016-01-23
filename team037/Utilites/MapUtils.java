@@ -134,14 +134,13 @@ public class MapUtils
 
     /**
      * returns a direction that this unit can move in
-     * @param unit
      * @return
      */
-    public static Direction getRCCanMoveDirection(Unit unit) {
-        Direction toMove = randomDirection(unit.id, unit.rc.getRoundNum());
+    public static Direction getRCCanMoveDirection() {
+        Direction toMove = randomDirection(Unit.id, Unit.rc.getRoundNum());
         int i = 8;
         do {
-            if (unit.rc.canMove(toMove)) {
+            if (Unit.rc.canMove(toMove)) {
                 break;
             }
             toMove = toMove.rotateLeft();
@@ -303,7 +302,13 @@ public class MapUtils
         // precondition
         if (currentLoc == null || target == null) return null;
 
-        if (Unit.rc.getTeam() == Team.A)
+        if (currentLoc.equals(target))
+        {
+            return target;
+        }
+
+        // get rid of this
+        if (Unit.us == Team.A)
         {
             return getClosestUnoccupiedSquare(currentLoc, target);
         }
@@ -312,7 +317,6 @@ public class MapUtils
 
         if (dist >= 81)
         {
-            Unit.rc.setIndicatorString(2, "returning target");
             return target;
         }
 
@@ -333,6 +337,7 @@ public class MapUtils
             closestDistToTarget = dist;
             illegalSpot = false;
         }
+
 
         do {
             getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
@@ -355,10 +360,8 @@ public class MapUtils
                 }
             }
 
-
             dist *= 2;
-        } while (closest.equals(currentLoc) && illegalSpot);
-
+        } while (closest.equals(currentLoc) && illegalSpot && dist <= Unit.sightRange);
 
         if (closest.x % 2 == closest.y % 2 && !closest.equals(currentLoc))
         {
