@@ -1,6 +1,8 @@
 package team037.DataStructures;
 
 import battlecode.common.*;
+import team037.Utilites.MapUtils;
+import team037.Utilites.RubbleUtilities;
 
 public class SortedParts
 {
@@ -274,7 +276,24 @@ public class SortedParts
 
         for (int i = parts.length; --i>=0; )
         {
-            addParts(parts[i], (int)rc.senseParts(parts[i]), false);
+            double rubble = rc.senseRubble(parts[i]);
+            int partVal = (int) rc.senseParts(parts[i]);
+
+            if (rubble > 0)
+            {
+                int turns = RubbleUtilities.calculateClearActionsToPassableButSlow(rubble);
+                if (turns > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                {
+                    partVal /= turns;
+                    if (partVal <= 0) partVal = 1;
+                }
+
+                addParts(parts[i], partVal, false);
+            }
+            else
+            {
+                addParts(parts[i], partVal, false);
+            }
         }
 
         RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);

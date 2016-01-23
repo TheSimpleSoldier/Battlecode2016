@@ -61,10 +61,9 @@ public class TurtleScout extends BaseScout
         return goToLocation();
     }
 
-    private MapLocation goToLocation()
+    private Direction goToDirection()
     {
         Direction goTo = currentLocation.directionTo(turtlePoint);
-
         if (goTo != null)
         {
             if (goingLeft)
@@ -75,11 +74,13 @@ public class TurtleScout extends BaseScout
             {
                 goTo = goTo.rotateRight().rotateRight();
             }
-
-            return currentLocation.add(goTo, 100);
         }
+        return goTo;
+    }
 
-        return null;
+    private MapLocation goToLocation()
+    {
+        return currentLocation.add(goToDirection(), 100);
     }
 
     @Override
@@ -108,7 +109,6 @@ public class TurtleScout extends BaseScout
             // if enemies can attack us then try to move to get them to chase us while the turrets blast them
             if (fightMicro.EnemiesInRangeOfLoc(currentLocation, zombies))
             {
-                rc.setIndicatorString(1, "running away");
                 Direction goTo = currentLocation.directionTo(turtlePoint);
                 Direction left = goTo.rotateLeft().rotateLeft();
                 Direction right = goTo.rotateRight().rotateRight();
@@ -184,9 +184,8 @@ public class TurtleScout extends BaseScout
 
                 if (!herding)
                 {
-                    MapLocation navigatorTarget = navigator.getTarget();
-                    Direction dir = currentLocation.directionTo(navigatorTarget);
-                    navigatorTarget = currentLocation.add(dir);
+                    rc.setIndicatorString(1, "Not herding: " + rc.getRoundNum());
+                    MapLocation navigatorTarget = currentLocation.add(goToDirection());
 
                     boolean keepGoing = true;
                     int ourDist = currentLocation.distanceSquaredTo(navigatorTarget);
@@ -211,6 +210,7 @@ public class TurtleScout extends BaseScout
                     // if we should just keep going around the circle
                     if (keepGoing)
                     {
+                        rc.setIndicatorString(2, "Continue in current dir: " + rc.getRoundNum());
                         return false;
                     }
                     else
@@ -242,12 +242,14 @@ public class TurtleScout extends BaseScout
                         // if we should go the opposite way then do it
                         if (keepGoing)
                         {
+                            rc.setIndicatorString(2, "Going opposite way now: " + rc.getRoundNum());
                             goingLeft = !goingLeft;
                             navigator.setTarget(goToLocation());
                             return false;
                         }
                         else
                         {
+                            rc.setIndicatorString(2, "staying put");
                             return true;
                         }
                     }

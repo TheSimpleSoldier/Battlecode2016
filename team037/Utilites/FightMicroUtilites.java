@@ -3,6 +3,7 @@ package team037.Utilites;
 import battlecode.common.*;
 import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
+import team037.Unit;
 
 public class FightMicroUtilites
 {
@@ -11,20 +12,26 @@ public class FightMicroUtilites
      */
     public static RobotInfo findWeakestEnemy(RobotInfo[] nearByEnemies)
     {
-        RobotInfo weakest = nearByEnemies[nearByEnemies.length - 1];
+        RobotInfo bestTarget = nearByEnemies[nearByEnemies.length - 1];
+        double value = bestTarget.attackPower * Math.sqrt(bestTarget.type.attackRadiusSquared) / (bestTarget.health * bestTarget.type.attackDelay);
 
         for (int i = nearByEnemies.length-1; --i >= 0; )
         {
-            if (nearByEnemies[i] == null)
+            if (nearByEnemies[i] != null)
             {
-            }
-            else if (nearByEnemies[i].health < weakest.health)
-            {
-                weakest = nearByEnemies[i];
+                RobotInfo enemy = nearByEnemies[i];
+                double newValue = enemy.attackPower * Math.sqrt(bestTarget.type.attackRadiusSquared) / (enemy.health * enemy.type.attackDelay);
+
+                if (newValue > value)
+                {
+                    value = newValue;
+                    bestTarget = enemy;
+                }
             }
         }
 
-        return weakest;
+        return bestTarget;
+
     }
 
     /**
