@@ -37,7 +37,7 @@ public class SuperRushArchon extends Unit
         dirTo = currentLocation.directionTo(targetArchon);
         targetID = -1;
 
-        distanceFromArchon = 2;
+        distanceFromArchon = 4;
 
         navigator.setTarget(targetArchon);
     }
