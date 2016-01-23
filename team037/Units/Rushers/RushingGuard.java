@@ -69,7 +69,7 @@ public class RushingGuard extends BaseGaurd implements PacMan
     @Override
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
+        return fightMicro.basicAttack(nearByEnemies, enemies);
     }
 
     @Override
