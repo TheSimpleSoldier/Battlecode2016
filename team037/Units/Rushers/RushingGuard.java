@@ -19,6 +19,7 @@ public class RushingGuard extends BaseGaurd implements PacMan
     public RushingGuard(RobotController rc)
     {
         super(rc);
+        rc.setIndicatorString(0, "rushing guard");
         updatedLocs = new MapLocation[enemyArchonStartLocs.length];
 
         for (int i = updatedLocs.length; --i>=0; )
@@ -26,7 +27,7 @@ public class RushingGuard extends BaseGaurd implements PacMan
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
-        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
+        rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;

@@ -24,8 +24,6 @@ public class RushingViper extends BaseViper implements PacMan
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
-        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
-
         rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
 
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));

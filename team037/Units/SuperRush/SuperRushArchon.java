@@ -2,6 +2,10 @@ package team037.Units.SuperRush;
 
 import battlecode.common.*;
 import team037.DataStructures.UnitProportion;
+import team037.Enums.Bots;
+import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
+import team037.Messages.MissionCommunication;
 import team037.Unit;
 
 /**
@@ -17,6 +21,7 @@ public class SuperRushArchon extends Unit
 
     public MapLocation targetArchon;
     public Direction dirTo;
+    public int targetID;
 
     private int turnHealed = 0;
 
@@ -27,37 +32,112 @@ public class SuperRushArchon extends Unit
         unitProportion = new UnitProportion(0, 1, 0, 0, 0);
 
         spawnedFirst = false;
-        dirTo = Direction.EAST;
+        targetArchon = chooseBestArchon();
+        dirTo = currentLocation.directionTo(targetArchon);
+        targetID = -1;
 
         distanceFromArchon = 2;
+
+        navigator.setTarget(targetArchon);
+    }
+
+    private MapLocation chooseBestArchon()
+    {
+        int[] archons = new int[enemyArchonStartLocs.length];
+
+        for(int k = archons.length; --k >= 0;)
+        {
+            int dist = currentLocation.distanceSquaredTo(enemyArchonStartLocs[k]);
+            archons[k] += dist;
+            for(int a = alliedArchonStartLocs.length; --a >= 0;)
+            {
+                if(!alliedArchonStartLocs[a].equals(currentLocation))
+                {
+                    if(alliedArchonStartLocs[a].distanceSquaredTo(enemyArchonStartLocs[k]) <= dist)
+                    {
+                        archons[k] += dist;
+                    }
+                }
+            }
+
+            MapLocation current = currentLocation;
+            while(rc.canSenseLocation(current))
+            {
+                double rubble = rc.senseRubble(current);
+                if(rubble >= 100)
+                {
+                    archons[k] += 30;
+                }
+                current = current.add(current.directionTo(enemyArchonStartLocs[k]));
+            }
+        }
+
+        int index = 0;
+        int min = 9999999;
+        for(int k = archons.length; --k >= 0;)
+        {
+            if(archons[k] < min)
+            {
+                min = archons[k];
+                index = k;
+            }
+        }
+
+        return enemyArchonStartLocs[index];
     }
 
     @Override
     public void collectData() throws GameActionException
     {
         super.collectData();
+
+        for(int k = enemies.length; --k >= 0;)
+        {
+            if(enemies[k].type == RobotType.ARCHON)
+            {
+                if(targetID == -1)
+                {
+                    targetArchon = enemies[k].location;
+                    dirTo = currentLocation.directionTo(targetArchon);
+                    targetID = enemies[k].ID;
+                    break;
+                }
+                else if(enemies[k].ID == targetID)
+                {
+                    targetArchon = enemies[k].location;
+                    dirTo = currentLocation.directionTo(targetArchon);
+                    break;
+                }
+            }
+        }
+        rc.setIndicatorLine(currentLocation, targetArchon, 0, 0, 0);
     }
 
     @Override
     public boolean act() throws GameActionException
     {
+        String happening = "";
         healNearbyAllies();
         if(!rc.isCoreReady())
         {
+            happening = "nothing";
+            rc.setIndicatorString(0, "happening: " + happening);
             return false;
         }
         else if(!spawnedFirst)
         {
+            happening = "spawning first";
             if(spawnUnit())
             {
                 spawnedFirst = true;
             }
         }
-        else if(activateUnit()){}
-        else if(collectParts()){}
-        else if(moveToSeeEnemy()){}
-        else if(spawnUnit()){}
-        else if(runAway()){}
+        else if(activateUnit()){happening = "activating";}
+        else if(collectParts()){happening = "collecting parts";}
+        else if(moveToSeeEnemy()){happening = "moving to enemy";}
+        else if(spawnUnit()){happening = "spawning";}
+        else if(runAway()){happening = "running";}
+        rc.setIndicatorString(0, "happening: " + happening);
 
         return true;
     }
@@ -235,6 +315,7 @@ public class SuperRushArchon extends Unit
                 rc.build(dir, toSpawn);
                 spawnedFirst = true;
                 unitProportion.addBot(toSpawn);
+                sendInitialMessages(dir, toSpawn);
                 return -100;
             }
             else
@@ -246,6 +327,37 @@ public class SuperRushArchon extends Unit
         return -1;
     }
 
+    private void sendInitialMessages(Direction dir, RobotType toSpawn) throws GameActionException
+    {
+        MissionCommunication communication = new MissionCommunication();
+        communication.opcode = CommunicationType.CHANGEMISSION;
+        communication.id = rc.senseRobotAtLocation(currentLocation.add(dir)).ID;
+        switch(toSpawn)
+        {
+            case GUARD:
+                communication.newBType = Bots.RUSHGUARD;
+                break;
+            case SCOUT:
+                communication.newBType = Bots.RUSHSCOUT;
+                break;
+            case SOLDIER:
+                communication.newBType = Bots.RUSHINGSOLDIER;
+                break;
+            case TURRET:
+                communication.newBType = Bots.RUSHTURRET;
+                break;
+            case VIPER:
+                communication.newBType = Bots.RUSHINGVIPER;
+                break;
+        }
+        communication.x = targetArchon.x;
+        communication.y = targetArchon.y;
+        communicator.sendCommunication(2, communication);
+
+        Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication();
+        communicator.sendCommunication(2, mapBoundsCommunication);
+    }
+
     private boolean moveToSeeEnemy() throws GameActionException
     {
         if(currentLocation.distanceSquaredTo(targetArchon) < distanceFromArchon)
@@ -253,6 +365,7 @@ public class SuperRushArchon extends Unit
             return false;
         }
 
+        navigator.setTarget(targetArchon);
         navigator.takeNextStep();
         return true;
     }

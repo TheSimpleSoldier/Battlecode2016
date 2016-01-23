@@ -23,9 +23,8 @@ public class RushingSoldier extends BaseSoldier implements PacMan
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
-        rc.setIndicatorString(0, "Rushing Soldier");
+        rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
 
-        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;

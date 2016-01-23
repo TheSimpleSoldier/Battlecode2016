@@ -451,14 +451,13 @@ public abstract class Unit
                 if(comm.id == rc.getID())
                 {
                     nextBot = comm.newBType;
-                }
-                else if(comm.id == 0 && comm.bType == thisBot)
-                {
-                    nextBot = comm.newBType;
-                }
-                else if(comm.id == 0 && comm.rType == rc.getType())
-                {
-                    nextBot = comm.newBType;
+                    if(nextBot == Bots.RUSHGUARD || nextBot == Bots.RUSHSCOUT ||
+                       nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHTURRET ||
+                       nextBot == Bots.RUSHINGVIPER)
+                    {
+                        rc.setIndicatorString(2, "setting target");
+                        rushTarget = new MapLocation(comm.x, comm.y);
+                    }
                 }
                 break;
         }

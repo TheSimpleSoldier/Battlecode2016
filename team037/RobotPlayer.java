@@ -7,17 +7,12 @@ import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.AlphaArchon;
-import team037.Units.BaseUnits.BaseArchon;
-import team037.Units.BaseUnits.BaseScout;
-import team037.Units.BaseUnits.BaseTurret;
-import team037.Units.BaseUnits.BaseViper;
+import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleArchon;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManGuard;
-import team037.Units.Rushers.RushingGuard;
-import team037.Units.Rushers.RushingSoldier;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
@@ -120,8 +115,8 @@ public class RobotPlayer
                 }
                 else
                 {
-                    unit = new RushingGuard(rc);
-                    Unit.thisBot = Bots.RUSHGUARD;
+                    unit = new BaseGaurd(rc);
+                    Unit.thisBot = Bots.BASEGAURD;
                 }
             }
             else if(type == RobotType.SCOUT)
@@ -150,8 +145,8 @@ public class RobotPlayer
                 }
                 else
                 {
-                    unit = new RushingSoldier(rc);
-                    Unit.thisBot = Bots.RUSHINGSOLDIER;
+                    unit = new BaseSoldier(rc);
+                    Unit.thisBot = Bots.BASESOLDIER;
                 }
 
             }
