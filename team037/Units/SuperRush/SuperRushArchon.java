@@ -13,9 +13,12 @@ public class SuperRushArchon extends Unit
 
     public RobotType first;
     public boolean spawnedFirst;
+    public int distanceFromArchon;
 
     public MapLocation targetArchon;
     public Direction dirTo;
+
+    private int turnHealed = 0;
 
     public SuperRushArchon(RobotController rc)
     {
@@ -25,6 +28,8 @@ public class SuperRushArchon extends Unit
 
         spawnedFirst = false;
         dirTo = Direction.EAST;
+
+        distanceFromArchon = 2;
     }
 
     @Override
@@ -36,7 +41,7 @@ public class SuperRushArchon extends Unit
     @Override
     public boolean act() throws GameActionException
     {
-        rc.setIndicatorString(0, "" + spawnedFirst);
+        healNearbyAllies();
         if(!rc.isCoreReady())
         {
             return false;
@@ -50,8 +55,8 @@ public class SuperRushArchon extends Unit
         }
         else if(activateUnit()){}
         else if(collectParts()){}
-        else if(spawnUnit()){}
         else if(moveToSeeEnemy()){}
+        else if(spawnUnit()){}
         else if(runAway()){}
 
         return true;
@@ -241,9 +246,15 @@ public class SuperRushArchon extends Unit
         return -1;
     }
 
-    private boolean moveToSeeEnemy()
+    private boolean moveToSeeEnemy() throws GameActionException
     {
-        return false;
+        if(currentLocation.distanceSquaredTo(targetArchon) < distanceFromArchon)
+        {
+            return false;
+        }
+
+        navigator.takeNextStep();
+        return true;
     }
 
     private boolean runAway()
@@ -266,6 +277,44 @@ public class SuperRushArchon extends Unit
     @Override
     public boolean fightZombies() throws GameActionException
     {
+        return false;
+    }
+
+    public boolean healNearbyAllies() throws GameActionException {
+        // precondition
+        if (nearByAllies.length == 0 || turnHealed == rc.getRoundNum()) {
+            return false;
+        }
+
+        double weakestHealth = 9999;
+        RobotInfo weakest = null;
+
+        for (int i = nearByAllies.length; --i>=0; )
+        {
+            double health = nearByAllies[i].health;
+            if (nearByAllies[i].type != RobotType.ARCHON && health < nearByAllies[i].maxHealth && currentLocation.distanceSquaredTo(nearByAllies[i].location) <= RobotType.ARCHON.attackRadiusSquared)
+            {
+                if (health < weakestHealth)
+                {
+                    weakestHealth = health;
+                    weakest = nearByAllies[i];
+                }
+            }
+        }
+
+        try
+        {
+            if (weakest != null)
+            {
+                if (rc.senseRobotAtLocation(weakest.location) != null)
+                {
+                    rc.repair(weakest.location);
+                }
+                turnHealed = rc.getRoundNum();
+                return true;
+            }
+        } catch (Exception e) {e.printStackTrace();}
+
         return false;
     }
 }
