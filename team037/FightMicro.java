@@ -119,6 +119,69 @@ public class FightMicro
         return false;
     }
 
+    /**
+     * This is a very basic fight micro method that shoots if possible and otherwise moves towards enemies
+     *
+     * @param nearByEnemies
+     * @param enemies
+     * @return
+     * @throws GameActionException
+     */
+    public boolean basicAttack(RobotInfo[] nearByEnemies, RobotInfo[] enemies) throws GameActionException
+    {
+        if (enemies.length <= 0) return false;
+
+        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        {
+            RobotInfo enemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+
+            if (rc.canAttackLocation(enemy.location))
+            {
+                rc.attackLocation(enemy.location);
+                return true;
+            }
+        }
+
+        if (rc.isCoreReady())
+        {
+            int closestDir = Integer.MAX_VALUE;
+            Direction direction = null;
+            MapLocation currentLoc = rc.getLocation();
+
+            for (int i = Unit.dirs.length; --i>=0; )
+            {
+                Direction dir = Unit.dirs[i];
+                int currentDist = 0;
+                if (!rc.canMove(dir)) continue;
+                if (rc.senseRubble(currentLoc.add(dir)) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
+
+                MapLocation next = currentLoc.add(dir);
+
+                for (int j = enemies.length; --j>=0; )
+                {
+                    currentDist += enemies[i].location.distanceSquaredTo(next);
+                }
+
+                if (currentDist < closestDir)
+                {
+                    closestDir = currentDist;
+                    direction = dir;
+                }
+            }
+
+            if (direction != null)
+            {
+                if (rc.canMove(direction))
+                {
+                    rc.move(direction);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public boolean basicNetFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByAllies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target) throws GameActionException
     {
         if (enemies == null || enemies.length == 0 || nearByEnemies == null || allies == null)
