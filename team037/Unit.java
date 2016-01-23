@@ -59,6 +59,7 @@ public abstract class Unit
     public static MapLocation enemyArchonCenterOfMass;
     public static MapLocation alliedArchonCenterOfMass;
     public static int centerOfMassDifference;
+    public static int myArchon;
 
     public Unit()
     {
@@ -90,6 +91,8 @@ public abstract class Unit
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
         enemyArchonCenterOfMass = MapUtils.getCenterOfMass(enemyArchonStartLocs);
         centerOfMassDifference = alliedArchonCenterOfMass.distanceSquaredTo(enemyArchonCenterOfMass);
+
+        myArchon = -1;
 
         mapKnowledge.updateEdgesFromLocation(currentLocation);
         for(int k = alliedArchonStartLocs.length; --k >= 0;)
@@ -180,6 +183,7 @@ public abstract class Unit
         communications = communicator.processCommunications();
         for(int k = communications.length; --k >= 0;)
         {
+            System.out.println(communications[k].opcode);
             switch(communications[k].opcode)
             {
                 case MAP_BOUNDS:
@@ -243,6 +247,7 @@ public abstract class Unit
 
     public Unit getNewStrategy(Unit current) throws GameActionException
     {
+        //rc.setIndicatorString(1, "current: " + thisBot + ", next: " + nextBot);
         if(nextBot != null && nextBot != thisBot)
         {
             rc.setIndicatorString(0, "Changing to: " + nextBot);
@@ -452,9 +457,11 @@ public abstract class Unit
         {
             case CHANGEMISSION:
                 MissionCommunication comm = (MissionCommunication) communication;
+                rc.setIndicatorString(0, "next bot is " + comm.newBType);
                 if(comm.id == rc.getID())
                 {
                     nextBot = comm.newBType;
+                    rc.setIndicatorString(0, "changing mission to " + nextBot);
                     if(nextBot == Bots.RUSHGUARD || nextBot == Bots.RUSHSCOUT ||
                        nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHTURRET ||
                        nextBot == Bots.RUSHINGVIPER)
@@ -474,7 +481,10 @@ public abstract class Unit
         {
             case ATTACK:
                 AttackCommunication com = (AttackCommunication)communication;
-                rushTarget = new MapLocation(com.x, com.y);
+                if(myArchon == -1 || myArchon == com.signalID)
+                {
+                    rushTarget = new MapLocation(com.x, com.y);
+                }
                 break;
             case RALLY_POINT:
                 com = (AttackCommunication)communication;

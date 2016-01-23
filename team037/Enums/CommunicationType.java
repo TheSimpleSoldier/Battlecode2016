@@ -4,10 +4,27 @@ import team037.Messages.*;
 
 public enum CommunicationType
 {
-    DEN, PARTS, ENEMY, OENEMY, CHANGEMISSION, MAP_BOUNDS,
-    SARCHON, SENEMY, SZOMBIE, SDEN, SPARTS, TURRET_SUPPORT,
-    NEUTRAL, SKILLED_DEN, DEAD_DEN, EXPLORE_EDGE,
-    ATTACK, RALLY_POINT, RUBBLE, ARCHON_DISTRESS, GOING_AFTER_PARTS;
+    DEN,
+    PARTS,
+    ENEMY,
+    OENEMY,
+    CHANGEMISSION,
+    MAP_BOUNDS,
+    SARCHON,
+    SENEMY,
+    SZOMBIE,
+    SDEN,
+    SPARTS,
+    TURRET_SUPPORT,
+    NEUTRAL,
+    SKILLED_DEN,
+    DEAD_DEN,
+    EXPLORE_EDGE,
+    ATTACK,
+    RALLY_POINT,
+    RUBBLE,
+    ARCHON_DISTRESS,
+    GOING_AFTER_PARTS;
 
     public static int toInt(CommunicationType type)
     {

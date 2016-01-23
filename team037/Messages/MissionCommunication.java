@@ -10,12 +10,11 @@ public class MissionCommunication extends Communication
     public Bots newBType;
     public int x;
     public int y;
-    public int value;
 
     @Override
     public int[] getValues()
     {
-        return new int[]{CommunicationType.toInt(opcode), id, x, y, value};
+        return new int[]{CommunicationType.toInt(opcode), id, Bots.toInt(newBType), x, y};
     }
 
     @Override
@@ -26,7 +25,6 @@ public class MissionCommunication extends Communication
         newBType = Bots.fromInt(values[2]);
         x = values[3];
         y = values[4];
-        value = values[5];
     }
 
     @Override
@@ -34,6 +32,6 @@ public class MissionCommunication extends Communication
     {
         return new int[]{CommunicationUtilities.opcodeSize, CommunicationUtilities.valSize,
         CommunicationUtilities.botSize, CommunicationUtilities.locationSize,
-        CommunicationUtilities.locationSize, CommunicationUtilities.valSize};
+        CommunicationUtilities.locationSize};
     }
 }

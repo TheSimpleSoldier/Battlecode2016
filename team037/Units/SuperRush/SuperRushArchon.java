@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.DataStructures.UnitProportion;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Messages.AttackCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Unit;
@@ -91,6 +92,7 @@ public class SuperRushArchon extends Unit
     {
         super.collectData();
 
+        int num = 0;
         for(int k = enemies.length; --k >= 0;)
         {
             if(enemies[k].type == RobotType.ARCHON)
@@ -100,15 +102,25 @@ public class SuperRushArchon extends Unit
                     targetArchon = enemies[k].location;
                     dirTo = currentLocation.directionTo(targetArchon);
                     targetID = enemies[k].ID;
+                    num++;
                     break;
                 }
                 else if(enemies[k].ID == targetID)
                 {
                     targetArchon = enemies[k].location;
                     dirTo = currentLocation.directionTo(targetArchon);
+                    num++;
                     break;
                 }
             }
+        }
+        if(num > 0)
+        {
+            AttackCommunication attackCommunication = new AttackCommunication();
+            attackCommunication.opcode = CommunicationType.ATTACK;
+            attackCommunication.x = targetArchon.x;
+            attackCommunication.y = targetArchon.y;
+            communicator.sendCommunication(mapKnowledge.getRange(), attackCommunication);
         }
         rc.setIndicatorLine(currentLocation, targetArchon, 0, 0, 0);
     }
