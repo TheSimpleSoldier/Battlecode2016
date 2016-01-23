@@ -303,6 +303,10 @@ public class MapUtils
         // precondition
         if (currentLoc == null || target == null) return null;
 
+        if (Unit.rc.getTeam() == Team.A)
+        {
+            return getClosestUnoccupiedSquare(currentLoc, target);
+        }
 
         int dist = currentLoc.distanceSquaredTo(target);
 

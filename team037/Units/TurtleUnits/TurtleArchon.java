@@ -229,6 +229,17 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (allies.length == 0) return true;
         if (!offensiveAllies) return true;
         if ((enemies.length + zombies.length + 2) > allies.length) return true;
+
+        return false;
+    }
+
+    @Override
+    public void handleMessages() throws GameActionException
+    {
+        if (!underAttack)
+        {
+            super.handleMessages();
+        }
     }
 
     @Override
@@ -269,11 +280,13 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public void sendInitialMessages(Direction dir) throws GameActionException
     {
-        super.sendInitialMessages(dir);
-        Communication newRallyPoint = new AttackCommunication();
-        newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-        communicator.sendCommunication(2, newRallyPoint);
-
+        if (!underAttack)
+        {
+            super.sendInitialMessages(dir);
+            Communication newRallyPoint = new AttackCommunication();
+            newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+            communicator.sendCommunication(2, newRallyPoint);
+        }
     }
 
     @Override

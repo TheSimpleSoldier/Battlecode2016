@@ -96,7 +96,7 @@ public class BaseTurret extends Unit
 
         boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
 
-        if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && allies.length == 0 && !fought && rc.isWeaponReady())
+        if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && !FightMicroUtilites.offensiveEnemies(allies) && !fought && rc.isWeaponReady())
         {
             rc.pack();
             return false;

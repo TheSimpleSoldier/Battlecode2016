@@ -88,6 +88,8 @@ public class TurtleGuard extends BaseGaurd
 
         if (defensePoint != null)
         {
+            System.out.println("using defense point");
+            rc.setIndicatorString(2, "Defense point x: " + defensePoint.x + " y: " + defensePoint.y + " round: " + rc.getRoundNum());
             return defensePoint;
         }
 
@@ -198,6 +200,7 @@ public class TurtleGuard extends BaseGaurd
                 {
                     if (dirs[j].equals(dir))
                     {
+//                        System.out.println("set zombie to enemySightings: " + enemySightings[j]);
                         enemySightings[j]++;
                     }
                 }

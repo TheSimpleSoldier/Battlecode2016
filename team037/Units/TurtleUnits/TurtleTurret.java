@@ -1,7 +1,5 @@
 package team037.Units.TurtleUnits;
 
-import _teamcastle.Messages.BotInfoCommunication;
-import _teamcastle.Messages.Communication;
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseTurret;
 import team037.Utilites.MapUtils;
