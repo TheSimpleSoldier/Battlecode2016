@@ -57,6 +57,8 @@ public abstract class Unit
     public static MapLocation distressedArchon;
     public static MapLocation turtlePoint;
     public static MapLocation enemyArchonCenterOfMass;
+    public static MapLocation alliedArchonCenterOfMass;
+    public static int centerOfMassDifference;
 
     public Unit()
     {
@@ -84,8 +86,10 @@ public abstract class Unit
         start = rc.getLocation();
         repaired = false;
         alliedArchonStartLocs = rc.getInitialArchonLocations(us);
+        alliedArchonCenterOfMass = MapUtils.getCenterOfMass(alliedArchonStartLocs);
         enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
         enemyArchonCenterOfMass = MapUtils.getCenterOfMass(enemyArchonStartLocs);
+        centerOfMassDifference = alliedArchonCenterOfMass.distanceSquaredTo(enemyArchonCenterOfMass);
 
         mapKnowledge.updateEdgesFromLocation(currentLocation);
         for(int k = alliedArchonStartLocs.length; --k >= 0;)

@@ -6,6 +6,7 @@ import team037.Unit;
 import team037.Units.AlphaArchon;
 import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleSoldier;
+import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManArchon;
@@ -13,6 +14,7 @@ import team037.Units.PacMan.PacManScout;
 import team037.Units.Rushers.*;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
+import team037.Units.ScoutBomb.ScoutBombViper;
 import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
 import team037.Units.Scouts.RegionScout;
@@ -55,8 +57,9 @@ public enum Bots
     SCOUTBOMBGUARD,
     SCOUTBOMBSCOUT,
     RUSHSCOUT,
-    SUPERRUSHARCHON;
-
+    SUPERRUSHARCHON,
+    SCOUTBOMBVIPER,
+    CASTLETURRET;
 
     public static int toInt(Bots type)
     {
@@ -120,8 +123,12 @@ public enum Bots
                 return 27;
             case RUSHSCOUT:
                 return 28;
-            case SUPERRUSHARCHON:
+            case SCOUTBOMBVIPER:
                 return 29;
+            case CASTLETURRET:
+                return 30;
+            case SUPERRUSHARCHON:
+                return 31;
         }
         return -1;
     }
@@ -189,7 +196,11 @@ public enum Bots
             case 28:
                 return RUSHSCOUT;
             case 29:
-                return SUPERRUSHARCHON;
+                return SCOUTBOMBVIPER;
+            case 30:
+                return CASTLETURRET;
+            case 31:
+            return SUPERRUSHARCHON;
         }
 
         return null;
@@ -231,6 +242,7 @@ public enum Bots
             case RUSHTURRET:
             case TURTLETURRET:
             case BASETURRET:
+            case CASTLETURRET:
                 return RobotType.TURRET;
             case RUSHINGVIPER:
             case BASEVIPER:
@@ -299,8 +311,12 @@ public enum Bots
                 return new ScoutBombScout(rc);
             case SCOUTBOMBGUARD:
                 return new ScoutBombGuard(rc);
+            case SCOUTBOMBVIPER:
+                return new ScoutBombViper(rc);
             case RUSHSCOUT:
                 return new RushingScout(rc);
+            case CASTLETURRET:
+                return new CastleTurret(rc);
         }
 
         return null;
