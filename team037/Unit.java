@@ -183,7 +183,6 @@ public abstract class Unit
         communications = communicator.processCommunications();
         for(int k = communications.length; --k >= 0;)
         {
-            System.out.println(communications[k].opcode);
             switch(communications[k].opcode)
             {
                 case MAP_BOUNDS:

@@ -158,8 +158,6 @@ public class CommunicationUtilities
                 second += createVal(values[k], lengths[k]);
             }
         }
-        System.out.println(first);
-        System.out.println(second);
         String buffer = new String(new char[31 - first.length()]).replace('\0', '0');
         first += buffer;
         buffer = new String(new char[31 - second.length()]).replace('\0', '0');
