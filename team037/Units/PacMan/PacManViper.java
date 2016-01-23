@@ -92,13 +92,13 @@ public class PacManViper extends RushingViper implements PacMan {
         if (myArchons == null) {
             myArchons = rc.getInitialArchonLocations(us);
         }
-        directions = applyConstants(currentLocation, directions, myArchons, new double[]{16, 8, 4, 0, 0});
+        directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{16, 8, 4});
 
         MapLocation[] badArchons = mapKnowledge.getArchonLocations(false);
         if (badArchons == null) {
             badArchons = rc.getInitialArchonLocations(us);
         }
-        directions = applyConstants(currentLocation, directions, badArchons, new double[]{-16, -8, -4, 0, 0});
+        directions = PacManUtils.applySimpleConstants(currentLocation, directions, badArchons, new int[]{-16, -8, -4});
 
         return directions;
     }

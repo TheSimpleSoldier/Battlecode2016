@@ -71,7 +71,9 @@ public class RobotPlayer
             /*
             FOR TESTING ONLY remove if merging with master
              */
-            strategy = Strategies.PACMAN;
+            if (rc.getTeam().equals(Team.A)) {
+                strategy = Strategies.PACMAN;
+            }
 
 
 

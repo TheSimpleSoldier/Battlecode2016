@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.Navigation;
 import team037.Units.BaseUnits.BaseGaurd;
 import team037.Units.PacMan.PacMan;
+import team037.Units.PacMan.PacManUtils;
 
 /**
  * Created by davej on 1/21/2016.
@@ -86,13 +87,13 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
         return rc.isCoreReady() && runAway(null);
     }
 
-    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
+    public int[] applyAdditionalConstants(int[] directions) {
         if (myArchon != null) {
-            directions = applyConstants(currentLocation, directions, new MapLocation[]{myArchon.location}, new double[]{999999,9999,0,0,0});
+            directions = PacManUtils.applySimpleConstant(currentLocation, directions, myArchon.location, new int[]{999999,9999,0});
         } else if (archonLastLoc != null) {
-            directions = applyConstants(currentLocation, directions, new MapLocation[]{archonLastLoc}, new double[]{999999,9999,0,0,0});
+            directions = PacManUtils.applySimpleConstant(currentLocation, directions, archonLastLoc, new int[]{999999,9999,0});
         } else {
-            directions = applyConstants(currentLocation, directions, new MapLocation[]{enemyArchonCenterOfMass}, new double[]{-32,-16,-8,0,0});
+            directions = PacManUtils.applySimpleConstant(currentLocation, directions, enemyArchonCenterOfMass, new int[]{-32,-16,-8});
         }
         return directions;
     }

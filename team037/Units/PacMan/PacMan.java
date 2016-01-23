@@ -19,7 +19,7 @@ public interface PacMan {
     double[][] DEFAULT_WEIGHTS = new double[][] {
             {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
             {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
-            {-8, -4, -2, -1, 0},            // target constants (attract towards target)
+            {-16, -8, -4, 0, 0},            // target constants (attract towards target)
     };
 
     /**
@@ -28,23 +28,23 @@ public interface PacMan {
      *
      * Check out PacManArchon for its set of weights, and the comments above applyUnitWeights for a basic description.
      */
-    default int[] applyAdditionalWeights(int[] directions, double[][] weights) { return directions; }
-    default int[] applyAdditionalConstants(int[] directions, double[][] weights) { return directions; }
+    default int[] applyAdditionalWeights(int[] directions) { return directions; }
+    default int[] applyAdditionalConstants(int[] directions) { return directions; }
     default int[] applyAllWeights(int[] directions, double[][] weights) {
-        directions = applyUnitWeights(Unit.currentLocation, directions, Unit.zombies, weights[ZOMBIES]);
-        directions = applyUnitWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
+        directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.zombies);
+        directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.enemies);
 
-        directions = applyAdditionalWeights(directions,weights);
+        directions = applyAdditionalWeights(directions);
 
         return directions;
     }
     default int[] applyAllConstants(int[] directions, double[][] weights) {
         MapLocation loc = Unit.navigator.getTarget();
         if (loc != null) {
-            directions = applyConstants(Unit.currentLocation, directions, new MapLocation[]{loc}, weights[TARGET]);
+            directions = PacManUtils.applyConstant(Unit.currentLocation, directions, loc, weights[TARGET]);
         }
 
-        directions = applyAdditionalConstants(directions,weights);
+        directions = applyAdditionalConstants(directions);
 
         return directions;
     }
@@ -176,334 +176,5 @@ public interface PacMan {
             navigator.setTarget(saveTarget);
             return false;
         }
-    }
-
-    /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
-     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
-     *
-     * @param directions         8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
-     * @param locations          MapLocation array whose to be used to find distances to the currentLocation variable
-     * @param scalars            5 values used to scale the distances, {currentLoc.directionTo(locations[i]),
-     *                           directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     *                           Set to 0 to ignore a specific direction, negative to attract unit to locations, & positive to
-     *                           repel unit from locations.
-     * @param maxDistanceSquared maximum distance squared that we care about. Usually is the unit's sensor range.
-     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
-     */
-    default int[] applyLocationWeights(MapLocation currentLocation, int[] directions, MapLocation[] locations, double[] scalars, int maxDistanceSquared) {
-
-        if (locations == null) {
-            return directions;
-        }
-
-
-        int length = locations.length;
-
-        for (int i = length; --i >= 0; ) {
-            double add = (maxDistanceSquared - locations[i].distanceSquaredTo(currentLocation)) * scalars[0];
-            double addAdjacent = add * scalars[1];
-            double addPerp = addAdjacent * scalars[2];
-            double addPerpAdj = addPerp * scalars[3];
-            double addOpp = addPerpAdj * scalars[4];
-            switch (currentLocation.directionTo(locations[i])) {
-                case NORTH:
-                    directions[4] += addOpp;
-                    directions[5] += addPerpAdj;
-                    directions[6] += addPerp;
-                    directions[7] += addAdjacent;
-                    directions[0] += add;
-                    directions[1] += addAdjacent;
-                    directions[2] += addPerp;
-                    directions[3] += addPerpAdj;
-                    break;
-                case NORTH_EAST:
-                    directions[5] += addOpp;
-                    directions[6] += addPerpAdj;
-                    directions[7] += addPerp;
-                    directions[0] += addAdjacent;
-                    directions[1] += add;
-                    directions[2] += addAdjacent;
-                    directions[3] += addPerp;
-                    directions[4] += addPerpAdj;
-                    break;
-                case EAST:
-                    directions[6] += addOpp;
-                    directions[7] += addPerpAdj;
-                    directions[0] += addPerp;
-                    directions[1] += addAdjacent;
-                    directions[2] += add;
-                    directions[3] += addAdjacent;
-                    directions[4] += addPerp;
-                    directions[5] += addPerpAdj;
-                    break;
-                case SOUTH_EAST:
-                    directions[7] += addOpp;
-                    directions[0] += addPerpAdj;
-                    directions[1] += addPerp;
-                    directions[2] += addAdjacent;
-                    directions[3] += add;
-                    directions[4] += addAdjacent;
-                    directions[5] += addPerp;
-                    directions[6] += addPerpAdj;
-                    break;
-                case SOUTH:
-                    directions[0] += addOpp;
-                    directions[1] += addPerpAdj;
-                    directions[2] += addPerp;
-                    directions[3] += addAdjacent;
-                    directions[4] += add;
-                    directions[5] += addAdjacent;
-                    directions[6] += addPerp;
-                    directions[7] += addPerpAdj;
-                    break;
-                case SOUTH_WEST:
-                    directions[1] += addOpp;
-                    directions[2] += addPerpAdj;
-                    directions[3] += addPerp;
-                    directions[4] += addAdjacent;
-                    directions[5] += add;
-                    directions[6] += addAdjacent;
-                    directions[7] += addPerp;
-                    directions[0] += addPerpAdj;
-                    break;
-                case WEST:
-                    directions[2] += addOpp;
-                    directions[3] += addPerpAdj;
-                    directions[4] += addPerp;
-                    directions[5] += addAdjacent;
-                    directions[6] += add;
-                    directions[7] += addAdjacent;
-                    directions[0] += addPerp;
-                    directions[1] += addPerpAdj;
-                    break;
-                case NORTH_WEST:
-                    directions[3] += addOpp;
-                    directions[4] += addPerpAdj;
-                    directions[5] += addPerp;
-                    directions[6] += addAdjacent;
-                    directions[7] += add;
-                    directions[0] += addAdjacent;
-                    directions[1] += addPerp;
-                    directions[2] += addPerpAdj;
-                    break;
-            }
-        }
-
-        return directions;
-    }
-
-    /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
-     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
-     *
-     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
-     * @param units      RobotInfo array whose locations will be used to find distances to the currentLocation variable
-     * @param scalars    values used to scale the distances, {currentLoc.directionTo(unit.location),
-     *                   directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     *                   Set to 0 to ignore a specific direction, negative to attract unit to units, & positive to
-     *                   repel unit from locations.
-     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
-     */
-    default int[] applyUnitWeights(MapLocation currentLocation, int[] directions, RobotInfo[] units, double[] scalars) {
-
-        if (units == null) {
-            return directions;
-        }
-
-        int length = units.length;
-
-        for (int i = length; --i >= 0; ) {
-            MapLocation nextUnit = units[i].location;
-            double add = (38 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];
-            double addAdjacent = add * scalars[1];
-            double addPerp = addAdjacent * scalars[2];
-            double addPerpAdj = addPerp * scalars[3];
-            double addOpp = addPerpAdj * scalars[4];
-            switch (currentLocation.directionTo(nextUnit)) {
-                case NORTH:
-                    directions[4] += addOpp;
-                    directions[5] += addPerpAdj;
-                    directions[6] += addPerp;
-                    directions[7] += addAdjacent;
-                    directions[0] += add;
-                    directions[1] += addAdjacent;
-                    directions[2] += addPerp;
-                    directions[3] += addPerpAdj;
-                    break;
-                case NORTH_EAST:
-                    directions[5] += addOpp;
-                    directions[6] += addPerpAdj;
-                    directions[7] += addPerp;
-                    directions[0] += addAdjacent;
-                    directions[1] += add;
-                    directions[2] += addAdjacent;
-                    directions[3] += addPerp;
-                    directions[4] += addPerpAdj;
-                    break;
-                case EAST:
-                    directions[6] += addOpp;
-                    directions[7] += addPerpAdj;
-                    directions[0] += addPerp;
-                    directions[1] += addAdjacent;
-                    directions[2] += add;
-                    directions[3] += addAdjacent;
-                    directions[4] += addPerp;
-                    directions[5] += addPerpAdj;
-                    break;
-                case SOUTH_EAST:
-                    directions[7] += addOpp;
-                    directions[0] += addPerpAdj;
-                    directions[1] += addPerp;
-                    directions[2] += addAdjacent;
-                    directions[3] += add;
-                    directions[4] += addAdjacent;
-                    directions[5] += addPerp;
-                    directions[6] += addPerpAdj;
-                    break;
-                case SOUTH:
-                    directions[0] += addOpp;
-                    directions[1] += addPerpAdj;
-                    directions[2] += addPerp;
-                    directions[3] += addAdjacent;
-                    directions[4] += add;
-                    directions[5] += addAdjacent;
-                    directions[6] += addPerp;
-                    directions[7] += addPerpAdj;
-                    break;
-                case SOUTH_WEST:
-                    directions[1] += addOpp;
-                    directions[2] += addPerpAdj;
-                    directions[3] += addPerp;
-                    directions[4] += addAdjacent;
-                    directions[5] += add;
-                    directions[6] += addAdjacent;
-                    directions[7] += addPerp;
-                    directions[0] += addPerpAdj;
-                    break;
-                case WEST:
-                    directions[2] += addOpp;
-                    directions[3] += addPerpAdj;
-                    directions[4] += addPerp;
-                    directions[5] += addAdjacent;
-                    directions[6] += add;
-                    directions[7] += addAdjacent;
-                    directions[0] += addPerp;
-                    directions[1] += addPerpAdj;
-                    break;
-                case NORTH_WEST:
-                    directions[3] += addOpp;
-                    directions[4] += addPerpAdj;
-                    directions[5] += addPerp;
-                    directions[6] += addAdjacent;
-                    directions[7] += add;
-                    directions[0] += addAdjacent;
-                    directions[1] += addPerp;
-                    directions[2] += addPerpAdj;
-                    break;
-            }
-        }
-
-        return directions;
-    }
-
-    /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
-     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
-     *
-     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
-     * @param locations  MapLocation array to be used to find distances to the currentLocation variable
-     * @param constants  values added to the directions array, {currentLoc.directionTo(unit.location),
-     *                   directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
-     */
-    default int[] applyConstants(MapLocation currentLocation, int[] directions, MapLocation[] locations, double[] constants) {
-        if (locations != null) {
-            for (int i = locations.length; --i >= 0; ) {
-                switch (currentLocation.directionTo(locations[i])) {
-                    case NORTH:
-                        directions[4] += constants[4];
-                        directions[5] += constants[3];
-                        directions[6] += constants[2];
-                        directions[7] += constants[1];
-                        directions[0] += constants[0];
-                        directions[1] += constants[1];
-                        directions[2] += constants[2];
-                        directions[3] += constants[3];
-                        break;
-                    case NORTH_EAST:
-                        directions[5] += constants[4];
-                        directions[6] += constants[3];
-                        directions[7] += constants[2];
-                        directions[0] += constants[1];
-                        directions[1] += constants[0];
-                        directions[2] += constants[1];
-                        directions[3] += constants[2];
-                        directions[4] += constants[3];
-                        break;
-                    case EAST:
-                        directions[6] += constants[4];
-                        directions[7] += constants[3];
-                        directions[0] += constants[2];
-                        directions[1] += constants[1];
-                        directions[2] += constants[0];
-                        directions[3] += constants[1];
-                        directions[4] += constants[2];
-                        directions[5] += constants[3];
-                        break;
-                    case SOUTH_EAST:
-                        directions[7] += constants[4];
-                        directions[0] += constants[3];
-                        directions[1] += constants[2];
-                        directions[2] += constants[1];
-                        directions[3] += constants[0];
-                        directions[4] += constants[1];
-                        directions[5] += constants[2];
-                        directions[6] += constants[3];
-                        break;
-                    case SOUTH:
-                        directions[0] += constants[4];
-                        directions[1] += constants[3];
-                        directions[2] += constants[2];
-                        directions[3] += constants[1];
-                        directions[4] += constants[0];
-                        directions[5] += constants[1];
-                        directions[6] += constants[2];
-                        directions[7] += constants[3];
-                        break;
-                    case SOUTH_WEST:
-                        directions[1] += constants[4];
-                        directions[2] += constants[3];
-                        directions[3] += constants[2];
-                        directions[4] += constants[1];
-                        directions[5] += constants[0];
-                        directions[6] += constants[1];
-                        directions[7] += constants[2];
-                        directions[0] += constants[3];
-                        break;
-                    case WEST:
-                        directions[2] += constants[4];
-                        directions[3] += constants[3];
-                        directions[4] += constants[2];
-                        directions[5] += constants[1];
-                        directions[6] += constants[0];
-                        directions[7] += constants[1];
-                        directions[0] += constants[2];
-                        directions[1] += constants[3];
-                        break;
-                    case NORTH_WEST:
-                        directions[3] += constants[4];
-                        directions[4] += constants[3];
-                        directions[5] += constants[2];
-                        directions[6] += constants[1];
-                        directions[7] += constants[0];
-                        directions[0] += constants[1];
-                        directions[1] += constants[2];
-                        directions[2] += constants[3];
-                        break;
-                }
-            }
-        }
-        return directions;
     }
 }

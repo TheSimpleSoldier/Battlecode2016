@@ -55,9 +55,9 @@ public class PacManGuard extends BaseGaurd implements PacMan {
         return runAway(PACMAN_WEIGHTS);
     }
 
-    public int[] applyAdditionalWeights(int[] directions, double[][] weights) {
+    public int[] applyAdditionalWeights(int[] directions) {
 
-        directions = applyUnitWeights(currentLocation,directions,allies,weights[3]);
+        directions = PacManUtils.applyWeights(currentLocation,directions,allies,PACMAN_WEIGHTS[3]);
 
 //        MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
 //        if (myArchons != null && myArchons.length > 0) {

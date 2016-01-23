@@ -10,6 +10,7 @@ import team037.Messages.Communication;
 import team037.Navigation;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.PacMan.PacMan;
+import team037.Units.PacMan.PacManUtils;
 import team037.Utilites.Utilities;
 
 /**
@@ -69,14 +70,14 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         return runAway(null);
     }
 
-    public int[] applyAdditionalWeights(int[] directions, double[][] weights) {
-        directions = applyUnitWeights(currentLocation,directions, allies, weights[0]);
+    public int[] applyAdditionalWeights(int[] directions) {
+        directions = PacManUtils.applySimpleWeights(currentLocation,directions, allies);
         return directions;
     }
 
-    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
+    public int[] applyAdditionalConstants(int[] directions) {
         if (countermeasure != null) {
-            directions = applyConstants(currentLocation,directions,new MapLocation[]{countermeasure.location},new double[]{999999,64,32,0,0});
+            directions = PacManUtils.applySimpleConstant(currentLocation,directions,countermeasure.location,new int[]{999999,64,32});
         }
         return directions;
     }
@@ -142,15 +143,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         }
 
         if (zombies.length > 1 && zombies.length < 8) {
-            int x = 0, y = 0;
-            for (int i = zombies.length; --i >= 0;) {
-                MapLocation zombieLoc = zombies[i].location;
-                x += zombieLoc.x;
-                y += zombieLoc.y;
-            }
-            x /= zombies.length;
-            y /= zombies.length;
-            zombieCenterOfMass = new MapLocation(x,y);
+            zombieCenterOfMass = PacManUtils.centerOfMass(zombies);
         } else {
             zombieCenterOfMass = null;
         }
@@ -235,6 +228,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         }
     }
 
+    @Override
     public boolean carryOutAbility() throws GameActionException {
         if (!rc.isCoreReady() || !rc.hasBuildRequirements(RobotType.GUARD)) {
             return false;
@@ -253,100 +247,111 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
                     } else {
                         toSpawn = currentLocation.directionTo(enemies[0].location);
                     }
-                } else if (myScouts < 4) {
-                    nextBot = Bots.SCAVENGERSCOUT;
-                    int direction = 0;
-                    if (scout2 == null) {
-                        direction = 2;
-                    } else if (scout3 == null) {
-                        direction = 4;
-                    } else if (scout4 == null) {
-                        direction = 6;
-                    }
-                    toSpawn = dirs[direction];
-                } else if (navigator.getTarget() == null) {
-                    nextBot = Bots.SCOUTBOMBSCOUT;
-                    toSpawn = currentLocation.directionTo(enemyArchonCenterOfMass);
+                    countermeasure = PacManUtils.deployCountermeasure(toSpawn);
+                    return true;
                 }
+//                else if (myScouts < 4) {
+//                    nextBot = Bots.SCAVENGERSCOUT;
+//                    int direction = 0;
+//                    if (scout2 == null) {
+//                        direction = 2;
+//                    } else if (scout3 == null) {
+//                        direction = 4;
+//                    } else if (scout4 == null) {
+//                        direction = 6;
+//                    }
+//                    toSpawn = dirs[direction];
+//                } else if (navigator.getTarget() == null) {
+//                    nextBot = Bots.SCOUTBOMBSCOUT;
+//                    toSpawn = currentLocation.directionTo(enemyArchonCenterOfMass);
+//                }
                 break;
             case 1:
-                    RobotType zombie = zombies[0].type;
-                    if (zombie.equals(RobotType.ZOMBIEDEN) && myScouts < 4) {
-                        nextBot = Bots.SCAVENGERSCOUT;
-                        toSpawn = currentLocation.directionTo(zombies[0].location);
-                    } else if (countermeasure == null) {
-                        nextBot = Bots.COUNTERMEASUREGUARD;
-                        toSpawn = currentLocation.directionTo(zombies[0].location);
-                    }
+//                    RobotType zombie = zombies[0].type;
+//                    if (zombie.equals(RobotType.ZOMBIEDEN) && myScouts < 4) {
+//                        nextBot = Bots.SCAVENGERSCOUT;
+//                        toSpawn = currentLocation.directionTo(zombies[0].location);
+//                    } else if (countermeasure == null) {
+//                        nextBot = Bots.COUNTERMEASUREGUARD;
+//                        toSpawn = currentLocation.directionTo(zombies[0].location);
+//                    }
+                if (countermeasure == null) {
+                    toSpawn = currentLocation.directionTo(zombies[0].location);
+                    countermeasure = PacManUtils.deployCountermeasure(toSpawn);
+                    return true;
+                }
                 break;
             case 2:
             case 3:
             case 4:
             case 5:
                 if (countermeasure == null) {
-                    nextBot = Bots.COUNTERMEASUREGUARD;
+//                    nextBot = Bots.COUNTERMEASUREGUARD;
                     toSpawn = currentLocation.directionTo(zombies[0].location);
+                    countermeasure = PacManUtils.deployCountermeasure(toSpawn);
+                    return true;
                 }
                 break;
             default:
                 return false;
         }
 
-        if (nextBot == null) {
-            return false;
-        }
-        RobotType nextType = Bots.typeFromBot(nextBot);
-
-        if (nextBot != null) {
-            if (nextType.equals(RobotType.GUARD)) {
-                if (rc.canBuild(toSpawn, nextType)) {
-                    rc.build(toSpawn, nextType);
-                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
-                    return true;
-                } else if (rc.canBuild(toSpawn.rotateLeft(), nextType)) {
-                    rc.build(toSpawn.rotateLeft(), nextType);
-                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateLeft()));
-                    return true;
-                } else if (rc.canBuild(toSpawn.rotateRight(), nextType)) {
-                    rc.build(toSpawn.rotateRight(), nextType);
-                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateRight()));
-                    return true;
-                } else if (rc.canBuild(toSpawn.rotateLeft().rotateLeft(), nextType)) {
-                    rc.build(toSpawn.rotateLeft().rotateLeft(), nextType);
-                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateLeft().rotateLeft()));
-                    return true;
-                } else if (rc.canBuild(toSpawn.rotateRight().rotateRight(), nextType)) {
-                    rc.build(toSpawn.rotateRight().rotateRight(), nextType);
-                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateRight().rotateRight()));
-                    return true;
-                }
-            } else if (nextType.equals(RobotType.SCOUT)) {
-                if (rc.canBuild(toSpawn, nextType)) {
-                    rc.build(toSpawn, nextType);
-                } else {
-                    for (int i = dirs.length; --i >= 0; ) {
-                        if (rc.onTheMap(currentLocation.add(dirs[i]))) {
-                            if (rc.canBuild(dirs[i], nextType)) {
-                                rc.build(dirs[i], nextType);
-                                toSpawn = dirs[i];
-                                sendInitialMessages(toSpawn);
-                                myScouts++;
-                                if (scout1 == null)
-                                    scout1 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
-                                else if (scout2 == null)
-                                    scout2 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
-                                else if (scout3 == null)
-                                    scout3 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
-                                else
-                                    scout4 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
-
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
         return false;
+//        if (nextBot == null) {
+//            return false;
+//        }
+//        RobotType nextType = Bots.typeFromBot(nextBot);
+//
+//        if (nextBot != null) {
+//            if (nextType.equals(RobotType.GUARD)) {
+//                if (rc.canBuild(toSpawn, nextType)) {
+//                    rc.build(toSpawn, nextType);
+//                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
+//                    return true;
+//                } else if (rc.canBuild(toSpawn.rotateLeft(), nextType)) {
+//                    rc.build(toSpawn.rotateLeft(), nextType);
+//                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateLeft()));
+//                    return true;
+//                } else if (rc.canBuild(toSpawn.rotateRight(), nextType)) {
+//                    rc.build(toSpawn.rotateRight(), nextType);
+//                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateRight()));
+//                    return true;
+//                } else if (rc.canBuild(toSpawn.rotateLeft().rotateLeft(), nextType)) {
+//                    rc.build(toSpawn.rotateLeft().rotateLeft(), nextType);
+//                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateLeft().rotateLeft()));
+//                    return true;
+//                } else if (rc.canBuild(toSpawn.rotateRight().rotateRight(), nextType)) {
+//                    rc.build(toSpawn.rotateRight().rotateRight(), nextType);
+//                    countermeasure = rc.senseRobotAtLocation(currentLocation.add(toSpawn.rotateRight().rotateRight()));
+//                    return true;
+//                }
+//            } else if (nextType.equals(RobotType.SCOUT)) {
+//                if (rc.canBuild(toSpawn, nextType)) {
+//                    rc.build(toSpawn, nextType);
+//                } else {
+//                    for (int i = dirs.length; --i >= 0; ) {
+//                        if (rc.onTheMap(currentLocation.add(dirs[i]))) {
+//                            if (rc.canBuild(dirs[i], nextType)) {
+//                                rc.build(dirs[i], nextType);
+//                                toSpawn = dirs[i];
+//                                sendInitialMessages(toSpawn);
+//                                myScouts++;
+//                                if (scout1 == null)
+//                                    scout1 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
+//                                else if (scout2 == null)
+//                                    scout2 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
+//                                else if (scout3 == null)
+//                                    scout3 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
+//                                else
+//                                    scout4 = rc.senseRobotAtLocation(currentLocation.add(toSpawn));
+//
+//                                return true;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return false;
     }
 }
