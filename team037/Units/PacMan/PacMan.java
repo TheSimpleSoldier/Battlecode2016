@@ -5,9 +5,6 @@ import team037.Navigation;
 import team037.Navigator;
 import team037.Unit;
 
-/**
- * Created by davej on 1/15/2016.
- */
 public interface PacMan {
     /**
      * These are the array indices of the zombies weights, enemies weights, and target constants.
@@ -31,6 +28,14 @@ public interface PacMan {
     default int[] applyAdditionalWeights(int[] directions) { return directions; }
     default int[] applyAdditionalConstants(int[] directions) { return directions; }
     default int[] applyAllWeights(int[] directions, double[][] weights) {
+        directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ZOMBIES]);
+        directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
+
+        directions = applyAdditionalWeights(directions);
+
+        return directions;
+    }
+    default int[] applyAllSimpleWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.zombies);
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.enemies);
 
@@ -59,7 +64,6 @@ public interface PacMan {
         try {
             RobotController rc = Unit.rc;
             MapLocation currentLocation = Unit.currentLocation;
-            Navigator navigator = Unit.navigator;
             Direction[] dirs = Unit.dirs;
 
             if (weights == null) {
@@ -69,44 +73,51 @@ public interface PacMan {
 
         /* This is the array that will ultimately decide where we go.
         The direction with the smallest weight will be taken. */
-            int[] directions = new int[8];
+            int[] directions = new int[] {1,1,1,1,1,1,1,1};
 
-            // First: apply weights of nearby units
+
+            int[] ping0 = Navigation.map.ping(currentLocation, 0, 3);
+            int[] ping2 = Navigation.map.ping(currentLocation, 2, 3);
+            int[] ping4 = Navigation.map.ping(currentLocation, 4, 3);
+            int[] ping6 = Navigation.map.ping(currentLocation, 6, 3);
+
+//            // First: apply weights of nearby units
             directions = applyAllWeights(directions, weights);
+//            if ((ping0[1] < 5 || ping4[1] < 5) && (ping2[1] < 5 || ping6[1] < 5)) {
+//                directions = applyAllWeights(directions, weights);
+//            } else {
+//                directions = applyAllSimpleWeights(directions, weights);
+//            }
 
             // Second: scale weights based on nearby rubble
-            int[] ping = Navigation.map.ping(currentLocation, 0, 3);
 //            rc.setIndicatorString(0, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
             int divide = 17;
-            int left = divide / ++ping[0], mid = divide / ++ping[1], right = divide / ++ping[2];
+            int left = divide / ++ping0[0], mid = divide / ++ping0[1], right = divide / ++ping0[2];
             directions[7] *= 1 + left / 2;
             directions[0] *= 1 + mid;
             directions[1] *= 1 + right / 2;
 
-            ping = Navigation.map.ping(currentLocation, 2, 3);
 //            rc.setIndicatorString(1, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
-            left = divide / ++ping[0];
-            mid = divide / ++ping[1];
-            right = divide / ++ping[2];
+            left = divide / ++ping2[0];
+            mid = divide / ++ping2[1];
+            right = divide / ++ping2[2];
             directions[1] *= 1 + left / 2;
             directions[2] *= 1 + mid;
             directions[3] *= 1 + right / 2;
 
-            ping = Navigation.map.ping(currentLocation, 4, 3);
 //            rc.setIndicatorString(2, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
 
-            left = divide / ++ping[0];
-            mid = divide / ++ping[1];
-            right = divide / ++ping[2];
+            left = divide / ++ping4[0];
+            mid = divide / ++ping4[1];
+            right = divide / ++ping4[2];
             directions[3] *= 1 + left / 2;
             directions[4] *= 1 + mid;
             directions[5] *= 1 + right / 2;
 
-            ping = Navigation.map.ping(currentLocation, 6, 3);
 //            rc.setIndicatorString(2, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
-            left = divide / ++ping[0];
-            mid = divide / ++ping[1];
-            right = divide / ++ping[2];
+            left = divide / ++ping6[0];
+            mid = divide / ++ping6[1];
+            right = divide / ++ping6[2];
             directions[5] *= 1 + left / 2;
             directions[6] *= 1 + mid;
             directions[7] *= 1 + right / 2;
@@ -155,8 +166,35 @@ public interface PacMan {
             while (!(rc.canMove(dirs[minDir]) || rc.senseRubble(nextLoc) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH || min == Integer.MAX_VALUE));
             return Unit.dirs[minDir];
         } catch (Exception e) {
+            e.printStackTrace();
             return Direction.NONE;
         }
+    }
+    default boolean runAwayWithCountermeasures(double[][] weights)  {
+        Navigator navigator = Unit.navigator;
+
+        Direction direction = getRunAwayDirection(weights);
+        MapLocation currentLocation = Unit.currentLocation;
+
+        if (PacManUtils.canDeployCountermeasure()) {
+            try {
+                if (PacManUtils.deployCountermeasure(direction.opposite()) != null) return true;
+            } catch (GameActionException e) {e.printStackTrace();}
+        }
+            MapLocation nextLoc = currentLocation.add(direction);
+
+            MapLocation saveTarget = navigator.getTarget();
+            navigator.setTarget(nextLoc);
+            try {
+                boolean out = navigator.takeNextStep();
+                navigator.setTarget(saveTarget);
+                return out;
+            } catch (Exception e) {
+                navigator.setTarget(saveTarget);
+                e.printStackTrace();
+                return false;
+            }
+
     }
 
     default boolean runAway(double[][] weights)  {
@@ -174,6 +212,7 @@ public interface PacMan {
             return out;
         } catch (Exception e) {
             navigator.setTarget(saveTarget);
+            e.printStackTrace();
             return false;
         }
     }

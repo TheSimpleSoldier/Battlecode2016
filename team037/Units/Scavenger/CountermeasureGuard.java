@@ -6,9 +6,6 @@ import team037.Units.BaseUnits.BaseGaurd;
 import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
 
-/**
- * Created by davej on 1/21/2016.
- */
 public class CountermeasureGuard extends BaseGaurd implements PacMan {
 
     public static MapLocation archonLastLoc;
@@ -47,15 +44,18 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
     }
 
     public boolean act() throws GameActionException {
-        if (zombieCenterOfMass != null && zombies.length > 0) {
-            navigator.setTarget(zombieCenterOfMass);
-        } else if (enemyCenterOfMass != null && enemies.length > 0) {
-            navigator.setTarget(enemyCenterOfMass);
-        } else {
+        if (myArchon == null) {
+            roundsSurvived++;
             navigator.setTarget(enemyArchonCenterOfMass);
-        }
-
-        if (myArchon != null) {
+            return super.act();
+        } else {
+            if (zombieCenterOfMass != null && zombies.length > 0) {
+                navigator.setTarget(zombieCenterOfMass);
+            } else if (enemyCenterOfMass != null && enemies.length > 0) {
+                navigator.setTarget(enemyCenterOfMass);
+            } else {
+                navigator.setTarget(enemyArchonCenterOfMass);
+            }
             if (zombieAdjacentToArchon && currentLocation.isAdjacentTo(myArchon.location)) {
                 return fightZombies();
             }
@@ -81,10 +81,9 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
                     }
                 }
             }
+            roundsSurvived++;
             return fightZombies();
         }
-        roundsSurvived++;
-        return rc.isCoreReady() && runAway(null);
     }
 
     public int[] applyAdditionalConstants(int[] directions) {

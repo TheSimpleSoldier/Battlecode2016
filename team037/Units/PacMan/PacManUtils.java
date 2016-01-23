@@ -2,7 +2,13 @@ package team037.Units.PacMan;
 
 import battlecode.common.*;
 import team037.Enums.Bots;
+import team037.Enums.CommunicationType;
+import team037.Messages.Communication;
+import team037.Messages.MissionCommunication;
+import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
+
+import java.sql.Driver;
 
 /**
  * Created by davej on 1/22/2016.
@@ -36,35 +42,73 @@ public class PacManUtils {
         return false;
     }
 
+    public static Direction getDeployDirection(Direction toEnemy) {
+        RobotController rc = Unit.rc;
+        RobotType nextType = RobotType.GUARD;
+        if (rc.canBuild(toEnemy, nextType)) {
+            return toEnemy;
+        } else if (rc.canBuild(toEnemy.rotateLeft(), nextType)) {
+            return toEnemy.rotateLeft();
+        } else if (rc.canBuild(toEnemy.rotateRight(), nextType)) {
+            return toEnemy.rotateRight();
+        } else if (rc.canBuild(toEnemy.rotateLeft().rotateLeft(), nextType)) {
+            return toEnemy.rotateLeft().rotateLeft();
+        } else if (rc.canBuild(toEnemy.rotateRight().rotateRight(), nextType)) {
+            return toEnemy.rotateRight().rotateRight();
+        }
+
+        return null;
+    }
+
     public static RobotInfo deployCountermeasure(Direction toEnemy) throws GameActionException {
 
         RobotController rc = Unit.rc;
 
-        if (!rc.isCoreReady() || !rc.hasBuildRequirements(RobotType.GUARD)) {
+
+        if (toEnemy == null || toEnemy == Direction.NONE || toEnemy == Direction.OMNI || !rc.isCoreReady() || !rc.hasBuildRequirements(RobotType.GUARD)) {
             return null;
         }
 
-        MapLocation currentLocation = Unit.currentLocation;
-        Bots nextBot = Bots.COUNTERMEASUREGUARD;
-        RobotType nextType = RobotType.GUARD;
+        toEnemy = getDeployDirection(toEnemy);
 
-        if (rc.canBuild(toEnemy, nextType)) {
-            rc.build(toEnemy, nextType);
-            countermeasure = rc.senseRobotAtLocation(currentLocation.add(toEnemy));
-        } else if (rc.canBuild(toEnemy.rotateLeft(), nextType)) {
-            rc.build(toEnemy.rotateLeft(), nextType);
-            countermeasure = rc.senseRobotAtLocation(currentLocation.add(toEnemy.rotateLeft()));
-        } else if (rc.canBuild(toEnemy.rotateRight(), nextType)) {
-            rc.build(toEnemy.rotateRight(), nextType);
-            countermeasure = rc.senseRobotAtLocation(currentLocation.add(toEnemy.rotateRight()));
-        } else if (rc.canBuild(toEnemy.rotateLeft().rotateLeft(), nextType)) {
-            rc.build(toEnemy.rotateLeft().rotateLeft(), nextType);
-            countermeasure = rc.senseRobotAtLocation(currentLocation.add(toEnemy.rotateLeft().rotateLeft()));
-        } else if (rc.canBuild(toEnemy.rotateRight().rotateRight(), nextType)) {
-            rc.build(toEnemy.rotateRight().rotateRight(), nextType);
-            countermeasure = rc.senseRobotAtLocation(currentLocation.add(toEnemy.rotateRight().rotateRight()));
+        if (toEnemy == null) {
+            return null;
         }
+        rc.build(toEnemy,RobotType.GUARD);
+
+        sendInitialMessages(toEnemy);
+
+        countermeasure = rc.senseRobotAtLocation(Unit.currentLocation.add(toEnemy));
+
         return countermeasure;
+    }
+
+
+    public static void sendInitialMessages(Direction dir) throws GameActionException
+    {
+        int id = Unit.rc.senseRobotAtLocation(Unit.rc.getLocation().add(dir)).ID;
+        MissionCommunication communication = new MissionCommunication();
+        communication.opcode = CommunicationType.CHANGEMISSION;
+        communication.id = id;
+        communication.rType = RobotType.GUARD;
+        communication.bType = Bots.COUNTERMEASUREGUARD;
+        communication.newBType = Bots.COUNTERMEASUREGUARD;
+        Unit.communicator.sendCommunication(2, communication);
+
+        Communication mapBoundsCommunication = Unit.mapKnowledge.getMapBoundsCommunication();
+        Unit.communicator.sendCommunication(2, mapBoundsCommunication);
+
+        for (int j = Unit.mapKnowledge.dens.length; --j>=0; )
+        {
+            MapLocation den = Unit.mapKnowledge.dens.array[j];
+
+            if (den != null)
+            {
+                Communication communicationDen = new SimpleBotInfoCommunication();
+                communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                Unit.communicator.sendCommunication(2, communicationDen);
+            }
+        }
     }
 
     /**
