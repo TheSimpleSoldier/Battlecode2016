@@ -121,7 +121,7 @@ public class FightMicro
 
     public boolean basicNetFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByAllies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target) throws GameActionException
     {
-        if (enemies == null || enemies.length == 0)
+        if (enemies == null || enemies.length == 0 || nearByEnemies == null || allies == null)
         {
             return false;
         }
@@ -213,7 +213,7 @@ public class FightMicro
 
     public boolean basicNetZombieFightMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByAllies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target) throws GameActionException
     {
-        if (nearByEnemies == null || nearByEnemies.length == 0)
+        if (nearByEnemies == null || nearByEnemies.length == 0 || nearByEnemies == null || allies == null)
         {
             return false;
         }
@@ -662,7 +662,7 @@ public class FightMicro
     {
         if (enemies.length == 0) return false;
 
-        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        if (rc.isWeaponReady() && nearByEnemies != null && nearByEnemies.length > 0)
         {
             RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
 
@@ -791,7 +791,7 @@ public class FightMicro
 
         MapLocation currentLoc = rc.getLocation();
 
-        if (nearByZombies.length > 0)
+        if (nearByZombies != null && nearByZombies.length > 0)
         {
             for (int i = nearByZombies.length; --i>=0; )
             {

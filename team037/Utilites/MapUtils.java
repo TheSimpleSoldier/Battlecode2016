@@ -306,39 +306,63 @@ public class MapUtils
 
         int dist = currentLoc.distanceSquaredTo(target);
 
-        if (dist >= 81) return target;
+        if (dist >= 81)
+        {
+            Unit.rc.setIndicatorString(2, "returning target");
+            return target;
+        }
 
         MapLocation closest = currentLoc;
 
-        MapLocation[] getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
+        MapLocation[] getLocs;
 
-        int closestDistToTarget = dist;
+        int closestDistToTarget;
+        boolean illegalSpot;
 
-        if (currentLoc.x % 2 != currentLoc.y % 2)
+        if (currentLoc.x % 2 == currentLoc.y % 2)
         {
-            closestDistToTarget = dist;
+            closestDistToTarget = 999999;
+            illegalSpot = true;
         }
         else
         {
-            closestDistToTarget = 99999;
+            closestDistToTarget = dist;
+            illegalSpot = false;
         }
 
-        for (int i = getLocs.length; --i>=0; )
-        {
-            MapLocation current = getLocs[i];
+        do {
+            getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
 
-            if (current.x % 2 == current.y % 2) continue;
-            if (!Unit.rc.canSenseLocation(current)) continue;
-            if (!Unit.rc.onTheMap(current)) continue;
-            if (Unit.rc.senseRubble(current) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
-
-            int newDist = current.distanceSquaredTo(target);
-
-            if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)
+            for (int i = getLocs.length; --i>=0; )
             {
-                closestDistToTarget = newDist;
-                closest = current;
+                MapLocation current = getLocs[i];
+
+                if (current.x % 2 == current.y % 2) continue;
+                if (!Unit.rc.canSenseLocation(current)) continue;
+                if (!Unit.rc.onTheMap(current)) continue;
+                if (Unit.rc.senseRubble(current) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
+
+                int newDist = current.distanceSquaredTo(target);
+
+                if (newDist < closestDistToTarget && Unit.rc.canSense(current) && Unit.rc.senseRobotAtLocation(current) == null)
+                {
+                    closestDistToTarget = newDist;
+                    closest = current;
+                }
             }
+
+
+            dist *= 2;
+        } while (closest.equals(currentLoc) && illegalSpot);
+
+
+        if (closest.x % 2 == closest.y % 2 && !closest.equals(currentLoc))
+        {
+            System.out.println("Houston we have a problem");
+        }
+        else if (closest.equals(currentLoc) && currentLoc.x % 2 == currentLoc.y % 2)
+        {
+            System.out.println("Returning current loc");
         }
 
         return closest;

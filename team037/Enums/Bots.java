@@ -59,6 +59,7 @@ public enum Bots
     SCOUTBOMBGUARD,
     SCOUTBOMBSCOUT,
     RUSHSCOUT,
+    SCOUTBOMBVIPER,
     SCAVENGERARCHON,
     SCAVENGERSCOUT,
     COUNTERMEASUREGUARD;
@@ -125,12 +126,14 @@ public enum Bots
                 return 27;
             case RUSHSCOUT:
                 return 28;
-            case SCAVENGERARCHON:
+            case SCOUTBOMBVIPER:
                 return 29;
-            case SCAVENGERSCOUT:
+            case SCAVENGERARCHON:
                 return 30;
-            case COUNTERMEASUREGUARD:
+            case SCAVENGERSCOUT:
                 return 31;
+            case COUNTERMEASUREGUARD:
+                return 32;
         }
         return -1;
     }
@@ -198,10 +201,12 @@ public enum Bots
             case 28:
                 return RUSHSCOUT;
             case 29:
-                return SCAVENGERARCHON;
+                return SCOUTBOMBVIPER;
             case 30:
-                return SCAVENGERSCOUT;
+                return SCAVENGERARCHON;
             case 31:
+                return SCAVENGERSCOUT;
+            case 32:
                 return COUNTERMEASUREGUARD;
         }
 

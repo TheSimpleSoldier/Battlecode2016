@@ -43,7 +43,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
     }
 
     public boolean precondition() {
-        if (zombies.length < 5) {
+        if (zombies.length < 7) {
             if (rc.isCoreReady() && countermeasure != null) {
                 return runAway(null);
             }
@@ -70,7 +70,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
     }
 
     public int[] applyAdditionalWeights(int[] directions, double[][] weights) {
-        directions = applyUnitWeights(currentLocation,directions, new RobotInfo[]{}, weights[0]);
+        directions = applyUnitWeights(currentLocation,directions, allies, weights[0]);
         return directions;
     }
 
@@ -128,8 +128,6 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         if (!safeToCommunicate()) {
             return;
         }
-
-
     }
 
     public void collectData() throws GameActionException {

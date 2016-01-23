@@ -32,7 +32,7 @@ public class AlphaArchon extends BaseArchon
 
         MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
 
-        if (!bestParts.equals(currentTarget))
+        if (bestParts != null && !bestParts.equals(currentTarget))
             return true;
 
         return false;
