@@ -346,16 +346,46 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public Bots changeBuildOrder(Bots nextBot)
     {
         rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
+        int round = rc.getRoundNum();
 
-        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 30)
+//        if (zombieTracker.getNextZombieRound() - round < 30)
+//        {
+//            nextType = RobotType.SCOUT;
+//            return Bots.SCOUTBOMBSCOUT;
+//        }
+//        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 50)
+//        {
+//            nextType = RobotType.SCOUT;
+//            return Bots.SCOUTBOMBSCOUT;
+//        }
+
+        if (round > 1000)
         {
-            nextType = RobotType.SCOUT;
-            return Bots.SCOUTBOMBSCOUT;
-        }
-        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - rc.getRoundNum() < 50)
-        {
-            nextType = RobotType.SCOUT;
-            return Bots.SCOUTBOMBSCOUT;
+            int soldierCount = 0;
+            int guardCount = 0;
+
+            for (int i = allies.length; --i>=0; )
+            {
+                switch (allies[i].type)
+                {
+                    case SOLDIER:
+                        soldierCount++;
+                        break;
+                    case GUARD:
+                        guardCount++;
+                }
+            }
+
+            if (soldierCount < 5)
+            {
+                System.out.println("Spawning extra turtleSOldier");
+                return Bots.TURTLESOLDIER;
+            }
+            else if (guardCount < 5)
+            {
+                System.out.println("Spawning extra Turtle Guard");
+                return Bots.TURTLEGUARD;
+            }
         }
 
         return nextBot;

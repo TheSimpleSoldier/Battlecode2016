@@ -35,8 +35,24 @@ public class PacManUtils {
         return new MapLocation(x,y);
     }
 
+    /**
+     * This method returns true if we see an allied turret in which case we shouldn't deploy counter measures
+     *
+     * @return
+     */
+    public static boolean nearTurrets() {
+        if (Unit.allies == null || Unit.allies.length == 0) return false;
+
+        for (int i = Unit.allies.length; --i>=0; ) {
+            if (Unit.allies[i].type == RobotType.TURRET) return true;
+        }
+
+        return false;
+    }
+
     public static boolean canDeployCountermeasure() {
-        if (countermeasure == null || !Unit.rc.canSenseRobot(countermeasure.ID)) {
+        if ((countermeasure == null || !Unit.rc.canSenseRobot(countermeasure.ID)) && !nearTurrets()) {
+            System.out.println("Deploy countermeasures");
             countermeasure = null;
             return true;
         }
