@@ -301,4 +301,35 @@ public interface PacMan {
             return false;
         }
     }
+
+    default boolean runAwayPure(double[][] weights)  {
+        if (!Navigation.lastScan.equals(Unit.currentLocation)) {
+            try {
+                if (Clock.getBytecodesLeft() > 15000) {
+                    PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+                } else {
+                    PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
+                }
+                Navigation.lastScan = Unit.currentLocation;
+            } catch (Exception e) {e.printStackTrace();}
+        }
+
+        Navigator navigator = Unit.navigator;
+
+        Direction direction = getRunAwayDirection(weights);
+
+        MapLocation nextLoc = Unit.currentLocation.add(direction);
+
+        MapLocation saveTarget = navigator.getTarget();
+        navigator.setTarget(nextLoc);
+        try {
+            boolean out = navigator.takeNextStep();
+            navigator.setTarget(saveTarget);
+            return out;
+        } catch (Exception e) {
+            navigator.setTarget(saveTarget);
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
