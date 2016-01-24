@@ -1,24 +1,13 @@
 package team037;
 
 import battlecode.common.*;
-import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.AlphaArchon;
 import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleArchon;
-import team037.Units.CastleUnits.CastleSoldier;
-import team037.Units.CastleUnits.CastleTurret;
-import team037.Units.DenKillers.DenKillerSoldier;
-import team037.Units.PacMan.PacManArchon;
-import team037.Units.PacMan.PacManGuard;
-import team037.Units.Scavenger.CountermeasureGuard;
 import team037.Units.Scavenger.ScavengerArchon;
-import team037.Units.Scavenger.ScavengerScout;
 import team037.Units.ScoutBomb.ScoutBombArchon;
-import team037.Units.ScoutBomb.ScoutBombGuard;
-import team037.Units.ScoutBomb.ScoutBombScout;
-import team037.Units.ScoutBomb.ScoutBombViper;
 import team037.Units.TurtleUnits.TurtleArchon;
 import team037.Utilites.StrategyUtilities;
 import team037.Utilites.ZombieTracker;
