@@ -13,6 +13,7 @@ public class Map {
     public long[][] mapX;   // Row-major storage of the map.
     public final int originX, originY;  // Origin in real coordinates.
     static RobotController rc;
+    public static double[] adjacentRubble;
 
     /**
      * Constructor.
@@ -26,6 +27,7 @@ public class Map {
         originY = originLocation.y;
         mapX = new long[256][4];
         mapY = new long[256][4];
+        adjacentRubble = null;
     }
 
     /**
@@ -126,10 +128,11 @@ public class Map {
      * @param currentLoc MapLocation of the unit's current location
      * @throws GameActionException
      */
-    public void scanImmediateVicinity(MapLocation currentLoc) throws GameActionException {
+    public double[] scanImmediateVicinity(MapLocation currentLoc) throws GameActionException {
 
         MapLocation location = currentLoc;
         double rubble = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+        adjacentRubble = new double[8];
 
         long xNorth = 0;
         long xMid = 0;
@@ -144,42 +147,50 @@ public class Map {
             yMid += 2;
         }
         location = currentLoc.add(Direction.NORTH);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[0] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[0] >= rubble) {
             xNorth += 2;
             yMid += 4;
         }
         location = currentLoc.add(Direction.NORTH_EAST);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[1] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[1] >= rubble) {
             xNorth += 1;
             yEast += 4;
         }
         location = currentLoc.add(Direction.EAST);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[2] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[2] >= rubble) {
             xMid += 1;
             yEast += 2;
         }
         location = currentLoc.add(Direction.SOUTH_EAST);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[3] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[3] >= rubble) {
             xSouth += 1;
             yEast += 1;
         }
         location = currentLoc.add(Direction.SOUTH);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[4] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[4] >= rubble) {
             xSouth += 2;
             yMid += 1;
         }
         location = currentLoc.add(Direction.SOUTH_WEST);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[5] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[5] >= rubble) {
             xSouth += 4;
             yWest += 1;
         }
         location = currentLoc.add(Direction.WEST);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[6] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[6] >= rubble) {
             xMid += 4;
             yWest += 2;
         }
         location = currentLoc.add(Direction.NORTH_WEST);
-        if (!rc.onTheMap(location) || rc.senseRubble(location) >= rubble) {
+        adjacentRubble[7] = rc.senseRubble(location);
+        if (!rc.onTheMap(location) || adjacentRubble[7] >= rubble) {
             xNorth += 4;
             yWest += 4;
         }
@@ -254,6 +265,7 @@ public class Map {
             mapX[yIndex][index] |= xNorth << shift;
         }
 //        printMap(currentLoc,1);
+        return adjacentRubble;
     }
 
 
@@ -268,7 +280,7 @@ public class Map {
         long[] y = new long[9];
         double rubbleThresh = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
 
-        double[] adjacentRubble = new double[8];
+        adjacentRubble = new double[8];
 
         try {
             MapLocation checkLoc = locations[4];
