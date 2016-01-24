@@ -96,7 +96,8 @@ public class RobotPlayer
                     Unit.thisBot = Bots.SUPERRUSHARCHON;
                 }
                 else
-                { // default to alpha archons
+                {
+                    // default to alpha archons
                     unit = new AlphaArchon(rc);
                     Unit.thisBot = Bots.ALPHAARCHON;
                 }

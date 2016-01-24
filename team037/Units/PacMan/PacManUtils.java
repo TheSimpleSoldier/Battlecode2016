@@ -8,9 +8,6 @@ import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
 
-/**
- * Created by davej on 1/22/2016.
- */
 public class PacManUtils {
 
     public static RobotInfo countermeasure = null;
