@@ -52,7 +52,6 @@ public class PacManUtils {
 
     public static boolean canDeployCountermeasure() {
         if ((countermeasure == null || !Unit.rc.canSenseRobot(countermeasure.ID)) && !nearTurrets()) {
-            System.out.println("Deploy countermeasures");
             countermeasure = null;
             return true;
         }

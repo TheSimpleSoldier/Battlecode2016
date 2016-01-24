@@ -312,9 +312,10 @@ public class BaseArchon extends Unit implements PacMan
         {
             if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())
             {
-                Bots temp2 = nextBot;
+                Bots temp2 = Bots.fromInt(Bots.toInt(nextBot));
                 nextBot = temp;
 
+                nextType = Bots.typeFromBot(temp);
                 Direction dir = build();
                 if(dir != Direction.NONE)
                 {
@@ -325,7 +326,7 @@ public class BaseArchon extends Unit implements PacMan
                 }
             }
         }
-        else if(rc.hasBuildRequirements(nextType) && rc.isCoreReady())
+        else if(rc.hasBuildRequirements(Bots.typeFromBot(nextBot)) && rc.isCoreReady())
         {
             Direction dir = build();
             if(dir != Direction.NONE)

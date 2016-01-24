@@ -373,17 +373,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
                         break;
                     case GUARD:
                         guardCount++;
+                        break;
                 }
             }
 
-            if (soldierCount < 5)
+            if (soldierCount < 1)
             {
-                System.out.println("Spawning extra turtleSOldier");
                 return Bots.TURTLESOLDIER;
             }
-            else if (guardCount < 5)
+            else if (guardCount < 1)
             {
-                System.out.println("Spawning extra Turtle Guard");
                 return Bots.TURTLEGUARD;
             }
         }
