@@ -308,10 +308,10 @@ public class MapUtils
         }
 
         // get rid of this
-        if (Unit.us == Team.A)
-        {
-            return getClosestUnoccupiedSquare(currentLoc, target);
-        }
+//        if (Unit.us == Team.A)
+//        {
+//            return getClosestUnoccupiedSquare(currentLoc, target);
+//        }
 
         int dist = currentLoc.distanceSquaredTo(target);
 
