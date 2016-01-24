@@ -564,4 +564,3 @@ public class PacManUtils {
         return directions;
     }
 }
-

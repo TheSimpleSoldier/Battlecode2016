@@ -1,4 +1,5 @@
 package team037.Units.PacMan;
+
 import battlecode.common.*;
 import team037.Navigation;
 import team037.Navigator;
@@ -180,30 +181,28 @@ public interface PacMan {
                 if (PacManUtils.deployCountermeasure(direction.opposite()) != null) return true;
             } catch (GameActionException e) {e.printStackTrace();}
         }
-        MapLocation nextLoc = currentLocation.add(direction);
+            MapLocation nextLoc = currentLocation.add(direction);
 
-        MapLocation saveTarget = navigator.getTarget();
-        navigator.setTarget(nextLoc);
-        try {
-            boolean out = navigator.takeNextStep();
-            navigator.setTarget(saveTarget);
-            return out;
-        } catch (Exception e) {
-            navigator.setTarget(saveTarget);
-            e.printStackTrace();
-            return false;
-        }
+            MapLocation saveTarget = navigator.getTarget();
+            navigator.setTarget(nextLoc);
+            try {
+                boolean out = navigator.takeNextStep();
+                navigator.setTarget(saveTarget);
+                return out;
+            } catch (Exception e) {
+                navigator.setTarget(saveTarget);
+                e.printStackTrace();
+                return false;
+            }
 
     }
 
     default boolean runAway(double[][] weights)  {
-
         if (Unit.us.equals(Team.A)) {
             if (Unit.zombies.length < 8 || Unit.enemies.length < 5) {
                 return runAwayWithCountermeasures(weights);
             }
         }
-
         Navigator navigator = Unit.navigator;
 
         Direction direction = getRunAwayDirection(weights);
