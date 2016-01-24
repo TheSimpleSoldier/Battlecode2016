@@ -56,21 +56,7 @@ public class RobotPlayer
             {
                 strategy = Strategies.RUSH;
             }*/
-
-
-
-
-            /*
-            FOR TESTING ONLY remove if merging with master
-             */
-            if (rc.getTeam().equals(Team.A)) {
-                strategy = Strategies.PACMAN;
-            }
-
-
-
-
-
+            
             if(rc.getRoundNum() == 0)
             {
                 System.out.println(strategy);
