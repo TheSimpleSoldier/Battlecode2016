@@ -211,7 +211,7 @@ public class RobotPlayer
             }
         }
 
-        if(min < 100)
+        if(min <= 100)
         {
             return true;
         }
