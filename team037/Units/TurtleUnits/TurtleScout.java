@@ -201,37 +201,58 @@ public class TurtleScout extends BaseScout
             {
                 Direction goTo = currentLocation.directionTo(turtlePoint);
                 Direction left = goTo.rotateLeft().rotateLeft();
-                Direction right = goTo.rotateRight().rotateRight();
+                Direction right = goTo.rotateRight().rotateRight();3
 
-                if (fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation, zombies) == 0)
-                {
-                    return true;
-                }
+                int leftCount = fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(left), zombies);
+                int rightCount = fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(right), zombies);
 
-                if (rc.canMove(left) && fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(left), zombies) < fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(right), zombies))
+                if (rc.canMove(left) && leftCount == 0)
                 {
                     rc.move(left);
                     return true;
                 }
-                else if (rc.canMove(right))
+                else if (rc.canMove(right) && rightCount == 0)
                 {
                     rc.move(right);
                     return true;
                 }
-                else if (rc.canMove(left))
+                else
                 {
-                    rc.move(left);
-                    return true;
-                }
-                else if (rc.canMove(goTo.rotateLeft()))
-                {
-                    rc.move(goTo.rotateLeft());
-                    return true;
-                }
-                else if (rc.canMove(goTo.rotateRight()))
-                {
-                    rc.move(goTo.rotateRight());
-                    return true;
+                    Direction safeDir = null;
+                    for (int i = dirs.length; --i>=0; )
+                    {
+                        if (dirs[i] != left && dirs[i] != right && rc.canMove(dirs[i]))
+                        {
+                            MapLocation next = currentLocation.add(dirs[i]);
+
+                            if (!fightMicro.EnemiesInRangeOfLoc(next, zombies))
+                            {
+                                safeDir = dirs[i];
+                                break;
+                            }
+                        }
+                    }
+
+                    if (safeDir != null)
+                    {
+                        rc.move(safeDir);
+                        return true;
+                    }
+                    else if (rc.canMove(left))
+                    {
+                        rc.move(left);
+                        return true;
+                    }
+                    else if (rc.canMove(goTo.rotateLeft()))
+                    {
+                        rc.move(goTo.rotateLeft());
+                        return true;
+                    }
+                    else if (rc.canMove(goTo.rotateRight()))
+                    {
+                        rc.move(goTo.rotateRight());
+                        return true;
+                    }
                 }
             }
             else
