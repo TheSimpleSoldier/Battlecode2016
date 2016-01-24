@@ -18,8 +18,28 @@ public class Communicator
     public Communication[] processCommunications()
     {
         Signal[] signals = rc.emptySignalQueue();
+        boolean enemies = true;
+        boolean all = true;
+        if(signals.length > 100)
+        {
+            enemies = false;
+            all = false;
+        }
+        else if(signals.length > 50)
+        {
+            enemies = false;
+        }
         Communication[] communications = new Communication[signals.length];
-        for(int k = signals.length; --k >= 0;)
+        int k;
+        if(all)
+        {
+            k = signals.length;
+        }
+        else
+        {
+            k = 100;
+        }
+        for(;--k >= 0;)
         {
             if(rc.getTeam().equals(signals[k].getTeam()))
             {
@@ -32,7 +52,7 @@ public class Communicator
                     communications[k] = CommunicationUtilities.readCommunication(signals[k]);
                 }
             }
-            else
+            else if(enemies)
             {
                 communications[k] = CommunicationUtilities.readEnemyCommunication(signals[k]);
             }
