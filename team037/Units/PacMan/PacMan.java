@@ -272,10 +272,14 @@ public interface PacMan {
                 } else {
                     PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
                 }
+                Navigation.lastScan = Unit.currentLocation;
             } catch (Exception e) {e.printStackTrace();}
         }
 
-        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
+//        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
+//            return runAwayWithCountermeasures(weights);
+//        }
+        if (Unit.type.equals(RobotType.ARCHON)) {
             return runAwayWithCountermeasures(weights);
         }
         Navigator navigator = Unit.navigator;
