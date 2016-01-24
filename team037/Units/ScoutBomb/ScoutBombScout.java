@@ -197,7 +197,7 @@ public class ScoutBombScout extends BaseScout
         for (int i = signals.length; --i >= 0;) {
             if (signals[i].getTeam().equals(us)) {
                 int[] message = signals[i].getMessage();
-                if (message[0] == Integer.MIN_VALUE && message[1] == Integer.MIN_VALUE) {
+                if (message != null && message[0] == Integer.MIN_VALUE && message[1] == Integer.MIN_VALUE) {
                     rc.setIndicatorDot(currentLocation, 255, 0, 0);
                     if (closestAlliedArchonLoc == null) {
                         rushForward = true;
@@ -347,7 +347,7 @@ public class ScoutBombScout extends BaseScout
                 }
                 // TODO: consider moving, right, check to see what the distance would be after moving that direction
             }
-            toMove = MapUtils.getRCCanMoveDirection(this);
+            toMove = MapUtils.getRCCanMoveDirection();
             if (!toMove.equals(Direction.NONE)) {
                 rc.move(toMove);
                 return true;

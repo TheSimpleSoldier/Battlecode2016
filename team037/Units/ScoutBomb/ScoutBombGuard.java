@@ -126,7 +126,7 @@ public class ScoutBombGuard extends BaseGaurd {
 
         // move out the way!
         if (rc.senseNearbyRobots(2, us).length > 3) {
-            Direction rand = MapUtils.getRCCanMoveDirection(this);
+            Direction rand = MapUtils.getRCCanMoveDirection();
             rc.setIndicatorString(0, "moving out the way!");
             if (rc.canMove(rand)) {
                 rc.move(rand);
@@ -145,7 +145,7 @@ public class ScoutBombGuard extends BaseGaurd {
         }
 
         // move randomly
-        Direction rand = MapUtils.getRCCanMoveDirection(this);
+        Direction rand = MapUtils.getRCCanMoveDirection();
         if (rc.canMove(rand)) {
             rc.setIndicatorString(0, "moving randomly!");
             rc.move(rand);

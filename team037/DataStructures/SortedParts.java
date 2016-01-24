@@ -99,7 +99,7 @@ public class SortedParts
             {
                 int dist = current.distanceSquaredTo(locs[i]) + 1;
 
-                if (dist <= 25)
+                if (dist <= RobotType.ARCHON.sensorRadiusSquared)
                 {
                     double value = (score[i] / dist);
 
@@ -283,7 +283,7 @@ public class SortedParts
         {
             if (neutralBots[i].type == RobotType.ARCHON)
             {
-                addParts(neutralBots[i].location, 99999, true);
+                addParts(neutralBots[i].location, Integer.MAX_VALUE, true);
             }
             else
             {

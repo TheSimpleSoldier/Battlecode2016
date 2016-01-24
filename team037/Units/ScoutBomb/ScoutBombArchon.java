@@ -1,6 +1,7 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
+import team037.Enums.Bots;
 import team037.SlugNavigator;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Units.PacMan.PacMan;
@@ -339,9 +340,10 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         }
         if (start.equals(alliedArchonStartLocs[0]) && centerOfMassDifference < 1000 && vipersSpawned < rc.getRoundNum() / 300 ) {
             if (rc.hasBuildRequirements(RobotType.VIPER)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.VIPER);
+                    sendInitialMessages(toSpawn, RobotType.VIPER, Bots.SCOUTBOMBVIPER, false);
                     vipersSpawned++;
                     rc.setIndicatorString(1, "spawning viper, distance is " + centerOfMassDifference);
                 }
@@ -350,9 +352,10 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
 
         else if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
             if (rc.hasBuildRequirements(RobotType.GUARD)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.GUARD);
+                    sendInitialMessages(toSpawn, RobotType.GUARD, Bots.SCOUTBOMBGUARD, false);
                     if (zombies.length > 0) {
                         rc.setIndicatorString(1, "zombies are about, best spawn a guard");
                     } else {
@@ -363,9 +366,10 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
             }
         } else {
             if (rc.hasBuildRequirements(RobotType.SCOUT)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection(this);
+                Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
                     rc.build(toSpawn, RobotType.SCOUT);
+                    sendInitialMessages(toSpawn, RobotType.SCOUT, Bots.SCOUTBOMBSCOUT, false);
                     rc.setIndicatorString(1, "all clear, spawn a scout");
                     return true;
                 }

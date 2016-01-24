@@ -86,6 +86,7 @@ public class RobotPlayer
 
             RobotType type = rc.getType();
 
+            //TODO: archon switch for round > 1 to differentite activated archons
             if(type == RobotType.ARCHON)
             {
                 if(strategy.equals(Strategies.CASTLE))
@@ -115,74 +116,28 @@ public class RobotPlayer
             }
             else if(type == RobotType.GUARD)
             {
-                if(strategy.equals(Strategies.PACMAN))
-                {
-                    unit = new CountermeasureGuard(rc);
-                    Unit.thisBot = Bots.COUNTERMEASUREGUARD;
-                }
-                else if(strategy.equals(Strategies.SCOUT_BOMB))
-                {
-                    unit = new ScoutBombGuard(rc);
-                    Unit.thisBot = Bots.SCOUTBOMBGUARD;
-                }
-                else
-                {
-                    unit = new BaseGaurd(rc);
-                    Unit.thisBot = Bots.BASEGAURD;
-                }
+                unit = new BaseGaurd(rc);
+                Unit.thisBot = Bots.BASEGAURD;
             }
             else if(type == RobotType.SCOUT)
             {
-                if(strategy.equals(Strategies.PACMAN))
-                {
-                    unit = new ScavengerScout(rc);
-                    Unit.thisBot = Bots.SCAVENGERSCOUT;
-                }
-                else if(strategy.equals(Strategies.SCOUT_BOMB))
-                {
-                    unit = new ScoutBombScout(rc);
-                    Unit.thisBot = Bots.SCOUTBOMBSCOUT;
-                }
-                else
-                {
-                    unit = new BaseScout(rc);
-                    Unit.thisBot = Bots.BASESCOUT;
-                }
+                unit = new BaseScout(rc);
+                Unit.thisBot = Bots.BASESCOUT;
             }
             else if(type == RobotType.SOLDIER)
             {
-                if(strategy.equals(Strategies.CASTLE))
-                {
-                    unit = new CastleSoldier(rc);
-                }
-                else
-                {
-                    unit = new DenKillerSoldier(rc);
-                    Unit.thisBot = Bots.DENKILLERSOLDIER;
-                }
-
+                unit = new BaseSoldier(rc);
+                Unit.thisBot = Bots.BASESOLDIER;
             }
             else if(type == RobotType.TURRET || type == RobotType.TTM)
             {
-                if(strategy.equals(Strategies.CASTLE))
-                {
-                    unit = new CastleTurret(rc);
-                }
-                else
-                {
-                    unit = new BaseTurret(rc);
-                    Unit.thisBot = Bots.BASETURRET;
-                }
+                unit = new BaseTurret(rc);
+                Unit.thisBot = Bots.BASETURRET;
             }
             else if(type == RobotType.VIPER)
             {
-                if (strategy.equals(Strategies.SCOUT_BOMB)) {
-                    unit = new ScoutBombViper(rc);
-                    Unit.thisBot = Bots.SCOUTBOMBVIPER;
-                } else {
-                    unit = new BaseViper(rc);
-                    Unit.thisBot = Bots.BASEVIPER;
-                }
+                unit = new BaseViper(rc);
+                Unit.thisBot = Bots.BASEVIPER;
             }
 
             // initial update to strategy
@@ -194,12 +149,6 @@ public class RobotPlayer
             catch(Exception e)
             {
                 e.printStackTrace();
-            }
-
-            if(rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
-            {
-                BaseArchon.sendOutInitialLocation();
-                BaseArchon.mapKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
             }
         }
         catch(Exception e){e.printStackTrace();}
