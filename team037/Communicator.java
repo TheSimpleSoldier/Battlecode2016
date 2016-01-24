@@ -3,7 +3,6 @@ package team037;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 import battlecode.common.Signal;
-import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Utilites.CommunicationUtilities;
 

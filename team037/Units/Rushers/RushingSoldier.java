@@ -1,10 +1,12 @@
 package team037.Units.Rushers;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotType;
 import team037.Units.BaseUnits.BaseSoldier;
 import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
-import team037.Utilites.MapUtils;
 
 public class RushingSoldier extends BaseSoldier implements PacMan
 {
@@ -24,9 +26,21 @@ public class RushingSoldier extends BaseSoldier implements PacMan
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
-        rc.setIndicatorString(0, "Rushing Soldier");
+        int minDist = 9999;
+        for(int k = allies.length; --k >= 0;)
+        {
+            if(allies[k].type == RobotType.ARCHON)
+            {
+                int tempDist = currentLocation.distanceSquaredTo(allies[k].location);
+                if(tempDist < minDist)
+                {
+                    minDist = tempDist;
+                    myArchon = allies[k].ID;
+                }
+            }
+        }
 
-        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
+
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;
@@ -37,40 +51,12 @@ public class RushingSoldier extends BaseSoldier implements PacMan
     {
         super.collectData();
 
-        if (currentLocation != null && rushTarget != null)
-        {
-            if (currentLocation.distanceSquaredTo(rushTarget) < dist)
-            {
-                rushing = true;
-            }
-            else
-            {
-                rushing = false;
-            }
-        }
+        rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
     }
 
     @Override
     public MapLocation getNextSpot()
     {
-        if (currentIndex != -1)
-        {
-            if (currentIndex < updatedLocs.length)
-            {
-                updatedLocs[currentIndex] = null;
-            }
-            else
-            {
-                currentIndex = 0;
-                for (int i = updatedLocs.length; --i>=0; )
-                {
-                    updatedLocs[i] = enemyArchonStartLocs[i];
-                }
-            }
-
-            rushTarget =  MapUtils.getNearestLocation(updatedLocs, currentLocation);
-        }
-
         currentIndex++;
         return rushTarget;
     }
@@ -78,20 +64,17 @@ public class RushingSoldier extends BaseSoldier implements PacMan
     @Override
     public boolean updateTarget() throws GameActionException
     {
-        MapLocation target = navigator.getTarget();
+        return true;
+        /*MapLocation target = navigator.getTarget();
         if (target == null) return true;
         if (currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) return true;
-        return false;
+        return false;*/
     }
 
     @Override
     public boolean fight() throws GameActionException
     {
-        if (rushing)
-        {
-            return fightMicro.aggressiveFightMicro(nearByEnemies, enemies, nearByAllies);
-        }
-        return super.fight();
+        return fightMicro.basicAttack(nearByEnemies, enemies);
     }
 
     @Override
