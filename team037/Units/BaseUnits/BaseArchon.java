@@ -146,8 +146,12 @@ public class BaseArchon extends Unit implements PacMan
         
         if (neutralArchon != null)
         {
-            System.out.println("We see a neutral archon");
-            navigator.setTarget(neutralArchon);
+            if (!navigator.getTarget().equals(neutralArchon))
+            {
+                System.out.println("We see a neutral archon");
+                navigator.setTarget(neutralArchon);
+            }
+           
             if (rc.isCoreReady())
             {
                 navigator.takeNextStep();
@@ -491,7 +495,7 @@ public class BaseArchon extends Unit implements PacMan
         }
         if (least != null)
         {
-            rc.clearRubble(least);
+            try { rc.clearRubble(least); } catch (Exception e) { e.printStackTrace(); }
         }
 
         return Direction.NONE;
