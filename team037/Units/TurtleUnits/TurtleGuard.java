@@ -183,7 +183,12 @@ public class TurtleGuard extends BaseGaurd
         if (rallyPoint != null)
         {
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
-            rc.setIndicatorString(1, "Going to new rally point");
+            rc.setIndicatorString(1, "Going to new rally point x: " + rallyPoint.x + " y: " + rallyPoint.y + " round: " + rc.getRoundNum());
+            if (navigator.getTarget() != null)
+            {
+                rc.setIndicatorString(2, "NAvigation target x: " + navigator.getTarget().x + " y: " + navigator.getTarget().y + " round: " + rc.getRoundNum());
+            }
+            turnsArrivedLoc = -1;
             turtlePoint = rallyPoint;
             enemySightings = new int[8];
         }
@@ -237,17 +242,19 @@ public class TurtleGuard extends BaseGaurd
                 case SPARTS:
                     int values[] = communications[k].getValues();
 
-                    int id = values[3];
-
-                    if (RobotTypeTracker.contains(id))
+                    if (values.length >= 6)
                     {
-                        int x = values[4];
-                        int y = values[5];
+                        int id = values[3];
 
-                        MapLocation target = new MapLocation(x,y);
-                        navigator.setTarget(target);
+                        if (RobotTypeTracker.contains(id))
+                        {
+                            int x = values[4];
+                            int y = values[5];
+
+                            MapLocation target = new MapLocation(x,y);
+                            navigator.setTarget(target);
+                        }
                     }
-
 
                     break;
 

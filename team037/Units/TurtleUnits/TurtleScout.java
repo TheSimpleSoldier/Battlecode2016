@@ -2,6 +2,7 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseScout;
+import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
 public class TurtleScout extends BaseScout
@@ -80,8 +81,12 @@ public class TurtleScout extends BaseScout
             directionUpdateTurn = rc.getRoundNum();
         }
 
-        Direction goTo = currentLocation.directionTo(turtlePoint);
+        return goToLocation();
+    }
 
+    private Direction goToDirection()
+    {
+        Direction goTo = currentLocation.directionTo(turtlePoint);
         if (goTo != null)
         {
             if (goingLeft)
@@ -92,16 +97,85 @@ public class TurtleScout extends BaseScout
             {
                 goTo = goTo.rotateRight().rotateRight();
             }
-
-            return currentLocation.add(goTo, 100);
         }
+        return goTo;
+    }
 
-        return null;
+    private MapLocation goToLocation()
+    {
+        return currentLocation.add(goToDirection(), 100);
     }
 
     @Override
     public boolean fight() throws GameActionException
     {
+        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
+
+        Direction dir = goToDirection();
+        MapLocation next = currentLocation.add(dir);
+
+        // if we can move in
+        if (rc.canMove(dir) && !fightMicro.EnemiesInRangeOfLoc(next, enemies))
+        {
+            rc.move(dir);
+            return true;
+        }
+        else if (rc.canMove(dir.opposite()) && !fightMicro.EnemiesInRangeOfLoc(currentLocation.add(dir.opposite()), enemies))
+        {
+            goingLeft = !goingLeft;
+            rc.move(dir.opposite());
+            return true;
+        }
+
+        int bestEnemiesInRangeDamage = Integer.MAX_VALUE;
+        Direction bestDir = null;
+
+        for (int i = dirs.length; --i>=0; )
+        {
+            if (!rc.canMove(dirs[i])) continue;
+
+            next = currentLocation.add(dirs[i]);
+            int enemiesInRangeDamage = 0;
+
+            for (int j = enemies.length; --j>=0; )
+            {
+                if (enemies[j].location.distanceSquaredTo(next) <= enemies[j].type.attackRadiusSquared)
+                {
+                    enemiesInRangeDamage += enemies[j].type.attackPower;
+
+                    if (enemies[j].type == RobotType.VIPER)
+                    {
+                        enemiesInRangeDamage += 40;
+                    }
+                }
+            }
+
+            if (enemiesInRangeDamage < bestEnemiesInRangeDamage)
+            {
+                bestEnemiesInRangeDamage = enemiesInRangeDamage;
+                bestDir = dirs[i];
+
+                if (enemiesInRangeDamage == 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (bestDir != null && fightMicro.EnemiesInRangeOfLoc(currentLocation.add(bestDir), enemies) && !fightMicro.EnemiesInRangeOfLoc(currentLocation, enemies))
+        {
+            // stay put
+            return true;
+        }
+        else
+        {
+            if (bestDir != null)
+            {
+                rc.move(bestDir);
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -118,14 +192,13 @@ public class TurtleScout extends BaseScout
     @Override
     public boolean fightZombies() throws GameActionException
     {
-        if (zombies.length > 0)
+        if (FightMicroUtilites.offensiveEnemies(zombies))
         {
             rc.setIndicatorString(1, "");
 
             // if enemies can attack us then try to move to get them to chase us while the turrets blast them
             if (fightMicro.EnemiesInRangeOfLoc(currentLocation, zombies))
             {
-                rc.setIndicatorString(1, "running away");
                 Direction goTo = currentLocation.directionTo(turtlePoint);
                 Direction left = goTo.rotateLeft().rotateLeft();
                 Direction right = goTo.rotateRight().rotateRight();
@@ -159,6 +232,117 @@ public class TurtleScout extends BaseScout
                 {
                     rc.move(goTo.rotateRight());
                     return true;
+                }
+            }
+            else
+            {
+                boolean herding = false;
+
+                for (int i = zombies.length; --i>=0; )
+                {
+                    switch (zombies[i].type)
+                    {
+                        case FASTZOMBIE:
+                        case STANDARDZOMBIE:
+                        case RANGEDZOMBIE:
+                        case BIGZOMBIE:
+
+                            MapLocation zombie = zombies[i].location;
+                            int ourDist = currentLocation.distanceSquaredTo(zombie);
+
+                            for (int j = allies.length; --j>=0;)
+                            {
+                                if (allies[j].type == RobotType.SCOUT)
+                                {
+                                    MapLocation ally = allies[j].location;
+                                    int theirDist = ally.distanceSquaredTo(zombie);
+
+                                    // check to see if we are herding
+                                    if (theirDist >= ourDist)
+                                    {
+                                        herding = true;
+
+                                        // break out of for loops
+                                        i = -1;
+                                        j = -1;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                if (!herding)
+                {
+                    rc.setIndicatorString(1, "Not herding: " + rc.getRoundNum());
+                    MapLocation navigatorTarget = currentLocation.add(goToDirection());
+
+                    boolean keepGoing = true;
+                    int ourDist = currentLocation.distanceSquaredTo(navigatorTarget);
+
+                    for (int i = zombies.length; --i>=0; )
+                    {
+                        switch (zombies[i].type)
+                        {
+                            case FASTZOMBIE:
+                            case STANDARDZOMBIE:
+                            case RANGEDZOMBIE:
+                            case BIGZOMBIE:
+                                if (ourDist > zombies[i].location.distanceSquaredTo(navigatorTarget))
+                                {
+                                    keepGoing = false;
+                                    break;
+                                }
+                                break;
+                        }
+                    }
+
+                    // if we should just keep going around the circle
+                    if (keepGoing)
+                    {
+                        rc.setIndicatorString(2, "Continue in current dir: " + rc.getRoundNum());
+                        return false;
+                    }
+                    else
+                    {
+                        Direction current = currentLocation.directionTo(navigatorTarget).opposite();
+
+                        MapLocation goal = currentLocation.add(current);
+
+                        keepGoing = true;
+                        ourDist = currentLocation.distanceSquaredTo(goal);
+
+                        for (int i = zombies.length; --i>=0; )
+                        {
+                            switch (zombies[i].type)
+                            {
+                                case FASTZOMBIE:
+                                case STANDARDZOMBIE:
+                                case RANGEDZOMBIE:
+                                case BIGZOMBIE:
+                                    if (ourDist > zombies[i].location.distanceSquaredTo(goal))
+                                    {
+                                        keepGoing = false;
+                                        break;
+                                    }
+                                    break;
+                            }
+                        }
+
+                        // if we should go the opposite way then do it
+                        if (keepGoing)
+                        {
+                            rc.setIndicatorString(2, "Going opposite way now: " + rc.getRoundNum());
+                            goingLeft = !goingLeft;
+                            navigator.setTarget(goToLocation());
+                            return false;
+                        }
+                        else
+                        {
+                            rc.setIndicatorString(2, "staying put");
+                            return true;
+                        }
+                    }
                 }
             }
         }

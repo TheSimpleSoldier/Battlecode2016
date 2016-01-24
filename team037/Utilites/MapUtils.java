@@ -308,10 +308,10 @@ public class MapUtils
         }
 
         // get rid of this
-        if (Unit.us == Team.A)
-        {
-            return getClosestUnoccupiedSquare(currentLoc, target);
-        }
+//        if (Unit.us == Team.A)
+//        {
+//            return getClosestUnoccupiedSquare(currentLoc, target);
+//        }
 
         int dist = currentLoc.distanceSquaredTo(target);
 
@@ -340,7 +340,9 @@ public class MapUtils
 
 
         do {
-            getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
+            if (dist <= 0) dist = 1;
+
+            getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, Math.min(99, dist));
 
             for (int i = getLocs.length; --i>=0; )
             {
@@ -369,7 +371,7 @@ public class MapUtils
         }
         else if (closest.equals(currentLoc) && currentLoc.x % 2 == currentLoc.y % 2)
         {
-            System.out.println("Returning current loc");
+//            System.out.println("Returning current loc");
         }
 
         return closest;

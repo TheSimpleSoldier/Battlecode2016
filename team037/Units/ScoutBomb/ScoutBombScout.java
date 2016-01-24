@@ -6,6 +6,7 @@ import team037.FlyingSlugNavigator;
 import team037.RobotPlayer;
 import team037.ScoutMapKnowledge;
 import team037.Units.BaseUnits.BaseScout;
+import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 import team037.Utilites.MoveUtils;
 
@@ -210,7 +211,12 @@ public class ScoutBombScout extends BaseScout
     }
 
     @Override
-    public void sendMessages() {
+    public void sendMessages() throws GameActionException {
+        if (!FightMicroUtilites.offensiveEnemies(zombies)) {
+            msgDens();
+            msgParts();
+        }
+
         return;
     }
 

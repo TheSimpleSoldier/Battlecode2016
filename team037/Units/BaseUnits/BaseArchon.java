@@ -77,7 +77,7 @@ public class BaseArchon extends Unit implements PacMan
                 navigatorTarget = navigator.getTarget();
                 if (currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget))
                 {
-                    if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                    if (rc.isCoreReady() && rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
                     {
                         rc.clearRubble(currentLocation.directionTo(navigatorTarget));
                         return true;
@@ -140,6 +140,22 @@ public class BaseArchon extends Unit implements PacMan
             nextBot = getDefaultBotTypes(neutralBots[0].type);
             sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
             nextBot = currentBot;
+        }
+
+        MapLocation neutralArchon = sortedParts.getNeutralArchon();
+        
+        if (neutralArchon != null)
+        {
+            if (navigator.getTarget() == null || !navigator.getTarget().equals(neutralArchon))
+            {
+                System.out.println("We see a neutral archon");
+                navigator.setTarget(neutralArchon);
+            }
+
+            if (rc.isCoreReady())
+            {
+                navigator.takeNextStep();
+            }
         }
 
     }
@@ -459,7 +475,7 @@ public class BaseArchon extends Unit implements PacMan
     public Direction build() throws GameActionException
     {
         double rubble = Double.MAX_VALUE;
-        Direction least = dirs[0];
+        Direction least = null;
         for (int i = dirs.length; --i>=0; )
         {
             if(rc.onTheMap(currentLocation.add(dirs[i])))
@@ -477,10 +493,9 @@ public class BaseArchon extends Unit implements PacMan
                 }
             }
         }
-        try {
-            rc.clearRubble(least);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (least != null)
+        {
+            try { rc.clearRubble(least); } catch (Exception e) { e.printStackTrace(); }
         }
 
         return Direction.NONE;
