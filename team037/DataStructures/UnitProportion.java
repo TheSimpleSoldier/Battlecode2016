@@ -7,20 +7,20 @@ import battlecode.common.RobotType;
  */
 public class UnitProportion
 {
-    public int scouts;
-    public int soldiers;
-    public int guards;
-    public int vipers;
-    public int turrets;
-    public int totalProportion;
+    public double scouts;
+    public double soldiers;
+    public double guards;
+    public double vipers;
+    public double turrets;
+    public double totalProportion;
 
-    public int actualScouts;
-    public int actualSoldiers;
-    public int actualGuards;
-    public int actualVipers;
-    public int actualTurrets;
+    public double actualScouts;
+    public double actualSoldiers;
+    public double actualGuards;
+    public double actualVipers;
+    public double actualTurrets;
 
-    public UnitProportion(int scouts, int soldiers, int guards, int vipers, int turrets)
+    public UnitProportion(double scouts, double soldiers, double guards, double vipers, double turrets)
     {
         this.scouts = scouts;
         this.soldiers = soldiers;
@@ -32,10 +32,14 @@ public class UnitProportion
 
     public RobotType nextBot()
     {
-        int totalActual = actualScouts + actualSoldiers + actualGuards + actualVipers + actualTurrets;
+        double totalActual = actualScouts + actualSoldiers + actualGuards + actualVipers + actualTurrets;
+        if(totalActual == 0)
+        {
+            totalActual++;
+        }
 
-        int worst = 100;
-        int tempWorst;
+        double worst = 100;
+        double tempWorst;
         RobotType toReturn = null;
 
         if(scouts > 0)

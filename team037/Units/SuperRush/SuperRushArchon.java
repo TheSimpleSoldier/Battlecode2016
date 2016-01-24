@@ -8,6 +8,7 @@ import team037.Messages.AttackCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Unit;
+import team037.Utilites.RubbleUtilities;
 
 /**
  * Created by joshua on 1/22/16.
@@ -29,8 +30,8 @@ public class SuperRushArchon extends Unit
     public SuperRushArchon(RobotController rc)
     {
         super(rc);
-        first = RobotType.GUARD;
-        unitProportion = new UnitProportion(0, 1, 0, 0, 0);
+        first = RobotType.SOLDIER;
+        unitProportion = new UnitProportion(0., 1., 0., 0., 0.);
 
         spawnedFirst = false;
         targetArchon = chooseBestArchon();
@@ -62,12 +63,12 @@ public class SuperRushArchon extends Unit
             }
 
             MapLocation current = currentLocation;
-            while(rc.canSenseLocation(current))
+            while(rc.canSenseLocation(current) && !current.equals(enemyArchonStartLocs[k]))
             {
                 double rubble = rc.senseRubble(current);
                 if(rubble >= 100)
                 {
-                    archons[k] += 30;
+                    archons[k] += RubbleUtilities.calculateClearActionsToPassableButSlow(rubble) * 2;
                 }
                 current = current.add(current.directionTo(enemyArchonStartLocs[k]));
             }
@@ -77,12 +78,14 @@ public class SuperRushArchon extends Unit
         int min = 9999999;
         for(int k = archons.length; --k >= 0;)
         {
+            System.out.print(archons[k] + ", ");
             if(archons[k] < min)
             {
                 min = archons[k];
                 index = k;
             }
         }
+        System.out.println();
 
         return enemyArchonStartLocs[index];
     }
@@ -175,6 +178,7 @@ public class SuperRushArchon extends Unit
             {
                 rc.activate(nearest.location);
                 unitProportion.addBot(nearest.type);
+                sendInitialMessages(currentLocation.directionTo(nearest.location), nearest.type);
                 return true;
             }
 
@@ -378,8 +382,7 @@ public class SuperRushArchon extends Unit
         }
 
         navigator.setTarget(targetArchon);
-        navigator.takeNextStep();
-        return true;
+        return navigator.takeNextStep();
     }
 
     private boolean runAway()
