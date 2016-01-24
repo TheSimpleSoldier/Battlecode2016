@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.Navigation;
 import team037.Navigator;
 import team037.Unit;
+import team037.Utilites.FightMicroUtilites;
 
 public interface PacMan {
     /**
@@ -264,6 +265,46 @@ public interface PacMan {
 
     }
 
+    /**
+     * This method returns true if we see an allied turret in which case we shouldn't deploy counter measures
+     *
+     * @return
+     */
+    default boolean nearTurrets() {
+        if (Unit.allies == null || Unit.allies.length == 0) return false;
+
+        for (int i = Unit.allies.length; --i>=0; ) {
+            if (Unit.allies[i].type == RobotType.TURRET) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * This method checks to see if there are any fast zombies chasing us
+     *
+     * @return
+     */
+    default boolean fastZombie() {
+        for (int i = Unit.zombies.length; --i>=0; ) {
+            if (Unit.zombies[i].type == RobotType.FASTZOMBIE) return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method determines if we should spawn counter measures or not
+     * 
+     * @return
+     */
+    default boolean spawnCounterMeasure() {
+        if (nearTurrets()) return false;
+        if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
+        if (!fastZombie()) return false;
+        if (Unit.zombies.length > 9) return false;
+        return true;
+    }
+
     default boolean runAway(double[][] weights)  {
         if (!Navigation.lastScan.equals(Unit.currentLocation)) {
             try {
@@ -276,10 +317,7 @@ public interface PacMan {
             } catch (Exception e) {e.printStackTrace();}
         }
 
-//        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
-//            return runAwayWithCountermeasures(weights);
-//        }
-        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 10) {
+        if (Unit.type.equals(RobotType.ARCHON) && spawnCounterMeasure()) {
             return runAwayWithCountermeasures(weights);
         }
         Navigator navigator = Unit.navigator;

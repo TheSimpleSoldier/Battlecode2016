@@ -27,6 +27,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean offensiveEnemies = false;
     private boolean offensiveAllies = false;
     private boolean underAttack = false;
+    private int lastZombieSighting = 0;
+    private int lastEnemieSighting = 0;
 
     public TurtleArchon(RobotController rc)
     {
@@ -44,6 +46,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
+        lastZombieSighting = rc.getRoundNum();
 
         try
         {
@@ -71,7 +74,22 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         super.collectData();
 
-        offensiveEnemies = FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies);
+        boolean offensiveZombies = FightMicroUtilites.offensiveEnemies(zombies);
+        offensiveEnemies = FightMicroUtilites.offensiveEnemies(enemies);
+
+        int round = rc.getRoundNum();
+
+        if (offensiveZombies)
+        {
+            lastZombieSighting = round;
+        }
+
+        if (offensiveEnemies)
+        {
+            lastEnemieSighting = round;
+        }
+
+        offensiveEnemies = offensiveEnemies || offensiveZombies;
         offensiveAllies = FightMicroUtilites.offensiveEnemies(allies);
         underAttack = underAttack();
 
@@ -80,8 +98,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
             turtlePoint = rallyPoint;
             updateRound = rc.getRoundNum();
         }
-
-        int round = rc.getRoundNum();
 
         if ((round - updateRound) < 100)
         {
@@ -348,15 +364,23 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
         int round = rc.getRoundNum();
 
-        if (zombieTracker.getNextZombieRound() - round < 30)
+        if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
-            nextType = RobotType.SCOUT;
-            return Bots.SCOUTBOMBSCOUT;
+            if (zombieTracker.getNextZombieRound() - round < 30)
+            {
+                nextType = RobotType.SCOUT;
+                return Bots.SCOUTBOMBSCOUT;
+            }
+            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 50)
+            {
+                nextType = RobotType.SCOUT;
+                return Bots.SCOUTBOMBSCOUT;
+            }
         }
-        else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 50)
+
+        if (rc.getTeamParts() > 200)
         {
-            nextType = RobotType.SCOUT;
-            return Bots.SCOUTBOMBSCOUT;
+            return Bots.TURTLETURRET;
         }
 
         if (round > 1000)
