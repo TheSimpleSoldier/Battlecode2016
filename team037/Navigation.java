@@ -45,7 +45,7 @@ public class Navigation {
             lastScan = rc.getLocation();
             try {
                 map.scanImmediateVicinity(lastScan);
-            } catch (Exception e) {}
+            } catch (Exception e) {e.printStackTrace();}
 
             reachedGoal = false;
             searching = false;

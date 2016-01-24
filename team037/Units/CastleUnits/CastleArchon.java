@@ -3,6 +3,7 @@ package team037.Units.CastleUnits;
 import battlecode.common.*;
 import team037.CastleNavigator;
 import team037.DataStructures.AppendOnlyMapLocationArray;
+import team037.Enums.Bots;
 import team037.SlugNavigator;
 import team037.Unit;
 import team037.Units.BaseUnits.BaseArchon;
@@ -249,9 +250,10 @@ public class CastleArchon extends BaseArchon {
         return Direction.NONE;
     }
 
-    private boolean trySpawn(Direction d, RobotType toSpawn) throws GameActionException {
+    private boolean trySpawn(Direction d, RobotType toSpawn, Bots botType) throws GameActionException {
         if (!d.equals(Direction.NONE) && rc.canBuild(d, toSpawn)) {
             rc.build(d, toSpawn);
+            sendInitialMessages(d, toSpawn, botType, false);
             return true;
         }
         return false;
@@ -275,7 +277,7 @@ public class CastleArchon extends BaseArchon {
 
         if (numSoliders < 15 && rc.hasBuildRequirements(RobotType.SOLDIER)) {
             Direction spawnDir = nextSpawnDir();
-            if (trySpawn(spawnDir, RobotType.SOLDIER)) {
+            if (trySpawn(spawnDir, RobotType.SOLDIER, Bots.CASTLESOLDIER)) {
                 waitTill = round + RobotType.SOLDIER.buildTurns + 4;
                 rc.setIndicatorString(1, "spawn3d a soldier " + round);
                 return true;
@@ -284,7 +286,7 @@ public class CastleArchon extends BaseArchon {
 
         if (numTurrets < 4 && rc.hasBuildRequirements(RobotType.TURRET) && round > 2000) {
             Direction spawnDir = nextTurretSpawnDir();
-            if (trySpawn(spawnDir, RobotType.TURRET)) {
+            if (trySpawn(spawnDir, RobotType.TURRET, Bots.CASTLETURRET)) {
                 waitTill = round + RobotType.TURRET.buildTurns + 4;
                 rc.setIndicatorString(1, "spawn3d a turret " + round);
                 return true;

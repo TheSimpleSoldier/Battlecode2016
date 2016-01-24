@@ -351,6 +351,49 @@ public class BaseArchon extends Unit implements PacMan
         }
     }
 
+    public void sendInitialMessages(Direction dir, RobotType nextType, Bots nextBot, boolean sendDenLocs) throws GameActionException
+    {
+        int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
+        MissionCommunication communication = new MissionCommunication();
+        communication.opcode = CommunicationType.CHANGEMISSION;
+        communication.id = id;
+        communication.rType = nextType;
+        communication.bType = nextBot;
+        communication.newBType = nextBot;
+        communicator.sendCommunication(2, communication);
+
+        Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication();
+        communicator.sendCommunication(2, mapBoundsCommunication);
+
+        if (sendDenLocs) {
+            for (int j = mapKnowledge.dens.length; --j>=0; )
+            {
+                MapLocation den = mapKnowledge.dens.array[j];
+
+                if (den != null)
+                {
+                    Communication communicationDen = new SimpleBotInfoCommunication();
+                    communicationDen.setValues(new int[] {CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                    communicator.sendCommunication(2, communicationDen);
+                }
+            }
+        }
+    }
+
+    /**
+     * This method sends out the initial location of the archons
+     */
+    public static void sendOutInitialLocation()
+    {
+        try {
+            Communication communication = new SimpleBotInfoCommunication();
+            communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.SARCHON), id, rc.getLocation().x, rc.getLocation().y});
+            communicator.sendCommunication(2500, communication);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static MapLocation getNextPartLocation() throws GameActionException
     {
         MapLocation next = sortedParts.getBestSpot(currentLocation);

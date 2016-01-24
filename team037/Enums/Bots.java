@@ -6,14 +6,16 @@ import team037.Unit;
 import team037.Units.*;
 import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleSoldier;
+import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.PacMan.CountermeasureGuard;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManScout;
-import team037.Units.PacMan.PacManViper;
 import team037.Units.Rushers.*;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.ScoutBomb.ScoutBombGuard;
+import team037.Units.ScoutBomb.ScoutBombViper;
 import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
 import team037.Units.Scouts.RegionScout;
@@ -56,7 +58,9 @@ public enum Bots
     SCOUTBOMBGUARD,
     SCOUTBOMBSCOUT,
     RUSHSCOUT,
-    SCOUTBOMBVIPER;
+    SCOUTBOMBVIPER,
+    CASTLETURRET,
+    COUNTERMEASUREGUARD;
 
     public static int toInt(Bots type)
     {
@@ -122,6 +126,10 @@ public enum Bots
                 return 28;
             case SCOUTBOMBVIPER:
                 return 29;
+            case CASTLETURRET:
+                return 30;
+            case COUNTERMEASUREGUARD:
+                return 31;
         }
         return -1;
     }
@@ -190,6 +198,10 @@ public enum Bots
                 return RUSHSCOUT;
             case 29:
                 return SCOUTBOMBVIPER;
+            case 30:
+                return CASTLETURRET;
+            case 31:
+                return COUNTERMEASUREGUARD;
         }
 
         return null;
@@ -210,6 +222,7 @@ public enum Bots
             case BASEGAURD:
             case SCOUTBOMBGUARD:
             case PACMANGUARD:
+            case COUNTERMEASUREGUARD:
                 return RobotType.GUARD;
             case TURTLESCOUT:
             case SCOUTBOMBSCOUT:
@@ -230,6 +243,7 @@ public enum Bots
             case RUSHTURRET:
             case TURTLETURRET:
             case BASETURRET:
+            case CASTLETURRET:
                 return RobotType.TURRET;
             case RUSHINGVIPER:
             case BASEVIPER:
@@ -298,8 +312,14 @@ public enum Bots
                 return new ScoutBombScout(rc);
             case SCOUTBOMBGUARD:
                 return new ScoutBombGuard(rc);
+            case SCOUTBOMBVIPER:
+                return new ScoutBombViper(rc);
             case RUSHSCOUT:
                 return new RushingScout(rc);
+            case CASTLETURRET:
+                return new CastleTurret(rc);
+            case COUNTERMEASUREGUARD:
+                return new CountermeasureGuard(rc);
         }
 
         return null;
