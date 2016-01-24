@@ -536,8 +536,6 @@ public class FightMicro
             MapLocation spot = zombies[i].location;
             x += spot.x;
             y += spot.y;
-
-
         }
 
         enemyCOM = new MapLocation(x / len, y / len);
@@ -589,16 +587,6 @@ public class FightMicro
             if (rc.canAttackLocation(weakest.location))
             {
                 rc.attackLocation(weakest.location);
-                return true;
-            }
-        }
-
-        // if there are enemy zombies in range of us kite back
-        if (rc.isCoreReady() && nearByZombies.length > 0)
-        {
-            if (fleeDir != null)
-            {
-                rc.move(fleeDir);
                 return true;
             }
         }

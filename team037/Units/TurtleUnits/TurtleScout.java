@@ -188,7 +188,6 @@ public class TurtleScout extends BaseScout
         msgDens();
     }
 
-
     @Override
     public boolean fightZombies() throws GameActionException
     {
@@ -201,7 +200,7 @@ public class TurtleScout extends BaseScout
             {
                 Direction goTo = currentLocation.directionTo(turtlePoint);
                 Direction left = goTo.rotateLeft().rotateLeft();
-                Direction right = goTo.rotateRight().rotateRight();3
+                Direction right = goTo.rotateRight().rotateRight();
 
                 int leftCount = fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(left), zombies);
                 int rightCount = fightMicro.NumbOfEnemiesInRangeOfLoc(currentLocation.add(right), zombies);
