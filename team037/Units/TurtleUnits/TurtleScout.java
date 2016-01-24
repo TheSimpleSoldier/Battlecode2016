@@ -87,60 +87,63 @@ public class TurtleScout extends BaseScout
     @Override
     public boolean fight() throws GameActionException
     {
-        if (enemies.length == 0) return false;
+        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
 
-        if (!fightMicro.EnemiesInRangeOfLoc(currentLocation, enemies))
+        Direction dir = goToDirection();
+        MapLocation next = currentLocation.add(dir);
+
+        // if we can move in
+        if (rc.canMove(dir) && !fightMicro.EnemiesInRangeOfLoc(next, enemies))
         {
-            // we are safe here so don't move and just msg allied turrets
+            rc.move(dir);
+            return true;
+        }
+        else if (rc.canMove(dir.opposite()) && !fightMicro.EnemiesInRangeOfLoc(currentLocation.add(dir.opposite()), enemies))
+        {
+            goingLeft = !goingLeft;
+            rc.move(dir.opposite());
+            return true;
+        }
+
+        int bestEnemiesInRange = Integer.MAX_VALUE;
+        Direction bestDir = null;
+
+        for (int i = dirs.length; --i>=0; )
+        {
+            if (!rc.canMove(dirs[i])) continue;
+
+            next = currentLocation.add(dirs[i]);
+            int enemiesInRange = 0;
+
+            for (int j = enemies.length; --j>=0; )
+            {
+                if (enemies[j].location.distanceSquaredTo(next) <= enemies[j].type.attackRadiusSquared)
+                {
+                    enemiesInRange++;
+                }
+            }
+
+            if (enemiesInRange < bestEnemiesInRange)
+            {
+                bestEnemiesInRange = enemiesInRange;
+                bestDir = dirs[i];
+            }
+        }
+
+        if (bestDir != null && fightMicro.EnemiesInRangeOfLoc(currentLocation.add(bestDir), enemies) && !fightMicro.EnemiesInRangeOfLoc(currentLocation, enemies))
+        {
+            // stay put
             return true;
         }
         else
         {
-            Direction dir = goToDirection();
-            MapLocation next = currentLocation.add(dir);
-
-            // if we can move in
-            if (rc.canMove(dir) && !fightMicro.EnemiesInRangeOfLoc(next, enemies))
-            {
-                rc.move(dir);
-                return true;
-            }
-            else if (rc.canMove(dir.opposite()) && !fightMicro.EnemiesInRangeOfLoc(currentLocation.add(dir.opposite()), enemies))
-            {
-                goingLeft = !goingLeft;
-                rc.move(dir.opposite());
-                return true;
-            }
-
-            int bestEnemiesInRange = Integer.MAX_VALUE;
-            Direction bestDir = null;
-
-            for (int i = dirs.length; --i>=0; )
-            {
-                next = currentLocation.add(dirs[i]);
-                int enemiesInRange = 0;
-
-                for (int j = enemies.length; --j>=0; )
-                {
-                    if (enemies[i].location.distanceSquaredTo(next) <= enemies[i].type.attackRadiusSquared)
-                    {
-                        enemiesInRange++;
-                    }
-                }
-
-                if (enemiesInRange < bestEnemiesInRange)
-                {
-                    bestEnemiesInRange = enemiesInRange;
-                    bestDir = dirs[i];
-                }
-            }
-
             if (bestDir != null)
             {
                 rc.move(bestDir);
                 return true;
             }
         }
+
         return false;
     }
 

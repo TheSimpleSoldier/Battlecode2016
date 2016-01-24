@@ -256,6 +256,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
+        if (index == 0) return turtlePoint;
         int round = rc.getRoundNum();
         if (zombieTracker.getNextZombieRound() - round <= 25) return turtlePoint;
         if (FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies)) return turtlePoint;

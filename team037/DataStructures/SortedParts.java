@@ -310,4 +310,22 @@ public class SortedParts
             }
         }
     }
+
+    /**
+     * get Neutral Archon spot
+     *
+     * @return
+     */
+    public MapLocation getNeutralArchon()
+    {
+        for (int i = locs.length; --i>=0; )
+        {
+            if (score[i] > 99999)
+            {
+                return locs[i];
+            }
+        }
+
+        return null;
+    }
 }

@@ -371,7 +371,7 @@ public class MapUtils
         }
         else if (closest.equals(currentLoc) && currentLoc.x % 2 == currentLoc.y % 2)
         {
-            System.out.println("Returning current loc");
+//            System.out.println("Returning current loc");
         }
 
         return closest;

@@ -166,7 +166,7 @@ public class BaseScout extends Unit
                     int parts = bot.type.partCost;
                     if (bot.type == RobotType.ARCHON)
                     {
-                        parts = 1000;
+                        parts = Integer.MAX_VALUE;
                     }
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), parts, spot.x, spot.y});
                     communicator.sendCommunication(MapKnowledge.getRange(), communication);

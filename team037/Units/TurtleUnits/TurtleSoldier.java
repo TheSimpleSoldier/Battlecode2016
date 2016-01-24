@@ -1,6 +1,7 @@
 package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
+import team037.DataStructures.RobotTypeTracker;
 import team037.Units.BaseUnits.BaseSoldier;
 import team037.Utilites.MapUtils;
 
@@ -12,11 +13,13 @@ public class TurtleSoldier extends BaseSoldier
     private boolean healing = false;
     private boolean updatedTurtleSpot = false;
     private int[] enemySightings = new int[8];
+    public static RobotTypeTracker robotTypeTracker;
 
     public TurtleSoldier(RobotController rc)
     {
         super(rc);
         turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        robotTypeTracker = new RobotTypeTracker(RobotType.TURRET, rc);
     }
 
     @Override
@@ -163,6 +166,8 @@ public class TurtleSoldier extends BaseSoldier
             arrived = true;
         }
 
+        robotTypeTracker.scanForRobots(allies);
+
         if (turtlePoint != null)
         {
             for (int i = zombies.length; --i>=0; )
@@ -192,6 +197,60 @@ public class TurtleSoldier extends BaseSoldier
             rc.setIndicatorString(1, "Going to new rally point");
             turtlePoint = rallyPoint;
             enemySightings = new int[8];
+        }
+    }
+
+    // additional methods with default behavior
+    public void handleMessages() throws GameActionException
+    {
+        communications = communicator.processCommunications();
+        for (int k = communications.length; --k >= 0; )
+        {
+            switch (communications[k].opcode)
+            {
+                case SARCHON:
+                case SENEMY:
+                case SZOMBIE:
+                case SDEN:
+                case SPARTS:
+                    int values[] = communications[k].getValues();
+
+                    if (values.length >= 6)
+                    {
+                        int id = values[3];
+
+                        if (RobotTypeTracker.contains(id))
+                        {
+                            int x = values[4];
+                            int y = values[5];
+
+                            MapLocation target = new MapLocation(x, y);
+                            navigator.setTarget(target);
+                        }
+                    }
+
+                    break;
+
+                case CHANGEMISSION:
+                    if (missionComs)
+                    {
+                        interpretMissionChange(communications[k]);
+                    }
+                    break;
+                case ATTACK:
+                case RALLY_POINT:
+                    if (archonComs)
+                    {
+                        interpretLocFromArchon(communications[k]);
+                    }
+                    break;
+                case ARCHON_DISTRESS:
+                    if (archonDistressComs)
+                    {
+                        interpretDistressFromArchon(communications[k]);
+                    }
+                    break;
+            }
         }
     }
 }

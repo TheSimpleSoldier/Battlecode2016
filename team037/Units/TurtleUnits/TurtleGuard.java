@@ -242,17 +242,19 @@ public class TurtleGuard extends BaseGaurd
                 case SPARTS:
                     int values[] = communications[k].getValues();
 
-                    int id = values[3];
-
-                    if (RobotTypeTracker.contains(id))
+                    if (values.length >= 6)
                     {
-                        int x = values[4];
-                        int y = values[5];
+                        int id = values[3];
 
-                        MapLocation target = new MapLocation(x,y);
-                        navigator.setTarget(target);
+                        if (RobotTypeTracker.contains(id))
+                        {
+                            int x = values[4];
+                            int y = values[5];
+
+                            MapLocation target = new MapLocation(x,y);
+                            navigator.setTarget(target);
+                        }
                     }
-
 
                     break;
 

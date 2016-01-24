@@ -142,6 +142,18 @@ public class BaseArchon extends Unit implements PacMan
             nextBot = currentBot;
         }
 
+        MapLocation neutralArchon = sortedParts.getNeutralArchon();
+        
+        if (neutralArchon != null)
+        {
+            System.out.println("We see a neutral archon");
+            navigator.setTarget(neutralArchon);
+            if (rc.isCoreReady())
+            {
+                navigator.takeNextStep();
+            }
+        }
+
     }
 
     public Bots getDefaultBotTypes(RobotType type)
@@ -459,7 +471,7 @@ public class BaseArchon extends Unit implements PacMan
     public Direction build() throws GameActionException
     {
         double rubble = Double.MAX_VALUE;
-        Direction least = dirs[0];
+        Direction least = null;
         for (int i = dirs.length; --i>=0; )
         {
             if(rc.onTheMap(currentLocation.add(dirs[i])))
@@ -477,10 +489,9 @@ public class BaseArchon extends Unit implements PacMan
                 }
             }
         }
-        try {
+        if (least != null)
+        {
             rc.clearRubble(least);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return Direction.NONE;
