@@ -1,9 +1,6 @@
 package team037;
 
-import battlecode.common.Clock;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.AlphaArchon;
@@ -172,8 +169,12 @@ public class RobotPlayer
     {
         int[] archons = new int[enemyArchonStartLocs.length];
 
+        RobotInfo[] neutrals = rc.senseNearbyRobots(RobotType.ARCHON.sensorRadiusSquared, Team.NEUTRAL);
+        int minus = neutrals.length * 20;
+
         for(int k = archons.length; --k >= 0;)
         {
+            archons[k] -= minus;
             int dist = currentLocation.distanceSquaredTo(enemyArchonStartLocs[k]);
             archons[k] += dist;
             for(int a = alliedArchonStartLocs.length; --a >= 0;)
