@@ -33,6 +33,39 @@ public class FightMicroUtilites
         return bestTarget;
     }
 
+    public static boolean unitsEngaged(RobotInfo[] units, RobotInfo[] opponents)
+    {
+        for (int i = units.length; --i>=0; )
+        {
+            for (int j = opponents.length; --j>=0; )
+            {
+                if (opponents[j].location.distanceSquaredTo(units[i].location) <= units[i].type.attackRadiusSquared)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static int totalZombieDamage(RobotInfo[] zombies, MapLocation current)
+    {
+        int total = 0;
+        for (int i = zombies.length; --i>=0; )
+        {
+            if (zombies[i].location.distanceSquaredTo(current) <= zombies[i].type.attackRadiusSquared)
+            {
+                double delay = zombies[i].weaponDelay;
+
+                if (delay < 1) delay = 1;
+
+                total += zombies[i].attackPower / delay;
+            }
+        }
+
+        return total;
+    }
+
     /**
      * This is a targeting method for vipers to infect their own units
      *

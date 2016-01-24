@@ -573,7 +573,7 @@ public class FightMicro
         }
 
         // don't turn into zombie so flee if you have low health
-        if (rc.getHealth() <= 50 && rc.isCoreReady())
+        if (rc.getHealth() <= FightMicroUtilites.totalZombieDamage(zombies, currentLoc) && rc.isCoreReady())
         {
             if (fleeDir != null)
             {
@@ -886,14 +886,16 @@ public class FightMicro
 
                 for (int i = Unit.dirs.length; --i>=0; )
                 {
-                    if (!rc.canMove(Unit.dirs[i])) continue;
+                    Direction dir = Unit.dirs[i];
+                    if (!rc.canMove(dir)) continue;
+                    if (rc.senseRubble(currentLoc.add(dir)) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
 
-                    MapLocation nxt = currentLoc.add(Unit.dirs[i]);
+                    MapLocation nxt = currentLoc.add(dir);
                     int numbOfEnemies = NumbOfEnemiesInRangeOfLoc(nxt, zombies);
                     if (numbOfEnemies < bestNumb)
                     {
                         bestNumb = numbOfEnemies;
-                        bestDir = Unit.dirs[i];
+                        bestDir = dir;
                     }
                 }
 

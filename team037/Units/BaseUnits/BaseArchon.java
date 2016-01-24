@@ -66,7 +66,7 @@ public class BaseArchon extends Unit implements PacMan
                 navigatorTarget = navigator.getTarget();
                 if (currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget))
                 {
-                    if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                    if (rc.isCoreReady() && rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH)
                     {
                         rc.clearRubble(currentLocation.directionTo(navigatorTarget));
                         return true;

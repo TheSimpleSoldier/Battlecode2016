@@ -62,7 +62,7 @@ public class BaseTurret extends Unit implements PacMan
     {
         if (rc.getType() == RobotType.TURRET)
         {
-            if (packIntoTTM() && navigator.getTarget() != null && !navigator.getTarget().equals(currentLocation) && (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies)))
+            if (packIntoTTM() && navigator.getTarget() != null && !navigator.getTarget().equals(currentLocation) && (!FightMicroUtilites.offensiveEnemies(enemies) && zombies.length == 0))
             {
                 arrived = false;
                 rc.pack();
@@ -97,8 +97,9 @@ public class BaseTurret extends Unit implements PacMan
 
         boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
 
-        if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && allies.length == 0 && !fought && rc.isWeaponReady())
+        if (pack(fought))
         {
+//            System.out.println("Flee from enemies: Offensive allies: " + FightMicroUtilites.offensiveEnemies(allies) + " allies engaged: " + FightMicroUtilites.unitsEngaged(allies, enemies) + " allies.length: " + allies.length + " enemies.length: " + enemies.length);
             rc.pack();
             return false;
         }
@@ -111,7 +112,7 @@ public class BaseTurret extends Unit implements PacMan
         if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies) && !fought && rc.isWeaponReady())
         {
             if (!FightMicroUtilites.offensiveEnemies(allies)) return true;
-//            if (!)
+            if (!FightMicroUtilites.unitsEngaged(allies, enemies) && !FightMicroUtilites.unitsEngaged(allies, zombies)) return true;
         }
 
         return false;

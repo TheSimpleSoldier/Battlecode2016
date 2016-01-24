@@ -331,7 +331,9 @@ public class MapUtils
         }
 
         do {
-            getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, dist);
+            if (dist <= 0) dist = 1;
+
+            getLocs = MapLocation.getAllMapLocationsWithinRadiusSq(target, Math.min(99, dist));
 
             for (int i = getLocs.length; --i>=0; )
             {

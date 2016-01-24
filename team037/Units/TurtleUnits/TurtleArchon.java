@@ -74,13 +74,15 @@ public class TurtleArchon extends BaseArchon implements PacMan
             updateRound = rc.getRoundNum();
         }
 
-        if ((rc.getRoundNum() - updateRound) < 100)
+        int round = rc.getRoundNum();
+
+        if ((round - updateRound) < 100)
         {
         }
-        else if (rc.getRoundNum() < 300)
+        else if (round < 300)
         {
         }
-        else if (rc.getRoundNum() % 5 != index)
+        else if (round % 5 != index)
         {
         }
         else if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 25)
@@ -88,6 +90,14 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
         else
         {
+            if (round % 100 == index)
+            {
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(1600, newRallyPoint);
+            }
+
+
             rc.setIndicatorString(1, "len: " + mapKnowledge.dens.length);
 
             int closestDen = 99999;
@@ -146,7 +156,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                     newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), concentration.x, concentration.y});
                     communicator.sendCommunication(1600, newRallyPoint);
                 }
-                else if (!hiding)
+                else if (!hiding || round % 50 == index)
                 {
                     int leftX = mapKnowledge.minX;
                     int rightX = mapKnowledge.maxX;
@@ -209,13 +219,14 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
-        if (zombieTracker.getNextZombieRound() - rc.getRoundNum() <= 25) return turtlePoint;
+        int round = rc.getRoundNum();
+        if (zombieTracker.getNextZombieRound() - round <= 25) return turtlePoint;
         if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
         if (!reachedTurtleSpot) reachedTurtleSpot = true;
 
         MapLocation bestParts = getNextPartLocation();
 
-        if (bestParts == null || turtlePoint.distanceSquaredTo(bestParts) > 400) return turtlePoint;
+        if (bestParts == null || turtlePoint.distanceSquaredTo(bestParts) > (1600 - (round/2))) return turtlePoint;
 
         rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 

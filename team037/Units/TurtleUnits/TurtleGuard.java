@@ -139,7 +139,12 @@ public class TurtleGuard extends BaseGaurd
         if (rallyPoint != null)
         {
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
-            rc.setIndicatorString(1, "Going to new rally point");
+            rc.setIndicatorString(1, "Going to new rally point x: " + rallyPoint.x + " y: " + rallyPoint.y + " round: " + rc.getRoundNum());
+            if (navigator.getTarget() != null)
+            {
+                rc.setIndicatorString(2, "NAvigation target x: " + navigator.getTarget().x + " y: " + navigator.getTarget().y + " round: " + rc.getRoundNum());
+            }
+            turnsArrivedLoc = -1;
             turtlePoint = rallyPoint;
         }
     }
