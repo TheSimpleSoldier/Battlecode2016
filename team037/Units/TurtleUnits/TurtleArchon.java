@@ -382,7 +382,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        if (rc.getTeamParts() > 200)
+        if (rc.getTeamParts() > 300)
         {
             return Bots.TURTLETURRET;
         }

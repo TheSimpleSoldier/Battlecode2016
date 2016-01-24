@@ -709,8 +709,8 @@ public class FightMicro
                     MapLocation turret = allies[i].location;
                     for (int j = zombies.length; --j>=0; )
                     {
-                        MapLocation zombie = zombies[i].location;
-                        if (turret.distanceSquaredTo(zombie) <= zombies[i].type.attackRadiusSquared)
+                        MapLocation zombie = zombies[j].location;
+                        if (turret.distanceSquaredTo(zombie) <= zombies[j].type.attackRadiusSquared)
                         {
                             turretUnderAttack = true;
                             break;
@@ -773,25 +773,44 @@ public class FightMicro
 
         if (rc.isCoreReady())
         {
+            MapLocation closestEnemyAttackingTurret = null;
+            int closestEnemyToTurretDist = Integer.MAX_VALUE;
             MapLocation closestTurret = null;
             MapLocation current = rc.getLocation();
-            int bestDist = 99999;
+            int closestTurretDist = Integer.MAX_VALUE;
 
             for (int i = allies.length; --i>=0; )
             {
                 if (allies[i].type == RobotType.TURRET)
                 {
+                    MapLocation allyTurret = allies[i].location;
                     MapLocation turret = allies[i].location;
                     int currentDist = turret.distanceSquaredTo(current);
-                    if (currentDist < bestDist)
+                    if (currentDist < closestTurretDist)
                     {
-                        bestDist = currentDist;
+                        closestTurretDist = currentDist;
                         closestTurret = turret;
+                    }
+
+                    for (int j = enemies.length; --j>=0; )
+                    {
+                        MapLocation enemy = enemies[j].location;
+                        int dist = enemy.distanceSquaredTo(allyTurret);
+
+                        if (dist < closestEnemyToTurretDist)
+                        {
+                            closestEnemyToTurretDist = dist;
+                            closestEnemyAttackingTurret = enemy;
+                        }
                     }
                 }
             }
 
-            if (closestTurret != null)
+            if (closestEnemyAttackingTurret != null)
+            {
+                FightMicroUtilites.moveDir(rc, current.directionTo(closestEnemyAttackingTurret), true);
+            }
+            else if (closestTurret != null)
             {
                 // hide behind the apron strings of the closest turret
                 FightMicroUtilites.moveDir(rc, current.directionTo(closestTurret), true);
@@ -806,9 +825,9 @@ public class FightMicro
                     MapLocation enemy = enemies[i].location;
                     int currentDist = enemy.distanceSquaredTo(current);
 
-                    if (currentDist < bestDist)
+                    if (currentDist < closestTurretDist)
                     {
-                        bestDist = currentDist;
+                        closestTurretDist = currentDist;
                         closestEnemy = enemy;
                     }
                 }
