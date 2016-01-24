@@ -279,10 +279,10 @@ public class SortedParts
             double rubble = rc.senseRubble(parts[i]);
             int partVal = (int) rc.senseParts(parts[i]);
 
-            if (rubble > 0)
+            if (rubble > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
             {
                 int turns = RubbleUtilities.calculateClearActionsToPassableButSlow(rubble);
-                if (turns > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                if (turns > 0)
                 {
                     partVal /= turns;
                     if (partVal <= 0) partVal = 1;

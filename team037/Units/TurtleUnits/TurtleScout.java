@@ -1,7 +1,6 @@
 package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
-import scala.Int;
 import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
@@ -105,7 +104,7 @@ public class TurtleScout extends BaseScout
             return true;
         }
 
-        int bestEnemiesInRange = Integer.MAX_VALUE;
+        int bestEnemiesInRangeDamage = Integer.MAX_VALUE;
         Direction bestDir = null;
 
         for (int i = dirs.length; --i>=0; )
@@ -113,20 +112,30 @@ public class TurtleScout extends BaseScout
             if (!rc.canMove(dirs[i])) continue;
 
             next = currentLocation.add(dirs[i]);
-            int enemiesInRange = 0;
+            int enemiesInRangeDamage = 0;
 
             for (int j = enemies.length; --j>=0; )
             {
                 if (enemies[j].location.distanceSquaredTo(next) <= enemies[j].type.attackRadiusSquared)
                 {
-                    enemiesInRange++;
+                    enemiesInRangeDamage += enemies[j].type.attackPower;
+
+                    if (enemies[j].type == RobotType.VIPER)
+                    {
+                        enemiesInRangeDamage += 40;
+                    }
                 }
             }
 
-            if (enemiesInRange < bestEnemiesInRange)
+            if (enemiesInRangeDamage < bestEnemiesInRangeDamage)
             {
-                bestEnemiesInRange = enemiesInRange;
+                bestEnemiesInRangeDamage = enemiesInRangeDamage;
                 bestDir = dirs[i];
+
+                if (enemiesInRangeDamage == 0)
+                {
+                    break;
+                }
             }
         }
 
