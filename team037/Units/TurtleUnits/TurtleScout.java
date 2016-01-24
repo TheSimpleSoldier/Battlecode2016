@@ -43,7 +43,9 @@ public class TurtleScout extends BaseScout
      */
     public int getMinDist()
     {
-        return (minDist + furthestTurret) * (minDist + furthestTurret) - 1;
+        int newMinDist = (int) ((minDist + (furthestTurret * 0.75)) * (minDist + (furthestTurret * 0.75)) - 1);
+        rc.setIndicatorString(0, "MinDist: " + newMinDist);
+        return newMinDist;
     }
 
     /**
@@ -53,19 +55,21 @@ public class TurtleScout extends BaseScout
      */
     public int getMaxDist()
     {
-        return (maxDist + furthestTurret) * (maxDist + furthestTurret) + 1;
+        int newMaxDist = ((maxDist + furthestTurret) * (maxDist + furthestTurret) + 1);
+        rc.setIndicatorString(2, "MaxDist: " + newMaxDist);
+        return newMaxDist;
     }
 
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
-        if (currentLocation.distanceSquaredTo(turtlePoint) < minDist)
+        if (currentLocation.distanceSquaredTo(turtlePoint) < getMinDist())
         {
             // set target to run away from the turtle point
             return currentLocation.add(turtlePoint.directionTo(currentLocation), 100);
         }
 
-        if (currentLocation.distanceSquaredTo(turtlePoint) > maxDist)
+        if (currentLocation.distanceSquaredTo(turtlePoint) > getMaxDist())
         {
             return turtlePoint;
         }
@@ -159,7 +163,6 @@ public class TurtleScout extends BaseScout
             }
         }
 
-
         return false;
     }
 
@@ -173,6 +176,13 @@ public class TurtleScout extends BaseScout
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
             rc.setIndicatorString(1, "Going to new rally point");
             turtlePoint = rallyPoint;
+            furthestTurret = 0;
+        }
+
+        // furthest turret dist should degrade if we don't have any turrets in vision
+        if (rc.getRoundNum() % 10 == 0 && furthestTurret > 0)
+        {
+            furthestTurret--;
         }
 
         for (int i = allies.length; --i>=0;)
