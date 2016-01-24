@@ -650,6 +650,28 @@ public class FightMicro
             }
         }
 
+        if (!FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation closestZombie = null;
+            int closestDist = Integer.MAX_VALUE;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                dist = zombies[i].location.distanceSquaredTo(currentLoc);
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestZombie = zombies[i].location;
+                }
+            }
+
+            if (closestZombie != null)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(closestZombie), true);
+            }
+        }
+
         return true;
     }
 
@@ -864,7 +886,6 @@ public class FightMicro
         }
 
         // if an ally is fighting a zombie advance
-
         if (rc.isCoreReady() && rc.getHealth() > 15)
         {
             boolean allyEngaged = false;
@@ -906,6 +927,28 @@ public class FightMicro
                 {
                     rc.move(bestDir);
                 }
+            }
+        }
+
+        if (!FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation closestZombie = null;
+            int closestDist = Integer.MAX_VALUE;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                int dist = zombies[i].location.distanceSquaredTo(currentLoc);
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestZombie = zombies[i].location;
+                }
+            }
+
+            if (closestZombie != null)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(closestZombie), true);
             }
         }
 
