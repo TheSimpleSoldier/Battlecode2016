@@ -39,6 +39,7 @@ public class Communicator
         {
             k = 100;
         }
+        int count = 0;
         for(;--k >= 0;)
         {
             if(rc.getTeam().equals(signals[k].getTeam()))
@@ -46,16 +47,35 @@ public class Communicator
                 if(signals[k].getMessage() == null)
                 {
                     communications[k] = CommunicationUtilities.readSimpleCommunication(signals[k], rc.getRoundNum());
+                    count++;
                 }
                 else
                 {
                     communications[k] = CommunicationUtilities.readCommunication(signals[k]);
+                    count++;
                 }
             }
             else if(enemies)
             {
                 communications[k] = CommunicationUtilities.readEnemyCommunication(signals[k]);
+                count++;
             }
+        }
+
+        if(count != signals.length)
+        {
+            Communication[] shortened = new Communication[count];
+            count = 0;
+            for(int i = communications.length; --i >= 0;)
+            {
+                if(communications[i] != null)
+                {
+                    shortened[count] = communications[i];
+                    count++;
+                }
+            }
+
+            return shortened;
         }
 
         return communications;
