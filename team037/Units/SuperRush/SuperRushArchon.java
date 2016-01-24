@@ -8,7 +8,8 @@ import team037.Messages.AttackCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Unit;
-import team037.Utilites.RubbleUtilities;
+
+import java.util.Random;
 
 /**
  * Created by joshua on 1/22/16.
@@ -26,6 +27,9 @@ public class SuperRushArchon extends Unit
     public int targetID;
 
     private int turnHealed = 0;
+
+    private int timesNotSeen = 0;
+    private int lastSeen = 0;
 
     public SuperRushArchon(RobotController rc)
     {
@@ -68,7 +72,7 @@ public class SuperRushArchon extends Unit
                 double rubble = rc.senseRubble(current);
                 if(rubble >= 100)
                 {
-                    archons[k] += RubbleUtilities.calculateClearActionsToPassableButSlow(rubble) * 2;
+                    archons[k] += 1000;
                 }
                 current = current.add(current.directionTo(enemyArchonStartLocs[k]));
             }
@@ -78,12 +82,14 @@ public class SuperRushArchon extends Unit
         int min = 9999999;
         for(int k = archons.length; --k >= 0;)
         {
+            System.out.print(archons[k] + ", ");
             if(archons[k] < min)
             {
                 min = archons[k];
                 index = k;
             }
         }
+        System.out.println();
 
         return enemyArchonStartLocs[index];
     }
@@ -103,6 +109,7 @@ public class SuperRushArchon extends Unit
                     targetArchon = enemies[k].location;
                     dirTo = currentLocation.directionTo(targetArchon);
                     targetID = enemies[k].ID;
+                    lastSeen = round;
                     num++;
                     break;
                 }
@@ -110,6 +117,7 @@ public class SuperRushArchon extends Unit
                 {
                     targetArchon = enemies[k].location;
                     dirTo = currentLocation.directionTo(targetArchon);
+                    lastSeen = round;
                     num++;
                     break;
                 }
@@ -122,6 +130,32 @@ public class SuperRushArchon extends Unit
             attackCommunication.x = targetArchon.x;
             attackCommunication.y = targetArchon.y;
             communicator.sendCommunication(mapKnowledge.getRange(), attackCommunication);
+        }
+        else
+        {
+            if(currentLocation.distanceSquaredTo(targetArchon) < 24 && round - lastSeen < 2)
+            {
+                rc.setIndicatorString(1, "WE GOT IT!");
+                targetID = -1;
+                //time to change professions
+                nextBot = Bots.TURTLEARCHON;
+            }
+        }
+
+        if(num == 0 && timesNotSeen > 20)
+        {
+            targetArchon = enemyArchonStartLocs[Math.abs(new Random(round).nextInt()) % enemyArchonStartLocs.length];
+            AttackCommunication attackCommunication = new AttackCommunication();
+            attackCommunication.opcode = CommunicationType.ATTACK;
+            attackCommunication.x = targetArchon.x;
+            attackCommunication.y = targetArchon.y;
+            communicator.sendCommunication(mapKnowledge.getRange(), attackCommunication);
+            timesNotSeen = 0;
+            targetID = -1;
+        }
+        else if(num== 0 && rc.canSenseLocation(targetArchon))
+        {
+            timesNotSeen++;
         }
         rc.setIndicatorLine(currentLocation, targetArchon, 0, 0, 0);
     }

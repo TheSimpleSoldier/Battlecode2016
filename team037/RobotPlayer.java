@@ -1,6 +1,7 @@
 package team037;
 
 import battlecode.common.Clock;
+import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.DataStructures.SimpleRobotInfo;
@@ -55,7 +56,6 @@ public class RobotPlayer
             {
                 strategy = Strategies.RUSH;
             }*/
-            strategy = Strategies.RUSH;
 
             if(rc.getRoundNum() == 0)
             {
@@ -67,6 +67,11 @@ public class RobotPlayer
             //TODO: archon switch for round > 1 to differentite activated archons
             if(type == RobotType.ARCHON)
             {
+                if(shouldRush(rc.getInitialArchonLocations(rc.getTeam().opponent()),
+                        rc.getInitialArchonLocations(rc.getTeam()), rc.getLocation(), rc))
+                {
+                    strategy = Strategies.RUSH;
+                }
                 if(strategy.equals(Strategies.CASTLE))
                 {
                     unit = new CastleArchon(rc);
@@ -167,5 +172,55 @@ public class RobotPlayer
 
             Clock.yield();
         }
+    }
+
+    private static boolean shouldRush(MapLocation[] enemyArchonStartLocs, MapLocation[] alliedArchonStartLocs,
+                                   MapLocation currentLocation, RobotController rc)
+    {
+        int[] archons = new int[enemyArchonStartLocs.length];
+
+        for(int k = archons.length; --k >= 0;)
+        {
+            int dist = currentLocation.distanceSquaredTo(enemyArchonStartLocs[k]);
+            archons[k] += dist;
+            for(int a = alliedArchonStartLocs.length; --a >= 0;)
+            {
+                if(!alliedArchonStartLocs[a].equals(currentLocation))
+                {
+                    if(alliedArchonStartLocs[a].distanceSquaredTo(enemyArchonStartLocs[k]) <= dist)
+                    {
+                        archons[k] += dist;
+                    }
+                }
+            }
+
+            MapLocation current = currentLocation;
+            while(rc.canSenseLocation(current) && !current.equals(enemyArchonStartLocs[k]))
+            {
+                double rubble = rc.senseRubble(current);
+                if(rubble >= 100)
+                {
+                    archons[k] += 1000;
+                }
+                current = current.add(current.directionTo(enemyArchonStartLocs[k]));
+            }
+        }
+
+        int index = 0;
+        int min = 9999999;
+        for(int k = archons.length; --k >= 0;)
+        {
+            if(archons[k] < min)
+            {
+                min = archons[k];
+                index = k;
+            }
+        }
+
+        if(min < 100)
+        {
+            return true;
+        }
+        return false;
     }
 }
