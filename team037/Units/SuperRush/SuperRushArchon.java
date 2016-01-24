@@ -397,6 +397,9 @@ public class SuperRushArchon extends Unit
             case VIPER:
                 communication.newBType = Bots.RUSHINGVIPER;
                 break;
+            case ARCHON:
+                communication.newBType = Bots.SUPERRUSHARCHON;
+                break;
         }
         communication.x = targetArchon.x;
         communication.y = targetArchon.y;
