@@ -9,6 +9,7 @@ import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
 import team037.Units.DenKillers.DenKillerGuard;
 import team037.Units.DenKillers.DenKillerSoldier;
+import team037.Units.PacMan.CountermeasureGuard;
 import team037.Units.PacMan.PacManArchon;
 import team037.Units.PacMan.PacManScout;
 import team037.Units.Rushers.*;
@@ -58,7 +59,8 @@ public enum Bots
     SCOUTBOMBSCOUT,
     RUSHSCOUT,
     SCOUTBOMBVIPER,
-    CASTLETURRET;
+    CASTLETURRET,
+    COUNTERMEASUREGUARD;
 
     public static int toInt(Bots type)
     {
@@ -126,6 +128,8 @@ public enum Bots
                 return 29;
             case CASTLETURRET:
                 return 30;
+            case COUNTERMEASUREGUARD:
+                return 31;
         }
         return -1;
     }
@@ -196,6 +200,8 @@ public enum Bots
                 return SCOUTBOMBVIPER;
             case 30:
                 return CASTLETURRET;
+            case 31:
+                return COUNTERMEASUREGUARD;
         }
 
         return null;
@@ -216,6 +222,7 @@ public enum Bots
             case BASEGAURD:
             case SCOUTBOMBGUARD:
             case PACMANGUARD:
+            case COUNTERMEASUREGUARD:
                 return RobotType.GUARD;
             case TURTLESCOUT:
             case SCOUTBOMBSCOUT:
@@ -311,6 +318,8 @@ public enum Bots
                 return new RushingScout(rc);
             case CASTLETURRET:
                 return new CastleTurret(rc);
+            case COUNTERMEASUREGUARD:
+                return new CountermeasureGuard(rc);
         }
 
         return null;

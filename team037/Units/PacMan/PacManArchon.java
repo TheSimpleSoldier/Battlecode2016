@@ -9,7 +9,6 @@ import team037.Messages.*;
 import team037.Navigation;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
-import team037.Units.BaseUnits.BaseArchon;
 import team037.Utilites.BuildOrderCreation;
 import team037.Utilites.MapUtils;
 import team037.Utilites.Utilities;
@@ -18,7 +17,7 @@ import team037.Utilites.Utilities;
  * PacMan bot runs away. That's it.
  * Created by davej on 1/13/2016.
  */
-public class PacManArchon extends BaseArchon implements PacMan {
+public class PacManArchon extends Unit implements PacMan {
 
     // These are the weights.
     static final double[][] PACMAN_WEIGHTS = new double[][]
@@ -190,7 +189,6 @@ public class PacManArchon extends BaseArchon implements PacMan {
 
         if (rc.canBuild(dir, nextType)) {
             rc.build(dir, nextType);
-            sendInitialMessages(dir, nextType, nextBot, false);
             nextBot = buildOrder.nextBot();
             nextType = Bots.typeFromBot(nextBot);
             return true;
