@@ -70,8 +70,12 @@ public class BaseTurret extends Unit implements PacMan
             return false;
         }
 
+        rc.setIndicatorString(0, "Navigation: " + rc.getRoundNum() + " bytecodes: " + Clock.getBytecodeNum());
+
         // otherwise we are a ttm
-        return navigator.takeNextStepTTM();
+        boolean returnVal = navigator.takeNextStepTTM();
+        rc.setIndicatorString(1, "After navigations: " + rc.getRoundNum() + " bytecodes: " + Clock.getBytecodeNum());
+        return returnVal;
     }
 
     @Override
@@ -98,6 +102,7 @@ public class BaseTurret extends Unit implements PacMan
         boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
 
         if (pack(fought))
+        if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && !FightMicroUtilites.offensiveEnemies(allies) && !fought && rc.isWeaponReady())
         {
 //            System.out.println("Flee from enemies: Offensive allies: " + FightMicroUtilites.offensiveEnemies(allies) + " allies engaged: " + FightMicroUtilites.unitsEngaged(allies, enemies) + " allies.length: " + allies.length + " enemies.length: " + enemies.length);
             rc.pack();
@@ -151,8 +156,9 @@ public class BaseTurret extends Unit implements PacMan
             return targetLoc;
         else
         {
+            rc.setIndicatorString(1, "setting target: " + rc.getRoundNum());
             MapLocation target = MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, targetLoc);
-            rc.setIndicatorString(1, "Target x: " + target.x + " y: " + target.y);
+            rc.setIndicatorString(2, "Target x: " + target.x + " y: " + target.y + " round: " + rc.getRoundNum());
             rc.setIndicatorLine(currentLocation, target, 255, 0, 255);
             return target;
         }

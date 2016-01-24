@@ -136,12 +136,6 @@ public class RobotPlayer
             {
                 e.printStackTrace();
             }
-
-            if(rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
-            {
-                BaseArchon.sendOutInitialLocation();
-                BaseArchon.mapKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
-            }
         }
         catch(Exception e){e.printStackTrace();}
 

@@ -7,9 +7,6 @@ import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Utilites.CommunicationUtilities;
 
-/**
- * Created by joshua on 1/5/16.
- */
 public class Communicator
 {
     RobotController rc;
@@ -85,6 +82,18 @@ public class Communicator
         }
 
         return false;
+    }
+
+    /**
+     * This function will send a simple communication with radius
+     *
+     * @param radius
+     * @return
+     * @throws GameActionException
+     */
+    public void forceSendSimpleCommunication(int radius) throws GameActionException
+    {
+        rc.broadcastSignal(radius);
     }
 
     /**

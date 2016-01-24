@@ -843,7 +843,10 @@ public class FightMicro
 
                 if (bestDir != null)
                 {
-                    rc.move(bestDir);
+                    if (rc.canMove(bestDir))
+                    {
+                        rc.move(bestDir);
+                    }
                 }
             }
 

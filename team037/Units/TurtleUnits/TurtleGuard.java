@@ -1,8 +1,11 @@
 package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
+import team037.DataStructures.RobotTypeTracker;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
+import team037.Utilites.FightMicroUtilites;
+import team037.Unit;
 
 public class TurtleGuard extends BaseGaurd
 {
@@ -11,11 +14,14 @@ public class TurtleGuard extends BaseGaurd
     private boolean chasingEnemies = false;
     private boolean healing = false;
     private boolean updatedTurtleSpot = false;
+    private int[] enemySightings = new int[8];
+    public static RobotTypeTracker robotTypeTracker;
 
     public TurtleGuard(RobotController rc)
     {
         super(rc);
         turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        robotTypeTracker = new RobotTypeTracker(RobotType.TURRET, rc);
     }
 
     @Override
@@ -78,6 +84,15 @@ public class TurtleGuard extends BaseGaurd
             return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
         }
 
+        MapLocation defensePoint = getDefensePoint();
+
+        if (defensePoint != null)
+        {
+            System.out.println("using defense point");
+            rc.setIndicatorString(2, "Defense point x: " + defensePoint.x + " y: " + defensePoint.y + " round: " + rc.getRoundNum());
+            return defensePoint;
+        }
+
         for (int i = dirs.length; --i>=0; )
         {
             MapLocation possible = currentLocation.add(dirs[i], 3);
@@ -120,6 +135,33 @@ public class TurtleGuard extends BaseGaurd
         return null;
     }
 
+    /**
+     * This method returns the side that we have seen the most enemies on
+     *
+     * @return
+     */
+    private MapLocation getDefensePoint()
+    {
+        int highestCount = 0;
+        Direction direction = null;
+
+        for (int i = enemySightings.length; --i>=0; )
+        {
+            if (enemySightings[i] > highestCount)
+            {
+                highestCount = enemySightings[i];
+                direction = dirs[i];
+            }
+        }
+
+        if (direction == null)
+        {
+            return null;
+        }
+
+        return turtlePoint.add(direction, 3);
+    }
+
     @Override
     public void collectData() throws GameActionException
     {
@@ -136,6 +178,8 @@ public class TurtleGuard extends BaseGaurd
             healing = false;
         }
 
+        robotTypeTracker.scanForRobots(allies);
+
         if (rallyPoint != null)
         {
             rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
@@ -146,6 +190,92 @@ public class TurtleGuard extends BaseGaurd
             }
             turnsArrivedLoc = -1;
             turtlePoint = rallyPoint;
+            enemySightings = new int[8];
+        }
+
+        if (turtlePoint != null)
+        {
+            for (int i = zombies.length; --i>=0; )
+            {
+                MapLocation zombie = zombies[i].location;
+
+                Direction dir = turtlePoint.directionTo(zombie);
+
+                for (int j = dirs.length; --j >= 0; )
+                {
+                    if (dirs[j].equals(dir))
+                    {
+//                        System.out.println("set zombie to enemySightings: " + enemySightings[j]);
+                        enemySightings[j]++;
+                    }
+                }
+            }
+        }
+
+        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            for (int i = allies.length; --i>=0; )
+            {
+                // if we see a turret that has just shot then we should go support it
+                if (allies[i].type == RobotType.TURRET && allies[i].weaponDelay > 1)
+                {
+                    MapLocation ally = allies[i].location;
+                    navigator.setTarget(ally.add(currentLocation.directionTo(ally)));
+                    break;
+                }
+            }
+        }
+    }
+
+    // additional methods with default behavior
+    public void handleMessages() throws GameActionException
+    {
+        communications = communicator.processCommunications();
+        for(int k = communications.length; --k >= 0;)
+        {
+            switch(communications[k].opcode)
+            {
+                case SARCHON:
+                case SENEMY:
+                case SZOMBIE:
+                case SDEN:
+                case SPARTS:
+                    int values[] = communications[k].getValues();
+
+                    int id = values[3];
+
+                    if (RobotTypeTracker.contains(id))
+                    {
+                        int x = values[4];
+                        int y = values[5];
+
+                        MapLocation target = new MapLocation(x,y);
+                        navigator.setTarget(target);
+                    }
+
+
+                    break;
+
+                case CHANGEMISSION:
+                    if(missionComs)
+                    {
+                        interpretMissionChange(communications[k]);
+                    }
+                    break;
+                case ATTACK:
+                case RALLY_POINT:
+                    if(archonComs)
+                    {
+                        interpretLocFromArchon(communications[k]);
+                    }
+                    break;
+                case ARCHON_DISTRESS:
+                    if(archonDistressComs)
+                    {
+                        interpretDistressFromArchon(communications[k]);
+                    }
+                    break;
+            }
         }
     }
 }
