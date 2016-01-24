@@ -3,7 +3,7 @@ package team037.Enums;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.Unit;
-import team037.Units.*;
+import team037.Units.AlphaArchon;
 import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleSoldier;
 import team037.Units.CastleUnits.CastleTurret;
@@ -16,8 +16,8 @@ import team037.Units.PacMan.PacManScout;
 import team037.Units.Scavenger.ScavengerArchon;
 import team037.Units.Scavenger.ScavengerScout;
 import team037.Units.Rushers.*;
-import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.ScoutBomb.ScoutBombGuard;
+import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.ScoutBomb.ScoutBombViper;
 import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
@@ -61,6 +61,7 @@ public enum Bots
     SCOUTBOMBGUARD,
     SCOUTBOMBSCOUT,
     RUSHSCOUT,
+    SUPERRUSHARCHON,
     SCOUTBOMBVIPER,
     SCAVENGERARCHON,
     SCAVENGERSCOUT,
@@ -135,10 +136,12 @@ public enum Bots
                 return 30;
             case COUNTERMEASUREGUARD:
                 return 31;
-            case SCAVENGERARCHON:
+            case SUPERRUSHARCHON:
                 return 32;
-            case SCAVENGERSCOUT:
+            case SCAVENGERARCHON:
                 return 33;
+            case SCAVENGERSCOUT:
+                return 34;
         }
         return -1;
     }
@@ -212,8 +215,10 @@ public enum Bots
             case 31:
                 return COUNTERMEASUREGUARD;
             case 32:
-                return SCAVENGERARCHON;
+                return SUPERRUSHARCHON;
             case 33:
+                return SCAVENGERARCHON;
+            case 34:
                 return SCAVENGERSCOUT;
         }
 
@@ -229,6 +234,7 @@ public enum Bots
             case BASEARCHON:
             case PACMANARCHON:
             case SCAVENGERARCHON:
+            case SUPERRUSHARCHON:
                 return RobotType.ARCHON;
             case RUSHGUARD:
             case TURTLEGUARD:

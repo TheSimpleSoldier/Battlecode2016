@@ -8,8 +8,6 @@ import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
 
-import java.sql.Driver;
-
 /**
  * Created by davej on 1/22/2016.
  */
@@ -91,8 +89,6 @@ public class PacManUtils {
         MissionCommunication communication = new MissionCommunication();
         communication.opcode = CommunicationType.CHANGEMISSION;
         communication.id = id;
-        communication.rType = RobotType.GUARD;
-        communication.bType = Bots.COUNTERMEASUREGUARD;
         communication.newBType = Bots.COUNTERMEASUREGUARD;
         Unit.communicator.sendCommunication(2, communication);
 
