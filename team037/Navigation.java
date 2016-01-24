@@ -122,6 +122,7 @@ public class Navigation {
                 moved = false;
             }
         } else {
+            pathLength = Integer.MAX_VALUE;
             moved = false;
         }
 
@@ -144,11 +145,18 @@ public class Navigation {
             if (myLoc.equals(nextPt)) {
                 lastPt = nextPt;
                 nextPt = nextPt.mapNext;
+                if (nextPt != null && myLoc.equals(nextPt)) {
+                    lastPt = nextPt;
+                    nextPt = nextPt.mapNext;
+                }
             }
 
             if (nextPt != null) {
 
                 int direction = myLoc.directionTo(nextPt);
+                if (direction < 0) {
+                    return false;
+                }
                 Direction forward = Unit.dirs[direction];
 
                 if (rc.canMove(forward)) {
@@ -167,8 +175,6 @@ public class Navigation {
 
         Direction forward = currentLoc.directionTo(goal);
 
-        // if we have reached goal then it will try to clear rubble
-        // for direction omni which throws an error
         if (forward == Direction.NONE || forward == Direction.OMNI)
             return false;
 
@@ -193,7 +199,6 @@ public class Navigation {
             rc.clearRubble(forward);
             return true;
         } else {
-            pathLength = Integer.MAX_VALUE;
             return false;
         }
     }
@@ -288,6 +293,8 @@ public class Navigation {
                 reset();
                 currentGoal = goal;
             } else if (currentLoc.equals(goal)) { // We don't need to move if we're already at the goal.
+                reset();
+                currentGoal = goal;
                 return false;
             }
 
@@ -300,6 +307,7 @@ public class Navigation {
                             rc.clearRubble(Direction.NONE);
                             return true;
                         } catch (Exception e) {
+                            e.printStackTrace();
                             return false;
                         }
                     }
