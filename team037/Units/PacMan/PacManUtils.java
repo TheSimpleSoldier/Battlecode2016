@@ -16,6 +16,7 @@ import java.sql.Driver;
 public class PacManUtils {
 
     public static RobotInfo countermeasure = null;
+    public static double[] rubble;
 
     public static MapLocation centerOfMass(RobotInfo[] bots) {
         if (bots == null || bots.length == 0)

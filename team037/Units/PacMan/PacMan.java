@@ -83,11 +83,6 @@ public interface PacMan {
 
 //            // First: apply weights of nearby units
             directions = applyAllWeights(directions, weights);
-//            if ((ping0[1] < 5 || ping4[1] < 5) && (ping2[1] < 5 || ping6[1] < 5)) {
-//                directions = applyAllWeights(directions, weights);
-//            } else {
-//                directions = applyAllSimpleWeights(directions, weights);
-//            }
 
             // Second: scale weights based on nearby rubble
 //            rc.setIndicatorString(0, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
@@ -198,8 +193,12 @@ public interface PacMan {
     }
 
     default boolean runAway(double[][] weights)  {
+        if (!Navigation.lastScan.equals(Unit.currentLocation)) {
+            PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+        }
+
         if (Unit.us.equals(Team.A)) {
-            if (Unit.zombies.length < 8 || Unit.enemies.length < 5) {
+            if (Unit.zombies.length < 6 || Unit.enemies.length < 4) {
                 return runAwayWithCountermeasures(weights);
             }
         }
