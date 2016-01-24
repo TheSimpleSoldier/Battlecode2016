@@ -24,7 +24,6 @@ public class RushingTurret extends BaseTurret
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
-        rushTarget = MapUtils.getNearestLocation(enemyArchonStartLocs, currentLocation);
         rushTarget.add(rushTarget.directionTo(currentLocation), 3);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;

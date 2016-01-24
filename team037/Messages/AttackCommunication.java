@@ -11,7 +11,6 @@ public class AttackCommunication extends Communication
     public AttackCommunication()
     {
         super();
-        opcode = CommunicationType.TURRET_SUPPORT;
     }
 
     public int[] getValues()

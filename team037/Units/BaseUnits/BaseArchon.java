@@ -346,8 +346,6 @@ public class BaseArchon extends Unit implements PacMan
         MissionCommunication communication = new MissionCommunication();
         communication.opcode = CommunicationType.CHANGEMISSION;
         communication.id = id;
-        communication.rType = nextType;
-        communication.bType = nextBot;
         communication.newBType = nextBot;
         communicator.sendCommunication(2, communication);
 
@@ -373,8 +371,6 @@ public class BaseArchon extends Unit implements PacMan
         MissionCommunication communication = new MissionCommunication();
         communication.opcode = CommunicationType.CHANGEMISSION;
         communication.id = id;
-        communication.rType = nextType;
-        communication.bType = nextBot;
         communication.newBType = nextBot;
         communicator.sendCommunication(2, communication);
 

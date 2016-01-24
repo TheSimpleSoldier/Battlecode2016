@@ -4,24 +4,15 @@ import battlecode.common.Clock;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
-import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.AlphaArchon;
 import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleArchon;
-import team037.Units.CastleUnits.CastleSoldier;
-import team037.Units.CastleUnits.CastleTurret;
-import team037.Units.DenKillers.DenKillerSoldier;
 import team037.Units.PacMan.PacManArchon;
-import team037.Units.PacMan.PacManGuard;
 import team037.Units.ScoutBomb.ScoutBombArchon;
-import team037.Units.ScoutBomb.ScoutBombGuard;
-import team037.Units.ScoutBomb.ScoutBombScout;
-import team037.Units.ScoutBomb.ScoutBombViper;
+import team037.Units.SuperRush.SuperRushArchon;
 import team037.Units.TurtleUnits.TurtleArchon;
-import team037.Utilites.StrategyUtilities;
-import team037.Utilites.ZombieTracker;
 
 public class RobotPlayer
 {
@@ -46,7 +37,7 @@ public class RobotPlayer
             // hardcode disabled for now
             strategy = Strategies.SCOUT_BOMB;
 
-            MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
+            /*MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
             ZombieTracker zombieTracker = new ZombieTracker(rc);
             int[] size = StrategyUtilities.estimatedSize(us, them);
@@ -63,7 +54,7 @@ public class RobotPlayer
             else
             {
                 strategy = Strategies.RUSH;
-            }
+            }*/
 
             if(rc.getRoundNum() == 0)
             {
@@ -75,6 +66,11 @@ public class RobotPlayer
             //TODO: archon switch for round > 1 to differentite activated archons
             if(type == RobotType.ARCHON)
             {
+                if(shouldRush(rc.getInitialArchonLocations(rc.getTeam().opponent()),
+                        rc.getInitialArchonLocations(rc.getTeam()), rc.getLocation(), rc))
+                {
+                    strategy = Strategies.RUSH;
+                }
                 if(strategy.equals(Strategies.CASTLE))
                 {
                     unit = new CastleArchon(rc);
@@ -93,6 +89,11 @@ public class RobotPlayer
                 {
                     unit = new PacManArchon(rc);
                     Unit.thisBot = Bots.PACMANARCHON;
+                }
+                else if(strategy.equals(Strategies.RUSH))
+                {
+                    unit = new SuperRushArchon(rc);
+                    Unit.thisBot = Bots.SUPERRUSHARCHON;
                 }
                 else
                 { // default to alpha archons
@@ -164,5 +165,55 @@ public class RobotPlayer
 
             Clock.yield();
         }
+    }
+
+    private static boolean shouldRush(MapLocation[] enemyArchonStartLocs, MapLocation[] alliedArchonStartLocs,
+                                   MapLocation currentLocation, RobotController rc)
+    {
+        int[] archons = new int[enemyArchonStartLocs.length];
+
+        for(int k = archons.length; --k >= 0;)
+        {
+            int dist = currentLocation.distanceSquaredTo(enemyArchonStartLocs[k]);
+            archons[k] += dist;
+            for(int a = alliedArchonStartLocs.length; --a >= 0;)
+            {
+                if(!alliedArchonStartLocs[a].equals(currentLocation))
+                {
+                    if(alliedArchonStartLocs[a].distanceSquaredTo(enemyArchonStartLocs[k]) <= dist)
+                    {
+                        archons[k] += dist;
+                    }
+                }
+            }
+
+            MapLocation current = currentLocation;
+            while(rc.canSenseLocation(current) && !current.equals(enemyArchonStartLocs[k]))
+            {
+                double rubble = rc.senseRubble(current);
+                if(rubble >= 100)
+                {
+                    archons[k] += 1000;
+                }
+                current = current.add(current.directionTo(enemyArchonStartLocs[k]));
+            }
+        }
+
+        int index = 0;
+        int min = 9999999;
+        for(int k = archons.length; --k >= 0;)
+        {
+            if(archons[k] < min)
+            {
+                min = archons[k];
+                index = k;
+            }
+        }
+
+        if(min < 100)
+        {
+            return true;
+        }
+        return false;
     }
 }
