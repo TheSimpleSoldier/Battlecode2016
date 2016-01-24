@@ -78,14 +78,12 @@ public class SuperRushArchon extends Unit
         int min = 9999999;
         for(int k = archons.length; --k >= 0;)
         {
-            System.out.print(archons[k] + ", ");
             if(archons[k] < min)
             {
                 min = archons[k];
                 index = k;
             }
         }
-        System.out.println();
 
         return enemyArchonStartLocs[index];
     }
