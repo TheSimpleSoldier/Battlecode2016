@@ -5,6 +5,7 @@ package team037;
  */
 
 import battlecode.common.*;
+import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 
 public class Map {
@@ -851,6 +852,8 @@ public class Map {
      * @param com RubbleCommunication object
      */
     public void updateFromComms(Communication com) {
+
+        if (com == null || com.opcode != CommunicationType.RUBBLE) return;
 
         long[] x = new long[7];
         long[] y = new long[7];

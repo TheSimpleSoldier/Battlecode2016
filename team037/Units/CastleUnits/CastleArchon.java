@@ -234,7 +234,7 @@ public class CastleArchon extends BaseArchon {
         if (rc.canBuild(Direction.NORTH, RobotType.SOLDIER)) {
             return Direction.NORTH;
         }
-        return MapUtils.getRCCanMoveDirection(this);
+        return MapUtils.getRCCanMoveDirection();
     }
 
     private Direction nextTurretSpawnDir() {
