@@ -4,9 +4,11 @@ import battlecode.common.*;
 import team037.DataStructures.UnitProportion;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.Enums.Strategies;
 import team037.Messages.AttackCommunication;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
+import team037.RobotPlayer;
 import team037.Unit;
 
 import java.util.Random;
@@ -102,30 +104,35 @@ public class SuperRushArchon extends Unit
     {
         super.collectData();
 
+        boolean move = false;
         int num = 0;
         for(int k = enemies.length; --k >= 0;)
         {
             if(enemies[k].type == RobotType.ARCHON)
             {
-                /*if(currentLocation.distanceSquaredTo(targetArchon) < 5 && enemies[k].coreDelay < 1)
+                if(currentLocation.distanceSquaredTo(targetArchon) < 5 && enemies[k].coreDelay < 1)
                 {
-                    if(moved >= 3 && !notRetreating)
+                    if(moved >= 5 && !notRetreating)
                     {
-                        nextBot = Bots.TURTLEARCHON;
-                        RobotPlayer.strategy = Strategies.TURTLE;
-                        notRetreating = true;
-                        unitProportion.guards = 10;
-                        unitProportion.totalProportion += 10;
+                        if(enemies.length - 3 >= allies.length || allies.length == 0)
+                        {
+                            nextBot = Bots.TURTLEARCHON;
+                            RobotPlayer.strategy = Strategies.TURTLE;
+                            notRetreating = true;
+                            unitProportion.guards += 10;
+                            unitProportion.totalProportion += 10;
+                        }
                     }
                     else if(enemies[k].location.equals(targetArchon))
                     {
                         moved++;
+                        rc.setIndicatorString(1, "" + moved);
+                    }
+                    else
+                    {
+                        moved = 0;
                     }
                 }
-                else
-                {
-                    moved = 0;
-                }*/
                 if(targetID == -1)
                 {
                     targetArchon = enemies[k].location;
@@ -137,6 +144,10 @@ public class SuperRushArchon extends Unit
                 }
                 else if(enemies[k].ID == targetID)
                 {
+                    if(!enemies[k].location.equals(targetArchon))
+                    {
+                        move = true;
+                    }
                     targetArchon = enemies[k].location;
                     dirTo = currentLocation.directionTo(targetArchon);
                     lastSeen = round;
@@ -147,11 +158,14 @@ public class SuperRushArchon extends Unit
         }
         if(num > 0)
         {
-            AttackCommunication attackCommunication = new AttackCommunication();
-            attackCommunication.opcode = CommunicationType.ATTACK;
-            attackCommunication.x = targetArchon.x;
-            attackCommunication.y = targetArchon.y;
-            communicator.sendCommunication(mapKnowledge.getRange(), attackCommunication);
+            if(move)
+            {
+                AttackCommunication attackCommunication = new AttackCommunication();
+                attackCommunication.opcode = CommunicationType.ATTACK;
+                attackCommunication.x = targetArchon.x;
+                attackCommunication.y = targetArchon.y;
+                communicator.sendCommunication(mapKnowledge.getRange(), attackCommunication);
+            }
         }
         else
         {
