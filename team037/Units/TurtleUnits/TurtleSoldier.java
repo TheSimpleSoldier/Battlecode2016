@@ -3,6 +3,7 @@ package team037.Units.TurtleUnits;
 import battlecode.common.*;
 import team037.DataStructures.RobotTypeTracker;
 import team037.Units.BaseUnits.BaseSoldier;
+import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
 public class TurtleSoldier extends BaseSoldier
@@ -198,6 +199,20 @@ public class TurtleSoldier extends BaseSoldier
             turtlePoint = rallyPoint;
             enemySightings = new int[8];
         }
+
+        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            for (int i = allies.length; --i>=0; )
+            {
+                // if we see a turret that has just shot then we should go support it
+                if (allies[i].type == RobotType.TURRET && allies[i].weaponDelay > 1)
+                {
+                    MapLocation ally = allies[i].location;
+                    navigator.setTarget(ally.add(currentLocation.directionTo(ally)));
+                    break;
+                }
+            }
+        }
     }
 
     // additional methods with default behavior
@@ -225,6 +240,7 @@ public class TurtleSoldier extends BaseSoldier
                             int y = values[5];
 
                             MapLocation target = new MapLocation(x, y);
+                            rc.setIndicatorString(2, "received msg from turrets: " + target.x + " y: " + target.y);
                             navigator.setTarget(target);
                         }
                     }

@@ -599,8 +599,6 @@ public class FightMicro
             MapLocation spot = zombies[i].location;
             x += spot.x;
             y += spot.y;
-
-
         }
 
         enemyCOM = new MapLocation(x / len, y / len);
@@ -656,16 +654,6 @@ public class FightMicro
             }
         }
 
-        // if there are enemy zombies in range of us kite back
-        if (rc.isCoreReady() && nearByZombies.length > 0)
-        {
-            if (fleeDir != null)
-            {
-                rc.move(fleeDir);
-                return true;
-            }
-        }
-
         // if we are outranged then rush them!!!
         if (rc.isCoreReady())
         {
@@ -710,6 +698,28 @@ public class FightMicro
             {
                 FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), true);
                 return true;
+            }
+        }
+
+        if (!FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation closestZombie = null;
+            int closestDist = Integer.MAX_VALUE;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                dist = zombies[i].location.distanceSquaredTo(currentLoc);
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestZombie = zombies[i].location;
+                }
+            }
+
+            if (closestZombie != null)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(closestZombie), true);
             }
         }
 
@@ -927,7 +937,6 @@ public class FightMicro
         }
 
         // if an ally is fighting a zombie advance
-
         if (rc.isCoreReady() && rc.getHealth() > 15)
         {
             boolean allyEngaged = false;
@@ -969,6 +978,28 @@ public class FightMicro
                 {
                     rc.move(bestDir);
                 }
+            }
+        }
+
+        if (!FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation closestZombie = null;
+            int closestDist = Integer.MAX_VALUE;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                int dist = zombies[i].location.distanceSquaredTo(currentLoc);
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestZombie = zombies[i].location;
+                }
+            }
+
+            if (closestZombie != null)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(closestZombie), true);
             }
         }
 
