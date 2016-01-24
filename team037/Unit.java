@@ -41,7 +41,7 @@ public abstract class Unit
     public static boolean repaired;
     public static int msgsSent = 0;
     public static boolean defendingArchon = false;
-    int rubbleUpdate = 0;
+    public static int rubbleUpdate = 0;
 
     public static boolean enemyComs = true;
     public static boolean archonComs = true;
@@ -333,7 +333,7 @@ public abstract class Unit
         currentLocation = newLoc;
     }
 
-    private void interpretMapKnowlege(Communication communication)
+    public static void interpretMapKnowlege(Communication communication)
     {
         switch(communication.opcode)
         {
@@ -366,7 +366,7 @@ public abstract class Unit
         }
     }
 
-    private void interpretArchonMapKnowledge(Communication communication)
+    public static void interpretArchonMapKnowledge(Communication communication)
     {
         switch(communication.opcode)
         {
@@ -402,7 +402,7 @@ public abstract class Unit
         }
     }
 
-    private void interpretScoutMapKnowledge(Communication communication)
+    public static void interpretScoutMapKnowledge(Communication communication)
     {
 
         switch(communication.opcode)
@@ -428,7 +428,7 @@ public abstract class Unit
         }
     }
 
-    private void interpretEnemy(Communication communication)
+    public static void interpretEnemy(Communication communication)
     {
         switch(communication.opcode)
         {
@@ -450,7 +450,7 @@ public abstract class Unit
         }
     }
 
-    private void interpretMissionChange(Communication communication)
+    public static void interpretMissionChange(Communication communication)
     {
         switch(communication.opcode)
         {
@@ -469,11 +469,17 @@ public abstract class Unit
                         rushTarget = new MapLocation(comm.x, comm.y);
                     }
                 }
+
+                if (nextBot != null && Bots.typeFromBot(nextBot) != type)
+                {
+                    System.out.println("Trying to be the wrong type");
+                    nextBot = null;
+                }
                 break;
         }
     }
 
-    private void interpretLocFromArchon(Communication communication)
+    public static void interpretLocFromArchon(Communication communication)
     {
 
         switch(communication.opcode)
@@ -492,7 +498,7 @@ public abstract class Unit
         }
     }
 
-    private void interpretDistressFromArchon(Communication communication)
+    public static void interpretDistressFromArchon(Communication communication)
     {
         switch(communication.opcode)
         {

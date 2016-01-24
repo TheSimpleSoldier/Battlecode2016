@@ -89,18 +89,18 @@ public class PacManScout extends Unit implements PacMan {
             directions = applyConstant(directions, loc, weights[TARGET]);
         }
 
-        directions = applyAdditionalConstants(directions, weights);
+        directions = applyAdditionalConstants(directions);
 
         return directions;
     }
 
-    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
+    public int[] applyAdditionalConstants(int[] directions) {
         MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
         if (myArchons == null || myArchons.length == 0) {
             return directions;
         }
 
-        directions = applyConstants(currentLocation, directions, myArchons, weights[4]);
+        directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{16,8,4});
 
         return directions;
     }

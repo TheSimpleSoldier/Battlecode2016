@@ -4,7 +4,6 @@ import battlecode.common.Clock;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
-import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.AlphaArchon;
@@ -137,12 +136,6 @@ public class RobotPlayer
             catch(Exception e)
             {
                 e.printStackTrace();
-            }
-
-            if(rc.getRoundNum() == 0 && rc.getType() == RobotType.ARCHON)
-            {
-                BaseArchon.sendOutInitialLocation();
-                BaseArchon.mapKnowledge.addArchon(new SimpleRobotInfo(rc.getID(), rc.getLocation(), RobotType.ARCHON, rc.getTeam()), true);
             }
         }
         catch(Exception e){e.printStackTrace();}

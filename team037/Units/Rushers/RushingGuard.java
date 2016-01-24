@@ -6,6 +6,7 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import team037.Units.BaseUnits.BaseGaurd;
 import team037.Units.PacMan.PacMan;
+import team037.Units.PacMan.PacManUtils;
 
 public class RushingGuard extends BaseGaurd implements PacMan
 {
@@ -85,22 +86,21 @@ public class RushingGuard extends BaseGaurd implements PacMan
      * Add additional constants to push the unit towards enemy Archons AND away from allied Archons
      *
      * @param directions
-     * @param weights
      * @return
      */
-    public int[] applyAdditionalConstants(int[] directions, double[][] weights) {
+    public int[] applyAdditionalConstants(int[] directions) {
 
         MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
         if (myArchons == null) {
             myArchons = rc.getInitialArchonLocations(us);
         }
-        directions = applyConstants(currentLocation, directions, myArchons, new double[]{16, 8, 4, 0, 0});
+        directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{16, 8, 4});
 
         MapLocation[] badArchons = mapKnowledge.getArchonLocations(false);
         if (badArchons == null) {
             badArchons = rc.getInitialArchonLocations(us);
         }
-        directions = applyConstants(currentLocation, directions, badArchons, new double[]{-8, -4, -2, 0, 0});
+        directions = PacManUtils.applySimpleConstants(currentLocation, directions, badArchons, new int[]{-8, -4, -2});
 
         return directions;
     }

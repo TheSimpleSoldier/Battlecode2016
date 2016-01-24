@@ -24,7 +24,8 @@ public enum CommunicationType
     RALLY_POINT,
     RUBBLE,
     ARCHON_DISTRESS,
-    GOING_AFTER_PARTS;
+    GOING_AFTER_PARTS,
+    TURRET_UNDER_ATTACK;
 
     public static int toInt(CommunicationType type)
     {
@@ -72,6 +73,8 @@ public enum CommunicationType
                 return 19;
             case GOING_AFTER_PARTS:
                 return 20;
+            case TURRET_UNDER_ATTACK:
+                return 21;
         }
         return -1;
     }
@@ -122,6 +125,8 @@ public enum CommunicationType
                 return ARCHON_DISTRESS;
             case 20:
                 return GOING_AFTER_PARTS;
+            case 21:
+                return TURRET_UNDER_ATTACK;
         }
         return null;
     }
@@ -135,6 +140,7 @@ public enum CommunicationType
             case ENEMY:
             case ARCHON_DISTRESS:
             case GOING_AFTER_PARTS:
+            case TURRET_UNDER_ATTACK:
                 return new BotInfoCommunication();
             //SimpleBotInfoCommunication
             case OENEMY:

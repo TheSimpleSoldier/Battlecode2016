@@ -23,6 +23,19 @@ public class TurtleTurret extends BaseTurret
     }
 
     @Override
+    public boolean fight() throws GameActionException
+    {
+        boolean value = super.fight();
+
+        if (value)
+        {
+            communicator.forceSendSimpleCommunication(sightRange * 2);
+        }
+
+        return value;
+    }
+
+    @Override
     public void collectData() throws GameActionException
     {
         super.collectData();
@@ -30,7 +43,6 @@ public class TurtleTurret extends BaseTurret
        if (rallyPoint != null)
        {
            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
-           rc.setIndicatorString(1, "Going to new rally point x: " + rallyPoint.x + " y: " + rallyPoint.y);
            turtlePoint = rallyPoint;
            setTargetLoc(MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, turtlePoint));
 
