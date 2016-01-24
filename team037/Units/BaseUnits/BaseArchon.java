@@ -67,7 +67,7 @@ public class BaseArchon extends Unit implements PacMan {
             // if we are trying to get to parts and the location has rubble on it we should clear it
             try {
                 navigatorTarget = navigator.getTarget();
-                if (currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
+                if (rc.isCoreReady() && currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
                     if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                         rc.clearRubble(currentLocation.directionTo(navigatorTarget));
                         return true;
