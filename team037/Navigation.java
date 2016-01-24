@@ -144,11 +144,18 @@ public class Navigation {
             if (myLoc.equals(nextPt)) {
                 lastPt = nextPt;
                 nextPt = nextPt.mapNext;
+                if (nextPt != null && myLoc.equals(nextPt)) {
+                    lastPt = nextPt;
+                    nextPt = nextPt.mapNext;
+                }
             }
 
             if (nextPt != null) {
 
                 int direction = myLoc.directionTo(nextPt);
+                if (direction < 0) {
+                    return false;
+                }
                 Direction forward = Unit.dirs[direction];
 
                 if (rc.canMove(forward)) {
@@ -288,6 +295,16 @@ public class Navigation {
                 reset();
                 currentGoal = goal;
             } else if (currentLoc.equals(goal)) { // We don't need to move if we're already at the goal.
+                reset();
+                if (rc.isCoreReady() && rc.senseRubble(currentLoc) >= GameConstants.RUBBLE_SLOW_THRESH) {
+                    // Rubble is on our current location; clear it for future bots.
+                    try {
+                        rc.clearRubble(Direction.NONE);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
                 return false;
             }
 

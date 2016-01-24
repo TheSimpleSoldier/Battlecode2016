@@ -53,7 +53,9 @@ public interface PacMan {
         if (loc != null) {
             directions = PacManUtils.applyConstant(Unit.currentLocation, directions, loc, weights[TARGET]);
         }
-
+        if (PacManUtils.countermeasure != null) {
+            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,32});
+        }
         directions = applyAdditionalConstants(directions);
 
         return directions;
@@ -79,7 +81,6 @@ public interface PacMan {
         /* This is the array that will ultimately decide where we go.
         The direction with the smallest weight will be taken. */
             int[] directions = new int[] {1,1,1,1,1,1,1,1};
-
 
             int[] ping0 = Navigation.map.ping(currentLocation, 0, 3);
             int[] ping2 = Navigation.map.ping(currentLocation, 2, 3);
@@ -339,6 +340,37 @@ public interface PacMan {
                     return runAwayWithCountermeasures(weights);
                 }
 
+            } catch (Exception e) {e.printStackTrace();}
+        }
+
+        Navigator navigator = Unit.navigator;
+
+        Direction direction = getRunAwayDirection(weights);
+
+        MapLocation nextLoc = Unit.currentLocation.add(direction);
+
+        MapLocation saveTarget = navigator.getTarget();
+        navigator.setTarget(nextLoc);
+        try {
+            boolean out = navigator.takeNextStep();
+            navigator.setTarget(saveTarget);
+            return out;
+        } catch (Exception e) {
+            navigator.setTarget(saveTarget);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    default boolean runAwayPure(double[][] weights)  {
+        if (!Navigation.lastScan.equals(Unit.currentLocation)) {
+            try {
+                if (Clock.getBytecodesLeft() > 15000) {
+                    PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+                } else {
+                    PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
+                }
+                Navigation.lastScan = Unit.currentLocation;
             } catch (Exception e) {e.printStackTrace();}
         }
 

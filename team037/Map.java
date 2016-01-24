@@ -15,6 +15,7 @@ public class Map {
     public final int originX, originY;  // Origin in real coordinates.
     static RobotController rc;
     public static double[] adjacentRubble;
+
     /**
      * Constructor.
      * @param in_rc RobotController
