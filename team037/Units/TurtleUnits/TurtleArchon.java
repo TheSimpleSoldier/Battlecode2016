@@ -352,7 +352,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public boolean carryOutAbility() throws GameActionException
     {
         // preconditions
-        if ((enemies.length + zombies.length) > allies.length) return false;
+        if ((FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies)) && ((enemies.length + zombies.length) > allies.length)) return false;
         if (currentLocation.distanceSquaredTo(turtlePoint) >= 100 && rc.getTeamParts() < 500) return false;
 
         return buildNextUnit();
