@@ -30,12 +30,15 @@ public class SuperRushArchon extends Unit
 
     private int timesNotSeen = 0;
     private int lastSeen = 0;
+    private int moved = 0;
+
+    private boolean notRetreating = false;
 
     public SuperRushArchon(RobotController rc)
     {
         super(rc);
-        first = RobotType.SOLDIER;
-        unitProportion = new UnitProportion(0., 1., 0., 0., 0.);
+        first = RobotType.GUARD;
+        unitProportion = new UnitProportion(0., 1., 3., 0., 0.);
 
         spawnedFirst = false;
         targetArchon = chooseBestArchon();
@@ -104,6 +107,25 @@ public class SuperRushArchon extends Unit
         {
             if(enemies[k].type == RobotType.ARCHON)
             {
+                /*if(currentLocation.distanceSquaredTo(targetArchon) < 5 && enemies[k].coreDelay < 1)
+                {
+                    if(moved >= 3 && !notRetreating)
+                    {
+                        nextBot = Bots.TURTLEARCHON;
+                        RobotPlayer.strategy = Strategies.TURTLE;
+                        notRetreating = true;
+                        unitProportion.guards = 10;
+                        unitProportion.totalProportion += 10;
+                    }
+                    else if(enemies[k].location.equals(targetArchon))
+                    {
+                        moved++;
+                    }
+                }
+                else
+                {
+                    moved = 0;
+                }*/
                 if(targetID == -1)
                 {
                     targetArchon = enemies[k].location;
@@ -182,8 +204,8 @@ public class SuperRushArchon extends Unit
         else if(activateUnit()){happening = "activating";}
         else if(collectParts()){happening = "collecting parts";}
         else if(moveToSeeEnemy()){happening = "moving to enemy";}
-        else if(spawnUnit()){happening = "spawning";}
         else if(runAway()){happening = "running";}
+        else if(spawnUnit()){happening = "spawning";}
         rc.setIndicatorString(0, "happening: " + happening);
 
         return true;
@@ -411,6 +433,10 @@ public class SuperRushArchon extends Unit
 
     private boolean moveToSeeEnemy() throws GameActionException
     {
+        if(notRetreating)
+        {
+            return false;
+        }
         if(currentLocation.distanceSquaredTo(targetArchon) < distanceFromArchon)
         {
             return false;
@@ -420,8 +446,19 @@ public class SuperRushArchon extends Unit
         return navigator.takeNextStep();
     }
 
-    private boolean runAway()
+    private boolean runAway() throws GameActionException
     {
+        if(!notRetreating)
+        {
+            return false;
+        }
+
+        if(currentLocation.distanceSquaredTo(targetArchon) < 17)
+        {
+            navigator.setTarget(currentLocation.add(currentLocation.directionTo(targetArchon).opposite(), 2));
+            return navigator.takeNextStep();
+        }
+
         return false;
     }
 
