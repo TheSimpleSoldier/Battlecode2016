@@ -699,7 +699,32 @@ public class FightMicro
                 FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), true);
                 return true;
             }
+
+            boolean turretUnderAttack = false;
+
+            for (int i = allies.length; --i>=0; )
+            {
+                if (allies[i].type == RobotType.TURRET)
+                {
+                    MapLocation turret = allies[i].location;
+                    for (int j = zombies.length; --j>=0; )
+                    {
+                        MapLocation zombie = zombies[i].location;
+                        if (turret.distanceSquaredTo(zombie) <= zombies[i].type.attackRadiusSquared)
+                        {
+                            turretUnderAttack = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (turretUnderAttack)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(enemyCOM), true);
+            }
         }
+
 
         if (!FightMicroUtilites.offensiveEnemies(zombies))
         {

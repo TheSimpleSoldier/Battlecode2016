@@ -293,11 +293,31 @@ public interface PacMan {
     }
 
     /**
+     * This checks if we are blocked in a lot of places
+     *
+     * @return
+     * @throws GameActionException
+     */
+    default boolean inCorner() throws GameActionException {
+        int offMapCount = 0;
+        for (int i = Unit.dirs.length; --i>=0; ) {
+            if (!Unit.rc.onTheMap(Unit.currentLocation.add(Unit.dirs[i]))) {
+                offMapCount++;
+            } else if (Unit.rc.senseRubble(Unit.currentLocation.add(Unit.dirs[i])) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                offMapCount++;
+            }
+        }
+        if (offMapCount > 3) return true;
+        return false;
+    }
+
+    /**
      * This method determines if we should spawn counter measures or not
-     * 
+     *
      * @return
      */
-    default boolean spawnCounterMeasure() {
+    default boolean spawnCounterMeasure() throws GameActionException{
+        if (inCorner()) return true;
         if (nearTurrets()) return false;
         if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
         if (!fastZombie()) return false;
@@ -314,12 +334,14 @@ public interface PacMan {
                     PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
                 }
                 Navigation.lastScan = Unit.currentLocation;
+
+                if (Unit.type.equals(RobotType.ARCHON) && spawnCounterMeasure()) {
+                    return runAwayWithCountermeasures(weights);
+                }
+
             } catch (Exception e) {e.printStackTrace();}
         }
 
-        if (Unit.type.equals(RobotType.ARCHON) && spawnCounterMeasure()) {
-            return runAwayWithCountermeasures(weights);
-        }
         Navigator navigator = Unit.navigator;
 
         Direction direction = getRunAwayDirection(weights);
