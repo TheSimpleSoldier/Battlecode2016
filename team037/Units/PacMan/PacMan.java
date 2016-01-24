@@ -13,6 +13,10 @@ public interface PacMan {
      */
     int ZOMBIES = 0, ENEMIES = 1, TARGET = 2;
 
+    double RUBBLE_OBSTRUCT = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
+    double RUBBLE_SLOW = GameConstants.RUBBLE_SLOW_THRESH;
+    double RUBBLE_DIFF = RUBBLE_OBSTRUCT - RUBBLE_SLOW;
+
     double[][] DEFAULT_WEIGHTS = new double[][] {
             {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
             {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
@@ -121,6 +125,74 @@ public interface PacMan {
             // Third: apply constant modifiers to the weights
             directions = applyAllConstants(directions, weights);
 
+            double[] rubble = PacManUtils.rubble;
+            if (rubble != null) {
+
+                if (rubble[0] > RUBBLE_OBSTRUCT) {
+                    directions[0] += RUBBLE_DIFF;
+                } else if (rubble[0] < RUBBLE_SLOW) {
+                    rubble[0] = 0;
+                } else {
+                    directions[0] += directions[0] * (rubble[0] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[1] > RUBBLE_OBSTRUCT) {
+                    directions[1] += RUBBLE_DIFF;
+                } else if (rubble[1] < RUBBLE_SLOW) {
+                    rubble[1] = 0;
+                } else {
+                    directions[1] += directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[2] > RUBBLE_OBSTRUCT) {
+                    directions[2] += RUBBLE_DIFF;
+                } else if (rubble[2] < RUBBLE_SLOW) {
+                    rubble[2] = 0;
+                } else {
+                    directions[2] += directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[3] > RUBBLE_OBSTRUCT) {
+                    directions[3] += RUBBLE_DIFF;
+                } else if (rubble[3] < RUBBLE_SLOW) {
+                    rubble[3] = 0;
+                } else {
+                    directions[3] += directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[4] > RUBBLE_OBSTRUCT) {
+                    directions[4] += RUBBLE_DIFF;
+                } else if (rubble[4] < RUBBLE_SLOW) {
+                    rubble[4] = 0;
+                } else {
+                    directions[4] += directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[5] > RUBBLE_OBSTRUCT) {
+                    directions[5] += RUBBLE_DIFF;
+                } else if (rubble[5] < RUBBLE_SLOW) {
+                    rubble[5] = 0;
+                } else {
+                    directions[5] += directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[6] > RUBBLE_OBSTRUCT) {
+                    directions[6] += RUBBLE_DIFF;
+                } else if (rubble[6] < RUBBLE_SLOW) {
+                    rubble[6] = 0;
+                } else {
+                    directions[6] += directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+
+                if (rubble[7] > RUBBLE_OBSTRUCT) {
+                    directions[7] += RUBBLE_DIFF;
+                } else if (rubble[7] < RUBBLE_SLOW) {
+                    rubble[7] = 0;
+                } else {
+                    directions[7] += directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                }
+            }
+            
             // Last: find the smallest value whose direction leads to a valid location.
             MapLocation nextLoc;
             int min, minDir;
@@ -194,13 +266,17 @@ public interface PacMan {
 
     default boolean runAway(double[][] weights)  {
         if (!Navigation.lastScan.equals(Unit.currentLocation)) {
-            PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+            try {
+                if (Clock.getBytecodesLeft() > 15000) {
+                    PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+                } else {
+                    PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
+                }
+            } catch (Exception e) {e.printStackTrace();}
         }
 
-        if (Unit.us.equals(Team.A)) {
-            if (Unit.zombies.length < 6 || Unit.enemies.length < 4) {
-                return runAwayWithCountermeasures(weights);
-            }
+        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
+            return runAwayWithCountermeasures(weights);
         }
         Navigator navigator = Unit.navigator;
 
