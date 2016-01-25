@@ -33,6 +33,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private int lastZombieSighting = 0;
     private int lastEnemieSighting = 0;
     private static int adjacentTurrets = 0;
+    private static boolean scavenging = false;
+    private static Direction lastDir = null;
 
     public TurtleArchon(RobotController rc)
     {
@@ -48,6 +50,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 index = i;
                 break;
             }
+        }
+
+        if (index != 0)
+        {
+            scavenging = true;
         }
 
         lastZombieSighting = rc.getRoundNum();
@@ -82,6 +89,41 @@ public class TurtleArchon extends BaseArchon implements PacMan
         offensiveEnemies = FightMicroUtilites.offensiveEnemies(enemies);
 
         int round = rc.getRoundNum();
+
+        if (scavenging)
+        {
+            if (zombies.length > 0 && rc.isCoreReady())
+            {
+                nextBot = Bots.COUNTERMEASUREGUARD;
+                buildNextUnit();
+            }
+
+            if (tooManyZombies())
+            {
+                scavenging = false;
+            }
+
+            if (FightMicroUtilites.offensiveEnemies(enemies))
+            {
+                scavenging = false;
+            }
+
+            if (RobotType.ARCHON.maxHealth - rc.getHealth() >= 50)
+            {
+                scavenging = false;
+            }
+
+            if (zombieTracker.getNextZombieRound() - round < 50 && zombieTracker.getNextZombieRoundStrength() > 15)
+            {
+                scavenging = false;
+            }
+
+            // if we stop scavenging...
+            if (!scavenging)
+            {
+                navigator.setTarget(turtlePoint);
+            }
+        }
 
         if (offensiveZombies)
         {
@@ -339,34 +381,93 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
     }
 
+    public boolean tooManyZombies()
+    {
+        if (zombies.length > 2) return true;
+
+        for (int i = zombies.length; --i>=0; )
+        {
+            if (zombies[i].type == RobotType.RANGEDZOMBIE || zombies[i].type == RobotType.BIGZOMBIE)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {
-        if (index == 0) return turtlePoint;
-        int round = rc.getRoundNum();
-        int nextZombieRound = zombieTracker.getNextZombieRound();
-        if (nextZombieRound - round <= 25) return turtlePoint;
-        if (FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies)) return turtlePoint;
-        if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
-        if (!reachedTurtleSpot) reachedTurtleSpot = true;
+        if (scavenging)
+        {
+            MapLocation bestParts = getNextPartLocation();
+
+            if (bestParts != null)
+            {
+                return bestParts;
+            }
+            else
+            {
+                Direction direction = null;
+
+                if (lastDir != null)
+                {
+                    if (Math.random() < 0.9)
+                    {
+                        direction = lastDir;
+                    }
+                }
+
+                if (direction == null)
+                {
+                    direction = dirs[(int) (Math.random() * dirs.length)];
+                }
+
+                MapLocation next = currentLocation.add(direction, 4);
+
+                while (!rc.onTheMap(next))
+                {
+                    direction = direction.rotateLeft();
+                    next = currentLocation.add(direction, 4);
+                }
+
+                lastDir = direction;
+
+                return next;
+            }
+        }
+        else
+        {
+            if (index == 0) return turtlePoint;
+
+            if (FightMicroUtilites.offensiveEnemies(enemies)) return turtlePoint;
 
 
-        MapLocation bestParts = getNextPartLocation();
+            int round = rc.getRoundNum();
+            int nextZombieRound = zombieTracker.getNextZombieRound();
+            if (nextZombieRound - round <= 25) return turtlePoint;
+            if (FightMicroUtilites.offensiveEnemies(zombies)) return turtlePoint;
+            if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
+            if (!reachedTurtleSpot) reachedTurtleSpot = true;
 
-        if (bestParts == null) return turtlePoint;
+            MapLocation bestParts = getNextPartLocation();
 
-        int turtleDist = turtlePoint.distanceSquaredTo(bestParts);
+            if (bestParts == null) return turtlePoint;
 
-        // if we have a lot of parts, don't go looking for more!
-        if (rc.getTeamParts() > 200) return turtlePoint;
-        // if we are safe, don't do anything!
-        if (adjacentTurrets == 4) return currentLocation;
-        if (turtleDist > (1600 - (round/2))) return turtlePoint;
-        if (Math.sqrt(turtleDist) > (nextZombieRound - round)) return turtlePoint;
+            int turtleDist = turtlePoint.distanceSquaredTo(bestParts);
 
-        rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
+            // if we have a lot of parts, don't go looking for more!
+            if (rc.getTeamParts() > 200) return turtlePoint;
+            // if we are safe, don't do anything!
+            if (adjacentTurrets == 4) return currentLocation;
+            if (turtleDist > (1600 - (round/2))) return turtlePoint;
+            if (Math.sqrt(turtleDist) > (nextZombieRound - round)) return turtlePoint;
 
-        return bestParts;
+            rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
+
+            return bestParts;
+        }
     }
 
     @Override
@@ -436,8 +537,25 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public Bots changeBuildOrder(Bots nextBot)
     {
-        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
         int round = rc.getRoundNum();
+        if (scavenging && zombies.length > 0)
+        {
+            nextType = RobotType.GUARD;
+            return Bots.SCOUTBOMBGUARD;
+        }
+        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30)
+        {
+            nextType = RobotType.SCOUT;
+            return Bots.SCOUTBOMBSCOUT;
+        }
+        else if (scavenging)
+        {
+            nextType = RobotType.SOLDIER;
+            return Bots.TURTLESOLDIER;
+        }
+
+
+        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
