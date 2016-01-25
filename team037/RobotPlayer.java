@@ -67,10 +67,13 @@ public class RobotPlayer
             //TODO: archon switch for round > 1 to differentite activated archons
             if(type == RobotType.ARCHON)
             {
-                if(shouldRush(rc.getInitialArchonLocations(rc.getTeam().opponent()),
-                        rc.getInitialArchonLocations(rc.getTeam()), rc.getLocation(), rc))
+                if(rc.getRoundNum() == 0)
                 {
-                    strategy = Strategies.RUSH;
+                    if(shouldRush(rc.getInitialArchonLocations(rc.getTeam().opponent()),
+                            rc.getInitialArchonLocations(rc.getTeam()), rc.getLocation(), rc))
+                    {
+                        strategy = Strategies.RUSH;
+                    }
                 }
                 if(strategy.equals(Strategies.CASTLE))
                 {
