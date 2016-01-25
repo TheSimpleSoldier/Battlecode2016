@@ -19,17 +19,17 @@ public class ScavengerScout extends ScoutBombScout {
         super(rc);
         BOMB = false;
         try {
-            myArchon = null;
             digTarget = null;
-            for (int i = 8; --i >= 0; ) {
-                MapLocation loc = currentLocation.add(dirs[i]);
-                if (rc.isLocationOccupied(loc)) {
-                    RobotInfo checkBot = rc.senseRobotAtLocation(loc);
-                    if (checkBot.type.equals(RobotType.ARCHON)) {
-                        if (myArchon == null) {
-                            myArchon = checkBot;
-                            break;
-                        }
+
+            myArchon = null;
+            allies = rc.senseNearbyRobots(8, us);
+            int distance = 9999999;
+            for (int i = allies.length; --i >= 0;) {
+                if (allies[i].type.equals(RobotType.ARCHON)) {
+                    int nextDistance = currentLocation.distanceSquaredTo(allies[i].location);
+                    if (myArchon == null || distance > nextDistance) {
+                        myArchon = allies[i];
+                        distance = nextDistance;
                     }
                 }
             }
