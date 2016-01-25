@@ -20,7 +20,7 @@ public class SuperRushViper extends BaseViper implements PacMan
     {
         super(rc);
         updatedLocs = new MapLocation[enemyArchonStartLocs.length];
-        rc.setIndicatorString(0, "rushing viper");
+        rc.setIndicatorString(0, "super rushing viper");
 
         for (int i = updatedLocs.length; --i>=0; )
         {
@@ -51,6 +51,7 @@ public class SuperRushViper extends BaseViper implements PacMan
             {
                 rushing = false;
             }
+            target = rushTarget;
         }
     }
 
@@ -79,7 +80,8 @@ public class SuperRushViper extends BaseViper implements PacMan
         if (zombies == null && zombies.length == 0 || (zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
             return false;
         }
-        return runAway(null);
+        return false;
+        //return runAway(null);
     }
 
 
