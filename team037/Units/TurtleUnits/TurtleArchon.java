@@ -455,9 +455,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 5)
+            if (zombieTracker.getNextZombieRoundStrength() < 5 &&  zombieTracker.getNextZombieRound() - round < 30)
             {
-                System.out.println("Don't waste time spawning scout bombs");
+                nextType = RobotType.SCOUT;
+                return Bots.SCOUTBOMBSCOUT;
             }
             else if (zombieTracker.getNextZombieRound() - round < 50)
             {
