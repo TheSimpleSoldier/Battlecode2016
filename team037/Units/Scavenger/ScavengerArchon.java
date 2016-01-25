@@ -69,12 +69,12 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         return directions;
     }
 
-//    public int[] applyAdditionalConstants(int[] directions) {
-//        if (countermeasure != null) {
-//            directions = PacManUtils.applySimpleConstant(currentLocation,directions,countermeasure.location,new int[]{999999,64,32});
-//        }
-//        return directions;
-//    }
+    public int[] applyAdditionalConstants(int[] directions) {
+        if (alliedArchonStartLocs != null) {
+            directions = PacManUtils.applySimpleConstants(currentLocation,directions,alliedArchonStartLocs,new int[]{128,64,32});
+        }
+        return directions;
+    }
 
 
     public boolean safeToCommunicate() {
