@@ -3,6 +3,7 @@ package team037.Units.ScoutBomb;
 import battlecode.common.*;
 import team037.Enums.Strategies;
 import team037.FlyingSlugNavigator;
+import team037.FlyingWallHuggerNavigator;
 import team037.RobotPlayer;
 import team037.ScoutMapKnowledge;
 import team037.Units.BaseUnits.BaseScout;
@@ -69,18 +70,27 @@ public class ScoutBombScout extends BaseScout
 
     public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
     public static FlyingSlugNavigator navigator;
+    public static FlyingWallHuggerNavigator wallNavigator;
 
     public ScoutBombScout(RobotController rc)
     {
         super(rc);
         mapKnowledge = mKnowledge;
         navigator = new FlyingSlugNavigator(rc);
+        wallNavigator = new FlyingWallHuggerNavigator(rc);
         enemyCore = MapUtils.getCenterOfMass(enemyArchonStartLocs);
         alliedCenter = MapUtils.getCenterOfMass(alliedArchonStartLocs);
-        navigator.setTarget(nextPlaceToLookForEnemies());
-
+        updateTarget(nextPlaceToLookForEnemies());
     }
 
+    private boolean useWallHugger() {
+        return id % 5 <= 1;
+    }
+
+    private void updateTarget(MapLocation target) {
+        navigator.setTarget(target);
+        wallNavigator.setTarget(target);
+    }
 
     @Override
     public void collectData() throws GameActionException {
@@ -88,10 +98,10 @@ public class ScoutBombScout extends BaseScout
 
 
         if (navigator.getTarget() == null) {
-            navigator.setTarget(nextPlaceToLookForEnemies());
+            updateTarget(nextPlaceToLookForEnemies());
         }
         if (currentLocation.isAdjacentTo(navigator.getTarget())) {
-            navigator.setTarget(nextPlaceToLookForEnemies());
+            updateTarget(nextPlaceToLookForEnemies());
         }
 
         // zombie info
@@ -142,7 +152,7 @@ public class ScoutBombScout extends BaseScout
                 case ARCHON:
                     nonScoutEnemies = true;
                     rc.setIndicatorLine(currentLocation, enemies[i].location, 0, 0, 0);
-                    navigator.setTarget(enemies[i].location);
+                    updateTarget(enemies[i].location);
                     break;
                 case SCOUT:
                     break;
@@ -270,7 +280,11 @@ public class ScoutBombScout extends BaseScout
             rushForward = true;
         }
         if (rc.getInfectedTurns() > 5) {
-            navigator.takeNextStep(id % 5 <= 1, id % 2 == 0);
+            if (useWallHugger()) {
+                wallNavigator.takeNextStep();
+            } else {
+                navigator.takeNextStep(id % 5 <= 2, id % 2 == 0);
+            }
         }
         return true;
     }
@@ -658,7 +672,11 @@ public class ScoutBombScout extends BaseScout
         // TODO: consider a herder, that hugs the edge of the map if able to find the enemy
 
 
-        return navigator.takeNextStep(id % 5 <= 1, id % 2 == 0);
+        if (useWallHugger()) {
+            return wallNavigator.takeNextStep();
+        } else {
+            return navigator.takeNextStep(id % 5 <= 2, id % 2 == 0);
+        }
     }
 
     /**
