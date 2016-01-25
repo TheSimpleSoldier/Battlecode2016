@@ -483,7 +483,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
 
         // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
-        if (round > 2500) {
+        if (round > 2500 && lastUnderAttack < 2500) {
             return Bots.SCOUTBOMBVIPER;
         }
 
