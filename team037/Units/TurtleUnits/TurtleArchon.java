@@ -130,10 +130,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 scavenging = false;
             }
 
-            if (RobotType.ARCHON.maxHealth - rc.getHealth() >= 200)
+            if (RobotType.ARCHON.maxHealth - rc.getHealth() >= 300)
             {
                 condition = "lost health";
                 scavenging = false;
+                stayHome = true;
             }
 
 //            if (zombieTracker.getNextZombieRound() - round < 50 && zombieTracker.getNextZombieRoundStrength() > 100)
@@ -472,8 +473,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
 //            rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 
 
-            if (rc.getHealth() > 800)
-                scavenging = true;
+
+            scavenging = true;
 
             rc.setIndicatorString(0, "scavenging: " + round + " x: " + bestParts.x + " y: " + bestParts.y);
 
