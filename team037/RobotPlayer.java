@@ -56,7 +56,7 @@ public class RobotPlayer
             {
                 strategy = Strategies.RUSH;
             }*/
-            
+
             if(rc.getRoundNum() == 0)
             {
                 System.out.println(strategy);

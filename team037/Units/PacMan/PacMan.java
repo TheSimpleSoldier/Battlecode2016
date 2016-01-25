@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.Navigation;
 import team037.Navigator;
 import team037.Unit;
+import team037.Units.BaseUnits.BaseArchon;
 
 public interface PacMan {
     /**
@@ -23,6 +24,8 @@ public interface PacMan {
             {-16, -8, -4, 0, 0},            // target constants (attract towards target)
     };
 
+    boolean[] flags = new boolean[1];
+
     /**
      * If you want to use PacMan navigation, you should use the default runAway() method. If you need to incorporate
      * additional factors, implement them in the applyAdditionalWeights and applyAdditionalConstants methods.
@@ -34,7 +37,9 @@ public interface PacMan {
     default int[] applyAllWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ZOMBIES]);
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
-
+//        if (Unit.type.equals(RobotType.ARCHON)) {
+//            directions = PacManUtils.applyWeights(Unit.currentLocation, directions, BaseArchon.neutralBots,new double[]{-2,-1,-.5,0,0});
+//        }
         directions = applyAdditionalWeights(directions);
 
         return directions;
@@ -42,7 +47,6 @@ public interface PacMan {
     default int[] applyAllSimpleWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.zombies);
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.enemies);
-
         directions = applyAdditionalWeights(directions);
 
         return directions;
@@ -53,7 +57,11 @@ public interface PacMan {
             directions = PacManUtils.applyConstant(Unit.currentLocation, directions, loc, weights[TARGET]);
         }
         if (PacManUtils.countermeasure != null) {
-            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,32});
+            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,16});
+        }
+        if (flags[0]) {
+            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.alliedArchonStartLocs,new int[]{32,16,8});
+            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.enemyArchonStartLocs,new int[]{-16,-8,-4});
         }
         directions = applyAdditionalConstants(directions);
 
@@ -142,7 +150,7 @@ public interface PacMan {
                 } else if (rubble[1] < RUBBLE_SLOW) {
                     rubble[1] = 0;
                 } else {
-                    directions[1] += directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[1] += (double)directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[2] > RUBBLE_OBSTRUCT) {
@@ -150,7 +158,7 @@ public interface PacMan {
                 } else if (rubble[2] < RUBBLE_SLOW) {
                     rubble[2] = 0;
                 } else {
-                    directions[2] += directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[2] += (double)directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[3] > RUBBLE_OBSTRUCT) {
@@ -158,7 +166,7 @@ public interface PacMan {
                 } else if (rubble[3] < RUBBLE_SLOW) {
                     rubble[3] = 0;
                 } else {
-                    directions[3] += directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[3] += (double)directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[4] > RUBBLE_OBSTRUCT) {
@@ -166,7 +174,7 @@ public interface PacMan {
                 } else if (rubble[4] < RUBBLE_SLOW) {
                     rubble[4] = 0;
                 } else {
-                    directions[4] += directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[4] += (double)directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[5] > RUBBLE_OBSTRUCT) {
@@ -174,7 +182,7 @@ public interface PacMan {
                 } else if (rubble[5] < RUBBLE_SLOW) {
                     rubble[5] = 0;
                 } else {
-                    directions[5] += directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[5] += (double)directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[6] > RUBBLE_OBSTRUCT) {
@@ -182,7 +190,7 @@ public interface PacMan {
                 } else if (rubble[6] < RUBBLE_SLOW) {
                     rubble[6] = 0;
                 } else {
-                    directions[6] += directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[6] += (double)directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[7] > RUBBLE_OBSTRUCT) {
@@ -190,7 +198,7 @@ public interface PacMan {
                 } else if (rubble[7] < RUBBLE_SLOW) {
                     rubble[7] = 0;
                 } else {
-                    directions[7] += directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[7] += (double)directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
             }
             
@@ -280,7 +288,44 @@ public interface PacMan {
 //        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
 //            return runAwayWithCountermeasures(weights);
 //        }
-        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
+        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
+            return runAwayWithCountermeasures(weights);
+        }
+        Navigator navigator = Unit.navigator;
+
+        Direction direction = getRunAwayDirection(weights);
+
+        MapLocation nextLoc = Unit.currentLocation.add(direction);
+
+        MapLocation saveTarget = navigator.getTarget();
+        navigator.setTarget(nextLoc);
+        try {
+            boolean out = navigator.takeNextStep();
+            navigator.setTarget(saveTarget);
+            return out;
+        } catch (Exception e) {
+            navigator.setTarget(saveTarget);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    default boolean runAway(double[][] weights, boolean spawnGuards, boolean tendTowardsEnemy) {
+
+        flags[0] = tendTowardsEnemy;
+
+        if (!Navigation.lastScan.equals(Unit.currentLocation)) {
+            try {
+                if (Clock.getBytecodesLeft() > 15000) {
+                    PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+                } else {
+                    PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
+                }
+                Navigation.lastScan = Unit.currentLocation;
+            } catch (Exception e) {e.printStackTrace();}
+        }
+
+        if (spawnGuards && Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
             return runAwayWithCountermeasures(weights);
         }
         Navigator navigator = Unit.navigator;
