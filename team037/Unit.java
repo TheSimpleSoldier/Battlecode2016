@@ -48,6 +48,7 @@ public abstract class Unit
     public static boolean archonDistressComs = true;
     public static boolean mapComs = true;
     public static boolean missionComs = true;
+    public static boolean anyComs = true;
 
     public static MapLocation locationLastTurn;
     public static MapLocation previousLocation;
@@ -178,63 +179,66 @@ public abstract class Unit
     // additional methods with default behavior
     public void handleMessages() throws GameActionException
     {
-        rubbleUpdate = 0;
-
-        communications = communicator.processCommunications();
-        for(int k = communications.length; --k >= 0;)
+        if(anyComs)
         {
-            switch(communications[k].opcode)
+            rubbleUpdate = 0;
+
+            communications = communicator.processCommunications();
+            for(int k = communications.length; --k >= 0; )
             {
-                case MAP_BOUNDS:
-                case SDEN:
-                case SKILLED_DEN:
-                case DEAD_DEN:
-                case RUBBLE:
-                    if(mapComs)
-                    {
-                        interpretMapKnowlege(communications[k]);
-                    }
-                    break;
-                case PARTS:
-                case GOING_AFTER_PARTS:
-                case NEUTRAL:
-                    if(type == RobotType.ARCHON)
-                    {
-                        interpretArchonMapKnowledge(communications[k]);
-                    }
-                    break;
-                case EXPLORE_EDGE:
-                    if(type == RobotType.SCOUT)
-                    {
-                        interpretScoutMapKnowledge(communications[k]);
-                    }
-                    break;
-                case OENEMY:
-                case ENEMY:
-                    if(enemyComs)
-                    {
-                        interpretEnemy(communications[k]);
-                    }
-                    break;
-                case CHANGEMISSION:
-                    if(missionComs)
-                    {
-                        interpretMissionChange(communications[k]);
-                    }
-                    break;
-                case ATTACK:
-                case RALLY_POINT:
-                    if(archonComs)
-                    {
-                        interpretLocFromArchon(communications[k]);
-                    }
-                    break;
-                case ARCHON_DISTRESS:
-                    if(archonDistressComs)
-                    {
-                        interpretDistressFromArchon(communications[k]);
-                    }
-                    break;
+                switch(communications[k].opcode)
+                {
+                    case MAP_BOUNDS:
+                    case SDEN:
+                    case SKILLED_DEN:
+                    case DEAD_DEN:
+                    case RUBBLE:
+                        if(mapComs)
+                        {
+                            interpretMapKnowlege(communications[k]);
+                        }
+                        break;
+                    case PARTS:
+                    case GOING_AFTER_PARTS:
+                    case NEUTRAL:
+                        if(type == RobotType.ARCHON)
+                        {
+                            interpretArchonMapKnowledge(communications[k]);
+                        }
+                        break;
+                    case EXPLORE_EDGE:
+                        if(type == RobotType.SCOUT)
+                        {
+                            interpretScoutMapKnowledge(communications[k]);
+                        }
+                        break;
+                    case OENEMY:
+                    case ENEMY:
+                        if(enemyComs)
+                        {
+                            interpretEnemy(communications[k]);
+                        }
+                        break;
+                    case CHANGEMISSION:
+                        if(missionComs)
+                        {
+                            interpretMissionChange(communications[k]);
+                        }
+                        break;
+                    case ATTACK:
+                    case RALLY_POINT:
+                        if(archonComs)
+                        {
+                            interpretLocFromArchon(communications[k]);
+                        }
+                        break;
+                    case ARCHON_DISTRESS:
+                        if(archonDistressComs)
+                        {
+                            interpretDistressFromArchon(communications[k]);
+                        }
+                        break;
+                }
             }
         }
     }

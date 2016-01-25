@@ -185,6 +185,9 @@ public class SortedParts
      */
     public int getIndexOfMapLocation(MapLocation m)
     {
+        if (m == null) {
+            return -1;
+        }
         int index = m.hashCode();
 
         index = Math.abs(index);

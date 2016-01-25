@@ -1,12 +1,16 @@
 package team037;
 
 import battlecode.common.*;
+import battlecode.common.Clock;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.RobotType;
 import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.Units.AlphaArchon;
 import team037.Units.BaseUnits.*;
 import team037.Units.CastleUnits.CastleArchon;
-import team037.Units.PacMan.PacManArchon;
+import team037.Units.Scavenger.ScavengerArchon;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.SuperRush.SuperRushArchon;
 import team037.Units.TurtleUnits.TurtleArchon;
@@ -52,7 +56,7 @@ public class RobotPlayer
             {
                 strategy = Strategies.RUSH;
             }*/
-
+            
             if(rc.getRoundNum() == 0)
             {
                 System.out.println(strategy);
@@ -84,8 +88,8 @@ public class RobotPlayer
                 }
                 else if(strategy.equals(Strategies.PACMAN))
                 {
-                    unit = new PacManArchon(rc);
-                    Unit.thisBot = Bots.PACMANARCHON;
+                    unit = new ScavengerArchon(rc);
+                    Unit.thisBot = Bots.SCAVENGERARCHON;
                 }
                 else if(strategy.equals(Strategies.RUSH))
                 {
