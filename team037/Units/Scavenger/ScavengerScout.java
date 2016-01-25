@@ -192,19 +192,6 @@ public class ScavengerScout extends ScoutBombScout {
 
     public void sendArchonMessages() {
         try {
-//            if (mKnowledge.firstFoundEdge && msgsSent < 20) {
-//                Communication com = mKnowledge.getMapBoundsCommunication();
-//                communicator.sendCommunication(ScoutMapKnowledge.getMaxRange(), com);
-//                msgsSent++;
-//                mKnowledge.firstFoundEdge = false;
-//                mKnowledge.updated = false;
-//            }
-//            if (mKnowledge.updated && msgsSent < 20) {
-//                Communication com = mKnowledge.getMapBoundsCommunication();
-//                communicator.sendCommunication(ScoutMapKnowledge.getRange(), com);
-//                msgsSent++;
-//                mKnowledge.updated = false;
-//            }
             msgArchons();
             msgParts();
             msgDens();
@@ -251,7 +238,7 @@ public class ScavengerScout extends ScoutBombScout {
                         }
                     }
 
-                    if (myDistance > 0) {
+                    if (myDistance > 0 && myDistance < 25) {
                         target = zombie;
                         navigator.setTarget(zombie);
                         BOMB = true;

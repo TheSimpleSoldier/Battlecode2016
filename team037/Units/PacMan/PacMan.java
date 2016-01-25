@@ -55,7 +55,7 @@ public interface PacMan {
             directions = PacManUtils.applyConstant(Unit.currentLocation, directions, loc, weights[TARGET]);
         }
         if (PacManUtils.countermeasure != null) {
-            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,32});
+            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,16});
         }
         if (flags[0]) {
             directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.alliedArchonStartLocs,new int[]{32,16,8});
