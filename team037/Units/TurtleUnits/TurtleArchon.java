@@ -94,6 +94,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         super.collectData();
 
+        rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
+
         boolean offensiveZombies = FightMicroUtilites.offensiveEnemies(zombies);
         offensiveEnemies = FightMicroUtilites.offensiveEnemies(enemies);
 
@@ -234,41 +236,44 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 int closestDen = 99999;
                 MapLocation den = null;
 
-                if (mapKnowledge.dens.hasLocations())
+                if (rc.getRoundNum() < 1000)
                 {
-                    for (int i = mapKnowledge.dens.length; --i >= 0; )
+                    if (mapKnowledge.dens.hasLocations())
                     {
-                        if (mapKnowledge.dens.array[i] != null)
+                        for (int i = mapKnowledge.dens.length; --i >= 0; )
                         {
-                            MapLocation currentDen = mapKnowledge.dens.array[i];
-
-                            if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
+                            if (mapKnowledge.dens.array[i] != null)
                             {
-                                mapKnowledge.dens.remove(currentDen);
+                                MapLocation currentDen = mapKnowledge.dens.array[i];
 
-                                if (!underAttack)
+                                if (rc.canSenseLocation(currentDen) && (rc.senseRobotAtLocation(currentDen) == null || rc.senseRobotAtLocation(currentDen).team != Team.ZOMBIE))
                                 {
-                                    Communication communication = new SimpleBotInfoCommunication();
-                                    communication.opcode = CommunicationType.DEAD_DEN;
-                                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
-                                    communicator.sendCommunication(400, communication);
+                                    mapKnowledge.dens.remove(currentDen);
+
+                                    if (!underAttack)
+                                    {
+                                        Communication communication = new SimpleBotInfoCommunication();
+                                        communication.opcode = CommunicationType.DEAD_DEN;
+                                        communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, currentDen.x, currentDen.y});
+                                        communicator.sendCommunication(400, communication);
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                int currentDist = currentDen.distanceSquaredTo(turtlePoint);
-
-                                if (currentDist < closestDen)
+                                else
                                 {
-                                    closestDen = currentDist;
-                                    den = currentDen;
+                                    int currentDist = currentDen.distanceSquaredTo(turtlePoint);
+
+                                    if (currentDist < closestDen)
+                                    {
+                                        closestDen = currentDist;
+                                        den = currentDen;
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 400 && rc.getRoundNum() < 1000)
+                if (den != null && den.distanceSquaredTo(turtlePoint) > 20 && den.distanceSquaredTo(turtlePoint) < 400)
                 {
                     turtlePoint = den.add(den.directionTo(turtlePoint), 3);
 
@@ -328,7 +333,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
             if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25)
             {
-                turtlePoint = origionalTurtleSpot;
+                turtlePoint = currentTurtle;
             }
             else
             {
@@ -339,11 +344,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
                     communicator.sendCommunication(1600, newRallyPoint);
                 }
             }
-        }
-
-        if (hiding)
-        {
-            rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
         }
     }
 
