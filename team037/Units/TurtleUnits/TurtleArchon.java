@@ -130,7 +130,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 scavenging = false;
             }
 
-            if (RobotType.ARCHON.maxHealth - rc.getHealth() >= 50)
+            if (RobotType.ARCHON.maxHealth - rc.getHealth() >= 200)
             {
                 condition = "lost health";
                 scavenging = false;
@@ -472,7 +472,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
 //            rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 
 
-            scavenging = true;
+            if (rc.getHealth() > 800)
+                scavenging = true;
 
             rc.setIndicatorString(0, "scavenging: " + round + " x: " + bestParts.x + " y: " + bestParts.y);
 
