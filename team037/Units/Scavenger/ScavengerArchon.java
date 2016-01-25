@@ -153,16 +153,22 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         if (scout1 != null && (!rc.canSenseRobot(scout1.ID) || currentLocation.distanceSquaredTo(scout1.location) > 25)) {
             scout1 = null;
             myScouts--;
+        } else if (scout1 != null) {
+            scout1 = rc.senseRobot(scout1.ID);
         }
 
         if (scout2 != null && (!rc.canSenseRobot(scout2.ID) || currentLocation.distanceSquaredTo(scout2.location) > 25)) {
             scout2 = null;
             myScouts--;
+        } else if (scout2 != null) {
+            scout2 = rc.senseRobot(scout2.ID);
         }
 
         if (scout3 != null && (!rc.canSenseRobot(scout3.ID) || currentLocation.distanceSquaredTo(scout3.location) > 25)) {
             scout3 = null;
             myScouts--;
+        } else if (scout3 != null) {
+            scout3 = rc.senseRobot(scout3.ID);
         }
 
         if (sortedParts.contains(currentLocation))
@@ -176,7 +182,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
 
     @Override
     public boolean carryOutAbility() throws GameActionException {
-        if (!rc.isCoreReady() || !rc.hasBuildRequirements(SCOUT) || myScouts >= 3) {
+        if (!(rc.isCoreReady() && rc.hasBuildRequirements(SCOUT))) {
             return false;
         }
 
@@ -185,58 +191,90 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
                 rc.build(Direction.NORTH,SCOUT);
                 scout1 = rc.senseRobotAtLocation(currentLocation.add(Direction.NORTH));
                 sendInitialMessages(Direction.NORTH,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             } else if (rc.canBuild(Direction.NORTH_WEST,SCOUT)) {
                 rc.build(Direction.NORTH_WEST,SCOUT);
                 scout1 = rc.senseRobotAtLocation(currentLocation.add(Direction.NORTH_WEST));
                 sendInitialMessages(Direction.NORTH_WEST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             } else if (rc.canBuild(Direction.NORTH_EAST,SCOUT)) {
                 rc.build(Direction.NORTH_EAST,SCOUT);
                 scout1 = rc.senseRobotAtLocation(currentLocation.add(Direction.NORTH_EAST));
                 sendInitialMessages(Direction.NORTH_EAST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             }
-        }
-
-        if (scout2 == null) {
+        } else if (scout2 == null) {
             if (rc.canBuild(Direction.EAST,SCOUT)) {
                 rc.build(Direction.EAST,SCOUT);
                 scout2 = rc.senseRobotAtLocation(currentLocation.add(Direction.EAST));
                 sendInitialMessages(Direction.EAST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             } else if (rc.canBuild(Direction.SOUTH_EAST,SCOUT)) {
                 rc.build(Direction.SOUTH_EAST,SCOUT);
                 scout2 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH_EAST));
                 sendInitialMessages(Direction.SOUTH_EAST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             } else if (rc.canBuild(Direction.SOUTH,SCOUT)) {
                 rc.build(Direction.SOUTH,SCOUT);
                 scout2 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH));
                 sendInitialMessages(Direction.SOUTH,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             }
-        }
-
-        if (scout3 == null) {
+        } else if (scout3 == null) {
             if (rc.canBuild(Direction.WEST,SCOUT)) {
                 rc.build(Direction.WEST,SCOUT);
                 scout3 = rc.senseRobotAtLocation(currentLocation.add(Direction.WEST));
                 sendInitialMessages(Direction.WEST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             } else if (rc.canBuild(Direction.SOUTH_WEST,SCOUT)) {
                 rc.build(Direction.SOUTH_WEST,SCOUT);
                 scout3 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH_WEST));
                 sendInitialMessages(Direction.SOUTH_WEST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             } else if (rc.canBuild(Direction.SOUTH,SCOUT)) {
                 rc.build(Direction.SOUTH,SCOUT);
                 scout3 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH));
                 sendInitialMessages(Direction.SOUTH,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                myScouts++;
                 return true;
             }
         }
 
         return false;
+    }
+
+    @Override
+    public boolean updateTarget() throws GameActionException
+    {
+        MapLocation currentTarget = navigator.getTarget();
+        if (currentTarget == null)
+            return true;
+        if (rc.getLocation().equals(currentTarget))
+            return true;
+        if (rc.canSenseLocation(currentTarget) && (rc.senseParts(currentTarget) == 0 && rc.senseRobotAtLocation(currentTarget) == null)) {
+            sortedParts.remove(sortedParts.getIndexOfMapLocation(currentTarget));
+            return true;
+        }
+
+        MapLocation bestParts = sortedParts.getBestSpot(currentLocation);
+
+        if (bestParts != null && !bestParts.equals(currentTarget))
+            return true;
+
+        return false;
+    }
+
+    @Override
+    public MapLocation getNextSpot() throws GameActionException
+    {
+        return getNextPartLocation();
     }
 }

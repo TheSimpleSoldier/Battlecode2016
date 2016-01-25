@@ -16,6 +16,39 @@ public class PacManUtils {
     public static RobotInfo countermeasure = null;
     public static double[] rubble;
 
+    public static MapLocation getClosestHarmfulUnit(RobotInfo[] badBots) {
+        MapLocation currentLocation = Unit.currentLocation;
+        RobotInfo[] allies = Unit.allies;
+        MapLocation closestUnitLocation = null;
+        if (badBots != null) {
+            for (int i = badBots.length; --i >= 0; ) {
+                RobotType type = badBots[i].type;
+
+                if (type.equals(RobotType.ZOMBIEDEN) || type.equals(RobotType.SCOUT)) {
+                    if (--i < 0)
+                        break;
+                }
+
+                MapLocation nextBadBot = badBots[i].location;
+                int myDistance = currentLocation.distanceSquaredTo(nextBadBot);
+
+                for (int j = allies.length; --j >= 0; ) {
+                    if (myDistance > allies[j].location.distanceSquaredTo(nextBadBot)) {
+                        myDistance = -1;
+                        break;
+                    }
+                }
+
+                if (myDistance > 0) {
+                    closestUnitLocation = nextBadBot;
+                    break;
+                }
+            }
+        }
+        
+        return closestUnitLocation;
+    }
+
     public static MapLocation centerOfMass(RobotInfo[] bots) {
         if (bots == null || bots.length == 0)
             return null;

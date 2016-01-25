@@ -280,7 +280,7 @@ public interface PacMan {
 //        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
 //            return runAwayWithCountermeasures(weights);
 //        }
-        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
+        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
             return runAwayWithCountermeasures(weights);
         }
         Navigator navigator = Unit.navigator;
