@@ -15,6 +15,7 @@ public class ScoutBombViper extends BaseViper {
     private static int closestAlly;
     private static RobotInfo closestAllyInfo;
     private static int numScouts;
+    private static int numScoutsInRange;
 
     private static boolean nonScoutEnemies;
 
@@ -61,6 +62,7 @@ public class ScoutBombViper extends BaseViper {
         closestAlly = Integer.MAX_VALUE;
         closestAllyInfo = null;
         numScouts = 0;
+        numScoutsInRange = 0;
         for (int i = allies.length; --i >= 0;) {
             int dist = allies[i].location.distanceSquaredTo(currentLocation);
             if (dist < closestAlly) {
@@ -69,6 +71,9 @@ public class ScoutBombViper extends BaseViper {
             }
             if (allies[i].type.equals(RobotType.SCOUT)) {
                 numScouts += 1;
+                if (allies[i].location.distanceSquaredTo(currentLocation) <= type.attackRadiusSquared) {
+                    numScoutsInRange += 1;
+                }
             }
         }
 
@@ -112,7 +117,7 @@ public class ScoutBombViper extends BaseViper {
         } else if (nonScoutEnemies) {
             return super.fight();
         }
-        if (rushing && numScouts > 10) {
+        if (rushing && numScoutsInRange > 2) {
             return true;
         }
         return navigator.takeNextStep();

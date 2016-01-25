@@ -2,6 +2,7 @@ package team037.Units.BaseUnits;
 
 import battlecode.common.*;
 import team037.Unit;
+import team037.Units.PacMan.PacMan;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
@@ -16,7 +17,7 @@ import team037.Utilites.MapUtils;
  *
  * Otherwise you shouldn't need to implement any code
  */
-public class BaseTurret extends Unit
+public class BaseTurret extends Unit implements PacMan
 {
     public MapLocation targetLoc;
     private int turnsAtLoc = 0;
@@ -61,7 +62,7 @@ public class BaseTurret extends Unit
     {
         if (rc.getType() == RobotType.TURRET)
         {
-            if (packIntoTTM() && navigator.getTarget() != null && !navigator.getTarget().equals(currentLocation) && (zombies.length == 0 && enemies.length == 0))
+            if (packIntoTTM() && navigator.getTarget() != null && !navigator.getTarget().equals(currentLocation) && (!FightMicroUtilites.offensiveEnemies(enemies) && zombies.length == 0))
             {
                 arrived = false;
                 rc.pack();
@@ -86,7 +87,7 @@ public class BaseTurret extends Unit
             {
                 if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies))
                 {
-                    return false;
+                    return runAway(null);
                 }
                 else
                 {
@@ -100,13 +101,26 @@ public class BaseTurret extends Unit
 
         boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
 
+        if (pack(fought))
         if ((fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies)) && !FightMicroUtilites.offensiveEnemies(allies) && !fought && rc.isWeaponReady())
         {
+//            System.out.println("Flee from enemies: Offensive allies: " + FightMicroUtilites.offensiveEnemies(allies) + " allies engaged: " + FightMicroUtilites.unitsEngaged(allies, enemies) + " allies.length: " + allies.length + " enemies.length: " + enemies.length);
             rc.pack();
             return false;
         }
 
         return fought;
+    }
+
+    private boolean pack(boolean fought)
+    {
+        if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies) && !fought && rc.isWeaponReady())
+        {
+            if (!FightMicroUtilites.offensiveEnemies(allies)) return true;
+            if (!FightMicroUtilites.unitsEngaged(allies, enemies) && !FightMicroUtilites.unitsEngaged(allies, zombies)) return true;
+        }
+
+        return false;
     }
 
     // zombie fight micro happens in fight()

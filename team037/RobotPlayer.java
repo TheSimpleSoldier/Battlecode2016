@@ -36,7 +36,7 @@ public class RobotPlayer
             // BUT THEY ARE FIXING IT!
 
             // hardcode disabled for now
-            strategy = Strategies.SCOUT_BOMB;
+            strategy = Strategies.TURTLE;
 
             /*MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
@@ -100,7 +100,8 @@ public class RobotPlayer
                     Unit.thisBot = Bots.SUPERRUSHARCHON;
                 }
                 else
-                { // default to alpha archons
+                {
+                    // default to alpha archons
                     unit = new AlphaArchon(rc);
                     Unit.thisBot = Bots.ALPHAARCHON;
                 }

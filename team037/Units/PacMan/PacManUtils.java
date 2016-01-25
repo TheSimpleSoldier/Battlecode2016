@@ -9,10 +9,8 @@ import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
+import team037.Utilites.FightMicroUtilites;
 
-/**
- * Created by davej on 1/22/2016.
- */
 public class PacManUtils {
 
     public static final RobotType SCOUT = RobotType.SCOUT;
@@ -154,7 +152,7 @@ public class PacManUtils {
     }
 
     public static boolean canDeployCountermeasure() {
-        if (countermeasure == null || !Unit.rc.canSenseRobot(countermeasure.ID)) {
+        if ((countermeasure == null || !Unit.rc.canSenseRobot(countermeasure.ID))) {
             countermeasure = null;
             return true;
         }

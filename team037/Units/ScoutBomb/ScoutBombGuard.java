@@ -100,7 +100,7 @@ public class ScoutBombGuard extends BaseGaurd {
                 rc.setIndicatorString(0, "trying to get to enemy");
                 return true;
             }
-            if (MoveUtils.tryMoveForwardOrLeftRight(archonLoc.directionTo(currentLocation), false)) {
+            if (archonLoc != null && MoveUtils.tryMoveForwardOrLeftRight(archonLoc.directionTo(currentLocation), false)) {
                 rc.setIndicatorString(0, "can't get to enemy, trying to get away from archon");
                 return true;
             }

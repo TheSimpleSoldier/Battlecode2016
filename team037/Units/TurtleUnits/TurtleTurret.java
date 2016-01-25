@@ -43,8 +43,12 @@ public class TurtleTurret extends BaseTurret
        if (rallyPoint != null)
        {
            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
-           turtlePoint = rallyPoint;
-           setTargetLoc(MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, turtlePoint));
+
+           // only look for a new location if we've moved rally points
+           if (!rallyPoint.equals(turtlePoint)) {
+               turtlePoint = rallyPoint;
+               setTargetLoc(MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, turtlePoint));
+           }
 
            rallyPoint = null;
        }
