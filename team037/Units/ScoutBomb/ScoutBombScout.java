@@ -19,6 +19,8 @@ public class ScoutBombScout extends BaseScout
     private static RobotInfo closestEnemyArchonInfo;
     private static int closestEnemyViper;
     private static MapLocation closestEnemyViperLoc;
+    private static RobotInfo closestEnemyViperInfo;
+    private static boolean onlyEnemyIsArchon;
 
     private static int closestAlliedArchon;
     private static MapLocation closestAlliedArchonLoc;
@@ -66,6 +68,7 @@ public class ScoutBombScout extends BaseScout
     private static final String HERD_AND_FIND_ENEMIES = "herding and finding enemies";
     private static final String MOVE_INTO_POSITION_AROUND_ENEMEY = "move into position around enemey";
     private static final String CHASE_ENEMY_VIPER = "going to enemy viper";
+    private static final String SURROUND_ENEMY_ARCHON = "surrounding enemy archon";
     private static final String NOTHING = "NOTHING :(";
 
     private static String lastAction = NOTHING;
@@ -147,6 +150,7 @@ public class ScoutBombScout extends BaseScout
         closestEnemyArchonInfo = null;
         closestEnemyViper = Integer.MAX_VALUE;
         closestEnemyViperLoc = null;
+        onlyEnemyIsArchon = true;
         for (int i = enemies.length; --i>=0;) {
             int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
             if (distance < closestEnemy && !enemies[i].type.equals(RobotType.SCOUT)) {
@@ -166,27 +170,32 @@ public class ScoutBombScout extends BaseScout
                 case SCOUT:
                     break;
                 case GUARD:
+                    onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
                     if (distance <= 7 + RobotType.GUARD.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.GUARD.attackPower;
                     }
                     break;
                 case SOLDIER:
+                    onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
                     if (distance <= 2 * RobotType.SOLDIER.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.SOLDIER.attackPower;
                     }
                     break;
                 case TTM:
+                    onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
                     break;
                 case TURRET:
+                    onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
                     if (distance <= 30 + RobotType.TURRET.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.TURRET.attackPower;
                     }
                     break;
                 case VIPER:
+                    onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
                     if (distance <= 30 + RobotType.VIPER.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.VIPER.attackPower + 20;
@@ -194,6 +203,7 @@ public class ScoutBombScout extends BaseScout
                     if (distance < closestEnemyViper) {
                         closestEnemyViper = distance;
                         closestEnemyViperLoc = enemies[i].location;
+                        closestEnemyViperInfo = enemies[i];
                     }
                     break;
 
@@ -257,7 +267,9 @@ public class ScoutBombScout extends BaseScout
             lastAction = HERD_AWAY_FROM_ARCHON;
         } else if (suicideOnEnemyViper()) {
             lastAction = CHASE_ENEMY_VIPER;
-        }  else if (herdFastZombies()) {
+        } else if (surroundEnemyArchon()) {
+            lastAction = SURROUND_ENEMY_ARCHON;
+        } else if (herdFastZombies()) {
             lastAction = "herdingFastZombie";
         } else if (herdAndFindEnemy()) {
             lastAction = HERD_AND_FIND_ENEMIES;
@@ -285,6 +297,30 @@ public class ScoutBombScout extends BaseScout
     If it's late game, or you are far enough away from your archon, dive onto the enemy viper!
     So if you see fast zombies, drop everything and RUN!
     ===============================
+    */
+    private boolean surroundEnemyArchon() throws GameActionException {
+        // preconditions
+        if (!onlyEnemyIsArchon) {
+            return false;
+        }
+        if (currentLocation.isAdjacentTo(closestEnemyArchonInfo.location)) {
+            // try and make the archon more confused
+            for (int i = 5; --i > 0;) {
+                rc.broadcastSignal(2);
+            }
+            for (int i = 20; --i > 0;) {
+                rc.broadcastMessageSignal(2, 2, 2);
+            }
+            return true;
+        }
+        return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
+    }
+
+    /*
+    ===============================
+    If it's late game, or you are far enough away from your archon, dive onto the enemy viper!
+    So if you see fast zombies, drop everything and RUN!
+    ===============================
      */
     private boolean suicideOnEnemyViper() throws GameActionException {
         // preconditions
@@ -292,6 +328,10 @@ public class ScoutBombScout extends BaseScout
             return false;
         }
         if (closestAlliedArchon < Integer.MAX_VALUE && round < 2450) {
+            return false;
+        }
+        // wait for it's spawn cooldown
+        if (closestEnemyViperInfo.coreDelay > 4 || closestEnemyViperInfo.weaponDelay > 4) {
             return false;
         }
         // if we're on the other side of the map, or it's lategame and we see a viper, close the distance!
