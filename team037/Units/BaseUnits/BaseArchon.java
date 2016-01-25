@@ -36,7 +36,6 @@ public class BaseArchon extends Unit implements PacMan {
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
         zombieTracker = new ZombieTracker(rc);
-        archonComs = false;
         archonDistressComs = false;
         rc.setIndicatorString(0, "Base Archon zombie Strength: " + zombieTracker.getZombieStrength());
 
@@ -67,6 +66,7 @@ public class BaseArchon extends Unit implements PacMan {
             // if we are trying to get to parts and the location has rubble on it we should clear it
             try {
                 navigatorTarget = navigator.getTarget();
+
                 if (rc.isCoreReady() && currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
                     if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                         rc.clearRubble(currentLocation.directionTo(navigatorTarget));
@@ -122,6 +122,22 @@ public class BaseArchon extends Unit implements PacMan {
             nextBot = getDefaultBotTypes(neutralBots[0].type);
             sendInitialMessages(currentLocation.directionTo(neutralBots[0].location));
             nextBot = currentBot;
+        }
+
+        MapLocation neutralArchon = sortedParts.getNeutralArchon();
+        
+        if (neutralArchon != null)
+        {
+            if (navigator.getTarget() == null || !navigator.getTarget().equals(neutralArchon))
+            {
+                System.out.println("We see a neutral archon");
+                navigator.setTarget(neutralArchon);
+            }
+
+            if (rc.isCoreReady())
+            {
+                navigator.takeNextStep();
+            }
         }
 
     }
@@ -246,6 +262,28 @@ public class BaseArchon extends Unit implements PacMan {
         return buildNextUnit();
     }
 
+    public void buildScavengerScout() throws GameActionException
+    {
+        Bots temp = Bots.SCAVENGERSCOUT;
+        nextType = RobotType.SCOUT;
+
+        if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())
+        {
+            Bots temp2 = Bots.fromInt(Bots.toInt(nextBot));
+            nextBot = temp;
+
+            nextType = Bots.typeFromBot(temp);
+            Direction dir = build();
+            if (dir != Direction.NONE)
+            {
+                sendInitialMessages(dir);
+                nextBot = temp2;
+                nextType = Bots.typeFromBot(nextBot);
+                System.out.println("We are spawning a scavenger scout");
+            }
+        }
+    }
+
     public boolean buildNextUnit() throws GameActionException {
         // if there are multiple archons and we have limited parts and we see
         // either parts or neutrals we should let the other archon's build while
@@ -256,11 +294,14 @@ public class BaseArchon extends Unit implements PacMan {
 
         Bots temp = changeBuildOrder(nextBot);
 
-        if (!temp.equals(nextBot)) {
-            if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady()) {
-                Bots temp2 = nextBot;
+        if (!temp.equals(nextBot))
+        {
+            if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())
+            {
+                Bots temp2 = Bots.fromInt(Bots.toInt(nextBot));
                 nextBot = temp;
 
+                nextType = Bots.typeFromBot(temp);
                 Direction dir = build();
                 if (dir != Direction.NONE) {
                     sendInitialMessages(dir);
@@ -269,7 +310,9 @@ public class BaseArchon extends Unit implements PacMan {
                     return true;
                 }
             }
-        } else if (rc.hasBuildRequirements(nextType) && rc.isCoreReady()) {
+        }
+        else if(rc.hasBuildRequirements(Bots.typeFromBot(nextBot)) && rc.isCoreReady())
+        {
             Direction dir = build();
             if (dir != Direction.NONE) {
                 sendInitialMessages(dir);
@@ -392,10 +435,13 @@ public class BaseArchon extends Unit implements PacMan {
 
     public Direction build() throws GameActionException {
         double rubble = Double.MAX_VALUE;
-        Direction least = dirs[0];
-        for (int i = dirs.length; --i >= 0; ) {
-            if (rc.onTheMap(currentLocation.add(dirs[i]))) {
-                if (rc.canBuild(dirs[i], nextType)) {
+        Direction least = null;
+        for (int i = dirs.length; --i>=0; )
+        {
+            if(rc.onTheMap(currentLocation.add(dirs[i])))
+            {
+                if(rc.canBuild(dirs[i], nextType))
+                {
                     rc.build(dirs[i], nextType);
                     return dirs[i];
                 }
@@ -406,10 +452,9 @@ public class BaseArchon extends Unit implements PacMan {
                 }
             }
         }
-        try {
-            rc.clearRubble(least);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (least != null)
+        {
+            try { rc.clearRubble(least); } catch (Exception e) { e.printStackTrace(); }
         }
 
         return Direction.NONE;
@@ -417,5 +462,11 @@ public class BaseArchon extends Unit implements PacMan {
 
     public Bots changeBuildOrder(Bots nextBot) {
         return nextBot;
+    }
+
+    @Override
+    public void suicide() throws GameActionException
+    {
+        return;
     }
 }

@@ -69,6 +69,7 @@ public enum Bots
     SCAVENGERSCOUT,
     CASTLETURRET,
     COUNTERMEASUREGUARD,
+    SPOTTINGSCOUT,
     SUPERRUSHTURRET,
     SUPERRUSHVIPER;
 
@@ -146,10 +147,12 @@ public enum Bots
                 return 33;
             case SCAVENGERSCOUT:
                 return 34;
-            case SUPERRUSHTURRET:
+            case SPOTTINGSCOUT:
                 return 35;
-            case SUPERRUSHVIPER:
+            case SUPERRUSHTURRET:
                 return 36;
+            case SUPERRUSHVIPER:
+                return 37;
         }
         return -1;
     }
@@ -229,8 +232,10 @@ public enum Bots
             case 34:
                 return SCAVENGERSCOUT;
             case 35:
-                return SUPERRUSHTURRET;
+                return SPOTTINGSCOUT;
             case 36:
+                return SUPERRUSHTURRET;
+            case 37:
                 return SUPERRUSHVIPER;
         }
 
@@ -266,6 +271,7 @@ public enum Bots
             case PACMANSCOUT:
             case RUSHSCOUT:
             case SCAVENGERSCOUT:
+            case SPOTTINGSCOUT:
                 return RobotType.SCOUT;
             case TURTLESOLDIER:
             case CASTLESOLDIER:
@@ -359,6 +365,8 @@ public enum Bots
                 return new CastleTurret(rc);
             case COUNTERMEASUREGUARD:
                 return new CountermeasureGuard(rc);
+            case SPOTTINGSCOUT:
+                return new SpottingScout(rc);
             case SUPERRUSHTURRET:
                 return new SuperRushTurret(rc);
             case SUPERRUSHVIPER:

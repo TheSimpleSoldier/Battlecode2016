@@ -25,8 +25,12 @@ public class RushingViper extends BaseViper implements PacMan
             updatedLocs[i] = enemyArchonStartLocs[i];
         }
 
-        rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
+        if (rushTarget == null)
+        {
+            rushTarget = MapUtils.getNearestLocation(updatedLocs, currentLocation);
+        }
 
+        rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;
@@ -92,16 +96,19 @@ public class RushingViper extends BaseViper implements PacMan
     @Override
     public boolean fight() throws GameActionException
     {
-        return super.fight();
+        return fightMicro.ViperAgressiveMicro(enemies);
+//        return fightMicro.basicAttack(nearByEnemies, enemies);
     }
 
     @Override
     public boolean fightZombies() throws GameActionException
     {
-        if (zombies == null && zombies.length == 0 || (zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
-            return false;
-        }
-        return runAway(null);
+        return false;
+//        if (zombies == null && zombies.length == 0 || (zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
+//            return false;
+//        }
+//
+//        return runAway(null);
     }
 
 

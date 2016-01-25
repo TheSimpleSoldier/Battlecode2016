@@ -8,6 +8,7 @@ import team037.Messages.*;
 import team037.ScoutMapKnowledge;
 import team037.Unit;
 import team037.Utilites.PartsUtilities;
+import team037.Utilites.RubbleUtilities;
 
 public class BaseScout extends Unit
 {
@@ -112,7 +113,7 @@ public class BaseScout extends Unit
                 Communication communication = new SimpleBotInfoCommunication();
                 communication.opcode = CommunicationType.DEAD_DEN;
                 communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.DEAD_DEN), 0, deadDen.x, deadDen.y});
-                communicator.sendCommunication(mKnowledge.getRange(), communication);
+                communicator.sendCommunication(MapKnowledge.getRange(), communication);
                 msgsSent++;
             }
         }
@@ -136,12 +137,26 @@ public class BaseScout extends Unit
                     bot = rc.senseRobotAtLocation(spot);
                 }
 
-                if (rc.senseParts(spot) > 0 && msgsSent < 20)
+                int partVal = (int)rc.senseParts(spot);
+
+                if (partVal > 0 && msgsSent < 20)
                 {
+                    double rubble = rc.senseRubble(spot);
+
+                    if (rubble > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+                    {
+                        int turns = RubbleUtilities.calculateClearActionsToPassableButSlow(rubble);
+                        if (turns > 0)
+                        {
+                            partVal /= turns;
+                            if (partVal <= 0) partVal = 1;
+                        }
+                    }
+
                     // create parts msg
                     Communication communication = new PartsCommunication();
-                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), (int) rc.senseParts(spot), spot.x, spot.y});
-                    communicator.sendCommunication(mKnowledge.getRange(), communication);
+                    communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.PARTS), partVal, spot.x, spot.y});
+                    communicator.sendCommunication(MapKnowledge.getRange(), communication);
                     msgsSent++;
                 }
                 else if (bot != null && bot.team == Team.NEUTRAL && msgsSent < 20)
@@ -151,10 +166,10 @@ public class BaseScout extends Unit
                     int parts = bot.type.partCost;
                     if (bot.type == RobotType.ARCHON)
                     {
-                        parts = 1000;
+                        parts = Integer.MAX_VALUE;
                     }
                     communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.NEUTRAL), parts, spot.x, spot.y});
-                    communicator.sendCommunication(mKnowledge.getRange(), communication);
+                    communicator.sendCommunication(MapKnowledge.getRange(), communication);
                     msgsSent++;
                 }
             }

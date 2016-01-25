@@ -68,16 +68,16 @@ public class ZombieTracker
             switch (zombieCounts[i].getType())
             {
                 case FASTZOMBIE:
-                    totalStrength += FAST_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length, index-1)];
+                    totalStrength += FAST_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length-1, index-1)];
                     break;
                 case BIGZOMBIE:
-                    totalStrength += BIG_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length, index-1)];
+                    totalStrength += BIG_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length-1, index-1)];
                     break;
                 case STANDARDZOMBIE:
-                    totalStrength += STANDARD_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length, index-1)];
+                    totalStrength += STANDARD_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length-1, index-1)];
                     break;
                 case RANGEDZOMBIE:
-                    totalStrength += RANGED_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length, index-1)];
+                    totalStrength += RANGED_ZOMBIE_SCORE * zombieCounts[i].getCount() * multipliers[Math.min(multipliers.length-1, index-1)];
                     break;
             }
         }
