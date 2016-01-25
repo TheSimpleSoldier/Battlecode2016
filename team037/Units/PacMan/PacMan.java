@@ -37,9 +37,9 @@ public interface PacMan {
     default int[] applyAllWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ZOMBIES]);
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
-        if (Unit.type.equals(RobotType.ARCHON)) {
-            directions = PacManUtils.applyWeights(Unit.currentLocation, directions, BaseArchon.neutralBots,new double[]{-2,-1,-.5,0,0});
-        }
+//        if (Unit.type.equals(RobotType.ARCHON)) {
+//            directions = PacManUtils.applyWeights(Unit.currentLocation, directions, BaseArchon.neutralBots,new double[]{-2,-1,-.5,0,0});
+//        }
         directions = applyAdditionalWeights(directions);
 
         return directions;
