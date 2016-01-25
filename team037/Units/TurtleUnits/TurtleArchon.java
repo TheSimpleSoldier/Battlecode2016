@@ -489,6 +489,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorString(2, "runAwayFrom enemies" + round);
         lastRoundRunAway = round;
 
+        if (!stayHome)
+        {
+            return runAway(null, true, true);
+        }
+
         return runAway(null);
     }
 
@@ -500,6 +505,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         rc.setIndicatorString(2, "runAwayFrom zombies" + round);
         lastRoundRunAway = round;
+
+        if (!stayHome)
+        {
+            return runAway(null, true, true);
+        }
 
         return runAway(null);
     }
@@ -549,6 +559,55 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (round - lastRoundRunAway < 25) return false;
 
         return buildNextUnit();
+    }
+
+    public boolean takeNextStep() throws GameActionException {
+        if (currentLocation != null && navigator.getTarget() != null) {
+            rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 0, 0);
+        }
+
+
+        // if there are no visible zombies then we should move to collect parts
+        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies)) {
+            MapLocation navigatorTarget;
+
+            // if we are trying to get to parts and the location has rubble on it we should clear it
+            try {
+                navigatorTarget = navigator.getTarget();
+
+                if (rc.isCoreReady() && currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
+                    if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                        if (!stayHome && rc.getRoundNum() % 6 == 1)
+                        {
+                            nextBot = Bots.SCAVENGERSCOUT;
+                            nextType = RobotType.SCOUT;
+                            buildNextUnit();
+                            return true;
+                        }
+                        else
+                        {
+                            rc.clearRubble(currentLocation.directionTo(navigatorTarget));
+                        }
+
+                        return true;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (!sortedParts.contains(navigator.getTarget())) {
+                MapLocation parts = getNextPartLocationInSight();
+
+                if (parts != null) {
+                    navigator.setTarget(parts);
+                    rc.setIndicatorLine(currentLocation, parts, 0, 0, 255);
+                    rc.setIndicatorString(2, "Parts loc x: " + parts.x + " y: " + parts.y + " round: " + rc.getRoundNum());
+                }
+            }
+        }
+
+        return navigator.takeNextStep();
     }
 
     @Override

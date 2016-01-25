@@ -479,8 +479,8 @@ public abstract class Unit
                     nextBot = comm.newBType;
                     rc.setIndicatorString(0, "changing mission to " + nextBot);
                     if(nextBot == Bots.RUSHGUARD || nextBot == Bots.RUSHSCOUT ||
-                       nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.RUSHTURRET ||
-                       nextBot == Bots.RUSHINGVIPER)
+                       nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.SUPERRUSHTURRET ||
+                       nextBot == Bots.SUPERRUSHVIPER)
                     {
                         rc.setIndicatorString(2, "setting target");
                         rushTarget = new MapLocation(comm.x, comm.y);
