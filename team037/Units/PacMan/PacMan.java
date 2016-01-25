@@ -23,6 +23,8 @@ public interface PacMan {
             {-16, -8, -4, 0, 0},            // target constants (attract towards target)
     };
 
+    boolean[] flags = new boolean[1];
+
     /**
      * If you want to use PacMan navigation, you should use the default runAway() method. If you need to incorporate
      * additional factors, implement them in the applyAdditionalWeights and applyAdditionalConstants methods.
@@ -53,7 +55,11 @@ public interface PacMan {
             directions = PacManUtils.applyConstant(Unit.currentLocation, directions, loc, weights[TARGET]);
         }
         if (PacManUtils.countermeasure != null) {
-            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,32});
+            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,16});
+        }
+        if (flags[0]) {
+            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.alliedArchonStartLocs,new int[]{32,16,8});
+            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.enemyArchonStartLocs,new int[]{-16,-8,-4});
         }
         directions = applyAdditionalConstants(directions);
 
@@ -280,7 +286,44 @@ public interface PacMan {
 //        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
 //            return runAwayWithCountermeasures(weights);
 //        }
-        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
+        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
+            return runAwayWithCountermeasures(weights);
+        }
+        Navigator navigator = Unit.navigator;
+
+        Direction direction = getRunAwayDirection(weights);
+
+        MapLocation nextLoc = Unit.currentLocation.add(direction);
+
+        MapLocation saveTarget = navigator.getTarget();
+        navigator.setTarget(nextLoc);
+        try {
+            boolean out = navigator.takeNextStep();
+            navigator.setTarget(saveTarget);
+            return out;
+        } catch (Exception e) {
+            navigator.setTarget(saveTarget);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    default boolean runAway(double[][] weights, boolean spawnGuards, boolean tendTowardsEnemy) {
+
+        flags[0] = tendTowardsEnemy;
+
+        if (!Navigation.lastScan.equals(Unit.currentLocation)) {
+            try {
+                if (Clock.getBytecodesLeft() > 15000) {
+                    PacManUtils.rubble = Navigation.map.scan(Unit.currentLocation);
+                } else {
+                    PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
+                }
+                Navigation.lastScan = Unit.currentLocation;
+            } catch (Exception e) {e.printStackTrace();}
+        }
+
+        if (spawnGuards && Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
             return runAwayWithCountermeasures(weights);
         }
         Navigator navigator = Unit.navigator;
