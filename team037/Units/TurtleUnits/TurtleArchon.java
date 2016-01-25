@@ -31,6 +31,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean underAttack = false;
     private int lastZombieSighting = 0;
     private int lastEnemieSighting = 0;
+    private int adjacentTurrets = 0;
 
     public TurtleArchon(RobotController rc)
     {
@@ -77,6 +78,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (underAttack) {
             return navigator.takeNextStep();
         }
+        // if we are in a safe position, hold
+        if (adjacentTurrets == 4) {
+            return false;
+        }
         // if it's later in the game and we have a lot of parts, spend that money!
         if (round > 500 && rc.getTeamParts() > 200) {
             return false;
@@ -106,6 +111,19 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         offensiveEnemies = offensiveEnemies || offensiveZombies;
         offensiveAllies = FightMicroUtilites.offensiveEnemies(allies);
+
+        adjacentTurrets = 0;
+        RobotInfo [] toCheck = allies;
+        if (allies.length > 10) {
+            toCheck = rc.senseNearbyRobots(1, us);
+        }
+        for (int i = 0; --i >= 0;) {
+            if (toCheck[i].location.distanceSquaredTo(currentLocation) == 1)
+                if (toCheck[i].type.equals(RobotType.TURRET) || toCheck[i].type.equals(RobotType.TTM)) {
+                    adjacentTurrets += 1;
+                }
+        }
+
         underAttack = underAttack();
 
         if (rallyPoint != null)
