@@ -74,23 +74,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
     }
 
     @Override
-    public boolean takeNextStep() throws GameActionException
-    {
-        if (underAttack) {
-            return navigator.takeNextStep();
-        }
-        // if we are in a safe position, hold
-        if (adjacentTurrets == 4) {
-            return false;
-        }
-        // if it's later in the game and we have a lot of parts, spend that money!
-        if (round > 500 && rc.getTeamParts() > 200) {
-            return false;
-        }
-        return navigator.takeNextStep();
-    }
-
-    @Override
     public void collectData() throws GameActionException
     {
         super.collectData();
@@ -367,6 +350,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
         if (!reachedTurtleSpot) reachedTurtleSpot = true;
 
+
         MapLocation bestParts = getNextPartLocation();
 
         if (bestParts == null) return turtlePoint;
@@ -374,7 +358,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
         int turtleDist = turtlePoint.distanceSquaredTo(bestParts);
 
         // if we have a lot of parts, don't go looking for more!
-        if (rc.getTeamParts() > 1000) return turtlePoint;
+        if (rc.getTeamParts() > 200) return turtlePoint;
+        // if we are safe, don't do anything!
+        if (adjacentTurrets == 4) return currentLocation;
         if (turtleDist > (1600 - (round/2))) return turtlePoint;
         if (Math.sqrt(turtleDist) > (nextZombieRound - round)) return turtlePoint;
 
@@ -455,17 +441,24 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 5 &&  zombieTracker.getNextZombieRound() - round < 30)
+            if (zombieTracker.getNextZombieRoundStrength() < 5) {
+
+            }
+            else if (zombieTracker.getNextZombieRoundStrength() < 10 )
+
+            {
+                if (zombieTracker.getNextZombieRound() - round < 10)
+                {
+                    nextType = RobotType.SCOUT;
+                    return Bots.SCOUTBOMBSCOUT;
+                }
+            }
+            else if (zombieTracker.getNextZombieRound() - round < 30)
             {
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
             }
-            else if (zombieTracker.getNextZombieRound() - round < 50)
-            {
-                nextType = RobotType.SCOUT;
-                return Bots.SCOUTBOMBSCOUT;
-            }
-            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 100)
+            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 80)
             {
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
@@ -484,6 +477,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
         if (round > 2500 && lastUnderAttack < 2500) {
+            return Bots.SCOUTBOMBVIPER;
+        }
+
+
+        if (round > 2800 && round < 2850) {
             return Bots.SCOUTBOMBVIPER;
         }
 
