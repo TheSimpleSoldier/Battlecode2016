@@ -29,9 +29,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean offensiveEnemies = false;
     private boolean offensiveAllies = false;
     private boolean underAttack = false;
+    private static int lastUnderAttack = 0;
     private int lastZombieSighting = 0;
     private int lastEnemieSighting = 0;
-    private int adjacentTurrets = 0;
+    private static int adjacentTurrets = 0;
 
     public TurtleArchon(RobotController rc)
     {
@@ -125,6 +126,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
 
         underAttack = underAttack();
+        if (underAttack) {
+            lastUnderAttack = round;
+        }
 
         if (rallyPoint != null)
         {
@@ -451,16 +455,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 10)
+            if (zombieTracker.getNextZombieRoundStrength() < 5)
             {
                 System.out.println("Don't waste time spawning scout bombs");
             }
-            else if (zombieTracker.getNextZombieRound() - round < 30)
+            else if (zombieTracker.getNextZombieRound() - round < 50)
             {
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
             }
-            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 50)
+            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 100)
             {
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
