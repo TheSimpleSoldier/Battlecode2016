@@ -67,10 +67,13 @@ public class RobotPlayer
             //TODO: archon switch for round > 1 to differentite activated archons
             if(type == RobotType.ARCHON)
             {
-                if(shouldRush(rc.getInitialArchonLocations(rc.getTeam().opponent()),
-                        rc.getInitialArchonLocations(rc.getTeam()), rc.getLocation(), rc))
+                if(rc.getRoundNum() == 0)
                 {
-                    strategy = Strategies.RUSH;
+                    if(shouldRush(rc.getInitialArchonLocations(rc.getTeam().opponent()),
+                            rc.getInitialArchonLocations(rc.getTeam()), rc.getLocation(), rc))
+                    {
+                        strategy = Strategies.RUSH;
+                    }
                 }
                 if(strategy.equals(Strategies.CASTLE))
                 {
@@ -173,8 +176,12 @@ public class RobotPlayer
     {
         int[] archons = new int[enemyArchonStartLocs.length];
 
+        RobotInfo[] neutrals = rc.senseNearbyRobots(RobotType.ARCHON.sensorRadiusSquared, Team.NEUTRAL);
+        int minus = neutrals.length * 20;
+
         for(int k = archons.length; --k >= 0;)
         {
+            archons[k] -= minus;
             int dist = currentLocation.distanceSquaredTo(enemyArchonStartLocs[k]);
             archons[k] += dist;
             for(int a = alliedArchonStartLocs.length; --a >= 0;)
@@ -211,7 +218,7 @@ public class RobotPlayer
             }
         }
 
-        if(min < 100)
+        if(min <= 100)
         {
             return true;
         }
