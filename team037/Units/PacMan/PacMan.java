@@ -303,12 +303,13 @@ public interface PacMan {
         int offMapCount = 0;
         for (int i = Unit.dirs.length; --i>=0; ) {
             if (!Unit.rc.onTheMap(Unit.currentLocation.add(Unit.dirs[i]))) {
-                offMapCount++;
+                offMapCount+= 2;
             } else if (Unit.rc.senseRubble(Unit.currentLocation.add(Unit.dirs[i])) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                 offMapCount++;
             }
         }
-        if (offMapCount > 3) return true;
+
+        if (offMapCount > 6) return true;
         return false;
     }
 
@@ -317,10 +318,10 @@ public interface PacMan {
      *
      * @return
      */
-    default boolean spawnCounterMeasure() throws GameActionException{
+    default boolean spawnCounterMeasure() throws GameActionException {
+        if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
         if (inCorner()) return true;
         if (nearTurrets()) return false;
-        if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
         if (!fastZombie()) return false;
         if (Unit.zombies.length > 9) return false;
         return true;

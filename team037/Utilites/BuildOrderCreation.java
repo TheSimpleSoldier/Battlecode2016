@@ -18,6 +18,18 @@ public class BuildOrderCreation
         //                                                                          //
         //////////////////////////////////////////////////////////////////////////////
 
+        if (RobotPlayer.strategy.equals(Strategies.DYNAMIC_TURTLE)) {
+            Bots[][] dynamicBuild = {
+                    {Bots.SCOUTINGSCOUT, Bots.TURTLESOLDIER},
+                    {Bots.TURTLESOLDIER, Bots.TURTLESOLDIER},
+                    {Bots.TURTLESOLDIER, Bots.RUSHINGVIPER}
+            };
+
+            int[] times = {1, 10, 10000};
+
+            return new BuildOrder(dynamicBuild, times);
+        }
+
         if (RobotPlayer.strategy.equals(Strategies.SCOUT_BOMB)) {
             Bots[][] buildOrderBombs = {
                     {Bots.SCOUTBOMBSCOUT}
