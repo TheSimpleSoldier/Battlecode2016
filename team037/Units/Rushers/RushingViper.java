@@ -96,16 +96,19 @@ public class RushingViper extends BaseViper implements PacMan
     @Override
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicAttack(nearByEnemies, enemies);
+        return fightMicro.ViperAgressiveMicro(enemies);
+//        return fightMicro.basicAttack(nearByEnemies, enemies);
     }
 
     @Override
     public boolean fightZombies() throws GameActionException
     {
-        if (zombies == null && zombies.length == 0 || (zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
-            return false;
-        }
-        return runAway(null);
+        return false;
+//        if (zombies == null && zombies.length == 0 || (zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
+//            return false;
+//        }
+//
+//        return runAway(null);
     }
 
 

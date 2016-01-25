@@ -1,5 +1,6 @@
 package team037;
 
+import _teamcastle.Utilites.MapUtils;
 import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
@@ -528,10 +529,102 @@ public class FightMicro
         return false;
     }
 
-//    public boolean ViperAgressiveMicro(RobotInfo[] enemies, RobotInfo[] nearByEnemies)
-//    {
-//
-//    }
+    public boolean ViperAgressiveMicro(RobotInfo[] enemies) throws GameActionException
+    {
+        if (enemies.length == 0) return false;
+
+        if (rc.isWeaponReady())
+        {
+            RobotInfo target = FightMicroUtilites.pickViperTarget(Unit.allies, enemies);
+
+            // don't shoot
+            if (target == null || (target.team == Unit.opponent && target.viperInfectedTurns > 10))
+            {
+
+            }
+            else
+            {
+                if (rc.canAttackLocation(target.location))
+                {
+                    rc.attackLocation(target.location);
+                    return true;
+                }
+            }
+        }
+
+        if (rc.isCoreReady())
+        {
+            boolean underAttack = false;
+
+            for (int i = enemies.length; --i>=0; )
+            {
+                if (enemies[i].location.distanceSquaredTo(Unit.currentLocation) <= enemies[i].type.attackRadiusSquared)
+                {
+                    underAttack = true;
+                    break;
+                }
+            }
+
+            // if under attack retreat to safe loc if possible otherwise retreat from com
+            if (underAttack)
+            {
+                Direction safeDir = null;
+
+                for (int i = Unit.dirs.length; --i>=0;)
+                {
+                    Direction dir = Unit.dirs[i];
+                    MapLocation nxt = Unit.currentLocation.add(dir);
+                    if (!rc.canMove(dir)) continue;
+                    if (rc.senseRubble(nxt) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
+
+                    boolean enemiesInRange = false;
+
+                    for (int j = enemies.length; --j>=0; )
+                    {
+                        if (enemies[j].location.distanceSquaredTo(nxt) < enemies[j].type.attackRadiusSquared)
+                        {
+                            enemiesInRange = true;
+                            break;
+                        }
+                    }
+
+                    if (!enemiesInRange)
+                    {
+                        safeDir = dir;
+                        break;
+                    }
+                }
+
+                if (safeDir != null && rc.canMove(safeDir))
+                {
+                    rc.move(safeDir);
+                    return true;
+                }
+                else
+                {
+                    // attack ourselves if low health and low infection
+                    if (rc.getHealth() < 15 && rc.getViperInfectedTurns() < 10)
+                    {
+                        if (rc.isWeaponReady())
+                        {
+                            System.out.println("attacking ourselves");
+                            rc.attackLocation(rc.getLocation());
+                        }
+                    }
+
+
+                    MapLocation enemyCOM = team037.Utilites.MapUtils.getCenterOfRobotInfoMass(enemies);
+
+                    Direction dir = Unit.currentLocation.directionTo(enemyCOM).opposite();
+
+                    FightMicroUtilites.moveDir(rc, dir, false);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * THis method causes a unit to run towards a target while trying to avoid enemies
