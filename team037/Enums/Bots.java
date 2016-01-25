@@ -20,6 +20,8 @@ import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
 import team037.Units.Scouts.RegionScout;
 import team037.Units.Scouts.ScoutingScout;
+import team037.Units.SuperRush.SuperRushTurret;
+import team037.Units.SuperRush.SuperRushViper;
 import team037.Units.TurtleUnits.*;
 
 /**
@@ -61,7 +63,9 @@ public enum Bots
     SUPERRUSHARCHON,
     SCOUTBOMBVIPER,
     CASTLETURRET,
-    COUNTERMEASUREGUARD;
+    COUNTERMEASUREGUARD,
+    SUPERRUSHTURRET,
+    SUPERRUSHVIPER;
 
     public static int toInt(Bots type)
     {
@@ -133,6 +137,10 @@ public enum Bots
                 return 31;
             case SUPERRUSHARCHON:
                 return 32;
+            case SUPERRUSHTURRET:
+                return 33;
+            case SUPERRUSHVIPER:
+                return 34;
         }
         return -1;
     }
@@ -207,6 +215,10 @@ public enum Bots
                 return COUNTERMEASUREGUARD;
             case 32:
                 return SUPERRUSHARCHON;
+            case 33:
+                return SUPERRUSHTURRET;
+            case 34:
+                return SUPERRUSHVIPER;
         }
 
         return null;
@@ -250,9 +262,11 @@ public enum Bots
             case TURTLETURRET:
             case BASETURRET:
             case CASTLETURRET:
+            case SUPERRUSHTURRET:
                 return RobotType.TURRET;
             case RUSHINGVIPER:
             case BASEVIPER:
+            case SUPERRUSHVIPER:
                 return RobotType.VIPER;
         }
         return null;
@@ -326,6 +340,10 @@ public enum Bots
                 return new CastleTurret(rc);
             case COUNTERMEASUREGUARD:
                 return new CountermeasureGuard(rc);
+            case SUPERRUSHTURRET:
+                return new SuperRushTurret(rc);
+            case SUPERRUSHVIPER:
+                return new SuperRushViper(rc);
         }
 
         return null;
