@@ -208,18 +208,16 @@ public class RobotPlayer
             }
         }
 
-        int index = 0;
         int min = 9999999;
         for(int k = archons.length; --k >= 0;)
         {
             if(archons[k] < min)
             {
                 min = archons[k];
-                index = k;
             }
         }
 
-        if(min <= 100)
+        if(min <= 150)
         {
             return true;
         }
