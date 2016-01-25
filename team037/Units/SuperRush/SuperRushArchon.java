@@ -114,7 +114,7 @@ public class SuperRushArchon extends Unit
                 {
                     if(moved >= 5 && !notRetreating)
                     {
-                        if(enemies.length - 3 >= allies.length || allies.length == 0)
+                        if(allies.length == 0)
                         {
                             nextBot = Bots.TURTLEARCHON;
                             RobotPlayer.strategy = Strategies.TURTLE;
