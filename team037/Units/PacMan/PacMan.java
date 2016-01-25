@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.Navigation;
 import team037.Navigator;
 import team037.Unit;
+import team037.Units.BaseUnits.BaseArchon;
 
 public interface PacMan {
     /**
@@ -36,7 +37,9 @@ public interface PacMan {
     default int[] applyAllWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ZOMBIES]);
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
-
+        if (Unit.type.equals(RobotType.ARCHON)) {
+            directions = PacManUtils.applyWeights(Unit.currentLocation, directions, BaseArchon.neutralBots,new double[]{-2,-1,-.5,0,0});
+        }
         directions = applyAdditionalWeights(directions);
 
         return directions;
@@ -44,7 +47,6 @@ public interface PacMan {
     default int[] applyAllSimpleWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.zombies);
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.enemies);
-
         directions = applyAdditionalWeights(directions);
 
         return directions;
@@ -148,7 +150,7 @@ public interface PacMan {
                 } else if (rubble[1] < RUBBLE_SLOW) {
                     rubble[1] = 0;
                 } else {
-                    directions[1] += directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[1] += (double)directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[2] > RUBBLE_OBSTRUCT) {
@@ -156,7 +158,7 @@ public interface PacMan {
                 } else if (rubble[2] < RUBBLE_SLOW) {
                     rubble[2] = 0;
                 } else {
-                    directions[2] += directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[2] += (double)directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[3] > RUBBLE_OBSTRUCT) {
@@ -164,7 +166,7 @@ public interface PacMan {
                 } else if (rubble[3] < RUBBLE_SLOW) {
                     rubble[3] = 0;
                 } else {
-                    directions[3] += directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[3] += (double)directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[4] > RUBBLE_OBSTRUCT) {
@@ -172,7 +174,7 @@ public interface PacMan {
                 } else if (rubble[4] < RUBBLE_SLOW) {
                     rubble[4] = 0;
                 } else {
-                    directions[4] += directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[4] += (double)directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[5] > RUBBLE_OBSTRUCT) {
@@ -180,7 +182,7 @@ public interface PacMan {
                 } else if (rubble[5] < RUBBLE_SLOW) {
                     rubble[5] = 0;
                 } else {
-                    directions[5] += directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[5] += (double)directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[6] > RUBBLE_OBSTRUCT) {
@@ -188,7 +190,7 @@ public interface PacMan {
                 } else if (rubble[6] < RUBBLE_SLOW) {
                     rubble[6] = 0;
                 } else {
-                    directions[6] += directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[6] += (double)directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[7] > RUBBLE_OBSTRUCT) {
@@ -196,7 +198,7 @@ public interface PacMan {
                 } else if (rubble[7] < RUBBLE_SLOW) {
                     rubble[7] = 0;
                 } else {
-                    directions[7] += directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[7] += (double)directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
             }
             
