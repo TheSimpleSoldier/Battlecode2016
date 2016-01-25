@@ -1,8 +1,10 @@
 package team037.Units.PacMan;
 
 import battlecode.common.*;
+import team037.Communicator;
 import team037.Enums.Bots;
 import team037.Enums.CommunicationType;
+import team037.MapKnowledge;
 import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
@@ -13,7 +15,11 @@ import team037.Unit;
  */
 public class PacManUtils {
 
+    public static final RobotType SCOUT = RobotType.SCOUT;
     public static RobotInfo countermeasure = null;
+    public static RobotInfo scout1 = null;
+    public static RobotInfo scout2 = null;
+    public static RobotInfo scout3 = null;
     public static double[] rubble;
 
     public static MapLocation getClosestHarmfulUnit(RobotInfo[] badBots) {
@@ -66,6 +72,87 @@ public class PacManUtils {
         return new MapLocation(x,y);
     }
 
+    public boolean deployScavengerScout() throws GameActionException {
+        RobotController rc = Unit.rc;
+        MapLocation currentLocation = Unit.currentLocation;
+
+        if (scout1 != null && (!rc.canSenseRobot(scout1.ID) || currentLocation.distanceSquaredTo(scout1.location) > 25)) {
+            scout1 = null;
+        } else if (scout1 != null) {
+            scout1 = rc.senseRobot(scout1.ID);
+        }
+
+        if (scout2 != null && (!rc.canSenseRobot(scout2.ID) || currentLocation.distanceSquaredTo(scout2.location) > 25)) {
+            scout2 = null;
+        } else if (scout2 != null) {
+            scout2 = rc.senseRobot(scout2.ID);
+        }
+
+        if (scout3 != null && (!rc.canSenseRobot(scout3.ID) || currentLocation.distanceSquaredTo(scout3.location) > 25)) {
+            scout3 = null;
+        } else if (scout3 != null) {
+            scout3 = rc.senseRobot(scout3.ID);
+        }
+
+        if (!(rc.isCoreReady() && rc.hasBuildRequirements(SCOUT))) {
+            return false;
+        }
+
+        if (scout1 == null) {
+            if (rc.canBuild(Direction.NORTH,SCOUT)) {
+                rc.build(Direction.NORTH,SCOUT);
+                scout1 = rc.senseRobotAtLocation(currentLocation.add(Direction.NORTH));
+                sendInitialMessages(Direction.NORTH,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            } else if (rc.canBuild(Direction.NORTH_WEST,SCOUT)) {
+                rc.build(Direction.NORTH_WEST,SCOUT);
+                scout1 = rc.senseRobotAtLocation(currentLocation.add(Direction.NORTH_WEST));
+                sendInitialMessages(Direction.NORTH_WEST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            } else if (rc.canBuild(Direction.NORTH_EAST,SCOUT)) {
+                rc.build(Direction.NORTH_EAST,SCOUT);
+                scout1 = rc.senseRobotAtLocation(currentLocation.add(Direction.NORTH_EAST));
+                sendInitialMessages(Direction.NORTH_EAST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            }
+        } else if (scout2 == null) {
+            if (rc.canBuild(Direction.EAST,SCOUT)) {
+                rc.build(Direction.EAST,SCOUT);
+                scout2 = rc.senseRobotAtLocation(currentLocation.add(Direction.EAST));
+                sendInitialMessages(Direction.EAST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            } else if (rc.canBuild(Direction.SOUTH_EAST,SCOUT)) {
+                rc.build(Direction.SOUTH_EAST,SCOUT);
+                scout2 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH_EAST));
+                sendInitialMessages(Direction.SOUTH_EAST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            } else if (rc.canBuild(Direction.SOUTH,SCOUT)) {
+                rc.build(Direction.SOUTH,SCOUT);
+                scout2 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH));
+                sendInitialMessages(Direction.SOUTH,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            }
+        } else if (scout3 == null) {
+            if (rc.canBuild(Direction.WEST,SCOUT)) {
+                rc.build(Direction.WEST,SCOUT);
+                scout3 = rc.senseRobotAtLocation(currentLocation.add(Direction.WEST));
+                sendInitialMessages(Direction.WEST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            } else if (rc.canBuild(Direction.SOUTH_WEST,SCOUT)) {
+                rc.build(Direction.SOUTH_WEST,SCOUT);
+                scout3 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH_WEST));
+                sendInitialMessages(Direction.SOUTH_WEST,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            } else if (rc.canBuild(Direction.SOUTH,SCOUT)) {
+                rc.build(Direction.SOUTH,SCOUT);
+                scout3 = rc.senseRobotAtLocation(currentLocation.add(Direction.SOUTH));
+                sendInitialMessages(Direction.SOUTH,RobotType.SCOUT,Bots.SCAVENGERSCOUT,false);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean canDeployCountermeasure() {
         if (countermeasure == null || !Unit.rc.canSenseRobot(countermeasure.ID)) {
             countermeasure = null;
@@ -115,6 +202,32 @@ public class PacManUtils {
         return countermeasure;
     }
 
+    public static void sendInitialMessages(Direction dir, RobotType nextType, Bots nextBot, boolean sendDenLocs) throws GameActionException {
+        RobotController rc = Unit.rc;
+        Communicator communicator = Unit.communicator;
+        MapKnowledge mapKnowledge = Unit.mapKnowledge;
+        int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
+        MissionCommunication communication = new MissionCommunication();
+        communication.opcode = CommunicationType.CHANGEMISSION;
+        communication.id = id;
+        communication.newBType = nextBot;
+        communicator.sendCommunication(2, communication);
+
+        Communication mapBoundsCommunication = mapKnowledge.getMapBoundsCommunication();
+        communicator.sendCommunication(2, mapBoundsCommunication);
+
+        if (sendDenLocs) {
+            for (int j = mapKnowledge.dens.length; --j >= 0; ) {
+                MapLocation den = mapKnowledge.dens.array[j];
+
+                if (den != null) {
+                    Communication communicationDen = new SimpleBotInfoCommunication();
+                    communicationDen.setValues(new int[]{CommunicationType.toInt(CommunicationType.SDEN), 0, den.x, den.y});
+                    communicator.sendCommunication(2, communicationDen);
+                }
+            }
+        }
+    }
 
     public static void sendInitialMessages(Direction dir) throws GameActionException
     {
