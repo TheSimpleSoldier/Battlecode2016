@@ -36,7 +36,6 @@ public class BaseArchon extends Unit implements PacMan {
         nextBot = buildOrder.nextBot();
         nextType = Bots.typeFromBot(nextBot);
         zombieTracker = new ZombieTracker(rc);
-        archonComs = false;
         archonDistressComs = false;
         rc.setIndicatorString(0, "Base Archon zombie Strength: " + zombieTracker.getZombieStrength());
 
@@ -441,5 +440,11 @@ public class BaseArchon extends Unit implements PacMan {
 
     public Bots changeBuildOrder(Bots nextBot) {
         return nextBot;
+    }
+
+    @Override
+    public void suicide() throws GameActionException
+    {
+        return;
     }
 }

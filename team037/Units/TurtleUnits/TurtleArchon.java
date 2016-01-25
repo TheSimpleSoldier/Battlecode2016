@@ -38,6 +38,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private static boolean scavenging = false;
     private static Direction lastDir = null;
     private static boolean stayHome = false;
+    private static int lastRoundRunAway = 0;
 
 
     public TurtleArchon(RobotController rc)
@@ -59,7 +60,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (!currentLocation.equals(turtlePoint))
         {
             scavenging = true;
-            rc.setIndicatorString(1, "Scavenging archon");
+            rc.setIndicatorString(0, "Scavenging archon");
         }
         else
         {
@@ -94,6 +95,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         super.collectData();
 
+        if (stayHome)
+        {
+            rc.setIndicatorDot(currentLocation.add(Direction.EAST), 255, 255, 255);
+        }
+
         rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
 
         boolean offensiveZombies = FightMicroUtilites.offensiveEnemies(zombies);
@@ -103,36 +109,42 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (scavenging)
         {
+            String condition = "";
             if (zombies.length > 0 && rc.isCoreReady())
             {
-                nextBot = Bots.COUNTERMEASUREGUARD;
+                nextType = RobotType.GUARD;
+                nextBot = Bots.TURTLEGUARD;
                 buildNextUnit();
             }
 
             if (tooManyZombies())
             {
+                condition = "tooManyZombies";
                 scavenging = false;
             }
 
             if (FightMicroUtilites.offensiveEnemies(enemies))
             {
+                condition = "offensiveEnemies";
                 scavenging = false;
             }
 
             if (RobotType.ARCHON.maxHealth - rc.getHealth() >= 50)
             {
+                condition = "lost health";
                 scavenging = false;
             }
 
-            if (zombieTracker.getNextZombieRound() - round < 50 && zombieTracker.getNextZombieRoundStrength() > 15)
-            {
-                scavenging = false;
-            }
+//            if (zombieTracker.getNextZombieRound() - round < 50 && zombieTracker.getNextZombieRoundStrength() > 100)
+//            {
+//                condition = "strong zombie round";
+//                scavenging = false;
+//            }
 
             // if we stop scavenging...
             if (!scavenging)
             {
-                rc.setIndicatorString(1, "not scavenging: " + round);
+                rc.setIndicatorString(0, "not scavenging: " + round + "  " + condition + " " + zombieTracker.getNextZombieRoundStrength());
                 navigator.setTarget(turtlePoint);
             }
         }
@@ -169,8 +181,14 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (rallyPoint != null)
         {
-            turtlePoint = rallyPoint;
-            updateRound = rc.getRoundNum();
+            if (!rallyPoint.equals(turtlePoint))
+            {
+                turtlePoint = rallyPoint;
+                updateRound = rc.getRoundNum();
+                rc.setIndicatorDot(turtlePoint, 0, 0, 0);
+                rc.setIndicatorString(0, "new turtle point: " + turtlePoint.x + " y: " + turtlePoint.y);
+            }
+            rallyPoint = null;
         }
 
         if (RobotPlayer.strategy.equals(Strategies.DYNAMIC_TURTLE) && (round - updateRound) > 100)
@@ -206,7 +224,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 {
                     if (!underAttack)
                     {
-                        rc.setIndicatorString(2, "We have a den location!!! x: " + den.x + " y: " + den.y + " round " + rc.getRoundNum());
                         rc.setIndicatorLine(currentLocation, den, 0, 0, 0);
                         turtlePoint = den.add(den.directionTo(turtlePoint), 3);
                         Communication newRallyPoint = new AttackCommunication();
@@ -331,7 +348,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25)
+            if (turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25)))
             {
                 turtlePoint = currentTurtle;
             }
@@ -341,7 +358,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 {
                     Communication newRallyPoint = new AttackCommunication();
                     newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                    communicator.sendCommunication(1600, newRallyPoint);
+                    communicator.sendCommunication(3600, newRallyPoint);
+                    rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
+                    rc.setIndicatorDot(turtlePoint, 255, 0, 0);
                 }
             }
         }
@@ -451,6 +470,12 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
 //            rc.setIndicatorString(1, "BestParts x: " + bestParts.x + " y: " + bestParts.y);
 
+
+            scavenging = true;
+
+            rc.setIndicatorString(0, "scavenging: " + round + " x: " + bestParts.x + " y: " + bestParts.y);
+
+
             return bestParts;
         }
     }
@@ -461,6 +486,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
         if (turtlePoint != null) navigator.setTarget(turtlePoint);
 
+        rc.setIndicatorString(2, "runAwayFrom enemies" + round);
+        lastRoundRunAway = round;
+
         return runAway(null);
     }
 
@@ -469,6 +497,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         if (!FightMicroUtilites.offensiveEnemies(zombies)) return false;
         if (turtlePoint != null) navigator.setTarget(turtlePoint);
+
+        rc.setIndicatorString(2, "runAwayFrom zombies" + round);
+        lastRoundRunAway = round;
 
         return runAway(null);
     }
@@ -515,6 +546,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         // preconditions
         if ((FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies)) && ((enemies.length + zombies.length) > allies.length)) return false;
         if (currentLocation.distanceSquaredTo(turtlePoint) >= 100 && rc.getTeamParts() < 500) return false;
+        if (round - lastRoundRunAway < 25) return false;
 
         return buildNextUnit();
     }
@@ -526,21 +558,19 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (scavenging && zombies.length > 0)
         {
             nextType = RobotType.GUARD;
-            return Bots.SCOUTBOMBGUARD;
+            return Bots.TURTLEGUARD;
         }
         else if (scavenging && zombieTracker.getNextZombieRound() - round < 30)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
-        else if (scavenging)
+        else if (scavenging && rc.getTeamParts() > 200)
         {
             nextType = RobotType.SOLDIER;
             return Bots.TURTLESOLDIER;
         }
 
-
-        rc.setIndicatorString(2, "Zombies: " + zombieTracker.getNextZombieRound());
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
@@ -588,10 +618,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
             return Bots.SCOUTBOMBVIPER;
         }
 
-        if (round > 1000)
+        if (round > 100)
         {
             int soldierCount = 0;
             int guardCount = 0;
+            int turretCount = 0;
 
             for (int i = allies.length; --i>=0; )
             {
@@ -603,16 +634,33 @@ public class TurtleArchon extends BaseArchon implements PacMan
                     case GUARD:
                         guardCount++;
                         break;
+                    case TURRET:
+                        turretCount++;
+                        break;
                 }
             }
 
-            if (soldierCount < 1)
+            if (turretCount < 3)
             {
-                return Bots.TURTLESOLDIER;
+                if (soldierCount < 3)
+                {
+                    return Bots.TURTLESOLDIER;
+                }
+                else if (guardCount < 3)
+                {
+                    return Bots.TURTLEGUARD;
+                }
             }
-            else if (guardCount < 1)
+            else
             {
-                return Bots.TURTLEGUARD;
+                if (soldierCount < 2)
+                {
+                    return Bots.TURTLESOLDIER;
+                }
+                else if (guardCount < 2)
+                {
+                    return Bots.TURTLEGUARD;
+                }
             }
         }
 
