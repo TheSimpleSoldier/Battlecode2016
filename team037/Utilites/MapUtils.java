@@ -291,6 +291,10 @@ public class MapUtils
         return closest;
     }
 
+    public static boolean onCheckerBovard(MapLocation toCheck) {
+        return toCheck.x % 2 == toCheck.y % 2;
+    }
+
     /**
      * This method returns the closest location to a target that is unoccupied
      *

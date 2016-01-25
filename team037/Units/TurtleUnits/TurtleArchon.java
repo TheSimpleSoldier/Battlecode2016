@@ -29,8 +29,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean offensiveEnemies = false;
     private boolean offensiveAllies = false;
     private boolean underAttack = false;
+    private static int lastUnderAttack = 0;
     private int lastZombieSighting = 0;
     private int lastEnemieSighting = 0;
+    private static int adjacentTurrets = 0;
 
     public TurtleArchon(RobotController rc)
     {
@@ -93,7 +95,23 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         offensiveEnemies = offensiveEnemies || offensiveZombies;
         offensiveAllies = FightMicroUtilites.offensiveEnemies(allies);
+
+        adjacentTurrets = 0;
+        RobotInfo [] toCheck = allies;
+        if (allies.length > 10) {
+            toCheck = rc.senseNearbyRobots(1, us);
+        }
+        for (int i = 0; --i >= 0;) {
+            if (toCheck[i].location.distanceSquaredTo(currentLocation) == 1)
+                if (toCheck[i].type.equals(RobotType.TURRET) || toCheck[i].type.equals(RobotType.TTM)) {
+                    adjacentTurrets += 1;
+                }
+        }
+
         underAttack = underAttack();
+        if (underAttack) {
+            lastUnderAttack = round;
+        }
 
         if (rallyPoint != null)
         {
@@ -332,12 +350,17 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (!reachedTurtleSpot && currentLocation.distanceSquaredTo(turtlePoint) > 10) return turtlePoint;
         if (!reachedTurtleSpot) reachedTurtleSpot = true;
 
+
         MapLocation bestParts = getNextPartLocation();
 
         if (bestParts == null) return turtlePoint;
 
         int turtleDist = turtlePoint.distanceSquaredTo(bestParts);
 
+        // if we have a lot of parts, don't go looking for more!
+        if (rc.getTeamParts() > 200) return turtlePoint;
+        // if we are safe, don't do anything!
+        if (adjacentTurrets == 4) return currentLocation;
         if (turtleDist > (1600 - (round/2))) return turtlePoint;
         if (Math.sqrt(turtleDist) > (nextZombieRound - round)) return turtlePoint;
 
@@ -418,16 +441,24 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 10)
+            if (zombieTracker.getNextZombieRoundStrength() < 5) {
+
+            }
+            else if (zombieTracker.getNextZombieRoundStrength() < 10 )
+
             {
-                System.out.println("Don't waste time spawning scout bombs");
+                if (zombieTracker.getNextZombieRound() - round < 10)
+                {
+                    nextType = RobotType.SCOUT;
+                    return Bots.SCOUTBOMBSCOUT;
+                }
             }
             else if (zombieTracker.getNextZombieRound() - round < 30)
             {
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
             }
-            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 50)
+            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 80)
             {
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
@@ -437,6 +468,21 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (rc.getTeamParts() > 300)
         {
             return Bots.TURTLETURRET;
+        }
+
+        // late game if we aren't under attack spawn a lot of scout bombs
+        if (round > 2000 && lastUnderAttack < 1500) {
+            return Bots.SCOUTBOMBSCOUT;
+        }
+
+        // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
+        if (round > 2500 && lastUnderAttack < 2500) {
+            return Bots.SCOUTBOMBVIPER;
+        }
+
+
+        if (round > 2800 && round < 2850) {
+            return Bots.SCOUTBOMBVIPER;
         }
 
         if (round > 1000)
@@ -466,6 +512,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 return Bots.TURTLEGUARD;
             }
         }
+
 
         return nextBot;
     }
