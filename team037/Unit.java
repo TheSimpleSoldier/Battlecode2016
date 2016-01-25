@@ -3,6 +3,7 @@ package team037;
 import battlecode.common.*;
 import team037.DataStructures.SimpleRobotInfo;
 import team037.Enums.Bots;
+import team037.Enums.CommunicationType;
 import team037.Enums.Strategies;
 import team037.Messages.*;
 import team037.Units.BaseUnits.BaseArchon;
@@ -61,6 +62,7 @@ public abstract class Unit
     public static MapLocation alliedArchonCenterOfMass;
     public static int centerOfMassDifference;
     public static int myArchon;
+    public static int turretSupportMsgRound;
 
     public Unit()
     {
@@ -101,6 +103,8 @@ public abstract class Unit
             mapKnowledge.updateEdgesFromLocation(alliedArchonStartLocs[k]);
             mapKnowledge.updateEdgesFromLocation(enemyArchonStartLocs[k]);
         }
+
+        turretSupportMsgRound = 0;
     }
 
     public boolean act() throws GameActionException
@@ -238,9 +242,18 @@ public abstract class Unit
                             interpretDistressFromArchon(communications[k]);
                         }
                         break;
+
+                    case TURRET_SUPPORT:
+                        handleTurretSupport(communications[k]);
+                        break;
                 }
             }
         }
+    }
+
+    public void handleTurretSupport(Communication communication)
+    {
+        turretSupportMsgRound = rc.getRoundNum();
     }
 
     public void sendMessages() throws GameActionException
