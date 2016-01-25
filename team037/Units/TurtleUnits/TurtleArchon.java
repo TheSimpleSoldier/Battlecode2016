@@ -348,7 +348,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25)))
+            if (turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25))
             {
                 turtlePoint = currentTurtle;
             }
