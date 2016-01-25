@@ -41,6 +41,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private static int lastRoundRunAway = 0;
 
 
+
     public TurtleArchon(RobotController rc)
     {
         super(rc);
@@ -561,14 +562,15 @@ public class TurtleArchon extends BaseArchon implements PacMan
         return buildNextUnit();
     }
 
-    private boolean seeScout()
+    private int seeScout()
     {
+        int count = 0;
         for (int i = allies.length; --i>=0; )
         {
-            if (allies[i].type == RobotType.SCOUT) return true;
+            if (allies[i].type == RobotType.SCOUT) count++;
         }
 
-        return false;
+        return count;
     }
 
     public boolean takeNextStep() throws GameActionException {
@@ -588,6 +590,14 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 if (rc.isCoreReady() && currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
                     if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
                         rc.clearRubble(currentLocation.directionTo(navigatorTarget));
+
+                        // if we went to move but cleared rubble then spawn a scouting scout
+                        if ((scavenging && seeScout() < 3) || seeScout() == 0)
+                        {
+                            while (!rc.isCoreReady()) Clock.yield();
+                            buildScavengerScout();
+                        }
+
                         return true;
                     }
                 }
@@ -606,7 +616,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        if (currentLocation != null && (scavenging || !seeScout()))
+        if (currentLocation != null && ((scavenging && seeScout() < 3) || seeScout() == 0))
         {
             MapLocation current = new MapLocation(currentLocation.x, currentLocation.y);
             boolean takeNextStep = navigator.takeNextStep();
@@ -639,6 +649,12 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
         else if (scavenging && rc.getTeamParts() > 200)
         {
+            if (currentLocation.distanceSquaredTo(enemyArchonCenterOfMass) < currentLocation.distanceSquaredTo(alliedArchonCenterOfMass))
+            {
+                nextType = RobotType.VIPER;
+                return Bots.RUSHINGVIPER;
+            }
+
             nextType = RobotType.SOLDIER;
             return Bots.TURTLESOLDIER;
         }
