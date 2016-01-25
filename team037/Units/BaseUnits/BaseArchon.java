@@ -262,6 +262,28 @@ public class BaseArchon extends Unit implements PacMan {
         return buildNextUnit();
     }
 
+    public void buildScavengerScout() throws GameActionException
+    {
+        Bots temp = Bots.SCAVENGERSCOUT;
+        nextType = RobotType.SCOUT;
+
+        if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())
+        {
+            Bots temp2 = Bots.fromInt(Bots.toInt(nextBot));
+            nextBot = temp;
+
+            nextType = Bots.typeFromBot(temp);
+            Direction dir = build();
+            if (dir != Direction.NONE)
+            {
+                sendInitialMessages(dir);
+                nextBot = temp2;
+                nextType = Bots.typeFromBot(nextBot);
+                System.out.println("We are spawning a scavenger scout");
+            }
+        }
+    }
+
     public boolean buildNextUnit() throws GameActionException {
         // if there are multiple archons and we have limited parts and we see
         // either parts or neutrals we should let the other archon's build while

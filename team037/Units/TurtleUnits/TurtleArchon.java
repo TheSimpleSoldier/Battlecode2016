@@ -489,7 +489,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorString(2, "runAwayFrom enemies" + round);
         lastRoundRunAway = round;
 
-        if (!stayHome)
+        if (!stayHome && zombies.length > 10)
         {
             return runAway(null, true, true);
         }
@@ -506,7 +506,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorString(2, "runAwayFrom zombies" + round);
         lastRoundRunAway = round;
 
-        if (!stayHome)
+        if (!stayHome && zombies.length > 10)
         {
             return runAway(null, true, true);
         }
@@ -587,19 +587,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
                 if (rc.isCoreReady() && currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
                     if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        if (!seeScout() || rc.getRoundNum() % 3 == 1)
-                        {
-                            nextBot = Bots.SCAVENGERSCOUT;
-                            nextType = RobotType.SCOUT;
-                            buildNextUnit();
-                            System.out.println("We are spawning a scavenger scout");
-                            return true;
-                        }
-                        else
-                        {
-                            rc.clearRubble(currentLocation.directionTo(navigatorTarget));
-                        }
-
+                        rc.clearRubble(currentLocation.directionTo(navigatorTarget));
                         return true;
                     }
                 }
@@ -615,6 +603,20 @@ public class TurtleArchon extends BaseArchon implements PacMan
                     rc.setIndicatorLine(currentLocation, parts, 0, 0, 255);
                     rc.setIndicatorString(2, "Parts loc x: " + parts.x + " y: " + parts.y + " round: " + rc.getRoundNum());
                 }
+            }
+        }
+
+        if (currentLocation != null && (scavenging || !seeScout()))
+        {
+            MapLocation current = new MapLocation(currentLocation.x, currentLocation.y);
+            boolean takeNextStep = navigator.takeNextStep();
+
+            // if we went to move but cleared rubble then spawn a scouting scout
+            if (takeNextStep && rc.getLocation().equals(current) && !rc.isCoreReady())
+            {
+                while (!rc.isCoreReady()) Clock.yield();
+                buildScavengerScout();
+                return true;
             }
         }
 
