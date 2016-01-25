@@ -638,6 +638,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public Bots changeBuildOrder(Bots nextBot)
     {
+        if (round > 2700) {
+            return Bots.SCOUTBOMBVIPER;
+        }
+
         int round = rc.getRoundNum();
         if (scavenging && zombies.length > 0)
         {
@@ -700,11 +704,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
         if (round > 2500 && lastUnderAttack < 2500) {
-            return Bots.SCOUTBOMBVIPER;
-        }
-
-
-        if (round > 2800 && round < 2850) {
             return Bots.SCOUTBOMBVIPER;
         }
 

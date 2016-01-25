@@ -133,7 +133,17 @@ public class FightMicro
 
         if (rc.isWeaponReady() && nearByEnemies.length > 0)
         {
-            RobotInfo enemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+            RobotInfo enemy;
+
+            if (rc.getType() == RobotType.VIPER)
+            {
+                enemy = FightMicroUtilites.pickViperTarget(Unit.nearByAllies, nearByEnemies);
+            }
+            else
+            {
+                enemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+            }
+
 
             if (rc.canAttackLocation(enemy.location))
             {
@@ -517,6 +527,11 @@ public class FightMicro
 
         return false;
     }
+
+//    public boolean ViperAgressiveMicro(RobotInfo[] enemies, RobotInfo[] nearByEnemies)
+//    {
+//
+//    }
 
     /**
      * THis method causes a unit to run towards a target while trying to avoid enemies

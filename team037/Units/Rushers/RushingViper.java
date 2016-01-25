@@ -96,7 +96,7 @@ public class RushingViper extends BaseViper implements PacMan
     @Override
     public boolean fight() throws GameActionException
     {
-        return super.fight();
+        return fightMicro.basicAttack(nearByEnemies, enemies);
     }
 
     @Override
