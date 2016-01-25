@@ -294,6 +294,7 @@ public class ScoutBombScout extends BaseScout
 
     /*
     ===============================
+    SURROUND_ENEMY_ARCHON
     If you see an enemy archon alone, try to surround it!
     ===============================
     */
@@ -302,6 +303,8 @@ public class ScoutBombScout extends BaseScout
         if (!onlyEnemyIsArchon) {
             return false;
         }
+
+        boolean moved =  MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
         if (currentLocation.isAdjacentTo(closestEnemyArchonInfo.location)) {
             // try and make the archon more confused
             for (int i = 5; --i > 0;) {
@@ -310,13 +313,16 @@ public class ScoutBombScout extends BaseScout
             for (int i = 20; --i > 0;) {
                 rc.broadcastMessageSignal(2, 2, 2);
             }
+        }
+        if (!moved && currentLocation.isAdjacentTo(closestEnemyArchonInfo.location)) {
             return true;
         }
-        return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
+        return moved;
     }
 
     /*
     ===============================
+    CHASE_ENEMY_VIPER
     If it's late game, or you are far enough away from your archon, dive onto the enemy viper!
     ===============================
      */
