@@ -106,6 +106,13 @@ public class SuperRushArchon extends Unit
 
         boolean move = false;
         int num = 0;
+
+        if(zombies.length > 5 && allies.length < 5)
+        {
+            nextBot = Bots.SCOUTBOMBARCHON;
+            RobotPlayer.strategy = Strategies.SCOUT_BOMB;
+        }
+
         for(int k = enemies.length; --k >= 0;)
         {
             if(enemies[k].type == RobotType.ARCHON)
@@ -114,7 +121,7 @@ public class SuperRushArchon extends Unit
                 {
                     if(moved >= 5 && !notRetreating)
                     {
-                        if(allies.length == 0)
+                        if(allies.length < 2)
                         {
                             nextBot = Bots.TURTLEARCHON;
                             RobotPlayer.strategy = Strategies.TURTLE;
@@ -135,12 +142,16 @@ public class SuperRushArchon extends Unit
                 }
                 if(targetID == -1)
                 {
-                    targetArchon = enemies[k].location;
-                    dirTo = currentLocation.directionTo(targetArchon);
-                    targetID = enemies[k].ID;
-                    lastSeen = round;
-                    num++;
-                    break;
+                    Direction toArchon = currentLocation.directionTo(enemies[k].location);
+                    if(!toArchon.equals(dirTo.opposite()))
+                    {
+                        targetArchon = enemies[k].location;
+                        dirTo = currentLocation.directionTo(targetArchon);
+                        targetID = enemies[k].ID;
+                        lastSeen = round;
+                        num++;
+                        break;
+                    }
                 }
                 else if(enemies[k].ID == targetID)
                 {
@@ -171,10 +182,18 @@ public class SuperRushArchon extends Unit
         {
             if(currentLocation.distanceSquaredTo(targetArchon) < 24 && round - lastSeen < 2)
             {
-                rc.setIndicatorString(1, "WE GOT IT!");
                 targetID = -1;
                 //time to change professions
-                nextBot = Bots.TURTLEARCHON;
+                if(rc.getTeamParts() > 200)
+                {
+                    nextBot = Bots.TURTLEARCHON;
+                    RobotPlayer.strategy = Strategies.TURTLE;
+                }
+                else
+                {
+                    nextBot = Bots.SCOUTBOMBARCHON;
+                    RobotPlayer.strategy = Strategies.SCOUT_BOMB;
+                }
             }
         }
 

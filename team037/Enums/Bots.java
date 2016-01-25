@@ -16,6 +16,7 @@ import team037.Units.PacMan.PacManScout;
 import team037.Units.Scavenger.ScavengerArchon;
 import team037.Units.Scavenger.ScavengerScout;
 import team037.Units.Rushers.*;
+import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Units.ScoutBomb.ScoutBombViper;
@@ -150,6 +151,8 @@ public enum Bots
                 return 35;
             case SUPERRUSHVIPER:
                 return 36;
+            case SCOUTBOMBARCHON:
+                return 37;
         }
         return -1;
     }
@@ -232,6 +235,8 @@ public enum Bots
                 return SUPERRUSHTURRET;
             case 36:
                 return SUPERRUSHVIPER;
+            case 37:
+                return SCOUTBOMBARCHON;
         }
 
         return null;
@@ -247,6 +252,7 @@ public enum Bots
             case PACMANARCHON:
             case SCAVENGERARCHON:
             case SUPERRUSHARCHON:
+            case SCOUTBOMBARCHON:
                 return RobotType.ARCHON;
             case RUSHGUARD:
             case TURTLEGUARD:
@@ -363,6 +369,8 @@ public enum Bots
                 return new SuperRushTurret(rc);
             case SUPERRUSHVIPER:
                 return new SuperRushViper(rc);
+            case SCOUTBOMBARCHON:
+                return new ScoutBombArchon(rc);
         }
 
         return null;
