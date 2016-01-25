@@ -72,6 +72,19 @@ public class TurtleArchon extends BaseArchon implements PacMan
     }
 
     @Override
+    public boolean takeNextStep() throws GameActionException
+    {
+        if (underAttack) {
+            return navigator.takeNextStep();
+        }
+        // if it's later in the game and we have a lot of parts, spend that money!
+        if (round > 500 && rc.getTeamParts() > 200) {
+            return false;
+        }
+        return navigator.takeNextStep();
+    }
+
+    @Override
     public void collectData() throws GameActionException
     {
         super.collectData();
@@ -338,6 +351,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         int turtleDist = turtlePoint.distanceSquaredTo(bestParts);
 
+        // if we have a lot of parts, don't go looking for more!
+        if (rc.getTeamParts() > 1000) return turtlePoint;
         if (turtleDist > (1600 - (round/2))) return turtlePoint;
         if (Math.sqrt(turtleDist) > (nextZombieRound - round)) return turtlePoint;
 
