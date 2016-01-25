@@ -561,6 +561,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
         return buildNextUnit();
     }
 
+    private boolean seeScout()
+    {
+        for (int i = allies.length; --i>=0; )
+        {
+            if (allies[i].type == RobotType.SCOUT) return true;
+        }
+
+        return false;
+    }
+
     public boolean takeNextStep() throws GameActionException {
         if (currentLocation != null && navigator.getTarget() != null) {
             rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 0, 0);
@@ -577,11 +587,12 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
                 if (rc.isCoreReady() && currentLocation != null && navigatorTarget != null && currentLocation.isAdjacentTo(navigatorTarget)) {
                     if (rc.canSense(navigatorTarget) && rc.senseRubble(navigatorTarget) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
-                        if (!stayHome && rc.getRoundNum() % 6 == 1)
+                        if (!seeScout() || rc.getRoundNum() % 3 == 1)
                         {
                             nextBot = Bots.SCAVENGERSCOUT;
                             nextType = RobotType.SCOUT;
                             buildNextUnit();
+                            System.out.println("We are spawning a scavenger scout");
                             return true;
                         }
                         else

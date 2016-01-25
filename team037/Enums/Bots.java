@@ -69,12 +69,9 @@ public enum Bots
     SCAVENGERSCOUT,
     CASTLETURRET,
     COUNTERMEASUREGUARD,
-<<<<<<< HEAD
-    SPOTTINGSCOUT;
-=======
+    SPOTTINGSCOUT,
     SUPERRUSHTURRET,
     SUPERRUSHVIPER;
->>>>>>> 8bac5414df6e2aa53946068558cdab09277bc5d1
 
     public static int toInt(Bots type)
     {
@@ -150,15 +147,12 @@ public enum Bots
                 return 33;
             case SCAVENGERSCOUT:
                 return 34;
-<<<<<<< HEAD
             case SPOTTINGSCOUT:
                 return 35;
-=======
             case SUPERRUSHTURRET:
-                return 35;
-            case SUPERRUSHVIPER:
                 return 36;
->>>>>>> 8bac5414df6e2aa53946068558cdab09277bc5d1
+            case SUPERRUSHVIPER:
+                return 37;
         }
         return -1;
     }
@@ -238,13 +232,11 @@ public enum Bots
             case 34:
                 return SCAVENGERSCOUT;
             case 35:
-<<<<<<< HEAD
                 return SPOTTINGSCOUT;
-=======
-                return SUPERRUSHTURRET;
             case 36:
+                return SUPERRUSHTURRET;
+            case 37:
                 return SUPERRUSHVIPER;
->>>>>>> 8bac5414df6e2aa53946068558cdab09277bc5d1
         }
 
         return null;
@@ -373,15 +365,12 @@ public enum Bots
                 return new CastleTurret(rc);
             case COUNTERMEASUREGUARD:
                 return new CountermeasureGuard(rc);
-<<<<<<< HEAD
             case SPOTTINGSCOUT:
                 return new SpottingScout(rc);
-=======
             case SUPERRUSHTURRET:
                 return new SuperRushTurret(rc);
             case SUPERRUSHVIPER:
                 return new SuperRushViper(rc);
->>>>>>> 8bac5414df6e2aa53946068558cdab09277bc5d1
         }
 
         return null;
