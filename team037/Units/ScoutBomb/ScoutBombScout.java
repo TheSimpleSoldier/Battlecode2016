@@ -294,8 +294,7 @@ public class ScoutBombScout extends BaseScout
 
     /*
     ===============================
-    If it's late game, or you are far enough away from your archon, dive onto the enemy viper!
-    So if you see fast zombies, drop everything and RUN!
+    If you see an enemy archon alone, try to surround it!
     ===============================
     */
     private boolean surroundEnemyArchon() throws GameActionException {
@@ -319,7 +318,6 @@ public class ScoutBombScout extends BaseScout
     /*
     ===============================
     If it's late game, or you are far enough away from your archon, dive onto the enemy viper!
-    So if you see fast zombies, drop everything and RUN!
     ===============================
      */
     private boolean suicideOnEnemyViper() throws GameActionException {
