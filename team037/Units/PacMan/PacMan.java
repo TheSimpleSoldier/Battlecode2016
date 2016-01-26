@@ -24,7 +24,7 @@ public interface PacMan {
     double[][] DEFAULT_WEIGHTS = new double[][] {
             {1, .5, .5, .5, .5},    // enemy and zombie weights (enemies in sensor range)
             {-16, -8, -4, 0, 0}, // target constants (attract towards target)
-            {-2,.5,.5,.5,.5},       // weights for neutrals and parts
+            {-1,.5,.5,.5,.5},       // weights for neutrals and parts
             {8,.5,.25}              // weights for turrets
     };
 
@@ -101,7 +101,7 @@ public interface PacMan {
 
         /* This is the array that will ultimately decide where we go.
         The direction with the smallest weight will be taken. */
-            int[] directions = new int[] {1,1,1,1,1,1,1,1};
+            int[] directions = new int[8];
 
             int[] ping0 = Navigation.map.ping(currentLocation, 0, 3);
             int[] ping2 = Navigation.map.ping(currentLocation, 2, 3);
@@ -114,15 +114,28 @@ public interface PacMan {
 //            // First: apply weights of nearby units
             directions = applyAllWeights(directions, weights);
 
+            int minValue = 99999999;
+            for (int i = 8; --i >= 0;) {
+                if (directions[i] < minValue)
+                    minValue = directions[i];
+            }
+
+            if (minValue < 1) {
+                minValue = Math.abs(minValue);
+                for (int i = 8; --i >= 0; ) {
+                    directions[i] += minValue;
+                }
+            }
+
             // Second: scale weights based on nearby rubble
-//            rc.setIndicatorString(0, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
+//            rc.setIndicatorString(0, "ping[0]:" + ping0[0] + ", ping[1]:" + ping0[1] + ", ping[2]:" + ping0[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
             int divide = 17;
             int left = divide / ++ping0[0], mid = divide / ++ping0[1], right = divide / ++ping0[2];
             directions[7] *= 1 + left / 2;
             directions[0] *= 1 + mid;
             directions[1] *= 1 + right / 2;
 
-//            rc.setIndicatorString(1, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
+//            rc.setIndicatorString(1, "ping[0]:" + ping2[0] + ", ping[1]:" + ping2[1] + ", ping[2]:" + ping2[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
             left = divide / ++ping2[0];
             mid = divide / ++ping2[1];
             right = divide / ++ping2[2];
@@ -130,7 +143,7 @@ public interface PacMan {
             directions[2] *= 1 + mid;
             directions[3] *= 1 + right / 2;
 
-//            rc.setIndicatorString(2, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
+//            rc.setIndicatorString(2, "ping[0]:" + ping4[0] + ", ping[1]:" + ping4[1] + ", ping[2]:" + ping4[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
 
             left = divide / ++ping4[0];
             mid = divide / ++ping4[1];
@@ -139,7 +152,7 @@ public interface PacMan {
             directions[4] *= 1 + mid;
             directions[5] *= 1 + right / 2;
 
-//            rc.setIndicatorString(2, "ping[0]:" + ping[0] + ", ping[1]:" + ping[1] + ", ping[2]:" + ping[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
+//            rc.setIndicatorString(2, "ping[0]:" + ping6[0] + ", ping[1]:" + ping6[1] + ", ping[2]:" + ping6[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
             left = divide / ++ping6[0];
             mid = divide / ++ping6[1];
             right = divide / ++ping6[2];
@@ -255,7 +268,7 @@ public interface PacMan {
             while (!(rc.canMove(dirs[minDir]) || rc.senseRubble(nextLoc) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH || min == Integer.MAX_VALUE));
             return Unit.dirs[minDir];
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return Direction.NONE;
         }
     }
