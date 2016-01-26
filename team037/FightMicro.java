@@ -1,8 +1,6 @@
 package team037;
 
 import battlecode.common.*;
-import com.sun.org.apache.bcel.internal.generic.FMUL;
-import scala.Int;
 import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
