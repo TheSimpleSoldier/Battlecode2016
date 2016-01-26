@@ -241,7 +241,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
         {
             MapLocation currentTurtle = new MapLocation(turtlePoint.x, turtlePoint.y);
 
-            /*
             if ((round - updateRound) < 100)
             {
             }
@@ -367,15 +366,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
                 rc.setIndicatorDot(turtlePoint, 255, 0, 0);
             }
-            */
-            if (!underAttack && round % 100 == index && round % 5 == index)
-            {
-                Communication newRallyPoint = new AttackCommunication();
-                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                communicator.sendCommunication(3600, newRallyPoint);
-                rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
-                rc.setIndicatorDot(turtlePoint, 255, 0, 0);
-            }
+
         }
     }
 
