@@ -1,6 +1,5 @@
 package team037;
 
-import _teamcastle.Utilites.MapUtils;
 import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
