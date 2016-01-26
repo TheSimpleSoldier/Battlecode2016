@@ -287,7 +287,7 @@ public class PacManUtils {
                     }
                     break;
                 case FASTZOMBIE:
-                    scalars[0] += .5;
+                    scalars[0] += .1;
                     break;
 
             }

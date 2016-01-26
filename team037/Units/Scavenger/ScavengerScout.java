@@ -97,8 +97,9 @@ public class ScavengerScout extends ScoutBombScout implements PacMan {
         double maxRubble = -1;
         int maxDir = -1;
         for (int i = 8; --i >= 0; ) {
-            if (rc.canSense(currentLocation.add(dirs[i]))) {
-                double rubble = rc.senseRubble(currentLocation.add(dirs[i]));
+            MapLocation nextLocation = currentLocation.add(dirs[i]);
+            if (rc.canSense(nextLocation) && rc.onTheMap(nextLocation)) {
+                double rubble = rc.senseRubble(nextLocation);
                 if (rubble > maxRubble) {
                     maxDir = i;
                     maxRubble = rubble;
