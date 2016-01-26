@@ -714,8 +714,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (round > 2500 && lastUnderAttack < 2500) {
             nextType = RobotType.VIPER;
             if (lastRush) {
+                lastRush = !lastRush;
                 return Bots.RUSHINGVIPER;
             } else {
+                lastRush = !lastRush;
                 return Bots.SCOUTBOMBVIPER;
             }
         }

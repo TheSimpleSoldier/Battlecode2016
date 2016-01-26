@@ -336,7 +336,10 @@ public class TurtleGuard extends BaseGaurd
         if (!coreReady) {
             return false;
         }
-        if (nearestTurret <= 8) {
+        if (nearestTurret > 8 && nearestTurret < Integer.MAX_VALUE) {
+            MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), false);
+            return true;
+        } else if (nearestTurret <= 8) {
             Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
             if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
                 if (rc.canMove(forward)) {
@@ -356,10 +359,10 @@ public class TurtleGuard extends BaseGaurd
             return true;
         } else if (nearestTurret < 2 * nearestCombatEnemy) {
             Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);
-            return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+            MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
         }
 
-        return false;
+        return true;
     }
 
     /*

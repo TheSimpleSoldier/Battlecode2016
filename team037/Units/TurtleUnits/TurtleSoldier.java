@@ -414,7 +414,7 @@ public class TurtleSoldier extends BaseSoldier
                 return true;
             }
         }
-        if (nearestArchon > 9 && nearestArchon > Integer.MAX_VALUE) {
+        if (nearestArchon > 9 && nearestArchon < Integer.MAX_VALUE) {
             if (MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestArchonInfo.location), true)) {
                 return true;
             }
