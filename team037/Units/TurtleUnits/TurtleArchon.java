@@ -25,7 +25,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean updatedTurtleSpot = false;
     private MapLocation origionalTurtleSpot;
     private boolean hiding = false;
-    private int updateRound = 0;
+    private int updateRound = -100;
     private int index = 0;
     private int ArchonDist;
     private boolean offensiveEnemies = false;
@@ -355,7 +355,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25))
+            if (round - updateRound < 100 || !stayHome || turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25))
             {
                 turtlePoint = currentTurtle;
             }
@@ -406,6 +406,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         return false;
     }
+
 
     @Override
     public MapLocation getNextSpot() throws GameActionException
@@ -751,11 +752,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
             // don't want to spawn massive #'s of units instead of turrets
             if (turretCount < 3 && rc.getRobotCount() < 30)
             {
-                if (soldierCount < 3)
+                if (soldierCount < 2)
                 {
                     return Bots.TURTLESOLDIER;
                 }
-                else if (guardCount < 5)
+                else if (guardCount < 3)
                 {
                     return Bots.TURTLEGUARD;
                 }

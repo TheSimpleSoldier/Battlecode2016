@@ -339,14 +339,14 @@ public class TurtleSoldier extends BaseSoldier
             return false;
         }
 
-        if (nearestTurret < Integer.MAX_VALUE && nearestTurret >= 8 ) {
+        if (nearestTurret < Integer.MAX_VALUE && nearestTurret > 2 ) {
             MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), false);
             rc.setIndicatorString(1, "moving to turret");
             return true;
         } else if (nearestCombatEnemy <= type.attackRadiusSquared) {
             rc.setIndicatorString(1, "in range, nothing");
             return true;
-        } else  if (nearestTurret <= 4) {
+        } else  if (nearestTurret <= 2) {
             MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestCombatEnemyInfo.location), false);
             rc.setIndicatorString(1, "moving to enemy");
             return true;
@@ -387,6 +387,9 @@ public class TurtleSoldier extends BaseSoldier
         if (rc.getHealth() < 10) {
             return fightMicro.soldierZombieFightMicro(zombies, nearByZombies, allies);
         }
+        if (nearestBigZombie <= type.attackRadiusSquared || nearestMeleeZombie <= type.attackRadiusSquared || nearestRangedZombie <= type.attackRadiusSquared) {
+            return true;
+        }
 
         if (coreReady) {
             if (nearestBigZombie > type.attackRadiusSquared && nearestBigZombie < Integer.MAX_VALUE) {
@@ -418,16 +421,6 @@ public class TurtleSoldier extends BaseSoldier
         // prereqs
         if (!coreReady) {
             return false;
-        }
-        if (nearestArchon < 2) {
-            if (MoveUtils.tryMoveForwardOrLeftRight(nearestArchonInfo.location.directionTo(currentLocation), true)) {
-                return true;
-            }
-        }
-        if (nearestArchon > 9 && nearestArchon < Integer.MAX_VALUE) {
-            if (MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestArchonInfo.location), true)) {
-                return true;
-            }
         }
         if (turtlePoint != null && !currentLocation.isAdjacentTo(turtlePoint)) {
             return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(turtlePoint), true);

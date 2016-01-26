@@ -384,14 +384,17 @@ public class TurtleGuard extends BaseGaurd
         if (weaponReady) {
             if (nearestBigZombie == 1) {
                 rc.attackLocation(nearestBigZombieInfo.location);
+                rc.setIndicatorString(1, "attacking");
                 return true;
             }
             if (nearestMeleeZombie == 1) {
                 rc.attackLocation(nearestMeleeZombieInfo.location);
+                rc.setIndicatorString(1, "attacking");
                 return true;
             }
             if (nearestRangedZombie == 1) {
                 rc.attackLocation(nearestRangedZombieInfo.location);
+                rc.setIndicatorString(1, "attacking");
                 return true;
             }
         }
@@ -400,23 +403,28 @@ public class TurtleGuard extends BaseGaurd
 
             }
             else if (nearestBigZombie == 2) {
+                rc.setIndicatorString(1, "moving to 1");
                 return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
             }
             else if (nearestMeleeZombie == 2) {
+                rc.setIndicatorString(1, "moving to 1");
                 return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
             }
             else if (nearestRangedZombie == 2) {
+                rc.setIndicatorString(1, "moving to 1");
                 return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestRangedZombieInfo.location), false);
             }
 
-            if (nearestTurret <= 9) {
+            if (nearestTurret <= 9 || nearestTurret == Integer.MAX_VALUE) {
                 if (nearestBigZombie < Integer.MAX_VALUE) {
                     if (rc.senseNearbyRobots(nearestBigZombieInfo.location, 8, us).length > 0) {
+                        rc.setIndicatorString(1, "moving in");
                         return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
                     }
                 }
                 if (nearestMeleeZombie < Integer.MAX_VALUE) {
                     if (rc.senseNearbyRobots(nearestMeleeZombieInfo.location, 8, us).length > 0) {
+                        rc.setIndicatorString(1, "moving in");
                         return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
                     }
                 }
@@ -440,16 +448,6 @@ public class TurtleGuard extends BaseGaurd
         // prereqs
         if (!coreReady) {
             return false;
-        }
-        if (nearestArchon < 2) {
-            if (MoveUtils.tryMoveForwardOrLeftRight(nearestArchonInfo.location.directionTo(currentLocation), true)) {
-                return true;
-            }
-        }
-        if (nearestArchon > 9 && nearestArchon < Integer.MAX_VALUE) {
-            if (MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestArchonInfo.location), true)) {
-                return true;
-            }
         }
         if (turtlePoint != null && !currentLocation.isAdjacentTo(turtlePoint))  {
             return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(turtlePoint), true);
