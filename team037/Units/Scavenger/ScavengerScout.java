@@ -94,7 +94,31 @@ public class ScavengerScout extends ScoutBombScout implements PacMan {
             return false;
         }
 
-        return MoveUtils.tryClearAnywhere(currentLocation.directionTo(myArchon.location));
+        double maxRubble = -1;
+        int maxDir = -1;
+        for (int i = 8; --i >= 0; ) {
+            if (rc.canSense(currentLocation.add(dirs[i]))) {
+                double rubble = rc.senseRubble(currentLocation.add(dirs[i]));
+                if (rubble > maxRubble) {
+                    maxDir = i;
+                    maxRubble = rubble;
+                }
+            }
+        }
+
+        if (maxDir >= 0) {
+            try {
+                if (rc.onTheMap(currentLocation.add(dirs[maxDir])))
+                {
+                    rc.clearRubble(dirs[maxDir]);
+                }
+
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
     public static boolean scavengerDig() {
