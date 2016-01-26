@@ -652,7 +652,13 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (round > 2700)
         {
             nextType = RobotType.VIPER;
-            return Bots.RUSHINGVIPER;
+            if (lastRush) {
+                lastRush = !lastRush;
+                return Bots.RUSHINGVIPER;
+            } else {
+                lastRush = !lastRush;
+                return Bots.SCOUTBOMBVIPER;
+            }
         }
 
         if (scavenging && zombies.length > 0 && allies.length <= 2)
@@ -698,11 +704,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        if (rc.getTeamParts() > 300 && round > 100)
-        {
-            nextType = RobotType.TURRET;
-            return Bots.TURTLETURRET;
-        }
 
         // late game if we aren't under attack spawn a lot of scout bombs
         if (round > 2500 && lastUnderAttack < 2000) {
@@ -751,7 +752,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 {
                     return Bots.TURTLESOLDIER;
                 }
-                else if (guardCount < 3)
+                else if (guardCount < 5)
                 {
                     return Bots.TURTLEGUARD;
                 }
@@ -768,6 +769,13 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
         }
+
+        if (rc.getTeamParts() > 300 && round > 100)
+        {
+            nextType = RobotType.TURRET;
+            return Bots.TURTLETURRET;
+        }
+
 
         return nextBot;
     }
