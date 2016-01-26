@@ -129,8 +129,8 @@ public class SuperRushArchon extends Unit
                     {
                         if(allies.length < 2 && enemies.length - 1 > allies.length)
                         {
-                            nextBot = Bots.SCOUTBOMBARCHON;
-                            RobotPlayer.strategy = Strategies.SCOUT_BOMB;
+                            nextBot = Bots.TURTLEARCHON;
+                            RobotPlayer.strategy = Strategies.TURTLE;
                         }
                     }
                     else if(enemies[k].location.equals(targetArchon))
