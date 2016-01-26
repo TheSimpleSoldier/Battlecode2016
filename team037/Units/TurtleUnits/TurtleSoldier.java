@@ -333,23 +333,11 @@ public class TurtleSoldier extends BaseSoldier
         if (!coreReady) {
             return false;
         }
-        if (nearestTurret <= 4) {
-            Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
-            if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-                if (rc.canMove(forward)) {
-                    rc.move(forward);
-                    return true;
-                }
-            }
-
-            Direction back = forward.opposite();
-            if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-                if (rc.canMove(back)) {
-                    rc.move(back);
-                    return true;
-                }
-            }
-            // hold;
+        if (nearestTurret < Integer.MAX_VALUE && nearestTurret >= 8 ) {
+            MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), false);
+            return true;
+        } else  if (nearestTurret <= 4) {
+            MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestCombatEnemyInfo.location), false);
             return true;
         } else if (nearestTurret < 2 * nearestCombatEnemy) {
             Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);

@@ -2,6 +2,7 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.RobotTypeTracker;
+import team037.FightMicro;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
 import team037.Utilites.MoveUtils;
@@ -481,6 +482,49 @@ public class TurtleGuard extends BaseGaurd
                     return true;
                 }
             }
+        }
+
+        if (rc.getHealth() < 10) {
+            return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
+        }
+
+        if (coreReady) {
+            if (nearestBigZombie < Integer.MAX_VALUE) {
+
+                if (coreReady) {
+                    if (currentLocation.distanceSquaredTo(nearestBigZombieInfo.location) == 1) {
+                        if (weaponReady) {
+                            if (currentLocation.isAdjacentTo(nearestBigZombieInfo.location)) {
+                                rc.attackLocation(nearestBigZombieInfo.location);
+                                return true;
+                            }
+                        }
+                        return true;
+                    } else {
+                        return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestBigZombieInfo.location), true);
+                    }
+
+                }
+
+            }
+
+            if (nearestMeleeZombie < Integer.MAX_VALUE) {
+
+                if (coreReady) {
+                    if (currentLocation.distanceSquaredTo(nearestMeleeZombieInfo.location) == 1) {
+                        if (weaponReady) {
+                            if (currentLocation.isAdjacentTo(nearestMeleeZombieInfo.location)) {
+                                rc.attackLocation(nearestMeleeZombieInfo.location);
+                                return true;
+                            }
+                        }
+                        return true;
+                    } else {
+                        return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestMeleeZombieInfo.location), true);
+                    }
+                }
+            }
+
         }
 
         return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
