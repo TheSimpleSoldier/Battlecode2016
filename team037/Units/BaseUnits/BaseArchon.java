@@ -294,6 +294,7 @@ public class BaseArchon extends Unit implements PacMan {
 
         Bots temp = changeBuildOrder(nextBot);
         if (temp == null) {
+            System.out.println("WHAT?");
             temp = nextBot;
         }
 
