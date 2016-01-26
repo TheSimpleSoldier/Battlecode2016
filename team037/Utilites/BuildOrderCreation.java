@@ -19,6 +19,30 @@ public class BuildOrderCreation
         //                                                                          //
         //////////////////////////////////////////////////////////////////////////////
 
+        if (RobotPlayer.strategy.equals(Strategies.VIPERS))
+        {
+            Bots[][] dynamicBuild = {
+                    {Bots.SCOUTINGSCOUT},
+                    {Bots.RUSHINGVIPER},
+            };
+
+            int[] times = {1, 10, 10000};
+
+            return new BuildOrder(dynamicBuild, times);
+        }
+
+        if (RobotPlayer.strategy.equals(Strategies.DYNAMIC_TURTLE)) {
+            Bots[][] dynamicBuild = {
+                    {Bots.SCOUTINGSCOUT, Bots.TURTLESOLDIER},
+                    {Bots.TURTLESOLDIER, Bots.TURTLESOLDIER},
+                    {Bots.TURTLESOLDIER, Bots.RUSHINGVIPER}
+            };
+
+            int[] times = {1, 10, 10000};
+
+            return new BuildOrder(dynamicBuild, times);
+        }
+
         if (RobotPlayer.strategy.equals(Strategies.SCOUT_BOMB)) {
             Bots[][] buildOrderBombs = {
                     {Bots.SCOUTBOMBSCOUT}
@@ -51,17 +75,16 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.TURTLE))
         {
             Bots[][] buildOrderTurtle = {
-                    {Bots.TURTLEGUARD, Bots.TURTLEGUARD},
-                    {Bots.TURTLESCOUT, Bots.TURTLETURRET},
-                    {Bots.TURTLETURRET, Bots.TURTLEGUARD},
-                    {Bots.SCOUTINGSCOUT, Bots.TURTLEGUARD},
-                    {Bots.TURTLETURRET, Bots.TURTLETURRET},
-                    {Bots.TURTLETURRET, Bots.TURTLESCOUT},
-                    {Bots.TURTLETURRET, Bots.TURTLEGUARD},
-                    {Bots.TURTLETURRET, Bots.RUSHINGVIPER},
+                    {Bots.TURTLESOLDIER, Bots.TURTLEGUARD, Bots.SCOUTINGSCOUT},
+                    {Bots.TURTLESCOUT, Bots.TURTLETURRET, Bots.TURTLEGUARD},
+                    {Bots.TURTLETURRET, Bots.TURTLESOLDIER, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET, Bots.TURTLETURRET, Bots.SPOTTINGSCOUT},
+                    {Bots.TURTLETURRET, Bots.TURTLESCOUT, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET, Bots.TURTLESOLDIER, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET, Bots.RUSHINGVIPER, Bots.TURTLETURRET},
             };
 
-            int[] timesTurtle = {4/multiplier, 4/multiplier, 4/multiplier, 1, 4/multiplier, 4/multiplier, 8/multiplier, 1000};
+            int[] timesTurtle = {1, 4/multiplier, 4/multiplier, 1, 4/multiplier, 4/multiplier, 1000};
 
             return new BuildOrder(buildOrderTurtle, timesTurtle);
         }

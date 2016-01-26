@@ -1,5 +1,6 @@
 package team037;
 
+import _teamcastle.Utilites.MapUtils;
 import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
@@ -133,7 +134,17 @@ public class FightMicro
 
         if (rc.isWeaponReady() && nearByEnemies.length > 0)
         {
-            RobotInfo enemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+            RobotInfo enemy;
+
+            if (rc.getType() == RobotType.VIPER)
+            {
+                enemy = FightMicroUtilites.pickViperTarget(Unit.nearByAllies, nearByEnemies);
+            }
+            else
+            {
+                enemy = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+            }
+
 
             if (rc.canAttackLocation(enemy.location))
             {
@@ -518,6 +529,103 @@ public class FightMicro
         return false;
     }
 
+    public boolean ViperAgressiveMicro(RobotInfo[] enemies) throws GameActionException
+    {
+        if (enemies.length == 0) return false;
+
+        if (rc.isWeaponReady())
+        {
+            RobotInfo target = FightMicroUtilites.pickViperTarget(Unit.allies, enemies);
+
+            // don't shoot
+            if (target == null || (target.team == Unit.opponent && target.viperInfectedTurns > 10))
+            {
+
+            }
+            else
+            {
+                if (rc.canAttackLocation(target.location))
+                {
+                    rc.attackLocation(target.location);
+                    return true;
+                }
+            }
+        }
+
+        if (rc.isCoreReady())
+        {
+            boolean underAttack = false;
+
+            for (int i = enemies.length; --i>=0; )
+            {
+                if (enemies[i].location.distanceSquaredTo(Unit.currentLocation) <= enemies[i].type.attackRadiusSquared)
+                {
+                    underAttack = true;
+                    break;
+                }
+            }
+
+            // if under attack retreat to safe loc if possible otherwise retreat from com
+            if (underAttack)
+            {
+                Direction safeDir = null;
+
+                for (int i = Unit.dirs.length; --i>=0;)
+                {
+                    Direction dir = Unit.dirs[i];
+                    MapLocation nxt = Unit.currentLocation.add(dir);
+                    if (!rc.canMove(dir)) continue;
+                    if (rc.senseRubble(nxt) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
+
+                    boolean enemiesInRange = false;
+
+                    for (int j = enemies.length; --j>=0; )
+                    {
+                        if (enemies[j].location.distanceSquaredTo(nxt) < enemies[j].type.attackRadiusSquared)
+                        {
+                            enemiesInRange = true;
+                            break;
+                        }
+                    }
+
+                    if (!enemiesInRange)
+                    {
+                        safeDir = dir;
+                        break;
+                    }
+                }
+
+                if (safeDir != null && rc.canMove(safeDir))
+                {
+                    rc.move(safeDir);
+                    return true;
+                }
+                else
+                {
+                    // attack ourselves if low health and low infection
+                    if (rc.getHealth() < 15 && rc.getViperInfectedTurns() < 10)
+                    {
+                        if (rc.isWeaponReady())
+                        {
+                            System.out.println("attacking ourselves");
+                            rc.attackLocation(rc.getLocation());
+                        }
+                    }
+
+
+                    MapLocation enemyCOM = team037.Utilites.MapUtils.getCenterOfRobotInfoMass(enemies);
+
+                    Direction dir = Unit.currentLocation.directionTo(enemyCOM).opposite();
+
+                    FightMicroUtilites.moveDir(rc, dir, false);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * THis method causes a unit to run towards a target while trying to avoid enemies
      *
@@ -599,8 +707,6 @@ public class FightMicro
             MapLocation spot = zombies[i].location;
             x += spot.x;
             y += spot.y;
-
-
         }
 
         enemyCOM = new MapLocation(x / len, y / len);
@@ -636,7 +742,7 @@ public class FightMicro
         }
 
         // don't turn into zombie so flee if you have low health
-        if (rc.getHealth() <= 50 && rc.isCoreReady())
+        if (rc.getHealth() <= FightMicroUtilites.totalZombieDamage(zombies, currentLoc) && rc.isCoreReady())
         {
             if (fleeDir != null)
             {
@@ -652,16 +758,6 @@ public class FightMicro
             if (rc.canAttackLocation(weakest.location))
             {
                 rc.attackLocation(weakest.location);
-                return true;
-            }
-        }
-
-        // if there are enemy zombies in range of us kite back
-        if (rc.isCoreReady() && nearByZombies.length > 0)
-        {
-            if (fleeDir != null)
-            {
-                rc.move(fleeDir);
                 return true;
             }
         }
@@ -711,6 +807,53 @@ public class FightMicro
                 FightMicroUtilites.moveDir(rc, rc.getLocation().directionTo(rushLoc), true);
                 return true;
             }
+
+            boolean turretUnderAttack = false;
+
+            for (int i = allies.length; --i>=0; )
+            {
+                if (allies[i].type == RobotType.TURRET)
+                {
+                    MapLocation turret = allies[i].location;
+                    for (int j = zombies.length; --j>=0; )
+                    {
+                        MapLocation zombie = zombies[j].location;
+                        if (turret.distanceSquaredTo(zombie) <= zombies[j].type.attackRadiusSquared)
+                        {
+                            turretUnderAttack = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (turretUnderAttack)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(enemyCOM), true);
+            }
+        }
+
+
+        if (!FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation closestZombie = null;
+            int closestDist = Integer.MAX_VALUE;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                dist = zombies[i].location.distanceSquaredTo(currentLoc);
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestZombie = zombies[i].location;
+                }
+            }
+
+            if (closestZombie != null)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(closestZombie), true);
+            }
         }
 
         return true;
@@ -738,25 +881,44 @@ public class FightMicro
 
         if (rc.isCoreReady())
         {
+            MapLocation closestEnemyAttackingTurret = null;
+            int closestEnemyToTurretDist = Integer.MAX_VALUE;
             MapLocation closestTurret = null;
             MapLocation current = rc.getLocation();
-            int bestDist = 99999;
+            int closestTurretDist = Integer.MAX_VALUE;
 
             for (int i = allies.length; --i>=0; )
             {
                 if (allies[i].type == RobotType.TURRET)
                 {
+                    MapLocation allyTurret = allies[i].location;
                     MapLocation turret = allies[i].location;
                     int currentDist = turret.distanceSquaredTo(current);
-                    if (currentDist < bestDist)
+                    if (currentDist < closestTurretDist)
                     {
-                        bestDist = currentDist;
+                        closestTurretDist = currentDist;
                         closestTurret = turret;
+                    }
+
+                    for (int j = enemies.length; --j>=0; )
+                    {
+                        MapLocation enemy = enemies[j].location;
+                        int dist = enemy.distanceSquaredTo(allyTurret);
+
+                        if (dist < closestEnemyToTurretDist)
+                        {
+                            closestEnemyToTurretDist = dist;
+                            closestEnemyAttackingTurret = enemy;
+                        }
                     }
                 }
             }
 
-            if (closestTurret != null)
+            if (closestEnemyAttackingTurret != null)
+            {
+                FightMicroUtilites.moveDir(rc, current.directionTo(closestEnemyAttackingTurret), true);
+            }
+            else if (closestTurret != null)
             {
                 // hide behind the apron strings of the closest turret
                 FightMicroUtilites.moveDir(rc, current.directionTo(closestTurret), true);
@@ -771,9 +933,9 @@ public class FightMicro
                     MapLocation enemy = enemies[i].location;
                     int currentDist = enemy.distanceSquaredTo(current);
 
-                    if (currentDist < bestDist)
+                    if (currentDist < closestTurretDist)
                     {
-                        bestDist = currentDist;
+                        closestTurretDist = currentDist;
                         closestEnemy = enemy;
                     }
                 }
@@ -927,7 +1089,6 @@ public class FightMicro
         }
 
         // if an ally is fighting a zombie advance
-
         if (rc.isCoreReady() && rc.getHealth() > 15)
         {
             boolean allyEngaged = false;
@@ -952,14 +1113,16 @@ public class FightMicro
 
                 for (int i = Unit.dirs.length; --i>=0; )
                 {
-                    if (!rc.canMove(Unit.dirs[i])) continue;
+                    Direction dir = Unit.dirs[i];
+                    if (!rc.canMove(dir)) continue;
+                    if (rc.senseRubble(currentLoc.add(dir)) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
 
-                    MapLocation nxt = currentLoc.add(Unit.dirs[i]);
+                    MapLocation nxt = currentLoc.add(dir);
                     int numbOfEnemies = NumbOfEnemiesInRangeOfLoc(nxt, zombies);
                     if (numbOfEnemies < bestNumb)
                     {
                         bestNumb = numbOfEnemies;
-                        bestDir = Unit.dirs[i];
+                        bestDir = dir;
                     }
                 }
 
@@ -967,6 +1130,28 @@ public class FightMicro
                 {
                     rc.move(bestDir);
                 }
+            }
+        }
+
+        if (!FightMicroUtilites.offensiveEnemies(zombies))
+        {
+            MapLocation closestZombie = null;
+            int closestDist = Integer.MAX_VALUE;
+
+            for (int i = zombies.length; --i>=0; )
+            {
+                int dist = zombies[i].location.distanceSquaredTo(currentLoc);
+
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestZombie = zombies[i].location;
+                }
+            }
+
+            if (closestZombie != null)
+            {
+                FightMicroUtilites.moveDir(rc, currentLoc.directionTo(closestZombie), true);
             }
         }
 

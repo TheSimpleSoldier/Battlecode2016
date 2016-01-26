@@ -4,8 +4,8 @@ import battlecode.common.*;
 import team037.Navigation;
 import team037.Navigator;
 import team037.Unit;
-import team037.Units.BaseUnits.BaseArchon;
 import team037.Utilites.TurretMemory;
+import team037.Utilites.FightMicroUtilites;
 
 public interface PacMan {
     /**
@@ -286,6 +286,67 @@ public interface PacMan {
 
     }
 
+    /**
+     * This method returns true if we see an allied turret in which case we shouldn't deploy counter measures
+     *
+     * @return
+     */
+    default boolean nearTurrets() {
+        if (Unit.allies == null || Unit.allies.length == 0) return false;
+
+        for (int i = Unit.allies.length; --i>=0; ) {
+            if (Unit.allies[i].type == RobotType.TURRET) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * This method checks to see if there are any fast zombies chasing us
+     *
+     * @return
+     */
+    default boolean fastZombie() {
+        for (int i = Unit.zombies.length; --i>=0; ) {
+            if (Unit.zombies[i].type == RobotType.FASTZOMBIE) return true;
+        }
+        return false;
+    }
+
+    /**
+     * This checks if we are blocked in a lot of places
+     *
+     * @return
+     * @throws GameActionException
+     */
+    default boolean inCorner() throws GameActionException {
+        int offMapCount = 0;
+        for (int i = Unit.dirs.length; --i>=0; ) {
+            if (!Unit.rc.onTheMap(Unit.currentLocation.add(Unit.dirs[i]))) {
+                offMapCount+= 2;
+            } else if (Unit.rc.senseRubble(Unit.currentLocation.add(Unit.dirs[i])) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                offMapCount++;
+            }
+        }
+
+        if (offMapCount > 6) return true;
+        return false;
+    }
+
+    /**
+     * This method determines if we should spawn counter measures or not
+     *
+     * @return
+     */
+    default boolean spawnCounterMeasure() throws GameActionException {
+        if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
+        if (inCorner()) return true;
+        if (nearTurrets()) return false;
+        if (!fastZombie()) return false;
+        if (Unit.zombies.length > 9) return false;
+        return true;
+    }
+
     default boolean runAway(double[][] weights)  {
         if (!Navigation.lastScan.equals(Unit.currentLocation)) {
             try {
@@ -295,15 +356,14 @@ public interface PacMan {
                     PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
                 }
                 Navigation.lastScan = Unit.currentLocation;
+
+                if (Unit.type.equals(RobotType.ARCHON) && spawnCounterMeasure()) {
+                    return runAwayWithCountermeasures(weights);
+                }
+
             } catch (Exception e) {e.printStackTrace();}
         }
 
-//        if (Unit.us.equals(Team.A) && Unit.zombies.length < 5 && Unit.enemies.length < 5) {
-//            return runAwayWithCountermeasures(weights);
-//        }
-        if (Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
-            return runAwayWithCountermeasures(weights);
-        }
         Navigator navigator = Unit.navigator;
 
         Direction direction = getRunAwayDirection(weights);
@@ -335,12 +395,14 @@ public interface PacMan {
                     PacManUtils.rubble = Navigation.map.scanImmediateVicinity(Unit.currentLocation);
                 }
                 Navigation.lastScan = Unit.currentLocation;
+
+                if (spawnGuards && Unit.type.equals(RobotType.ARCHON) && spawnCounterMeasure()) {
+                    return runAwayWithCountermeasures(weights);
+                }
+
             } catch (Exception e) {e.printStackTrace();}
         }
 
-        if (spawnGuards && Unit.type.equals(RobotType.ARCHON) && Unit.zombies.length < 6 && Unit.enemies.length < 5) {
-            return runAwayWithCountermeasures(weights);
-        }
         Navigator navigator = Unit.navigator;
 
         Direction direction = getRunAwayDirection(weights);

@@ -1,6 +1,8 @@
 package team037.DataStructures;
 
 import battlecode.common.*;
+import team037.Utilites.MapUtils;
+import team037.Utilites.RubbleUtilities;
 
 public class SortedParts
 {
@@ -188,6 +190,7 @@ public class SortedParts
         if (m == null) {
             return -1;
         }
+
         int index = m.hashCode();
 
         index = Math.abs(index);
@@ -277,7 +280,24 @@ public class SortedParts
 
         for (int i = parts.length; --i>=0; )
         {
-            addParts(parts[i], (int)rc.senseParts(parts[i]), false);
+            double rubble = rc.senseRubble(parts[i]);
+            int partVal = (int) rc.senseParts(parts[i]);
+
+            if (rubble > GameConstants.RUBBLE_OBSTRUCTION_THRESH)
+            {
+                int turns = RubbleUtilities.calculateClearActionsToPassableButSlow(rubble);
+                if (turns > 0)
+                {
+                    partVal /= turns;
+                    if (partVal <= 0) partVal = 1;
+                }
+
+                addParts(parts[i], partVal, false);
+            }
+            else
+            {
+                addParts(parts[i], partVal, false);
+            }
         }
 
         RobotInfo[] neutralBots = rc.senseNearbyRobots(sensorRadiusSquared, Team.NEUTRAL);
@@ -293,5 +313,23 @@ public class SortedParts
                 addParts(neutralBots[i].location, neutralBots[i].type.partCost, true);
             }
         }
+    }
+
+    /**
+     * get Neutral Archon spot
+     *
+     * @return
+     */
+    public MapLocation getNeutralArchon()
+    {
+        for (int i = locs.length; --i>=0; )
+        {
+            if (score[i] > 99999)
+            {
+                return locs[i];
+            }
+        }
+
+        return null;
     }
 }
