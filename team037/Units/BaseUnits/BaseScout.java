@@ -62,24 +62,8 @@ public class BaseScout extends Unit
         msgArchons();
         msgTurrets();
         msgParts();
-        msgEnemyArchons();
         msgDens();
         msgRubble();
-    }
-
-    public void msgEnemyArchons() throws GameActionException
-    {
-        for (int i = enemies.length; --i>=0; )
-        {
-            if (msgsSent >= 20) break;
-
-            if (enemies[i].type == RobotType.ARCHON)
-            {
-                Communication communication = new BotInfoCommunication();
-                communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.ENEMY), 0, 0, 0, enemies[i].location.x, enemies[i].location.y});
-                communicator.sendCommunication(2500, communication);
-            }
-        }
     }
 
     public void msgArchons() throws GameActionException
@@ -95,7 +79,7 @@ public class BaseScout extends Unit
                 communication.type = RobotType.ARCHON;
                 communication.x = enemies[k].location.x;
                 communication.y = enemies[k].location.y;
-                communicator.sendCommunication(ScoutMapKnowledge.getRange(), communication);
+                communicator.sendCommunication(2500, communication);
                 msgsSent++;
             }
         }
