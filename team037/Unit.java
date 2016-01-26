@@ -473,11 +473,11 @@ public abstract class Unit
         {
             case CHANGEMISSION:
                 MissionCommunication comm = (MissionCommunication) communication;
-                rc.setIndicatorString(0, "next bot is " + comm.newBType);
+                rc.setIndicatorString(0, "next bot is " + comm.newBType + " round: " + rc.getRoundNum());
                 if(comm.id == rc.getID())
                 {
                     nextBot = comm.newBType;
-                    rc.setIndicatorString(0, "changing mission to " + nextBot);
+                    rc.setIndicatorString(0, "changing mission to " + nextBot  + " round: " + rc.getRoundNum());
                     if(nextBot == Bots.RUSHGUARD || nextBot == Bots.RUSHSCOUT ||
                        nextBot == Bots.RUSHINGSOLDIER || nextBot == Bots.SUPERRUSHTURRET ||
                        nextBot == Bots.SUPERRUSHVIPER)

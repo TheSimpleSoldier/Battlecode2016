@@ -25,6 +25,7 @@ public class ScoutBombScout extends BaseScout
     private static int closestAlliedArchon;
     private static MapLocation closestAlliedArchonLoc;
     private static RobotInfo closestAlliedArchonInfo;
+    private static int numberAlliedScouts;
 
     private static int closestZombie;
     private static MapLocation closestZombieLoc;
@@ -213,14 +214,17 @@ public class ScoutBombScout extends BaseScout
         // closestAlliedArchon
         closestAlliedArchon = Integer.MAX_VALUE;
         closestAlliedArchonLoc = null;
+        numberAlliedScouts = 0;
         for (int i = allies.length; --i>=0;) {
-            if (allies[i].type.equals(RobotType.SCOUT)) {
+            if (allies[i].type.equals(RobotType.ARCHON)) {
                 int distance =  allies[i].location.distanceSquaredTo(currentLocation);
                 if (distance < closestAlliedArchon) {
                     closestAlliedArchon = distance;
                     closestAlliedArchonLoc = allies[i].location;
                     closestAlliedArchonInfo = allies[i];
                 }
+            } else if (allies[i].type.equals(RobotType.SCOUT)) {
+                numberAlliedScouts += 1;
             }
         }
     }
@@ -300,10 +304,13 @@ public class ScoutBombScout extends BaseScout
     */
     private boolean surroundEnemyArchon() throws GameActionException {
         // preconditions
-        if (!onlyEnemyIsArchon) {
+        if (!onlyEnemyIsArchon || numberAlliedScouts < 5) {
             return false;
         }
 
+        if (closestEnemyArchonInfo == null) {
+            return false;
+        }
         boolean moved =  MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
         if (currentLocation.isAdjacentTo(closestEnemyArchonInfo.location)) {
             // try and make the archon more confused
