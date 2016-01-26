@@ -1,9 +1,12 @@
 package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
+import team037.Enums.CommunicationType;
 import team037.Enums.Strategies;
 import team037.FlyingSlugNavigator;
 import team037.FlyingWallHuggerNavigator;
+import team037.Messages.BotInfoCommunication;
+import team037.Messages.Communication;
 import team037.RobotPlayer;
 import team037.ScoutMapKnowledge;
 import team037.Units.BaseUnits.BaseScout;
@@ -326,7 +329,10 @@ public class ScoutBombScout extends BaseScout
             for (int i = 5; --i > 0;) {
                 rc.broadcastSignal(2);
             }
-            for (int i = 20; --i > 0;) {
+            Communication communication = new BotInfoCommunication();
+            communication.setValues(new int[] {CommunicationType.toInt(CommunicationType.ENEMY), 0, 0, 0, closestEnemyArchonInfo.location.x, closestEnemyArchonInfo.location.y});
+            communicator.sendCommunication(2500, communication);
+            for (int i = 19; --i > 0;) {
                 rc.broadcastMessageSignal(2, 2, 2);
             }
         }

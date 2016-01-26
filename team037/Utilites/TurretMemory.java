@@ -8,11 +8,10 @@ public class TurretMemory {
 
     public static final MapLocationBuffer mapLocationBuffer = new MapLocationBuffer(10);
     public static final int RADIUS = RobotType.TURRET.attackRadiusSquared;
-    public static MapLocation recentTurret = null;
 
     public static void addTurretLocation(MapLocation location) {
-        mapLocationBuffer.addToBuffer(location);
-        recentTurret = location;
+        if (!mapLocationBuffer.contains(location))
+            mapLocationBuffer.addToBuffer(location);
     }
 
     public static boolean outOfTurretRange(MapLocation location) {

@@ -49,4 +49,12 @@ public class MapLocationBuffer {
 
     // Return the size of the array
     public int size() { return size; }
+
+    // Check to see if this array contains a location
+    public boolean contains(MapLocation location) {
+        for (int i = buffer.length; --i >= 0;) {
+            if (buffer[i] != null && buffer[i].equals(location)) return true;
+        }
+        return false;
+    }
 }
