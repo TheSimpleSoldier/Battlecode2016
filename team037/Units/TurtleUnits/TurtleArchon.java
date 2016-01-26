@@ -65,6 +65,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
         else
         {
+            System.out.println("we are staying home");
             stayHome = true;
         }
 
@@ -492,10 +493,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorString(2, "runAwayFrom enemies" + round);
         lastRoundRunAway = round;
 
-        if (!stayHome && zombies.length > 10)
-        {
-            return runAway(null, true, true);
-        }
+//        if (!stayHome && zombies.length > 10)
+//        {
+//            return runAway(null, true, true);
+//        }
 
         return runAway(null);
     }
@@ -509,10 +510,10 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorString(2, "runAwayFrom zombies" + round);
         lastRoundRunAway = round;
 
-        if (!stayHome && zombies.length > 10)
-        {
-            return runAway(null, true, true);
-        }
+//        if (!stayHome && zombies.length > 10)
+//        {
+//            return runAway(null, true, true);
+//        }
 
         return runAway(null);
     }
@@ -557,7 +558,14 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public boolean carryOutAbility() throws GameActionException
     {
         // preconditions
-        if ((FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies)) && ((enemies.length + zombies.length) > allies.length)) return false;
+        if (stayHome)
+        {
+            return buildNextUnit();
+        }
+
+        boolean offensiveEnemies = (FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies));
+        if (offensiveEnemies && ((enemies.length + zombies.length) > allies.length)) return false;
+        if (offensiveEnemies && allies.length == 0) return false;
         if (currentLocation.distanceSquaredTo(turtlePoint) >= 100 && rc.getTeamParts() < 500) return false;
         if (round - lastRoundRunAway < 25) return false;
 
@@ -607,7 +615,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 e.printStackTrace();
             }
 
-            if (!sortedParts.contains(navigator.getTarget())) {
+            if ((!stayHome || round > 50) && !sortedParts.contains(navigator.getTarget())) {
                 MapLocation parts = getNextPartLocationInSight();
 
                 if (parts != null) {
@@ -638,37 +646,34 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public Bots changeBuildOrder(Bots nextBot)
     {
-        if (round > 2700) {
-            return Bots.SCOUTBOMBVIPER;
+        int round = rc.getRoundNum();
+
+        if (round > 2700)
+        {
+            nextType = RobotType.VIPER;
+            return Bots.RUSHINGVIPER;
         }
 
-        int round = rc.getRoundNum();
-        if (scavenging && zombies.length > 0)
+        if (scavenging && zombies.length > 0 && allies.length <= 3)
         {
             nextType = RobotType.GUARD;
             return Bots.TURTLEGUARD;
         }
-        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30)
+        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30 && seeScout() < 5)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
-        else if (scavenging && rc.getTeamParts() > 200)
+        else if (scavenging && rc.getTeamParts() > 300 && zombieTracker.getZombieStrength() < 5)
         {
-            if (currentLocation.distanceSquaredTo(enemyArchonCenterOfMass) < currentLocation.distanceSquaredTo(alliedArchonCenterOfMass))
-            {
-                nextType = RobotType.VIPER;
-                return Bots.RUSHINGVIPER;
-            }
-
-            nextType = RobotType.SOLDIER;
-            return Bots.TURTLESOLDIER;
+            nextType = RobotType.VIPER;
+            return Bots.RUSHINGVIPER;
         }
 
 
-        if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
+        if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 50)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 5) {
+            if (zombieTracker.getNextZombieRoundStrength() < 5 || seeScout() >= 5) {
 
             }
             else if (zombieTracker.getNextZombieRoundStrength() < 10 )
@@ -692,22 +697,25 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        if (rc.getTeamParts() > 300)
+        if (rc.getTeamParts() > 300 && round > 100)
         {
+            nextType = RobotType.TURRET;
             return Bots.TURTLETURRET;
         }
 
         // late game if we aren't under attack spawn a lot of scout bombs
-        if (round > 2000 && lastUnderAttack < 1500) {
+        if (round > 2500 && lastUnderAttack < 2000) {
+            nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
 
         // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
         if (round > 2500 && lastUnderAttack < 2500) {
-            return Bots.SCOUTBOMBVIPER;
+            nextType = RobotType.VIPER;
+            return Bots.RUSHINGVIPER;
         }
 
-        if (round > 100)
+        if (round > 100 && currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
         {
             int soldierCount = 0;
             int guardCount = 0;
@@ -729,7 +737,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (turretCount < 3)
+            // don't want to spawn massive #'s of units instead of turrets
+            if (turretCount < 3 && rc.getRobotCount() < 30)
             {
                 if (soldierCount < 3)
                 {
@@ -742,17 +751,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
             else
             {
-                if (soldierCount < 2)
+                if (soldierCount < 1)
                 {
                     return Bots.TURTLESOLDIER;
                 }
-                else if (guardCount < 2)
+                else if (guardCount < 1)
                 {
                     return Bots.TURTLEGUARD;
                 }
             }
         }
-
 
         return nextBot;
     }

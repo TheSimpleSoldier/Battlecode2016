@@ -186,6 +186,7 @@ public class TurtleScout extends BaseScout
         msgTurrets();
         msgParts();
         msgDens();
+        msgArchons();
     }
 
     @Override
