@@ -2,234 +2,187 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.RobotTypeTracker;
-import team037.Messages.BotInfoCommunication;
+import team037.FightMicro;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
-import team037.Utilites.FightMicroUtilites;
-import team037.Unit;
+import team037.Utilites.MoveUtils;
+import team037.Utilites.ZombieTracker;
 
 public class TurtleGuard extends BaseGaurd
 {
-    private static int turnsArrivedLoc = -1;
-    private static boolean arrived = false;
-    private boolean chasingEnemies = false;
-    private boolean healing = false;
-    private boolean updatedTurtleSpot = false;
-    private int[] enemySightings = new int[8];
     public static RobotTypeTracker robotTypeTracker;
-    private static int lastArchonUpdateRound;
+    public static ZombieTracker zombieTracker;
+    private static int nearestEnemyArchon;
+    private static RobotInfo nearestEnemyArchonInfo;
+    private static int nearestCombatEnemy;
+    private static RobotInfo nearestCombatEnemyInfo;
+    private static boolean nonScoutEnemies;
+
+    private static int nearestMeleeZombie;
+    private static RobotInfo nearestMeleeZombieInfo;
+    private static int nearestBigZombie;
+    private static RobotInfo nearestBigZombieInfo;
+    private static int nearestRangedZombie;
+    private static RobotInfo nearestRangedZombieInfo;
+    private static int nearestDen;
+    private static RobotInfo nearestDenInfo;
+    private static boolean justDen;
+
+
+    private static int nearestArchon;
+    private static RobotInfo nearestArchonInfo;
+    private static int nearestScout;
+    private static RobotInfo nearestScoutInfo;
+    private static int nearestTurret;
+    private static RobotInfo nearestTurretInfo;
+
+
+    private static boolean coreReady;
+    private static boolean weaponReady;
 
     public TurtleGuard(RobotController rc)
     {
         super(rc);
         turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
         robotTypeTracker = new RobotTypeTracker(RobotType.TURRET, rc);
+        zombieTracker = new ZombieTracker(rc);
     }
 
-    @Override
-    public boolean updateTarget() throws GameActionException
+    public boolean fight() throws GameActionException
     {
-        MapLocation target = navigator.getTarget();
-        if (zombies.length > 0 || enemies.length > 0) return true;
-        if (target == null) return true;
-        if ((currentLocation.equals(target) || currentLocation.isAdjacentTo(target)) && (rc.getRoundNum() - turnsArrivedLoc) > 2) return true;
-        if (rc.canSense(target) && !rc.onTheMap(target)) return true;
-        if (rc.getHealth() <= 25) return true;
-
-        return false;
-    }
-
-    @Override
-    public boolean carryOutAbility() throws GameActionException
-    {
-        if (!rc.isCoreReady()) return false;
-        if (turnsArrivedLoc == -1) return false;
-        if (zombies.length > 0 || enemies.length > 0) return false;
-
-        for (int i = dirs.length; --i>=0; )
-        {
-            MapLocation next = currentLocation.add(dirs[i]);
-            if (rc.canSense(next) && rc.senseRubble(next) > 0)
-            {
-                rc.clearRubble(dirs[i]);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public MapLocation getNextSpot() throws GameActionException
-    {
-        if (healing || rc.getHealth() <= 25)
-        {
-            healing = true;
-            return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
-        }
-
-        if (zombies.length > 0)
-        {
-            chasingEnemies = true;
-            return MapUtils.closestUnit(zombies, currentLocation);
-        }
-
-        if (enemies.length > 0)
-        {
-            chasingEnemies = true;
-            return MapUtils.closestUnit(enemies, currentLocation);
-        }
-        
-        if (turnsArrivedLoc == -1 || chasingEnemies)
-        {
-            chasingEnemies = false;
-            arrived = false;
-            return turtlePoint.add(currentLocation.directionTo(turtlePoint), 3);
-        }
-
-        MapLocation defensePoint = getDefensePoint();
-
-        if (defensePoint != null)
-        {
-            System.out.println("using defense point");
-            rc.setIndicatorString(2, "Defense point x: " + defensePoint.x + " y: " + defensePoint.y + " round: " + rc.getRoundNum());
-            return defensePoint;
-        }
-
-        for (int i = dirs.length; --i>=0; )
-        {
-            MapLocation possible = currentLocation.add(dirs[i], 3);
-
-            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
-
-            if (possible.distanceSquaredTo(turtlePoint) <= 49)
-            {
-                arrived = false;
-                return possible;
-            }
-        }
-
-        for (int i = dirs.length; --i>=0; )
-        {
-            MapLocation possible = currentLocation.add(dirs[i], 6);
-
-            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
-
-            if (possible.distanceSquaredTo(turtlePoint) <= 49)
-            {
-                arrived = false;
-                return possible;
-            }
-        }
-
-        for (int i = dirs.length; --i>=0; )
-        {
-            MapLocation possible = currentLocation.add(dirs[i], 10);
-
-            if (rc.canSenseLocation(possible) && !rc.onTheMap(possible)) continue;
-
-            if (possible.distanceSquaredTo(turtlePoint) <= 49)
-            {
-                arrived = false;
-                return possible;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * This method returns the side that we have seen the most enemies on
-     *
-     * @return
-     */
-    private MapLocation getDefensePoint()
-    {
-        int highestCount = 0;
-        Direction direction = null;
-
-        for (int i = enemySightings.length; --i>=0; )
-        {
-            if (enemySightings[i] > highestCount)
-            {
-                highestCount = enemySightings[i];
-                direction = dirs[i];
-            }
-        }
-
-        if (direction == null)
-        {
-            return null;
-        }
-
-        return turtlePoint.add(direction, 3);
+        return fightMicro.turretGuardMicro(enemies, nearByEnemies, allies);
     }
 
     @Override
     public void collectData() throws GameActionException
     {
         super.collectData();
-
-        if (!arrived && (rc.canSense(turtlePoint)))
-        {
-            turnsArrivedLoc = rc.getRoundNum();
-            arrived = true;
-        }
-
-        if (healing && rc.getHealth() > 100)
-        {
-            healing = false;
-        }
-
-        robotTypeTracker.scanForRobots(allies);
+        coreReady = rc.isCoreReady();
+        weaponReady = rc.isWeaponReady();
 
         if (rallyPoint != null)
-        {
-            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
-            rc.setIndicatorString(1, "Going to new rally point x: " + rallyPoint.x + " y: " + rallyPoint.y + " round: " + rc.getRoundNum());
-            if (navigator.getTarget() != null)
-            {
-                rc.setIndicatorString(2, "NAvigation target x: " + navigator.getTarget().x + " y: " + navigator.getTarget().y + " round: " + rc.getRoundNum());
-            }
-            turnsArrivedLoc = -1;
-            turtlePoint = rallyPoint;
-            enemySightings = new int[8];
-        }
+       {
+           rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
 
-        if (turtlePoint != null)
-        {
-            for (int i = zombies.length; --i>=0; )
-            {
-                MapLocation zombie = zombies[i].location;
+           if (!rallyPoint.equals(turtlePoint)) {
+               turtlePoint = rallyPoint;
+           }
 
-                Direction dir = turtlePoint.directionTo(zombie);
+           rallyPoint = null;
+       }
 
-                for (int j = dirs.length; --j >= 0; )
-                {
-                    if (dirs[j].equals(dir))
-                    {
-//                        System.out.println("set zombie to enemySightings: " + enemySightings[j]);
-                        enemySightings[j]++;
+        nearestCombatEnemy = Integer.MAX_VALUE;
+        nearestCombatEnemyInfo = null;
+        nearestCombatEnemy = Integer.MAX_VALUE;
+        nearestCombatEnemyInfo = null;
+        nearestEnemyArchon = Integer.MAX_VALUE;
+        nearestEnemyArchonInfo = null;
+
+        nonScoutEnemies = false;
+        for (int i = enemies.length; --i >= 0; ) {
+            int dist = enemies[i].location.distanceSquaredTo(currentLocation);
+            switch (enemies[i].type) {
+                case SOLDIER:
+                case VIPER:
+                case GUARD:
+                case TTM:
+                case TURRET:
+                    nonScoutEnemies = true;
+                    if (dist < nearestCombatEnemy) {
+                        nearestCombatEnemy = dist;
+                        nearestCombatEnemyInfo = enemies[i];
                     }
-                }
+                    break;
+
+                case ARCHON:
+                    if (dist < nearestEnemyArchon) {
+                        nearestEnemyArchon = dist;
+                        nearestEnemyArchonInfo = enemies[i];
+                    }
+                    nonScoutEnemies = true;
+                    break;
+                case SCOUT:
+                    break;
+
             }
         }
 
-        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies))
-        {
-            for (int i = allies.length; --i>=0; )
-            {
-                // if we see a turret that has just shot then we should go support it
-                if (allies[i].type == RobotType.TURRET && allies[i].weaponDelay > 1)
-                {
-                    MapLocation ally = allies[i].location;
-                    navigator.setTarget(ally.add(currentLocation.directionTo(ally)));
+        nearestBigZombie = Integer.MAX_VALUE;
+        nearestBigZombieInfo = null;
+        nearestMeleeZombie = Integer.MAX_VALUE;
+        nearestMeleeZombieInfo = null;
+        nearestRangedZombie = Integer.MAX_VALUE;
+        nearestRangedZombieInfo = null;
+        nearestDen = Integer.MAX_VALUE;
+        nearestDenInfo = null;
+        justDen = true;
+
+        for (int i = zombies.length; --i >= 0;) {
+            int dist = zombies[i].location.distanceSquaredTo(currentLocation);
+            switch (zombies[i].type) {
+                case FASTZOMBIE:
+                case STANDARDZOMBIE:
+                    justDen = false;
+                    if (dist < nearestMeleeZombie) {
+                        nearestMeleeZombie = dist;
+                        nearestMeleeZombieInfo = zombies[i];
+                    }
                     break;
-                }
+                case BIGZOMBIE:
+                    justDen = false;
+                    if (dist < nearestBigZombie) {
+                        nearestBigZombie = dist;
+                        nearestBigZombieInfo = zombies[i];
+                    }
+                    break;
+                case RANGEDZOMBIE:
+                    justDen = false;
+                    if (dist < nearestRangedZombie) {
+                        nearestRangedZombie = dist;
+                        nearestRangedZombieInfo = zombies[i];
+                    }
+                case ZOMBIEDEN:
+                    if (dist < nearestDen) {
+                        nearestDen = dist;
+                        nearestDenInfo = zombies[i];
+                    }
             }
         }
+
+        nearestArchon = Integer.MAX_VALUE;
+        nearestArchonInfo = null;
+        nearestTurret = Integer.MAX_VALUE;
+        nearestTurretInfo = null;
+        nearestScout = Integer.MAX_VALUE;
+        nearestScoutInfo = null;
+
+        for (int i = allies.length; --i >= 0;) {
+            int dist = allies[i].location.distanceSquaredTo(currentLocation);
+            switch(allies[i].type) {
+                case TURRET:
+                case TTM:
+                    if (dist < nearestTurret) {
+                        nearestTurret = dist;
+                        nearestTurretInfo = allies[i];
+                    }
+                break;
+                case SCOUT:
+                    if (dist < nearestScout) {
+                        nearestScout = dist;
+                        nearestScoutInfo = allies[i];
+                    }
+                case ARCHON:
+                    if (dist < nearestArchon) {
+                        nearestArchon = dist;
+                        nearestArchonInfo = allies[i];
+                    }
+            }
+        }
+
     }
 
     // additional methods with default behavior
+    @Override
     public void handleMessages() throws GameActionException
     {
         communications = communicator.processCommunications();
@@ -279,14 +232,328 @@ public class TurtleGuard extends BaseGaurd
                         interpretDistressFromArchon(communications[k]);
                     }
                     break;
-
-                case ENEMY:
-                    BotInfoCommunication botCom = (BotInfoCommunication) communications[k];
-                    values = botCom.getValues();
-                    enemyArchon = new MapLocation(values[4], values[5]);
-                    lastArchonUpdateRound = rc.getRoundNum();
-                    break;
             }
         }
     }
+
+    private static final String ENEMIES_IN_OPEN = "enemies in the open";
+    private static final String ZOMBIES_IN_OPEN = "zombies in the open";
+    private static final String MOVE_TO_TURTLE_POINT = "move to turtle location";
+    private static final String ZOMBIES_NEAR_RALLY_POINT = "zombies near rally point";
+    private static final String ENEMIES_NEAR_RALLY_POINT = "enemies near rally point";
+    private static final String MOVE_TO_COMBAT = "move to combat";
+    private static final String PATROL_TURTLE_POINT = "patrol turtle point";
+
+    @Override
+    public boolean act() throws GameActionException {
+        String lastAction = "NONE";
+        if (turtlePoint != null) {
+            rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
+        }
+        if (nearRallyPoint()) {
+            if (zombiesNearTurtlePoint()) {
+                lastAction = ZOMBIES_NEAR_RALLY_POINT;
+            } else if (enemiesNearTurtlePoint()) {
+                lastAction = ENEMIES_NEAR_RALLY_POINT;
+            } else if (moveToCombat()) {
+                lastAction = MOVE_TO_COMBAT;
+            } else if (patrolTurtlePoint()) {
+                lastAction = PATROL_TURTLE_POINT;
+            }
+        } else {
+            if (enemiesInOpen()) {
+                lastAction = ENEMIES_IN_OPEN;
+            } else if (zombiesInOpen()) {
+                lastAction = ZOMBIES_IN_OPEN;
+            } else if (moveToTurtlePoint()) {
+                lastAction = MOVE_TO_TURTLE_POINT;
+            }
+        }
+        if (lastAction.equals("NONE") && coreReady) {
+            lastAction = "RANDO";
+            MoveUtils.tryMoveAnywhere(MapUtils.randomDirection(id, round), true);
+        }
+        rc.setIndicatorString(0, lastAction + " " + round);
+        return !lastAction.equals("NONE");
+
+    }
+
+
+
+    private static boolean reverse = false;
+    /*
+    PATROL_TURTLE POINT
+     */
+    private boolean patrolTurtlePoint() throws GameActionException {
+        // prereq
+        if (!coreReady) {
+            return false;
+        }
+        if (nearestTurret == Integer.MAX_VALUE) {
+            Direction toMove = currentLocation.directionTo(turtlePoint);
+            return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+        }
+        if (nearestTurret > 8)  {
+            if (reverse) {
+                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateRight(), true);
+            } else {
+                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateLeft(), true);
+            }
+        }
+
+        if (nearestArchon <=2) {
+            return MoveUtils.tryMoveForwardOrSideways(nearestArchonInfo.location.directionTo(currentLocation), true);
+        }
+
+        Direction toMove = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft().rotateLeft();
+        if (reverse) {
+            toMove = currentLocation.directionTo(turtlePoint).rotateRight().rotateRight().rotateRight();
+        }
+
+        if (!rc.onTheMap(currentLocation.add(toMove, 3))) {
+            reverse = !reverse;
+            toMove = toMove.opposite().rotateRight();
+        }
+
+        return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+    }
+
+    /*
+    MOVE TO COMBAT
+     */
+    private boolean moveToCombat() {
+        return false;
+    }
+
+    /*
+    ENEMIES NEAR TURTLE POINT
+     */
+    private boolean enemiesNearTurtlePoint() throws GameActionException {
+        // prereqs
+        if (nearestCombatEnemy == Integer.MAX_VALUE) {
+            return false;
+        }
+        if (weaponReady && nearestCombatEnemy <= type.attackRadiusSquared) {
+            rc.attackLocation(nearestCombatEnemyInfo.location);
+            return true;
+        }
+        if (!coreReady) {
+            return false;
+        }
+        if (nearestTurret > 8 && nearestTurret < Integer.MAX_VALUE) {
+            MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), false);
+            return true;
+        } else if (nearestTurret <= 8) {
+            Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
+            if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
+                if (rc.canMove(forward)) {
+                    rc.move(forward);
+                    return true;
+                }
+            }
+
+            Direction back = forward.opposite();
+            if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
+                if (rc.canMove(back)) {
+                    rc.move(back);
+                    return true;
+                }
+            }
+            // hold;
+            return true;
+        } else if (nearestTurret < 2 * nearestCombatEnemy) {
+            Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);
+            MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+        }
+
+        return true;
+    }
+
+    /*
+    ZOMBIES NEAR TURTLE POINT
+     */
+    private boolean zombiesNearTurtlePoint() throws GameActionException {
+        // prereqs
+        if (zombies.length == 0) {
+            return false;
+        }
+
+        if (justDen) {
+            return zombiesInOpen();
+        }
+        if (weaponReady) {
+            if (nearestBigZombie == 1) {
+                rc.attackLocation(nearestBigZombieInfo.location);
+                rc.setIndicatorString(1, "attacking");
+                return true;
+            }
+            if (nearestMeleeZombie == 1) {
+                rc.attackLocation(nearestMeleeZombieInfo.location);
+                rc.setIndicatorString(1, "attacking");
+                return true;
+            }
+            if (nearestRangedZombie == 1) {
+                rc.attackLocation(nearestRangedZombieInfo.location);
+                rc.setIndicatorString(1, "attacking");
+                return true;
+            }
+        }
+        if (coreReady) {
+            if (nearestBigZombie == 1 || nearestMeleeZombie == 1 || nearestRangedZombie == 1) {
+
+            }
+            else if (nearestBigZombie == 2) {
+                rc.setIndicatorString(1, "moving to 1");
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
+            }
+            else if (nearestMeleeZombie == 2) {
+                rc.setIndicatorString(1, "moving to 1");
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
+            }
+            else if (nearestRangedZombie == 2) {
+                rc.setIndicatorString(1, "moving to 1");
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestRangedZombieInfo.location), false);
+            }
+
+            if (nearestTurret <= 9 || nearestTurret == Integer.MAX_VALUE) {
+                if (nearestBigZombie < Integer.MAX_VALUE) {
+                    if (rc.senseNearbyRobots(nearestBigZombieInfo.location, 8, us).length > 0) {
+                        rc.setIndicatorString(1, "moving in");
+                        return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
+                    }
+                }
+                if (nearestMeleeZombie < Integer.MAX_VALUE) {
+                    if (rc.senseNearbyRobots(nearestMeleeZombieInfo.location, 8, us).length > 0) {
+                        rc.setIndicatorString(1, "moving in");
+                        return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
+                    }
+                }
+            }
+
+
+            if (nearestTurret <= 2 && nearestTurret < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(nearestTurretInfo.location.directionTo(currentLocation), false);
+            } else if (nearestScout <= 2 && nearestTurret < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(nearestScoutInfo.location.directionTo(currentLocation), false);
+            }
+        }
+
+        return patrolTurtlePoint();
+    }
+
+    /*
+    MOVE_TO_TURTLE_POINT
+     */
+    private boolean moveToTurtlePoint() throws GameActionException {
+        // prereqs
+        if (!coreReady) {
+            return false;
+        }
+        if (turtlePoint != null && !currentLocation.isAdjacentTo(turtlePoint))  {
+            return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(turtlePoint), true);
+        }
+        return false;
+    }
+
+    /*
+    ZOMBIES IN OPEN
+      Fight the zombies in the wild!
+     */
+    private boolean zombiesInOpen() throws GameActionException {
+        // precondition
+        if (zombies.length == 0) {
+            return false;
+        }
+
+        if (justDen) {
+            if (currentLocation.isAdjacentTo(nearestDenInfo.location)) {
+                if (zombieTracker.getNextZombieRound() - round <= 2 && coreReady) {
+                    if (MoveUtils.tryMoveForwardOrSideways(nearestDenInfo.location.directionTo(currentLocation), false)) {
+                        rc.setIndicatorString(1, "Moving away because spawn is near!");
+                        return true;
+                    }
+                }
+                if (weaponReady) {
+                    rc.attackLocation(nearestDenInfo.location);
+                    return true;
+                }
+            }
+            if (coreReady) {
+                if (currentLocation.distanceSquaredTo(nearestDenInfo.location) > 8 && MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestDenInfo.location), true)) {
+                    return true;
+                }
+            }
+        }
+
+        if (rc.getHealth() < 10) {
+            return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
+        }
+
+        if (coreReady) {
+            if (nearestBigZombie < Integer.MAX_VALUE) {
+
+                if (coreReady) {
+                    if (currentLocation.distanceSquaredTo(nearestBigZombieInfo.location) == 1) {
+                        if (weaponReady) {
+                            if (currentLocation.isAdjacentTo(nearestBigZombieInfo.location)) {
+                                rc.attackLocation(nearestBigZombieInfo.location);
+                                return true;
+                            }
+                        }
+                        return true;
+                    } else {
+                        return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestBigZombieInfo.location), true);
+                    }
+
+                }
+
+            }
+
+            if (nearestMeleeZombie < Integer.MAX_VALUE) {
+
+                if (coreReady) {
+                    if (currentLocation.distanceSquaredTo(nearestMeleeZombieInfo.location) == 1) {
+                        if (weaponReady) {
+                            if (currentLocation.isAdjacentTo(nearestMeleeZombieInfo.location)) {
+                                rc.attackLocation(nearestMeleeZombieInfo.location);
+                                return true;
+                            }
+                        }
+                        return true;
+                    } else {
+                        return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestMeleeZombieInfo.location), true);
+                    }
+                }
+            }
+
+        }
+
+        return fightMicro.guardZombieMicro(zombies, nearByZombies, allies);
+    }
+
+
+    /*
+    NEAR RALLY POINT
+       Are we close to the rally point?
+     */
+    private boolean nearRallyPoint() {
+        if (turtlePoint == null) {
+            return false;
+        }
+        return currentLocation.distanceSquaredTo(turtlePoint) < 100;
+    }
+
+    /*
+    ENEMIES_IN_OPEN
+       What should we do if we see an enemy in the open?
+     */
+    private boolean enemiesInOpen() throws GameActionException {
+        // precondition
+        if (!nonScoutEnemies) {
+            return false;
+        }
+
+        return fightMicro.basicGuardMicro(enemies, nearByEnemies, allies);
+    }
+
 }

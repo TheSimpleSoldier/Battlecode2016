@@ -23,11 +23,14 @@ public class ScoutBombScout extends BaseScout
     private static int closestEnemyViper;
     private static MapLocation closestEnemyViperLoc;
     private static RobotInfo closestEnemyViperInfo;
+    private static int closestEnemyTurret;
+    private static RobotInfo closestEnemyTurretInfo;
     private static boolean onlyEnemyIsArchon;
 
     private static int closestAlliedArchon;
     private static MapLocation closestAlliedArchonLoc;
     private static RobotInfo closestAlliedArchonInfo;
+    private static int numberAlliedScouts;
 
     private static int closestZombie;
     private static MapLocation closestZombieLoc;
@@ -153,6 +156,8 @@ public class ScoutBombScout extends BaseScout
         closestEnemyArchonInfo = null;
         closestEnemyViper = Integer.MAX_VALUE;
         closestEnemyViperLoc = null;
+        closestEnemyTurret = Integer.MAX_VALUE;
+        closestEnemyTurretInfo = null;
         onlyEnemyIsArchon = true;
         for (int i = enemies.length; --i>=0;) {
             int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
@@ -193,6 +198,10 @@ public class ScoutBombScout extends BaseScout
                 case TURRET:
                     onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
+                    if (distance < closestEnemyTurret) {
+                        closestEnemyTurret = distance;
+                        closestEnemyTurretInfo = enemies[i];
+                    }
                     if (distance <= 30 + RobotType.TURRET.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.TURRET.attackPower;
                     }
@@ -216,14 +225,17 @@ public class ScoutBombScout extends BaseScout
         // closestAlliedArchon
         closestAlliedArchon = Integer.MAX_VALUE;
         closestAlliedArchonLoc = null;
+        numberAlliedScouts = 0;
         for (int i = allies.length; --i>=0;) {
-            if (allies[i].type.equals(RobotType.SCOUT)) {
+            if (allies[i].type.equals(RobotType.ARCHON)) {
                 int distance =  allies[i].location.distanceSquaredTo(currentLocation);
                 if (distance < closestAlliedArchon) {
                     closestAlliedArchon = distance;
                     closestAlliedArchonLoc = allies[i].location;
                     closestAlliedArchonInfo = allies[i];
                 }
+            } else if (allies[i].type.equals(RobotType.SCOUT)) {
+                numberAlliedScouts += 1;
             }
         }
     }
@@ -268,6 +280,8 @@ public class ScoutBombScout extends BaseScout
         } else if (herdAwayFromArchon()) {
             // if you are near an allied archon and see zombies, help them!
             lastAction = HERD_AWAY_FROM_ARCHON;
+        } else if (infectEnemyArchon()) {
+
         } else if (suicideOnEnemyViper()) {
             lastAction = CHASE_ENEMY_VIPER;
         } else if (surroundEnemyArchon()) {
@@ -295,6 +309,19 @@ public class ScoutBombScout extends BaseScout
         return true;
     }
 
+    private boolean infectEnemyArchon() throws GameActionException {
+        if (rc.getInfectedTurns()  == 0 || closestEnemyArchonInfo == null) {
+            return false;
+        }
+        if (currentLocation.isAdjacentTo(closestEnemyArchonInfo.location) || rc.getInfectedTurns() <= 2) {
+            rc.disintegrate();
+        }
+        if (rc.getInfectedTurns() > 2) {
+            return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
+        }
+        return false;
+    }
+
     /*
     ===============================
     SURROUND_ENEMY_ARCHON
@@ -303,7 +330,7 @@ public class ScoutBombScout extends BaseScout
     */
     private boolean surroundEnemyArchon() throws GameActionException {
         // preconditions
-        if (!onlyEnemyIsArchon) {
+        if (!onlyEnemyIsArchon || numberAlliedScouts < 5) {
             return false;
         }
 
@@ -347,6 +374,9 @@ public class ScoutBombScout extends BaseScout
         // wait for it's spawn cooldown
         if (closestEnemyViperInfo.coreDelay > 4 || closestEnemyViperInfo.weaponDelay > 4) {
             return false;
+        }
+        if (currentLocation.isAdjacentTo(closestEnemyViperLoc) && rc.getInfectedTurns() > 0) {
+            suicideScout();
         }
         // if we're on the other side of the map, or it's lategame and we see a viper, close the distance!
         return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(closestEnemyViperLoc), false);
@@ -933,10 +963,15 @@ public class ScoutBombScout extends BaseScout
 
     private void suicideScout() throws GameActionException {
         int i = 0;
-        while (Clock.getBytecodesLeft() > 200 && i < 20) {
-            rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);
-            i++;
+        try {
+            while (Clock.getBytecodesLeft() > 200 && i < 15) {
+                rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);
+                i++;
+            }
+        } catch (GameActionException e) {
+
         }
+
         rc.disintegrate();
     }
 
