@@ -655,7 +655,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             return Bots.RUSHINGVIPER;
         }
 
-        if (scavenging && zombies.length > 0 && allies.length <= 3)
+        if (scavenging && zombies.length > 0 && allies.length <= 2)
         {
             nextType = RobotType.GUARD;
             return Bots.TURTLEGUARD;
