@@ -204,17 +204,9 @@ public class SuperRushArchon extends Unit
             if(currentLocation.distanceSquaredTo(targetArchon) < 24 && round - lastSeen < 2)
             {
                 targetID = -1;
+                //We are the champions
                 //time to change professions
-                if(rc.getTeamParts() > 200)
-                {
-                    nextBot = Bots.TURTLEARCHON;
-                    RobotPlayer.strategy = Strategies.TURTLE;
-                }
-                else
-                {
-                    nextBot = Bots.SCOUTBOMBARCHON;
-                    RobotPlayer.strategy = Strategies.SCOUT_BOMB;
-                }
+                nextBot = Bots.SCAVENGERARCHON;
             }
         }
 
