@@ -245,6 +245,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
             if ((round - updateRound) < 100)
             {
             }
+            else if (round - lastEnemieSighting < 50)
+            {
+            }
             else if (round < 300)
             {
             }
