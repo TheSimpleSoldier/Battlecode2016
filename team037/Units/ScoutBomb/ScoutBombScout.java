@@ -311,6 +311,7 @@ public class ScoutBombScout extends BaseScout
         if (closestEnemyArchonInfo == null) {
             return false;
         }
+
         boolean moved =  MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
         if (currentLocation.isAdjacentTo(closestEnemyArchonInfo.location)) {
             // try and make the archon more confused
