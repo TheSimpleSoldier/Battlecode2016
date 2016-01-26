@@ -293,11 +293,10 @@ public class BaseArchon extends Unit implements PacMan {
         }
 
         Bots temp = changeBuildOrder(nextBot);
-        if (temp == null) {
-            System.out.println("WHAT?");
-            temp = nextBot;
-        }
 
+//        System.out.println(temp);
+//        System.out.println(Bots.toInt(temp));
+//        System.out.println(Bots.typeFromBot(temp));
         if (!temp.equals(nextBot))
         {
             if (rc.hasBuildRequirements(Bots.typeFromBot(temp)) && rc.isCoreReady())

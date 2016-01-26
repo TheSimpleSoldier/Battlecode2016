@@ -372,7 +372,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
             */
-            if (!underAttack && round % 5 == index)
+            if (!underAttack && round % 100 == index && round % 5 == index)
             {
                 Communication newRallyPoint = new AttackCommunication();
                 newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
