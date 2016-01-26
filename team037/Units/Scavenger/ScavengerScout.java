@@ -3,6 +3,7 @@ package team037.Units.Scavenger;
 import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.ScoutMapKnowledge;
+import team037.Units.PacMan.PacMan;
 import team037.Units.ScoutBomb.ScoutBombScout;
 import team037.Utilites.MapUtils;
 import team037.Utilites.MoveUtils;
@@ -10,7 +11,7 @@ import team037.Utilites.MoveUtils;
 /**
  * Created by davej on 1/20/2016.
  */
-public class ScavengerScout extends ScoutBombScout {
+public class ScavengerScout extends ScoutBombScout implements PacMan {
 
     public static boolean BOMB;
     public static MapLocation mySpot, archonLastLoc, archonCurrentLoc, digTarget;
@@ -129,6 +130,7 @@ public class ScavengerScout extends ScoutBombScout {
             target = digTarget;
         }
 
+
         Direction moveDirection = currentLocation.directionTo(target);
 //        rc.setIndicatorString(2,"Round: " + round + ", Direction: " + moveDirection.toString() + ", mySpot: (" + mySpot.x + "," + mySpot.y + ")");
         if (moveDirection.equals(Direction.NONE) || moveDirection.equals(Direction.OMNI)) {
@@ -223,6 +225,23 @@ public class ScavengerScout extends ScoutBombScout {
                     if (myDistance > 0 && myDistance < 25) {
                         target = zombie;
                         navigator.setTarget(zombie);
+                        BOMB = true;
+                        break;
+                    }
+                }
+            }
+
+            if (enemies != null) {
+                for (int i = enemies.length; --i >= 0; ) {
+
+                    if (!enemies[i].type.equals(RobotType.VIPER)) continue;
+
+                    MapLocation enemy = enemies[i].location;
+                    int myDistance = currentLocation.distanceSquaredTo(enemy);
+
+                    if (myDistance < 25) {
+                        target = enemy;
+                        navigator.setTarget(enemy);
                         BOMB = true;
                         break;
                     }

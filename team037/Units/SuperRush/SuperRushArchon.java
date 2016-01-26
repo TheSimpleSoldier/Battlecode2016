@@ -479,7 +479,7 @@ public class SuperRushArchon extends Unit
                 communication.newBType = Bots.SUPERRUSHVIPER;
                 break;
             case ARCHON:
-                communication.newBType = Bots.SUPERRUSHARCHON;
+                communication.newBType = Bots.TURTLEARCHON;
                 break;
         }
         communication.x = targetArchon.x;

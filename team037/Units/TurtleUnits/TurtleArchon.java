@@ -659,7 +659,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             nextType = RobotType.GUARD;
             return Bots.TURTLEGUARD;
         }
-        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30 && seeScout() < 3)
+        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30 && seeScout() < 5)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
@@ -673,7 +673,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 50)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 5 || seeScout() >= 3) {
+            if (zombieTracker.getNextZombieRoundStrength() < 5 || seeScout() >= 5) {
 
             }
             else if (zombieTracker.getNextZombieRoundStrength() < 10 )
