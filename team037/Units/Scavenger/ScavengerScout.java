@@ -106,7 +106,11 @@ public class ScavengerScout extends ScoutBombScout implements PacMan {
 
         if (maxDir >= 0) {
             try {
-                rc.clearRubble(dirs[maxDir]);
+                if (rc.onTheMap(currentLocation.add(dirs[maxDir])))
+                {
+                    rc.clearRubble(dirs[maxDir]);
+                }
+
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
