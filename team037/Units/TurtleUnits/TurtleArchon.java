@@ -366,6 +366,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
                 rc.setIndicatorDot(turtlePoint, 255, 0, 0);
             }
+
         }
     }
 

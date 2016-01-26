@@ -293,6 +293,7 @@ public enum Bots
                 return RobotType.TURRET;
             case RUSHINGVIPER:
             case BASEVIPER:
+            case SCOUTBOMBVIPER:
             case SUPERRUSHVIPER:
                 return RobotType.VIPER;
         }

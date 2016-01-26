@@ -280,6 +280,8 @@ public class ScoutBombScout extends BaseScout
         } else if (herdAwayFromArchon()) {
             // if you are near an allied archon and see zombies, help them!
             lastAction = HERD_AWAY_FROM_ARCHON;
+        } else if (infectEnemyArchon()) {
+
         } else if (suicideOnEnemyViper()) {
             lastAction = CHASE_ENEMY_VIPER;
         } else if (surroundEnemyArchon()) {
@@ -305,6 +307,19 @@ public class ScoutBombScout extends BaseScout
         rc.setIndicatorString(0, lastAction);
         rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 255, 255);
         return true;
+    }
+
+    private boolean infectEnemyArchon() throws GameActionException {
+        if (rc.getInfectedTurns()  == 0 || closestEnemyArchonInfo == null) {
+            return false;
+        }
+        if (currentLocation.isAdjacentTo(closestEnemyArchonInfo.location) || rc.getInfectedTurns() <= 2) {
+            rc.disintegrate();
+        }
+        if (rc.getInfectedTurns() > 2) {
+            return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(closestEnemyArchonInfo.location), false);
+        }
+        return false;
     }
 
     /*
@@ -359,6 +374,9 @@ public class ScoutBombScout extends BaseScout
         // wait for it's spawn cooldown
         if (closestEnemyViperInfo.coreDelay > 4 || closestEnemyViperInfo.weaponDelay > 4) {
             return false;
+        }
+        if (currentLocation.isAdjacentTo(closestEnemyViperLoc) && rc.getInfectedTurns() > 0) {
+            suicideScout();
         }
         // if we're on the other side of the map, or it's lategame and we see a viper, close the distance!
         return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(closestEnemyViperLoc), false);
