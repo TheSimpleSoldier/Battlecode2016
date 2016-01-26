@@ -109,8 +109,8 @@ public class SuperRushArchon extends Unit
 
         if(zombies.length > 10 && allies.length < 5)
         {
-            nextBot = Bots.SCOUTBOMBARCHON;
-            RobotPlayer.strategy = Strategies.SCOUT_BOMB;
+            nextBot = Bots.TURTLEARCHON;
+            RobotPlayer.strategy = Strategies.TURTLE;
         }
 
         for(int k = enemies.length; --k >= 0;)
@@ -119,8 +119,8 @@ public class SuperRushArchon extends Unit
             {
                 if(allies.length < 1 && enemies.length > 3)
                 {
-                    nextBot = Bots.SCOUTBOMBARCHON;
-                    RobotPlayer.strategy = Strategies.SCOUT_BOMB;
+                    nextBot = Bots.TURTLEARCHON;
+                    RobotPlayer.strategy = Strategies.TURTLE;
                 }
 
                 if(currentLocation.distanceSquaredTo(targetArchon) < 5 && enemies[k].coreDelay < 1)
