@@ -9,14 +9,6 @@ import team037.Utilites.MoveUtils;
 
 public class TurtleSoldier extends BaseSoldier
 {
-
-    public TurtleSoldier(RobotController rc)
-    {
-        super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
-    }
-
-
     private static int nearestEnemyArchon;
     private static RobotInfo nearestEnemyArchonInfo;
     private static int nearestCombatEnemy;
@@ -43,8 +35,15 @@ public class TurtleSoldier extends BaseSoldier
     private static boolean coreReady;
     private static boolean weaponReady;
 
+    public TurtleSoldier(RobotController rc)
+    {
+        super(rc);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+    }
+
+
     @Override
-    public void collectData() throws GameActionException
+    public MapLocation getNextSpot() throws GameActionException
     {
         super.collectData();
 
@@ -170,7 +169,12 @@ public class TurtleSoldier extends BaseSoldier
                     }
             }
         }
+        return null;
+    }
 
+    public boolean fight() throws GameActionException
+    {
+        return fightMicro.soldierMicro(nearByEnemies, nearByAllies, enemies, allies, target);
     }
 
     // additional methods with default behavior

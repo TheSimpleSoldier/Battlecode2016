@@ -4,6 +4,7 @@ import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.NeuralNet.FeedForwardNeuralNet;
 import team037.Utilites.FightMicroUtilites;
+import team037.Utilites.MapUtils;
 import team037.Utilites.PartsUtilities;
 
 public class FightMicro
@@ -487,6 +488,99 @@ public class FightMicro
         return inputs;
     }
 
+    public boolean soldierMicro(RobotInfo[] nearByEnemies, RobotInfo[] nearByAllies, RobotInfo[] enemies, RobotInfo[] allies, MapLocation target) throws GameActionException
+    {
+        if (enemies.length == 0) return false;
+
+        boolean allyTurrets = false;
+        for (int i = allies.length; --i>=0; )
+        {
+            if (RobotType.TURRET == allies[i].type)
+            {
+                allyTurrets = true;
+            }
+        }
+
+        if (!allyTurrets)
+        {
+            return basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
+        }
+
+        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        {
+            RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+
+            if (rc.canAttackLocation(weakest.location))
+            {
+                rc.attackLocation(weakest.location);
+            }
+        }
+
+        if (rc.isCoreReady())
+        {
+            // if there are no offensive enemies charge!!!!
+            if (!FightMicroUtilites.offensiveEnemies(enemies))
+            {
+                Direction direction = Unit.currentLocation.directionTo(enemies[0].location);
+                FightMicroUtilites.moveDir(rc, direction, true);
+                return true;
+            }
+            else
+            {
+                MapLocation retreatToTurret = null;
+                boolean turretUnderAttack = false;
+
+                int closestTurret = Integer.MAX_VALUE;
+
+                for (int i = allies.length; --i>=0; )
+                {
+                    if (allies[i].type == RobotType.TURRET)
+                    {
+                        MapLocation turret = allies[i].location;
+
+                        for (int j = enemies.length; --j>=0; )
+                        {
+                            if (turret.distanceSquaredTo(enemies[j].location) <= enemies[j].type.attackRadiusSquared)
+                            {
+                                turretUnderAttack = true;
+                                break;
+                            }
+                        }
+
+                        int currentDist = Unit.currentLocation.distanceSquaredTo(turret);
+                        if (currentDist < closestTurret)
+                        {
+                            closestTurret = currentDist;
+                            retreatToTurret = turret;
+                        }
+                    }
+                }
+
+                // only move if we are not fighting
+                if (nearByEnemies.length == 0 && retreatToTurret != null)
+                {
+                    FightMicroUtilites.moveDir(rc, Unit.currentLocation.directionTo(retreatToTurret), true);
+                    return true;
+                }
+                else
+                {
+                    // if turrets are not under attack bring enemies into range
+                    if (!turretUnderAttack)
+                    {
+                        FightMicroUtilites.moveDir(rc, Unit.currentLocation.directionTo(retreatToTurret), true);
+                        return true;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * This method is an agressive fight micro that uses vipers specially ability to target allies in correct situations
      *
@@ -946,6 +1040,91 @@ public class FightMicro
             }
         }
         return true;
+    }
+
+
+    public boolean turretGuardMicro(RobotInfo[] enemies, RobotInfo[] nearByEnemies, RobotInfo[] allies) throws GameActionException
+    {
+        if (enemies.length == 0) return false;
+
+        boolean turrets = false;
+
+        for (int i = allies.length; --i>=0; )
+        {
+            if (allies[i].type == RobotType.TURRET)
+            {
+                turrets = true;
+            }
+        }
+
+        if (!turrets) return basicGuardMicro(enemies, nearByEnemies, allies);
+
+        if (rc.isWeaponReady() && nearByEnemies.length > 0)
+        {
+            RobotInfo weakest = FightMicroUtilites.findWeakestEnemy(nearByEnemies);
+            if (rc.canAttackLocation(weakest.location))
+            {
+                rc.attackLocation(weakest.location);
+                return true;
+            }
+        }
+
+        if (rc.isCoreReady())
+        {
+            if (!FightMicroUtilites.offensiveEnemies(enemies))
+            {
+                FightMicroUtilites.moveDir(rc, Unit.currentLocation.directionTo(enemies[0].location), true);
+            }
+
+            int closestTurretDist = Integer.MAX_VALUE;
+            int closestTurretUnderAttack = Integer.MAX_VALUE;
+            MapLocation closestTurretUnderAttackLoc = null;
+            MapLocation defendLoc = null;
+            MapLocation enemyCOM = MapUtils.getCenterOfRobotInfoMass(enemies);
+
+            for (int i = allies.length; --i>=0; )
+            {
+                if (allies[i].type == RobotType.TURRET)
+                {
+                    MapLocation turret = allies[i].location;
+                    int currentDist = turret.distanceSquaredTo(Unit.currentLocation);
+
+                    if (currentDist < closestTurretDist)
+                    {
+                        closestTurretDist = currentDist;
+                        defendLoc = turret;
+                    }
+
+                    for (int j = enemies.length; --j>=0; )
+                    {
+                        if (enemies[j].location.distanceSquaredTo(turret) <= enemies[j].type.attackRadiusSquared)
+                        {
+                            if (currentDist < closestTurretUnderAttack)
+                            {
+                                closestTurretUnderAttack = currentDist;
+                                closestTurretUnderAttackLoc = turret;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (closestTurretUnderAttackLoc != null)
+            {
+                closestTurretUnderAttackLoc = closestTurretUnderAttackLoc.add(closestTurretUnderAttackLoc.directionTo(enemyCOM), 2);
+                FightMicroUtilites.moveDir(rc, Unit.currentLocation.directionTo(closestTurretUnderAttackLoc), false);
+                return true;
+            }
+            else if (defendLoc != null)
+            {
+                defendLoc = defendLoc.add(defendLoc.directionTo(enemyCOM), 2);
+                FightMicroUtilites.moveDir(rc, Unit.currentLocation.directionTo(defendLoc), false);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

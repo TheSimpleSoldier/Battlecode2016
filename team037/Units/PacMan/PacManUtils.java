@@ -282,7 +282,7 @@ public class PacManUtils {
                     if (!unit.team.equals(Unit.us)) continue;
                     break;
                 case TURRET:
-                    if (!unit.team.equals(Unit.us)) {
+                    if (unit.team.equals(Unit.opponent)) {
                         TurretMemory.addTurretLocation(unit.location);
                     }
                     break;
