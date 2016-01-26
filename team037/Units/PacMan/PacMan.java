@@ -356,7 +356,7 @@ public interface PacMan {
         if (inCorner()) return true;
         if (nearTurrets()) return false;
         if (!fastZombie()) return false;
-        if (Unit.zombies.length > 9) return false;
+        if (Unit.zombies.length > 8) return false;
         return true;
     }
 
