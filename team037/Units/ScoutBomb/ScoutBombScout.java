@@ -360,6 +360,9 @@ public class ScoutBombScout extends BaseScout
         if (closestEnemyViperInfo.coreDelay > 4 || closestEnemyViperInfo.weaponDelay > 4) {
             return false;
         }
+        if (currentLocation.isAdjacentTo(closestEnemyViperLoc) && rc.getInfectedTurns() > 0) {
+            suicideScout();
+        }
         // if we're on the other side of the map, or it's lategame and we see a viper, close the distance!
         return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(closestEnemyViperLoc), false);
     }
