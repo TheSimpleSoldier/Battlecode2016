@@ -245,6 +245,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
             if ((round - updateRound) < 100)
             {
             }
+            else if (round - lastEnemieSighting < 50)
+            {
+            }
             else if (round < 300)
             {
             }
@@ -558,7 +561,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public boolean carryOutAbility() throws GameActionException
     {
         // preconditions
-        if (stayHome)
+        if (stayHome && (!FightMicroUtilites.offensiveEnemies(zombies) || (allies.length >= 3 && FightMicroUtilites.offensiveEnemies(allies))))
         {
             return buildNextUnit();
         }
@@ -648,7 +651,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         int round = rc.getRoundNum();
 
-        if (round > 2700)
+        if (round > 2500)
         {
             nextType = RobotType.VIPER;
             return Bots.RUSHINGVIPER;

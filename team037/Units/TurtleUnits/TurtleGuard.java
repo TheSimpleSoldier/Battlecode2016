@@ -58,6 +58,11 @@ public class TurtleGuard extends BaseGaurd
         return false;
     }
 
+    public boolean fight() throws GameActionException
+    {
+        return fightMicro.turretGuardMicro(enemies, nearByEnemies, allies);
+    }
+
     @Override
     public MapLocation getNextSpot() throws GameActionException
     {

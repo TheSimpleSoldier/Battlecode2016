@@ -47,6 +47,8 @@ public class TurtleSoldier extends BaseSoldier
         if (!rc.isCoreReady()) return false;
         if (turnsArrivedLoc == -1) return false;
         if (zombies.length > 0 || enemies.length > 0) return false;
+        if (navigator.getTarget() != null && enemyArchon != null && navigator.getTarget().equals(enemyArchon)) return false;
+        if (rc.getRoundNum() - lastArchonUpdateRound > 100) return false;
 
         for (int i = dirs.length; --i>=0; )
         {
@@ -221,6 +223,11 @@ public class TurtleSoldier extends BaseSoldier
                 }
             }
         }
+    }
+
+    public boolean fight() throws GameActionException
+    {
+        return fightMicro.soldierMicro(nearByEnemies, nearByAllies, enemies, allies, target);
     }
 
     // additional methods with default behavior
