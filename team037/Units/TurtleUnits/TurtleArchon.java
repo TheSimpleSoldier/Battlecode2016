@@ -25,7 +25,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean updatedTurtleSpot = false;
     private MapLocation origionalTurtleSpot;
     private boolean hiding = false;
-    private int updateRound = 0;
+    private int updateRound = -100;
     private int index = 0;
     private int ArchonDist;
     private boolean offensiveEnemies = false;
@@ -39,6 +39,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private static Direction lastDir = null;
     private static boolean stayHome = false;
     private static int lastRoundRunAway = 0;
+    private static boolean lastRush = false;
 
 
 
@@ -96,6 +97,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public void collectData() throws GameActionException
     {
         super.collectData();
+
+        if (rallyPoint != null)
+        {
+            if (!rallyPoint.equals(turtlePoint))
+            {
+                turtlePoint = rallyPoint;
+                updateRound = rc.getRoundNum();
+            }
+            rallyPoint = null;
+        }
 
         if (stayHome)
         {
@@ -182,18 +193,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
             lastUnderAttack = round;
         }
 
-        if (rallyPoint != null)
-        {
-            if (!rallyPoint.equals(turtlePoint))
-            {
-                turtlePoint = rallyPoint;
-                updateRound = rc.getRoundNum();
-                rc.setIndicatorDot(turtlePoint, 0, 0, 0);
-                rc.setIndicatorString(0, "new turtle point: " + turtlePoint.x + " y: " + turtlePoint.y);
-            }
-            rallyPoint = null;
-        }
-
         if (RobotPlayer.strategy.equals(Strategies.DYNAMIC_TURTLE) && (round - updateRound) > 100)
         {
             int closestDen = 99999;
@@ -243,6 +242,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
             MapLocation currentTurtle = new MapLocation(turtlePoint.x, turtlePoint.y);
 
             if ((round - updateRound) < 100)
+            {
+            }
+            else if (round - lastEnemieSighting < 50)
             {
             }
             else if (round < 300)
@@ -351,21 +353,20 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 }
             }
 
-            if (turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25))
+            if (round - updateRound < 100 || !stayHome || turtlePoint.equals(currentTurtle) || (zombieTracker.getNextZombieRound() - rc.getRoundNum() < 10 + Math.sqrt(turtlePoint.distanceSquaredTo(origionalTurtleSpot)) * 2 || round - turretSupportMsgRound < 25))
             {
                 turtlePoint = currentTurtle;
             }
             else
             {
-                if (!underAttack && round % 5 == index)
-                {
-                    Communication newRallyPoint = new AttackCommunication();
-                    newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                    communicator.sendCommunication(3600, newRallyPoint);
-                    rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
-                    rc.setIndicatorDot(turtlePoint, 255, 0, 0);
-                }
+                updateRound = round;
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(3600, newRallyPoint);
+                rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
+                rc.setIndicatorDot(turtlePoint, 255, 0, 0);
             }
+
         }
     }
 
@@ -402,6 +403,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
         return false;
     }
+
 
     @Override
     public MapLocation getNextSpot() throws GameActionException
@@ -558,7 +560,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public boolean carryOutAbility() throws GameActionException
     {
         // preconditions
-        if (stayHome)
+        if (stayHome && (!FightMicroUtilites.offensiveEnemies(zombies) || (allies.length >= 3 && FightMicroUtilites.offensiveEnemies(allies))))
         {
             return buildNextUnit();
         }
@@ -648,13 +650,19 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         int round = rc.getRoundNum();
 
-        if (round > 2700)
+        if (round > 2500)
         {
             nextType = RobotType.VIPER;
-            return Bots.RUSHINGVIPER;
+            if (lastRush) {
+                lastRush = !lastRush;
+                return Bots.RUSHINGVIPER;
+            } else {
+                lastRush = !lastRush;
+                return Bots.SCOUTBOMBVIPER;
+            }
         }
 
-        if (scavenging && zombies.length > 0 && allies.length <= 3)
+        if (scavenging && zombies.length > 0 && allies.length <= 2)
         {
             nextType = RobotType.GUARD;
             return Bots.TURTLEGUARD;
@@ -697,14 +705,9 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        if (rc.getTeamParts() > 300 && round > 100)
-        {
-            nextType = RobotType.TURRET;
-            return Bots.TURTLETURRET;
-        }
 
         // late game if we aren't under attack spawn a lot of scout bombs
-        if (round > 2500 && lastUnderAttack < 2000) {
+        if (round > 2300 && lastUnderAttack < 2000 && round < 2800) {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
@@ -712,10 +715,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
         // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
         if (round > 2500 && lastUnderAttack < 2500) {
             nextType = RobotType.VIPER;
-            return Bots.RUSHINGVIPER;
+            if (lastRush) {
+                lastRush = !lastRush;
+                return Bots.RUSHINGVIPER;
+            } else {
+                lastRush = !lastRush;
+                return Bots.SCOUTBOMBVIPER;
+            }
         }
 
-        if (round > 100 && currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
+        if (currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
         {
             int soldierCount = 0;
             int guardCount = 0;
@@ -740,7 +749,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             // don't want to spawn massive #'s of units instead of turrets
             if (turretCount < 3 && rc.getRobotCount() < 30)
             {
-                if (soldierCount < 3)
+                if (soldierCount < 2)
                 {
                     return Bots.TURTLESOLDIER;
                 }
@@ -762,6 +771,13 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        return nextBot;
+        if (rc.getTeamParts() > 300 && round > 100)
+        {
+            nextType = RobotType.TURRET;
+            return Bots.TURTLETURRET;
+        }
+
+        nextType = RobotType.TURRET;
+        return Bots.TURTLETURRET;
     }
 }

@@ -109,8 +109,8 @@ public class SuperRushArchon extends Unit
 
         if(zombies.length > 10 && allies.length < 5)
         {
-            nextBot = Bots.SCOUTBOMBARCHON;
-            RobotPlayer.strategy = Strategies.SCOUT_BOMB;
+            nextBot = Bots.TURTLEARCHON;
+            RobotPlayer.strategy = Strategies.TURTLE;
         }
 
         for(int k = enemies.length; --k >= 0;)
@@ -119,17 +119,8 @@ public class SuperRushArchon extends Unit
             {
                 if(allies.length < 1 && enemies.length > 3)
                 {
-                    if(rc.getTeamParts() > 100)
-                    {
-                        unitProportion = new UnitProportion(0., 0., 0., 1., 0.);
-                        rc.setIndicatorString(1, "viper rush!");
-                        notRetreating = true;
-                    }
-                    else
-                    {
-                        nextBot = Bots.SCOUTBOMBARCHON;
-                        RobotPlayer.strategy = Strategies.SCOUT_BOMB;
-                    }
+                    nextBot = Bots.TURTLEARCHON;
+                    RobotPlayer.strategy = Strategies.TURTLE;
                 }
 
                 if(currentLocation.distanceSquaredTo(targetArchon) < 5 && enemies[k].coreDelay < 1)
@@ -138,17 +129,8 @@ public class SuperRushArchon extends Unit
                     {
                         if(allies.length < 2 && enemies.length - 1 > allies.length)
                         {
-                            if(rc.getTeamParts() > 100)
-                            {
-                                unitProportion = new UnitProportion(0., 0., 0., 1., 0.);
-                                rc.setIndicatorString(1, "viper rush!");
-                                notRetreating = true;
-                            }
-                            else
-                            {
-                                nextBot = Bots.SCOUTBOMBARCHON;
-                                RobotPlayer.strategy = Strategies.SCOUT_BOMB;
-                            }
+                            nextBot = Bots.TURTLEARCHON;
+                            RobotPlayer.strategy = Strategies.TURTLE;
                         }
                     }
                     else if(enemies[k].location.equals(targetArchon))
@@ -204,17 +186,9 @@ public class SuperRushArchon extends Unit
             if(currentLocation.distanceSquaredTo(targetArchon) < 24 && round - lastSeen < 2)
             {
                 targetID = -1;
+                //We are the champions
                 //time to change professions
-                if(rc.getTeamParts() > 200)
-                {
-                    nextBot = Bots.TURTLEARCHON;
-                    RobotPlayer.strategy = Strategies.TURTLE;
-                }
-                else
-                {
-                    nextBot = Bots.SCOUTBOMBARCHON;
-                    RobotPlayer.strategy = Strategies.SCOUT_BOMB;
-                }
+                nextBot = Bots.SCAVENGERARCHON;
             }
         }
 

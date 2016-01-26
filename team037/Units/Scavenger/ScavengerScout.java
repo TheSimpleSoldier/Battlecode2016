@@ -5,6 +5,8 @@ import team037.Messages.Communication;
 import team037.ScoutMapKnowledge;
 import team037.Units.PacMan.PacMan;
 import team037.Units.ScoutBomb.ScoutBombScout;
+import team037.Utilites.MapUtils;
+import team037.Utilites.MoveUtils;
 
 /**
  * Created by davej on 1/20/2016.
@@ -107,7 +109,11 @@ public class ScavengerScout extends ScoutBombScout implements PacMan {
 
         if (maxDir >= 0) {
             try {
-                rc.clearRubble(dirs[maxDir]);
+                if (rc.onTheMap(currentLocation.add(dirs[maxDir])))
+                {
+                    rc.clearRubble(dirs[maxDir]);
+                }
+
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
