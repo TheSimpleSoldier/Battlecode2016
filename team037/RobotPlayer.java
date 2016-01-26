@@ -75,6 +75,8 @@ public class RobotPlayer
                         strategy = Strategies.RUSH;
                     }
                 }
+
+
                 if(strategy.equals(Strategies.CASTLE))
                 {
                     unit = new CastleArchon(rc);
