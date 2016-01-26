@@ -51,6 +51,18 @@ public class TurtleSoldier extends BaseSoldier
         coreReady = rc.isCoreReady();
         weaponReady = rc.isWeaponReady();
 
+         if (rallyPoint != null)
+       {
+           rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+
+           if (!rallyPoint.equals(turtlePoint)) {
+               turtlePoint = rallyPoint;
+           }
+
+           rallyPoint = null;
+       }
+
+
         nearestCombatEnemy = Integer.MAX_VALUE;
         nearestCombatEnemyInfo = null;
         nearestCombatEnemy = Integer.MAX_VALUE;
@@ -219,7 +231,7 @@ public class TurtleSoldier extends BaseSoldier
 
     private static final String ENEMIES_IN_OPEN = "enemies in the open";
     private static final String ZOMBIES_IN_OPEN = "zombies in the open";
-    private static final String MOVE_TO_TURTLE_POINT = "zombies in the open";
+    private static final String MOVE_TO_TURTLE_POINT = "move to turtle location";
     private static final String ZOMBIES_NEAR_RALLY_POINT = "zombies near rally point";
     private static final String ENEMIES_NEAR_RALLY_POINT = "enemies near rally point";
     private static final String MOVE_TO_COMBAT = "move to combat";
@@ -251,6 +263,10 @@ public class TurtleSoldier extends BaseSoldier
             }
 
         }
+        if (lastAction.equals("NONE") && coreReady) {
+            lastAction = "RANDO";
+            MoveUtils.tryMoveAnywhere(MapUtils.randomDirection(id, round), true);
+        }
         rc.setIndicatorString(0, lastAction + " " + round);
         return !lastAction.equals("NONE");
 
@@ -264,13 +280,25 @@ public class TurtleSoldier extends BaseSoldier
         if (!coreReady) {
             return false;
         }
-        if (nearestTurret > 2 && nearestScout > 2)  {
-            if (nearestTurret < nearestScout) {
-                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateLeft(), true);
-            }
+
+        if (nearestTurret == Integer.MAX_VALUE) {
+            Direction toMove = currentLocation.directionTo(turtlePoint);
+            return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+        }
+        if (nearestTurret > 2)  {
+            return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateRight(), true);
+        }
+
+        if (nearestArchon <=2) {
+            return MoveUtils.tryMoveForwardOrSideways(nearestArchonInfo.location.directionTo(currentLocation), true);
         }
 
         Direction toMove = currentLocation.directionTo(turtlePoint).rotateRight().rotateRight().rotateRight();
+
+        if (!rc.onTheMap(currentLocation.add(toMove, 3))) {
+            toMove = toMove.opposite().rotateLeft();
+        }
+
         return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
     }
 
@@ -286,7 +314,7 @@ public class TurtleSoldier extends BaseSoldier
      */
     private boolean enemiesNearTurtlePoint() throws GameActionException {
         // prereqs
-        if (!nonScoutEnemies) {
+        if (nearestCombatEnemy == Integer.MAX_VALUE) {
             return false;
         }
         if (weaponReady && nearestCombatEnemy <= type.attackRadiusSquared) {
@@ -375,7 +403,7 @@ public class TurtleSoldier extends BaseSoldier
                 return true;
             }
         }
-        if (turtlePoint != null) {
+        if (turtlePoint != null && !currentLocation.isAdjacentTo(turtlePoint)) {
             return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(turtlePoint), true);
         }
         return false;
@@ -395,8 +423,10 @@ public class TurtleSoldier extends BaseSoldier
             if (weaponReady && rc.canAttackLocation(nearestDenInfo.location)) {
                 rc.attackLocation(nearestDenInfo.location);
             }
-            if (coreReady && currentLocation.distanceSquaredTo(nearestDenInfo.location) > 8 && MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestDenInfo.location), true)) {
-                return true;
+            if (coreReady) {
+                if (currentLocation.distanceSquaredTo(nearestDenInfo.location) > 8 && MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestDenInfo.location), true)) {
+                    return true;
+                }
             }
         }
 

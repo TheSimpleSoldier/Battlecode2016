@@ -39,6 +39,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private static Direction lastDir = null;
     private static boolean stayHome = false;
     private static int lastRoundRunAway = 0;
+    private static boolean lastRush = false;
 
 
 
@@ -712,7 +713,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
         // and a some vipers to make them go "BRAAAAAAAIIIIIIINNNNNS"
         if (round > 2500 && lastUnderAttack < 2500) {
             nextType = RobotType.VIPER;
-            return Bots.RUSHINGVIPER;
+            if (lastRush) {
+                return Bots.RUSHINGVIPER;
+            } else {
+                return Bots.SCOUTBOMBVIPER;
+            }
         }
 
         if (round > 100 && currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
