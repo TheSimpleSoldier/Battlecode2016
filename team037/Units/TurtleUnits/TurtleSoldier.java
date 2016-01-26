@@ -383,12 +383,22 @@ public class TurtleSoldier extends BaseSoldier
                 return true;
             }
         }
-        if (coreReady) {
-            if (nearestBigZombie > 2 || nearestMeleeZombie > 2 || nearestRangedZombie > 2) {
 
+        if (rc.getHealth() < 10) {
+            return fightMicro.soldierZombieFightMicro(zombies, nearByZombies, allies);
+        }
+
+        if (coreReady) {
+            if (nearestBigZombie > type.attackRadiusSquared && nearestBigZombie < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
             }
-            else if (nearestBigZombie <= 2) {
-                return MoveUtils.tryMoveForwardOrLeftRight(nearestBigZombieInfo.location.directionTo(currentLocation), false);
+
+            if (nearestMeleeZombie > type.attackRadiusSquared && nearestMeleeZombie < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
+            }
+
+            if (nearestRangedZombie > type.attackRadiusSquared && nearestRangedZombie < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestRangedZombieInfo.location), false);
             }
 
             if (nearestTurret > 2 && nearestTurret < Integer.MAX_VALUE) {
@@ -445,6 +455,36 @@ public class TurtleSoldier extends BaseSoldier
                 }
             }
         }
+        if (weaponReady) {
+            if (nearestBigZombie <= type.attackRadiusSquared) {
+                rc.attackLocation(nearestBigZombieInfo.location);
+                return true;
+            }
+            if (nearestMeleeZombie == type.attackRadiusSquared) {
+                rc.attackLocation(nearestMeleeZombieInfo.location);
+                return true;
+            }
+            if (nearestRangedZombie == type.attackRadiusSquared) {
+                rc.attackLocation(nearestRangedZombieInfo.location);
+                return true;
+            }
+        }
+        if (rc.getHealth() < 10) {
+            return fightMicro.soldierZombieFightMicro(zombies, nearByZombies, allies);
+        }
+        if (coreReady) {
+            if (nearestBigZombie > type.attackRadiusSquared && nearestBigZombie < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
+            }
+
+            if (nearestMeleeZombie > type.attackRadiusSquared && nearestMeleeZombie < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
+            }
+
+            if (nearestRangedZombie > type.attackRadiusSquared && nearestRangedZombie < Integer.MAX_VALUE) {
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestRangedZombieInfo.location), false);
+            }
+        }
 
         return fightMicro.soldierZombieFightMicro(zombies, nearByZombies, allies);
     }
@@ -455,7 +495,10 @@ public class TurtleSoldier extends BaseSoldier
        Are we close to the rally point?
      */
     private boolean nearRallyPoint() {
-        return currentLocation.distanceSquaredTo(turtlePoint) > 100;
+        if (turtlePoint == null) {
+            return false;
+        }
+        return currentLocation.distanceSquaredTo(turtlePoint) < 100;
     }
 
     /*
