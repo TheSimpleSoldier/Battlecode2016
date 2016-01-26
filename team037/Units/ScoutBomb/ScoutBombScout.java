@@ -20,6 +20,8 @@ public class ScoutBombScout extends BaseScout
     private static int closestEnemyViper;
     private static MapLocation closestEnemyViperLoc;
     private static RobotInfo closestEnemyViperInfo;
+    private static int closestEnemyTurret;
+    private static RobotInfo closestEnemyTurretInfo;
     private static boolean onlyEnemyIsArchon;
 
     private static int closestAlliedArchon;
@@ -151,6 +153,8 @@ public class ScoutBombScout extends BaseScout
         closestEnemyArchonInfo = null;
         closestEnemyViper = Integer.MAX_VALUE;
         closestEnemyViperLoc = null;
+        closestEnemyTurret = Integer.MAX_VALUE;
+        closestEnemyTurretInfo = null;
         onlyEnemyIsArchon = true;
         for (int i = enemies.length; --i>=0;) {
             int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
@@ -191,6 +195,10 @@ public class ScoutBombScout extends BaseScout
                 case TURRET:
                     onlyEnemyIsArchon = false;
                     nonScoutEnemies = true;
+                    if (distance < closestEnemyTurret) {
+                        closestEnemyTurret = distance;
+                        closestEnemyTurretInfo = enemies[i];
+                    }
                     if (distance <= 30 + RobotType.TURRET.attackRadiusSquared) {
                         possibleEnemyDamageNextTurn += RobotType.TURRET.attackPower;
                     }
