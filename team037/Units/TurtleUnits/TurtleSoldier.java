@@ -50,16 +50,16 @@ public class TurtleSoldier extends BaseSoldier
         coreReady = rc.isCoreReady();
         weaponReady = rc.isWeaponReady();
 
-         if (rallyPoint != null)
-       {
-           rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
+        if (rallyPoint != null)
+        {
+            rc.setIndicatorLine(currentLocation, rallyPoint, 0, 0, 255);
 
-           if (!rallyPoint.equals(turtlePoint)) {
-               turtlePoint = rallyPoint;
-           }
+            if (!rallyPoint.equals(turtlePoint)) {
+                turtlePoint = rallyPoint;
+            }
 
-           rallyPoint = null;
-       }
+            rallyPoint = null;
+        }
 
 
         nearestCombatEnemy = Integer.MAX_VALUE;

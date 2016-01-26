@@ -98,6 +98,16 @@ public class TurtleArchon extends BaseArchon implements PacMan
     {
         super.collectData();
 
+        if (rallyPoint != null)
+        {
+            if (!rallyPoint.equals(turtlePoint))
+            {
+                turtlePoint = rallyPoint;
+                updateRound = rc.getRoundNum();
+            }
+            rallyPoint = null;
+        }
+
         if (stayHome)
         {
             rc.setIndicatorDot(currentLocation.add(Direction.EAST), 255, 255, 255);
@@ -181,18 +191,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
         underAttack = underAttack();
         if (underAttack) {
             lastUnderAttack = round;
-        }
-
-        if (rallyPoint != null)
-        {
-            if (!rallyPoint.equals(turtlePoint))
-            {
-                turtlePoint = rallyPoint;
-                updateRound = rc.getRoundNum();
-                rc.setIndicatorDot(turtlePoint, 0, 0, 0);
-                rc.setIndicatorString(0, "new turtle point: " + turtlePoint.x + " y: " + turtlePoint.y);
-            }
-            rallyPoint = null;
         }
 
         if (RobotPlayer.strategy.equals(Strategies.DYNAMIC_TURTLE) && (round - updateRound) > 100)
@@ -361,14 +359,12 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
             else
             {
-                if (!underAttack && round % 5 == index)
-                {
-                    Communication newRallyPoint = new AttackCommunication();
-                    newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
-                    communicator.sendCommunication(3600, newRallyPoint);
-                    rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
-                    rc.setIndicatorDot(turtlePoint, 255, 0, 0);
-                }
+                updateRound = round;
+                Communication newRallyPoint = new AttackCommunication();
+                newRallyPoint.setValues(new int[]{CommunicationType.toInt(CommunicationType.RALLY_POINT), turtlePoint.x, turtlePoint.y});
+                communicator.sendCommunication(3600, newRallyPoint);
+                rc.setIndicatorLine(currentLocation, turtlePoint, 0, 0, 0);
+                rc.setIndicatorDot(turtlePoint, 255, 0, 0);
             }
         }
     }
