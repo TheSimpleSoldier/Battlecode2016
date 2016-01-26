@@ -43,7 +43,7 @@ public class TurtleSoldier extends BaseSoldier
 
 
     @Override
-    public MapLocation getNextSpot() throws GameActionException
+    public void collectData() throws GameActionException
     {
         super.collectData();
 
@@ -169,7 +169,6 @@ public class TurtleSoldier extends BaseSoldier
                     }
             }
         }
-        return null;
     }
 
     public boolean fight() throws GameActionException
