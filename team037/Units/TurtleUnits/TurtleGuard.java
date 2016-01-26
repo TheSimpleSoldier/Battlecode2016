@@ -12,16 +12,6 @@ public class TurtleGuard extends BaseGaurd
 {
     public static RobotTypeTracker robotTypeTracker;
     public static ZombieTracker zombieTracker;
-
-    public TurtleGuard(RobotController rc)
-    {
-        super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
-        robotTypeTracker = new RobotTypeTracker(RobotType.TURRET, rc);
-        zombieTracker = new ZombieTracker(rc);
-    }
-
-
     private static int nearestEnemyArchon;
     private static RobotInfo nearestEnemyArchonInfo;
     private static int nearestCombatEnemy;
@@ -49,6 +39,19 @@ public class TurtleGuard extends BaseGaurd
 
     private static boolean coreReady;
     private static boolean weaponReady;
+
+    public TurtleGuard(RobotController rc)
+    {
+        super(rc);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        robotTypeTracker = new RobotTypeTracker(RobotType.TURRET, rc);
+        zombieTracker = new ZombieTracker(rc);
+    }
+
+    public boolean fight() throws GameActionException
+    {
+        return fightMicro.turretGuardMicro(enemies, nearByEnemies, allies);
+    }
 
     @Override
     public void collectData() throws GameActionException
