@@ -272,6 +272,7 @@ public class TurtleSoldier extends BaseSoldier
 
     }
 
+    private static boolean reverse = false;
     /*
     PATROL_TURTLE POINT
      */
@@ -286,7 +287,11 @@ public class TurtleSoldier extends BaseSoldier
             return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
         }
         if (nearestTurret > 2)  {
-            return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateRight(), true);
+            if (reverse) {
+                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateLeft(), true);
+            } else {
+                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateRight(), true);
+            }
         }
 
         if (nearestArchon <=2) {
@@ -294,8 +299,12 @@ public class TurtleSoldier extends BaseSoldier
         }
 
         Direction toMove = currentLocation.directionTo(turtlePoint).rotateRight().rotateRight().rotateRight();
+        if (reverse) {
+            toMove = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft().rotateLeft();
+        }
 
         if (!rc.onTheMap(currentLocation.add(toMove, 3))) {
+            reverse = !reverse;
             toMove = toMove.opposite().rotateLeft();
         }
 
@@ -324,20 +333,27 @@ public class TurtleSoldier extends BaseSoldier
         if (!coreReady) {
             return false;
         }
-        Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
-        if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-            if (rc.canMove(forward)) {
-                rc.move(forward);
-                return true;
+        if (nearestTurret <= 4) {
+            Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
+            if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
+                if (rc.canMove(forward)) {
+                    rc.move(forward);
+                    return true;
+                }
             }
-        }
 
-        Direction back = forward.opposite();
-        if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-            if (rc.canMove(back)) {
-                rc.move(back);
-                return true;
+            Direction back = forward.opposite();
+            if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
+                if (rc.canMove(back)) {
+                    rc.move(back);
+                    return true;
+                }
             }
+            // hold;
+            return true;
+        } else if (nearestTurret < 2 * nearestCombatEnemy) {
+            Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);
+            return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
         }
         return false;
     }
@@ -423,7 +439,7 @@ public class TurtleSoldier extends BaseSoldier
             if (weaponReady && rc.canAttackLocation(nearestDenInfo.location)) {
                 rc.attackLocation(nearestDenInfo.location);
             }
-            if (coreReady) {
+            if (rc.isCoreReady()) {
                 if (currentLocation.distanceSquaredTo(nearestDenInfo.location) > 8 && MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestDenInfo.location), true)) {
                     return true;
                 }

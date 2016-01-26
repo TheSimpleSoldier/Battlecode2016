@@ -276,6 +276,7 @@ public class TurtleGuard extends BaseGaurd
 
 
 
+    private static boolean reverse = false;
     /*
     PATROL_TURTLE POINT
      */
@@ -289,17 +290,24 @@ public class TurtleGuard extends BaseGaurd
             return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
         }
         if (nearestTurret > 8)  {
-            return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateLeft(), true);
+            if (reverse) {
+                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateRight(), true);
+            } else {
+                return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateLeft(), true);
+            }
         }
 
         if (nearestArchon <=2) {
             return MoveUtils.tryMoveForwardOrSideways(nearestArchonInfo.location.directionTo(currentLocation), true);
         }
 
-
         Direction toMove = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft().rotateLeft();
+        if (reverse) {
+            toMove = currentLocation.directionTo(turtlePoint).rotateRight().rotateRight().rotateRight();
+        }
 
         if (!rc.onTheMap(currentLocation.add(toMove, 3))) {
+            reverse = !reverse;
             toMove = toMove.opposite().rotateRight();
         }
 
@@ -328,21 +336,29 @@ public class TurtleGuard extends BaseGaurd
         if (!coreReady) {
             return false;
         }
-        Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
-        if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-            if (rc.canMove(forward)) {
-                rc.move(forward);
-                return true;
+        if (nearestTurret <= 8) {
+            Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
+            if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
+                if (rc.canMove(forward)) {
+                    rc.move(forward);
+                    return true;
+                }
             }
+
+            Direction back = forward.opposite();
+            if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
+                if (rc.canMove(back)) {
+                    rc.move(back);
+                    return true;
+                }
+            }
+            // hold;
+            return true;
+        } else if (nearestTurret < 2 * nearestCombatEnemy) {
+            Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);
+            return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
         }
 
-        Direction back = forward.opposite();
-        if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-            if (rc.canMove(back)) {
-                rc.move(back);
-                return true;
-            }
-        }
         return false;
     }
 
@@ -386,7 +402,7 @@ public class TurtleGuard extends BaseGaurd
                 return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestRangedZombieInfo.location), false);
             }
 
-            if (nearestTurret <= 18) {
+            if (nearestTurret <= 9) {
                 if (nearestBigZombie < Integer.MAX_VALUE) {
                     if (rc.senseNearbyRobots(nearestBigZombieInfo.location, 8, us).length > 0) {
                         return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
