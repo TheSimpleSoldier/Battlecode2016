@@ -119,17 +119,8 @@ public class SuperRushArchon extends Unit
             {
                 if(allies.length < 1 && enemies.length > 3)
                 {
-                    if(rc.getTeamParts() > 100)
-                    {
-                        unitProportion = new UnitProportion(0., 0., 0., 1., 0.);
-                        rc.setIndicatorString(1, "viper rush!");
-                        notRetreating = true;
-                    }
-                    else
-                    {
-                        nextBot = Bots.SCOUTBOMBARCHON;
-                        RobotPlayer.strategy = Strategies.SCOUT_BOMB;
-                    }
+                    nextBot = Bots.SCOUTBOMBARCHON;
+                    RobotPlayer.strategy = Strategies.SCOUT_BOMB;
                 }
 
                 if(currentLocation.distanceSquaredTo(targetArchon) < 5 && enemies[k].coreDelay < 1)
@@ -138,17 +129,8 @@ public class SuperRushArchon extends Unit
                     {
                         if(allies.length < 2 && enemies.length - 1 > allies.length)
                         {
-                            if(rc.getTeamParts() > 100)
-                            {
-                                unitProportion = new UnitProportion(0., 0., 0., 1., 0.);
-                                rc.setIndicatorString(1, "viper rush!");
-                                notRetreating = true;
-                            }
-                            else
-                            {
-                                nextBot = Bots.SCOUTBOMBARCHON;
-                                RobotPlayer.strategy = Strategies.SCOUT_BOMB;
-                            }
+                            nextBot = Bots.SCOUTBOMBARCHON;
+                            RobotPlayer.strategy = Strategies.SCOUT_BOMB;
                         }
                     }
                     else if(enemies[k].location.equals(targetArchon))
