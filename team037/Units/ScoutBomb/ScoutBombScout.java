@@ -931,10 +931,15 @@ public class ScoutBombScout extends BaseScout
 
     private void suicideScout() throws GameActionException {
         int i = 0;
-        while (Clock.getBytecodesLeft() > 200 && i < 20) {
-            rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);
-            i++;
+        try {
+            while (Clock.getBytecodesLeft() > 200 && i < 15) {
+                rc.broadcastMessageSignal(Integer.MIN_VALUE, Integer.MIN_VALUE, 25);
+                i++;
+            }
+        } catch (GameActionException e) {
+
         }
+
         rc.disintegrate();
     }
 

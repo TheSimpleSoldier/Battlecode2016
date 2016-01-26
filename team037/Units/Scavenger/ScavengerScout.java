@@ -4,6 +4,8 @@ import battlecode.common.*;
 import team037.Messages.Communication;
 import team037.ScoutMapKnowledge;
 import team037.Units.ScoutBomb.ScoutBombScout;
+import team037.Utilites.MapUtils;
+import team037.Utilites.MoveUtils;
 
 /**
  * Created by davej on 1/20/2016.
@@ -86,32 +88,12 @@ public class ScavengerScout extends ScoutBombScout {
         return scavengerDig() || scavengerMove() || clearWhileWaiting();
     }
 
-    public static boolean clearWhileWaiting() {
+    public static boolean clearWhileWaiting() throws GameActionException {
         if (!(rc.isCoreReady() && currentLocation.equals(mySpot))) {
             return false;
         }
 
-        double maxRubble = -1;
-        int maxDir = -1;
-        for (int i = 8; --i >= 0; ) {
-            if (rc.canSense(currentLocation.add(dirs[i]))) {
-                double rubble = rc.senseRubble(currentLocation.add(dirs[i]));
-                if (rubble > maxRubble) {
-                    maxDir = i;
-                    maxRubble = rubble;
-                }
-            }
-        }
-
-        if (maxDir >= 0) {
-            try {
-                rc.clearRubble(dirs[maxDir]);
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
+        return MoveUtils.tryClearAnywhere(currentLocation.directionTo(myArchon.location));
     }
 
     public static boolean scavengerDig() {
