@@ -230,7 +230,7 @@ public interface PacMan {
             
             // Last: find the smallest value whose direction leads to a valid location.
             MapLocation nextLoc;
-            int min, minDir;
+            int min, minDir, firstDir = -1;
             do {
                 minDir = 0;
                 min = directions[0];
@@ -262,10 +262,39 @@ public interface PacMan {
                     minDir = 7;
                 }
 
+                if (firstDir == -1) {
+                    firstDir = minDir;
+                }
                 directions[minDir] = Integer.MAX_VALUE;
                 nextLoc = currentLocation.add(dirs[minDir], 1);
             }
             while (!(rc.canMove(dirs[minDir]) || rc.senseRubble(nextLoc) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH || min == Integer.MAX_VALUE));
+            if (min == Integer.MAX_VALUE) {
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir])) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir];
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].rotateRight();
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].rotateLeft();
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].rotateRight().rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].rotateRight().rotateRight();
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].rotateLeft().rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].rotateLeft().rotateLeft();
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].rotateRight().rotateRight().rotateRight())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].rotateRight().rotateRight().rotateRight();
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].rotateLeft().rotateLeft().rotateLeft())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].rotateLeft().rotateLeft().rotateLeft();
+                }
+                if (rc.senseRubble(currentLocation.add(dirs[firstDir].opposite())) >= GameConstants.RUBBLE_OBSTRUCTION_THRESH) {
+                    return dirs[firstDir].opposite();
+                }
+            }
             return Unit.dirs[minDir];
         } catch (Exception e) {
 //            e.printStackTrace();
