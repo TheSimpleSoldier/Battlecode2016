@@ -5,6 +5,7 @@ import team037.Navigation;
 import team037.Navigator;
 import team037.Unit;
 import team037.Units.BaseUnits.BaseArchon;
+import team037.Utilites.TurretMemory;
 
 public interface PacMan {
     /**
@@ -12,17 +13,26 @@ public interface PacMan {
      * Unless you override applyAllWeights and applyAllConstants, keep this in mind if you add additional
      * weights or constants to the weights array you pass the runAway method.
      */
-    int ZOMBIES = 0, ENEMIES = 1, TARGET = 2;
+    int ENEMIES = 0, TARGET = 1, NEUTRALS_AND_PARTS = 2, TURRETS = 3,
+            COUNTERMEASURES = 0, ALLIED_ARCHONS = 1, BAD_ARCHONS = 2;
+
 
     double RUBBLE_OBSTRUCT = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
     double RUBBLE_SLOW = GameConstants.RUBBLE_SLOW_THRESH;
     double RUBBLE_DIFF = RUBBLE_OBSTRUCT - RUBBLE_SLOW;
 
     double[][] DEFAULT_WEIGHTS = new double[][] {
-            {1, .5, .5, .5, .5},        // zombie weights (zombies in sensor range)
-            {1, .25, .333333, .5, .5},  // enemy weights (enemies in sensor range)
-            {-16, -8, -4, 0, 0},            // target constants (attract towards target)
+            {1, .5, .5, .5, .5},    // enemy and zombie weights (enemies in sensor range)
+            {-32, -16, -8, -4, -2}, // target constants (attract towards target)
+            {-2,.5,.5,.5,.5},       // weights for neutrals and parts
+            {8,.5,.25}              // weights for turrets
     };
+
+    int[][] DEFAULT_CONSTANTS = new int[][] {
+            {9999999, 64, 16},      // constants for countermeasures
+            {16,8,4},               // constants for pushing away from allied archon starting locations
+            {-8,-4,-2}              // constants to attract slightly towards enemy base
+    } ;
 
     boolean[] flags = new boolean[1];
 
@@ -35,11 +45,15 @@ public interface PacMan {
     default int[] applyAdditionalWeights(int[] directions) { return directions; }
     default int[] applyAdditionalConstants(int[] directions) { return directions; }
     default int[] applyAllWeights(int[] directions, double[][] weights) {
-        directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ZOMBIES]);
+        directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ENEMIES]);
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
-//        if (Unit.type.equals(RobotType.ARCHON)) {
-//            directions = PacManUtils.applyWeights(Unit.currentLocation, directions, BaseArchon.neutralBots,new double[]{-2,-1,-.5,0,0});
-//        }
+        directions = PacManUtils.applyTurretWeights(Unit.currentLocation, directions, TurretMemory.getBufferContents(),weights[TURRETS]);
+        if (Unit.type.equals(RobotType.ARCHON)) {
+            RobotInfo[] neutrals = Unit.rc.senseNearbyRobots(Unit.sightRange, Team.NEUTRAL);
+            directions = PacManUtils.applyWeights(Unit.currentLocation, directions, neutrals, weights[NEUTRALS_AND_PARTS]);
+            MapLocation[] parts = Unit.rc.sensePartLocations(3);
+            directions = PacManUtils.applyPartsWeights(Unit.currentLocation, directions, parts, weights[NEUTRALS_AND_PARTS]);
+        }
         directions = applyAdditionalWeights(directions);
 
         return directions;
@@ -57,11 +71,11 @@ public interface PacMan {
             directions = PacManUtils.applyConstant(Unit.currentLocation, directions, loc, weights[TARGET]);
         }
         if (PacManUtils.countermeasure != null) {
-            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,new int[]{999999,64,16});
+            directions = PacManUtils.applySimpleConstant(Unit.currentLocation,directions,PacManUtils.countermeasure.location,DEFAULT_CONSTANTS[COUNTERMEASURES]);
         }
         if (flags[0]) {
-            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.alliedArchonStartLocs,new int[]{32,16,8});
-            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.enemyArchonStartLocs,new int[]{-16,-8,-4});
+            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.alliedArchonStartLocs,DEFAULT_CONSTANTS[ALLIED_ARCHONS]);
+            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.enemyArchonStartLocs,DEFAULT_CONSTANTS[BAD_ARCHONS]);
         }
         directions = applyAdditionalConstants(directions);
 
@@ -93,6 +107,9 @@ public interface PacMan {
             int[] ping2 = Navigation.map.ping(currentLocation, 2, 3);
             int[] ping4 = Navigation.map.ping(currentLocation, 4, 3);
             int[] ping6 = Navigation.map.ping(currentLocation, 6, 3);
+
+            // Third: apply constant modifiers to the weights
+            directions = applyAllConstants(directions, weights);
 
 //            // First: apply weights of nearby units
             directions = applyAllWeights(directions, weights);
@@ -130,10 +147,6 @@ public interface PacMan {
             directions[6] *= 1 + mid;
             directions[7] *= 1 + right / 2;
 
-
-            // Third: apply constant modifiers to the weights
-            directions = applyAllConstants(directions, weights);
-
             double[] rubble = PacManUtils.rubble;
             if (rubble != null) {
 
@@ -142,7 +155,7 @@ public interface PacMan {
                 } else if (rubble[0] < RUBBLE_SLOW) {
                     rubble[0] = 0;
                 } else {
-                    directions[0] += directions[0] * (rubble[0] - RUBBLE_SLOW) / RUBBLE_DIFF;
+                    directions[0] += (double)directions[0] * (rubble[0] - RUBBLE_SLOW) / RUBBLE_DIFF;
                 }
 
                 if (rubble[1] > RUBBLE_OBSTRUCT) {

@@ -5,6 +5,7 @@ import team037.Enums.Bots;
 import team037.Enums.Strategies;
 import team037.RobotPlayer;
 import team037.Unit;
+import team037.Units.TurtleUnits.TurtleTurret;
 
 public class BuildOrderCreation
 {
@@ -75,8 +76,7 @@ public class BuildOrderCreation
 
         if (RobotPlayer.strategy.equals(Strategies.PACMAN)) {
             Bots[][] buildOrderPacMan = {
-//                    {Bots.PACMANGUARD, Bots.SCOUTBOMBSCOUT}, //Bots.SCOUTBOMBSCOUT
-                    {Bots.COUNTERMEASUREGUARD}
+                    {Bots.RUSHGUARD, Bots.SCOUTBOMBSCOUT},
             };
 
             int[] timesPacMan = {0};

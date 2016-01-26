@@ -9,6 +9,7 @@ import team037.Messages.Communication;
 import team037.Messages.MissionCommunication;
 import team037.Messages.SimpleBotInfoCommunication;
 import team037.Unit;
+import team037.Utilites.TurretMemory;
 
 /**
  * Created by davej on 1/22/2016.
@@ -30,10 +31,7 @@ public class PacManUtils {
             for (int i = badBots.length; --i >= 0; ) {
                 RobotType type = badBots[i].type;
 
-                if (type.equals(RobotType.ZOMBIEDEN) || type.equals(RobotType.SCOUT)) {
-                    if (--i < 0)
-                        break;
-                }
+                if (type.equals(RobotType.ZOMBIEDEN) || type.equals(RobotType.SCOUT)) continue;
 
                 MapLocation nextBadBot = badBots[i].location;
                 int myDistance = currentLocation.distanceSquaredTo(nextBadBot);
@@ -267,15 +265,36 @@ public class PacManUtils {
      * @return directions array with weights applied. Minimum value is the ideal direction of movement.
      */
     public static int[] applyWeights(MapLocation currentLocation, int[] directions, RobotInfo[] units, double[] scalars) {
-
         if (units == null) {
             return directions;
         }
 
         int length = units.length;
+        double resetScalars = scalars[0];
 
         for (int i = length; --i >= 0; ) {
-            MapLocation nextUnit = units[i].location;
+            RobotInfo unit = units[i];
+            scalars[0] = resetScalars;
+            switch(unit.type) {
+                case ARCHON:
+                    if (unit.team.equals(Unit.opponent)) continue;
+                    if (unit.team.equals(Team.NEUTRAL)) scalars[0] -= 10;
+                    break;
+                case SCOUT:
+                case ZOMBIEDEN:
+                    if (!unit.team.equals(Unit.us)) continue;
+                    break;
+                case TURRET:
+                    if (!unit.team.equals(Unit.us)) {
+                        TurretMemory.addTurretLocation(unit.location);
+                    }
+                    break;
+                case FASTZOMBIE:
+                    scalars[0] += .5;
+                    break;
+
+            }
+            MapLocation nextUnit = unit.location;
             double add = (38 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];
             double addAdjacent = add * scalars[1];
             double addPerp = addAdjacent * scalars[2];
@@ -361,6 +380,159 @@ public class PacManUtils {
                     directions[0] += addAdjacent;
                     directions[1] += addPerp;
                     directions[2] += addPerpAdj;
+                    break;
+            }
+        }
+
+        return directions;
+    }
+    public static int[] applyPartsWeights(MapLocation currentLocation, int[] directions, MapLocation[] locations, double[] scalars) {
+
+        int length = locations.length;
+
+        for (int i = length; --i >= 0; ) {
+            MapLocation nextLocation = locations[i];
+            if (Unit.rc.senseRubble(nextLocation) > GameConstants.RUBBLE_OBSTRUCTION_THRESH) continue;
+            double add = (38 - nextLocation.distanceSquaredTo(currentLocation)) * scalars[0];
+            double addAdjacent = add * scalars[1];
+            double addPerp = addAdjacent * scalars[2];
+            switch (currentLocation.directionTo(nextLocation)) {
+                case NORTH:
+                    directions[6] += addPerp;
+                    directions[7] += addAdjacent;
+                    directions[0] += add;
+                    directions[1] += addAdjacent;
+                    directions[2] += addPerp;
+                    break;
+                case NORTH_EAST:
+                    directions[7] += addPerp;
+                    directions[0] += addAdjacent;
+                    directions[1] += add;
+                    directions[2] += addAdjacent;
+                    directions[3] += addPerp;
+                    break;
+                case EAST:
+                    directions[0] += addPerp;
+                    directions[1] += addAdjacent;
+                    directions[2] += add;
+                    directions[3] += addAdjacent;
+                    directions[4] += addPerp;
+                    break;
+                case SOUTH_EAST:
+                    directions[1] += addPerp;
+                    directions[2] += addAdjacent;
+                    directions[3] += add;
+                    directions[4] += addAdjacent;
+                    directions[5] += addPerp;
+                    break;
+                case SOUTH:
+                    directions[2] += addPerp;
+                    directions[3] += addAdjacent;
+                    directions[4] += add;
+                    directions[5] += addAdjacent;
+                    directions[6] += addPerp;
+                    break;
+                case SOUTH_WEST:
+                    directions[3] += addPerp;
+                    directions[4] += addAdjacent;
+                    directions[5] += add;
+                    directions[6] += addAdjacent;
+                    directions[7] += addPerp;
+                    break;
+                case WEST:
+                    directions[4] += addPerp;
+                    directions[5] += addAdjacent;
+                    directions[6] += add;
+                    directions[7] += addAdjacent;
+                    directions[0] += addPerp;
+                    break;
+                case NORTH_WEST:
+                    directions[5] += addPerp;
+                    directions[6] += addAdjacent;
+                    directions[7] += add;
+                    directions[0] += addAdjacent;
+                    directions[1] += addPerp;
+                    break;
+            }
+        }
+
+        return directions;
+    }
+
+    public static int[] applyTurretWeights(MapLocation currentLocation, int[] directions, MapLocation[] locations, double[] scalars) {
+
+        if (locations == null) {
+            return directions;
+        }
+
+        int length = locations.length;
+
+        for (int i = length; --i >= 0; ) {
+            MapLocation nextLocation = locations[i];
+            if (nextLocation == null) continue;
+            double distance = 64 - nextLocation.distanceSquaredTo(currentLocation);
+            if (distance <= 0) {
+                continue;
+            }
+            double add = distance * scalars[0];
+            double addAdjacent = add * scalars[1];
+            double addPerp = addAdjacent * scalars[2];
+            switch (currentLocation.directionTo(nextLocation)) {
+                case NORTH:
+                    directions[6] += addPerp;
+                    directions[7] += addAdjacent;
+                    directions[0] += add;
+                    directions[1] += addAdjacent;
+                    directions[2] += addPerp;
+                    break;
+                case NORTH_EAST:
+                    directions[7] += addPerp;
+                    directions[0] += addAdjacent;
+                    directions[1] += add;
+                    directions[2] += addAdjacent;
+                    directions[3] += addPerp;
+                    break;
+                case EAST:
+                    directions[0] += addPerp;
+                    directions[1] += addAdjacent;
+                    directions[2] += add;
+                    directions[3] += addAdjacent;
+                    directions[4] += addPerp;
+                    break;
+                case SOUTH_EAST:
+                    directions[1] += addPerp;
+                    directions[2] += addAdjacent;
+                    directions[3] += add;
+                    directions[4] += addAdjacent;
+                    directions[5] += addPerp;
+                    break;
+                case SOUTH:
+                    directions[2] += addPerp;
+                    directions[3] += addAdjacent;
+                    directions[4] += add;
+                    directions[5] += addAdjacent;
+                    directions[6] += addPerp;
+                    break;
+                case SOUTH_WEST:
+                    directions[3] += addPerp;
+                    directions[4] += addAdjacent;
+                    directions[5] += add;
+                    directions[6] += addAdjacent;
+                    directions[7] += addPerp;
+                    break;
+                case WEST:
+                    directions[4] += addPerp;
+                    directions[5] += addAdjacent;
+                    directions[6] += add;
+                    directions[7] += addAdjacent;
+                    directions[0] += addPerp;
+                    break;
+                case NORTH_WEST:
+                    directions[5] += addPerp;
+                    directions[6] += addAdjacent;
+                    directions[7] += add;
+                    directions[0] += addAdjacent;
+                    directions[1] += addPerp;
                     break;
             }
         }
