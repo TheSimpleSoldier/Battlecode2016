@@ -23,7 +23,6 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
     public static AppendOnlyMapLocationSet turretLocations;
     public static MessageBuffer messageBuffer;
     public static RobotType SCOUT = RobotType.SCOUT;
-    public static MapLocationBuffer mapLocationBuffer;
 
     public ScavengerArchon(RobotController rc) {
         super(rc);
@@ -53,7 +52,7 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         if (enemies.length == 0 || zombies.length > enemies.length) {
             return false;
         }
-        return runAway(null);
+        return runAway(null,true,true);
     }
 
     public boolean fightZombies() {
@@ -61,18 +60,11 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
             return false;
         }
 
-        return runAway(null);
+        return runAway(null,true,true);
     }
 
     public int[] applyAdditionalWeights(int[] directions) {
         directions = PacManUtils.applySimpleWeights(currentLocation,directions, allies);
-        return directions;
-    }
-
-    public int[] applyAdditionalConstants(int[] directions) {
-        if (alliedArchonStartLocs != null) {
-            directions = PacManUtils.applySimpleConstants(currentLocation,directions,alliedArchonStartLocs,new int[]{128,64,32});
-        }
         return directions;
     }
 
