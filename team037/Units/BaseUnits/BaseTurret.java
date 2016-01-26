@@ -89,7 +89,7 @@ public class BaseTurret extends Unit implements PacMan
                 {
                     return runAway(null);
                 }
-                else
+                else if (FightMicroUtilites.offensiveEnemies(allies))
                 {
                     rc.unpack();
                     return true;

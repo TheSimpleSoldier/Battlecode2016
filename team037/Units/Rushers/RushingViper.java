@@ -41,6 +41,13 @@ public class RushingViper extends BaseViper implements PacMan
     {
         super.collectData();
 
+        if (enemyArchon != null)
+        {
+            System.out.println("rushing to where the enemy archon is");
+            navigator.setTarget(enemyArchon);
+            enemyArchon = null;
+        }
+
         if (currentLocation != null && rushTarget != null)
         {
             rc.setIndicatorLine(currentLocation, rushTarget, 0, 0, 0);

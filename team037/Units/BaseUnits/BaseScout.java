@@ -79,7 +79,7 @@ public class BaseScout extends Unit
                 communication.type = RobotType.ARCHON;
                 communication.x = enemies[k].location.x;
                 communication.y = enemies[k].location.y;
-                communicator.sendCommunication(ScoutMapKnowledge.getRange(), communication);
+                communicator.sendCommunication(2500, communication);
                 msgsSent++;
             }
         }
