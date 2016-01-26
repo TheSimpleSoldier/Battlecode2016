@@ -169,11 +169,6 @@ public class TurtleGuard extends BaseGaurd
     {
         super.collectData();
 
-        if (enemyArchon != null && rc.getRoundNum() - lastArchonUpdateRound < 100 && currentLocation.distanceSquaredTo(enemyArchon) < 400)
-        {
-            navigator.setTarget(enemyArchon);
-        }
-
         if (!arrived && (rc.canSense(turtlePoint)))
         {
             turnsArrivedLoc = rc.getRoundNum();
