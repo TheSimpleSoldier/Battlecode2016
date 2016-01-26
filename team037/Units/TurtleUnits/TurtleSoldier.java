@@ -328,19 +328,28 @@ public class TurtleSoldier extends BaseSoldier
         }
         if (weaponReady && nearestCombatEnemy <= type.attackRadiusSquared) {
             rc.attackLocation(nearestCombatEnemyInfo.location);
+            rc.setIndicatorString(1, "attacking enemy");
             return true;
         }
         if (!coreReady) {
+            rc.setIndicatorString(1, "waiting on core");
             return false;
         }
+
         if (nearestTurret < Integer.MAX_VALUE && nearestTurret >= 8 ) {
             MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), false);
+            rc.setIndicatorString(1, "moving to turret");
+            return true;
+        } else if (nearestCombatEnemy <= type.attackRadiusSquared) {
+            rc.setIndicatorString(1, "in range, nothing");
             return true;
         } else  if (nearestTurret <= 4) {
             MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestCombatEnemyInfo.location), false);
+            rc.setIndicatorString(1, "moving to enemy");
             return true;
         } else if (nearestTurret < 2 * nearestCombatEnemy) {
             Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);
+            rc.setIndicatorString(1, "moving to enemy");
             return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
         }
         return false;

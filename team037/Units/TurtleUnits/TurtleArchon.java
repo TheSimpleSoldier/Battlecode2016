@@ -706,7 +706,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
 
         // late game if we aren't under attack spawn a lot of scout bombs
-        if (round > 2500 && lastUnderAttack < 2000) {
+        if (round > 2300 && lastUnderAttack < 2000 && round < 2800) {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
@@ -723,7 +723,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             }
         }
 
-        if (round > 100 && currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
+        if (currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
         {
             int soldierCount = 0;
             int guardCount = 0;
@@ -776,7 +776,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             return Bots.TURTLETURRET;
         }
 
-
-        return nextBot;
+        nextType = RobotType.TURRET;
+        return Bots.TURTLETURRET;
     }
 }
