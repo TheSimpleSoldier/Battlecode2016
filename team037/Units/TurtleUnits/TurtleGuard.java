@@ -2,6 +2,7 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.RobotTypeTracker;
+import team037.Messages.BotInfoCommunication;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseGaurd;
 import team037.Utilites.FightMicroUtilites;
@@ -16,6 +17,7 @@ public class TurtleGuard extends BaseGaurd
     private boolean updatedTurtleSpot = false;
     private int[] enemySightings = new int[8];
     public static RobotTypeTracker robotTypeTracker;
+    private static int lastArchonUpdateRound;
 
     public TurtleGuard(RobotController rc)
     {
@@ -167,6 +169,11 @@ public class TurtleGuard extends BaseGaurd
     {
         super.collectData();
 
+        if (enemyArchon != null && rc.getRoundNum() - lastArchonUpdateRound < 100 && currentLocation.distanceSquaredTo(enemyArchon) < 400)
+        {
+            navigator.setTarget(enemyArchon);
+        }
+
         if (!arrived && (rc.canSense(turtlePoint)))
         {
             turnsArrivedLoc = rc.getRoundNum();
@@ -276,6 +283,13 @@ public class TurtleGuard extends BaseGaurd
                     {
                         interpretDistressFromArchon(communications[k]);
                     }
+                    break;
+
+                case ENEMY:
+                    BotInfoCommunication botCom = (BotInfoCommunication) communications[k];
+                    values = botCom.getValues();
+                    enemyArchon = new MapLocation(values[4], values[5]);
+                    lastArchonUpdateRound = rc.getRoundNum();
                     break;
             }
         }

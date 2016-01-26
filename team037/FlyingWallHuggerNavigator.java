@@ -90,7 +90,6 @@ public class FlyingWallHuggerNavigator extends Navigator {
 
     @Override
     public boolean takeNextStep() throws GameActionException {
-        System.out.println("Taking next step, wall Hugger");
         if (!rc.isCoreReady()) {
             return false;
         }

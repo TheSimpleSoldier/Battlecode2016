@@ -654,32 +654,26 @@ public class TurtleArchon extends BaseArchon implements PacMan
             return Bots.RUSHINGVIPER;
         }
 
-        if (scavenging && zombies.length > 0)
+        if (scavenging && zombies.length > 0 && allies.length <= 3)
         {
             nextType = RobotType.GUARD;
             return Bots.TURTLEGUARD;
         }
-        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30)
+        else if (scavenging && zombieTracker.getNextZombieRound() - round < 30 && seeScout() < 3)
         {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
         else if (scavenging && rc.getTeamParts() > 300 && zombieTracker.getZombieStrength() < 5)
         {
-            if (currentLocation.distanceSquaredTo(enemyArchonCenterOfMass) < currentLocation.distanceSquaredTo(alliedArchonCenterOfMass))
-            {
-                nextType = RobotType.VIPER;
-                return Bots.RUSHINGVIPER;
-            }
-
-            nextType = RobotType.SOLDIER;
-            return Bots.TURTLESOLDIER;
+            nextType = RobotType.VIPER;
+            return Bots.RUSHINGVIPER;
         }
 
 
-        if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 25)
+        if (round - lastZombieSighting < 300 && round - lastEnemieSighting > 50)
         {
-            if (zombieTracker.getNextZombieRoundStrength() < 5) {
+            if (zombieTracker.getNextZombieRoundStrength() < 5 || seeScout() >= 3) {
 
             }
             else if (zombieTracker.getNextZombieRoundStrength() < 10 )
@@ -710,7 +704,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
 
         // late game if we aren't under attack spawn a lot of scout bombs
-        if (round > 2000 && lastUnderAttack < 1500) {
+        if (round > 2500 && lastUnderAttack < 2000) {
             nextType = RobotType.SCOUT;
             return Bots.SCOUTBOMBSCOUT;
         }
@@ -721,7 +715,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
             return Bots.RUSHINGVIPER;
         }
 
-        if (round > 100)
+        if (round > 100 && currentLocation.distanceSquaredTo(turtlePoint) < sightRange/2)
         {
             int soldierCount = 0;
             int guardCount = 0;

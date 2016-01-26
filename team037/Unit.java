@@ -60,6 +60,7 @@ public abstract class Unit
     public static MapLocation turtlePoint;
     public static MapLocation enemyArchonCenterOfMass;
     public static MapLocation alliedArchonCenterOfMass;
+    public static MapLocation enemyArchon;
     public static int centerOfMassDifference;
     public static int myArchon;
     public static int turretSupportMsgRound;
@@ -105,6 +106,7 @@ public abstract class Unit
         }
 
         turretSupportMsgRound = 0;
+        enemyArchon = null;
     }
 
     public boolean act() throws GameActionException
