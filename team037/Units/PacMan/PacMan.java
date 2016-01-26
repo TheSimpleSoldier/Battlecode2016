@@ -23,7 +23,7 @@ public interface PacMan {
 
     double[][] DEFAULT_WEIGHTS = new double[][] {
             {1, .5, .5, .5, .5},    // enemy and zombie weights (enemies in sensor range)
-            {-32, -16, -8, -4, -2}, // target constants (attract towards target)
+            {-16, -8, -4, 0, 0}, // target constants (attract towards target)
             {-2,.5,.5,.5,.5},       // weights for neutrals and parts
             {8,.5,.25}              // weights for turrets
     };
@@ -146,74 +146,74 @@ public interface PacMan {
             directions[5] *= 1 + left / 2;
             directions[6] *= 1 + mid;
             directions[7] *= 1 + right / 2;
-
-            double[] rubble = PacManUtils.rubble;
-            if (rubble != null) {
-
-                if (rubble[0] > RUBBLE_OBSTRUCT) {
-                    directions[0] += RUBBLE_DIFF;
-                } else if (rubble[0] < RUBBLE_SLOW) {
-                    rubble[0] = 0;
-                } else {
-                    directions[0] += (double)directions[0] * (rubble[0] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[1] > RUBBLE_OBSTRUCT) {
-                    directions[1] += RUBBLE_DIFF;
-                } else if (rubble[1] < RUBBLE_SLOW) {
-                    rubble[1] = 0;
-                } else {
-                    directions[1] += (double)directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[2] > RUBBLE_OBSTRUCT) {
-                    directions[2] += RUBBLE_DIFF;
-                } else if (rubble[2] < RUBBLE_SLOW) {
-                    rubble[2] = 0;
-                } else {
-                    directions[2] += (double)directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[3] > RUBBLE_OBSTRUCT) {
-                    directions[3] += RUBBLE_DIFF;
-                } else if (rubble[3] < RUBBLE_SLOW) {
-                    rubble[3] = 0;
-                } else {
-                    directions[3] += (double)directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[4] > RUBBLE_OBSTRUCT) {
-                    directions[4] += RUBBLE_DIFF;
-                } else if (rubble[4] < RUBBLE_SLOW) {
-                    rubble[4] = 0;
-                } else {
-                    directions[4] += (double)directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[5] > RUBBLE_OBSTRUCT) {
-                    directions[5] += RUBBLE_DIFF;
-                } else if (rubble[5] < RUBBLE_SLOW) {
-                    rubble[5] = 0;
-                } else {
-                    directions[5] += (double)directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[6] > RUBBLE_OBSTRUCT) {
-                    directions[6] += RUBBLE_DIFF;
-                } else if (rubble[6] < RUBBLE_SLOW) {
-                    rubble[6] = 0;
-                } else {
-                    directions[6] += (double)directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-
-                if (rubble[7] > RUBBLE_OBSTRUCT) {
-                    directions[7] += RUBBLE_DIFF;
-                } else if (rubble[7] < RUBBLE_SLOW) {
-                    rubble[7] = 0;
-                } else {
-                    directions[7] += (double)directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
-                }
-            }
+//
+//            double[] rubble = PacManUtils.rubble;
+//            if (rubble != null) {
+//
+//                if (rubble[0] > RUBBLE_OBSTRUCT) {
+//                    directions[0] += RUBBLE_DIFF;
+//                } else if (rubble[0] < RUBBLE_SLOW) {
+//                    rubble[0] = 0;
+//                } else {
+//                    directions[0] += (double)directions[0] * (rubble[0] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[1] > RUBBLE_OBSTRUCT) {
+//                    directions[1] += RUBBLE_DIFF;
+//                } else if (rubble[1] < RUBBLE_SLOW) {
+//                    rubble[1] = 0;
+//                } else {
+//                    directions[1] += (double)directions[1] * (rubble[1] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[2] > RUBBLE_OBSTRUCT) {
+//                    directions[2] += RUBBLE_DIFF;
+//                } else if (rubble[2] < RUBBLE_SLOW) {
+//                    rubble[2] = 0;
+//                } else {
+//                    directions[2] += (double)directions[2] * (rubble[2] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[3] > RUBBLE_OBSTRUCT) {
+//                    directions[3] += RUBBLE_DIFF;
+//                } else if (rubble[3] < RUBBLE_SLOW) {
+//                    rubble[3] = 0;
+//                } else {
+//                    directions[3] += (double)directions[3] * (rubble[3] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[4] > RUBBLE_OBSTRUCT) {
+//                    directions[4] += RUBBLE_DIFF;
+//                } else if (rubble[4] < RUBBLE_SLOW) {
+//                    rubble[4] = 0;
+//                } else {
+//                    directions[4] += (double)directions[4] * (rubble[4] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[5] > RUBBLE_OBSTRUCT) {
+//                    directions[5] += RUBBLE_DIFF;
+//                } else if (rubble[5] < RUBBLE_SLOW) {
+//                    rubble[5] = 0;
+//                } else {
+//                    directions[5] += (double)directions[5] * (rubble[5] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[6] > RUBBLE_OBSTRUCT) {
+//                    directions[6] += RUBBLE_DIFF;
+//                } else if (rubble[6] < RUBBLE_SLOW) {
+//                    rubble[6] = 0;
+//                } else {
+//                    directions[6] += (double)directions[6] * (rubble[6] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//
+//                if (rubble[7] > RUBBLE_OBSTRUCT) {
+//                    directions[7] += RUBBLE_DIFF;
+//                } else if (rubble[7] < RUBBLE_SLOW) {
+//                    rubble[7] = 0;
+//                } else {
+//                    directions[7] += (double)directions[7] * (rubble[7] - RUBBLE_SLOW) / RUBBLE_DIFF;
+//                }
+//            }
             
             // Last: find the smallest value whose direction leads to a valid location.
             MapLocation nextLoc;
