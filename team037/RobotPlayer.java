@@ -58,7 +58,6 @@ public class RobotPlayer
                 strategy = Strategies.RUSH;
             }*/
 
-            strategy = Strategies.PACMAN;
 
             if(rc.getRoundNum() == 0)
             {
