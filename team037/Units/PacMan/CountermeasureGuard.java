@@ -44,15 +44,10 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
     public boolean act() throws GameActionException {
         if (myArchon == null) {
             roundsSurvived++;
-            navigator.setTarget(enemyArchonCenterOfMass);
             return super.act();
         } else {
             if (zombieCenterOfMass != null && zombies.length > 0) {
                 navigator.setTarget(zombieCenterOfMass);
-            } else if (enemyCenterOfMass != null && enemies.length > 0) {
-                navigator.setTarget(enemyCenterOfMass);
-            } else {
-                navigator.setTarget(enemyArchonCenterOfMass);
             }
             if (zombieAdjacentToArchon && currentLocation.isAdjacentTo(myArchon.location)) {
                 return fightZombies();
@@ -85,12 +80,13 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
     }
 
     public int[] applyAdditionalConstants(int[] directions) {
+        if (rc.isArmageddon()) {
+            return directions;
+        }
         if (myArchon != null) {
             directions = PacManUtils.applySimpleConstant(currentLocation, directions, myArchon.location, new int[]{999999,9999,0});
         } else if (archonLastLoc != null) {
             directions = PacManUtils.applySimpleConstant(currentLocation, directions, archonLastLoc, new int[]{999999,9999,0});
-        } else {
-            directions = PacManUtils.applySimpleConstant(currentLocation, directions, enemyArchonCenterOfMass, new int[]{-32,-16,-8});
         }
         return directions;
     }
@@ -135,23 +131,6 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
             zombieCenterOfMass = new MapLocation(x, y);
         } else {
             zombieCenterOfMass = null;
-        }
-        x = 0;
-        y = 0;
-
-        if (enemies.length > 0) {
-            for (int i = enemies.length; --i >= 0; ) {
-                MapLocation enemyLoc = enemies[i].location;
-                x += enemyLoc.x;
-                y += enemyLoc.y;
-            }
-
-            x /= enemies.length;
-            y /= enemies.length;
-
-            enemyCenterOfMass = new MapLocation(x, y);
-        } else {
-            enemyCenterOfMass = null;
         }
     }
 }

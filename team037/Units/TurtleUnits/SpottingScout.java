@@ -11,7 +11,7 @@ public class SpottingScout extends BaseScout
     public SpottingScout(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, alliedArchonStartLocs);
         rc.setIndicatorString(0, "Spotting scout x: " + turtlePoint.x + " y: " + turtlePoint.y);
         System.out.println("We have a spotting scout!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }

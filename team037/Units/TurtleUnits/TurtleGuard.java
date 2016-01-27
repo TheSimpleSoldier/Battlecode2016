@@ -12,8 +12,6 @@ public class TurtleGuard extends BaseGaurd
 {
     public static RobotTypeTracker robotTypeTracker;
     public static ZombieTracker zombieTracker;
-    private static int nearestEnemyArchon;
-    private static RobotInfo nearestEnemyArchonInfo;
     private static int nearestCombatEnemy;
     private static RobotInfo nearestCombatEnemyInfo;
     private static boolean nonScoutEnemies;
@@ -43,14 +41,14 @@ public class TurtleGuard extends BaseGaurd
     public TurtleGuard(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, alliedArchonStartLocs);
         robotTypeTracker = new RobotTypeTracker(RobotType.TURRET, rc);
         zombieTracker = new ZombieTracker(rc);
     }
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.turretGuardMicro(enemies, nearByEnemies, allies);
+        return false;
     }
 
     @Override
@@ -75,37 +73,9 @@ public class TurtleGuard extends BaseGaurd
         nearestCombatEnemyInfo = null;
         nearestCombatEnemy = Integer.MAX_VALUE;
         nearestCombatEnemyInfo = null;
-        nearestEnemyArchon = Integer.MAX_VALUE;
-        nearestEnemyArchonInfo = null;
 
         nonScoutEnemies = false;
-        for (int i = enemies.length; --i >= 0; ) {
-            int dist = enemies[i].location.distanceSquaredTo(currentLocation);
-            switch (enemies[i].type) {
-                case SOLDIER:
-                case VIPER:
-                case GUARD:
-                case TTM:
-                case TURRET:
-                    nonScoutEnemies = true;
-                    if (dist < nearestCombatEnemy) {
-                        nearestCombatEnemy = dist;
-                        nearestCombatEnemyInfo = enemies[i];
-                    }
-                    break;
 
-                case ARCHON:
-                    if (dist < nearestEnemyArchon) {
-                        nearestEnemyArchon = dist;
-                        nearestEnemyArchonInfo = enemies[i];
-                    }
-                    nonScoutEnemies = true;
-                    break;
-                case SCOUT:
-                    break;
-
-            }
-        }
 
         nearestBigZombie = Integer.MAX_VALUE;
         nearestBigZombieInfo = null;
@@ -549,11 +519,7 @@ public class TurtleGuard extends BaseGaurd
      */
     private boolean enemiesInOpen() throws GameActionException {
         // precondition
-        if (!nonScoutEnemies) {
-            return false;
-        }
-
-        return fightMicro.basicGuardMicro(enemies, nearByEnemies, allies);
+        return false;
     }
 
 }

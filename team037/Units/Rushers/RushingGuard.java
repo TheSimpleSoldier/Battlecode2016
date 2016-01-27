@@ -4,15 +4,16 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
+import team037.MapKnowledge;
 import team037.Units.BaseUnits.BaseGaurd;
 import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
+import team037.Utilites.MapUtils;
 
 public class RushingGuard extends BaseGaurd implements PacMan
 {
     private boolean rushing = false;
     private MapLocation lastTarget = null;
-    private MapLocation[] updatedLocs;
     private int currentIndex = -1;
     private int dist = Integer.MAX_VALUE;
 
@@ -20,7 +21,8 @@ public class RushingGuard extends BaseGaurd implements PacMan
     {
         super(rc);
         rc.setIndicatorString(0, "rushing guard");
-        updatedLocs = new MapLocation[enemyArchonStartLocs.length];
+
+        rushTarget = mapKnowledge.getOppositeCorner(currentLocation);
 
         int minDist = 9999;
         for(int k = allies.length; --k >= 0;)
@@ -36,15 +38,12 @@ public class RushingGuard extends BaseGaurd implements PacMan
             }
         }
 
-        for (int i = updatedLocs.length; --i>=0; )
-        {
-            updatedLocs[i] = enemyArchonStartLocs[i];
-        }
-
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));
         dist = dist / 2;
         dist = dist*dist;
     }
+
+
 
     @Override
     public void collectData() throws GameActionException
@@ -62,46 +61,35 @@ public class RushingGuard extends BaseGaurd implements PacMan
     }
 
     @Override
-    public boolean updateTarget() throws GameActionException
-    {
-        return true;
-    }
-
-    @Override
-    public boolean fight() throws GameActionException
-    {
-        return fightMicro.basicAttack(nearByEnemies, enemies);
-    }
-
-    @Override
     public boolean fightZombies() throws GameActionException
     {
-        if (zombies == null && zombies.length == 0 || (zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
-            return false;
-        }
-        return runAway(null);
+        if (zombies != null && zombies.length > 0)
+            return fightMicro.guardZombieMicro(zombies,nearByZombies,allies);
+        return runAway(null,false,true);
     }
-
-    /**
-     * Add additional constants to push the unit towards enemy Archons AND away from allied Archons
-     *
-     * @param directions
-     * @return
-     */
     public int[] applyAdditionalConstants(int[] directions) {
 
         MapLocation[] myArchons = mapKnowledge.getArchonLocations(true);
         if (myArchons == null) {
             myArchons = rc.getInitialArchonLocations(us);
         }
-        directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{16, 8, 4});
 
-        MapLocation[] badArchons = mapKnowledge.getArchonLocations(false);
-        if (badArchons == null) {
-            badArchons = rc.getInitialArchonLocations(us);
+        if (rc.isArmageddon()) {
+            directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{32, 16, 8});
+        } else {
+            directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{-32, -16, -8});
         }
-        directions = PacManUtils.applySimpleConstants(currentLocation, directions, badArchons, new int[]{-8, -4, -2});
 
+        return directions;
+    }
+
+    public int[] applyAdditionalWeights(int[] directions) {
+
+        if (rc.isArmageddon()) {
+            directions = PacManUtils.applyWeights(currentLocation, directions, allies, DEFAULT_WEIGHTS[ENEMIES]);
+        } else {
+            directions = PacManUtils.applyWeights(currentLocation, directions, allies, DEFAULT_WEIGHTS[NEUTRALS_AND_PARTS]);
+        }
         return directions;
     }
 }

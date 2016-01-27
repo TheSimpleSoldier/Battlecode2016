@@ -60,7 +60,7 @@ public class BaseArchon extends Unit implements PacMan {
 
 
         // if there are no visible zombies then we should move to collect parts
-        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies)) {
+        if (!FightMicroUtilites.offensiveEnemies(zombies)) {
             MapLocation navigatorTarget;
 
             // if we are trying to get to parts and the location has rubble on it we should clear it
@@ -164,11 +164,7 @@ public class BaseArchon extends Unit implements PacMan {
     }
 
     public boolean fight() throws GameActionException {
-        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
-
-        rc.setIndicatorDot(currentLocation, 255, 0, 0);
-
-        return runAway(null);
+        return false;
     }
 
     public boolean fightZombies() throws GameActionException {
@@ -182,16 +178,6 @@ public class BaseArchon extends Unit implements PacMan {
     @Override
     public void sendMessages() throws GameActionException {
         int offensiveEnemies = 0;
-
-        for (int i = enemies.length; --i >= 0; ) {
-            switch (enemies[i].type) {
-                case TURRET:
-                case GUARD:
-                case SOLDIER:
-                case VIPER:
-                    offensiveEnemies++;
-            }
-        }
 
         offensiveEnemies += zombies.length;
 
@@ -255,7 +241,7 @@ public class BaseArchon extends Unit implements PacMan {
     // maybe spawn a unit or repair a damaged unit
     @Override
     public boolean carryOutAbility() throws GameActionException {
-        if (enemies.length > allies.length) {
+        if (zombies.length - 3 > allies.length) {
             return false;
         }
 

@@ -74,7 +74,6 @@ public class PacManScout extends Unit implements PacMan {
     public int[] applyAllWeights(int[] directions, double[][] weights) {
 
         directions = applyOrbitWeights(directions, zombies, PACMAN_WEIGHTS[0]);
-        directions = applyOrbitWeights(directions, enemies, PACMAN_WEIGHTS[1]);
 //        if (rc.isInfected()) {
 //
 //        }

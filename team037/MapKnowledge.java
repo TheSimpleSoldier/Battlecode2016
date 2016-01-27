@@ -214,7 +214,7 @@ public class MapKnowledge
             }
             else
             {
-                return Unit.enemyArchonStartLocs;
+                return Unit.alliedArchonStartLocs;
             }
         }
 

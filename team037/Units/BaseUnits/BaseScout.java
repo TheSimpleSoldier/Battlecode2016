@@ -28,7 +28,7 @@ public class BaseScout extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.avoidEnemiesInRoute(enemies, navigator.getTarget());
+        return false;
     }
 
     public boolean fightZombies() throws GameActionException
@@ -68,21 +68,7 @@ public class BaseScout extends Unit
 
     public void msgArchons() throws GameActionException
     {
-        for(int k = 0; k < enemies.length; k++)
-        {
-            if(enemies[k].type == RobotType.ARCHON && msgsSent < 20)
-            {
-                BotInfoCommunication communication = new BotInfoCommunication();
-                communication.opcode = CommunicationType.ENEMY;
-                communication.id = enemies[k].ID;
-                communication.team = opponent;
-                communication.type = RobotType.ARCHON;
-                communication.x = enemies[k].location.x;
-                communication.y = enemies[k].location.y;
-                communicator.sendCommunication(2500, communication);
-                msgsSent++;
-            }
-        }
+
     }
 
     public void msgDens() throws GameActionException
@@ -191,40 +177,6 @@ public class BaseScout extends Unit
 
         if (allyTurrets != null && mKnowledge.ourTurretLocations.hasLocations())
         {
-            for (int i = enemies.length; --i >= 0; )
-            {
-                MapLocation enemy = enemies[i].location;
-                boolean msg = false;
-                for (int j = mKnowledge.ourTurretLocations.length; --j >= 0; )
-                {
-                    if (allyTurrets[j] == null)
-                        continue;
-
-                    double dist = allyTurrets[j].distanceSquaredTo(enemy);
-
-                    if (dist <= RobotType.TURRET.attackRadiusSquared && dist > RobotType.TURRET.sensorRadiusSquared && msgsSent < 10)
-                    {
-                        msg = true;
-                        break;
-                    }
-
-                    if (msgsSent == 10)
-                    {
-                        i = -1;
-                        j = -1;
-                    }
-                }
-
-                if (msg)
-                {
-                    Communication communication = new TurretSupportCommunication();
-                    communication.setValues(new int[]{CommunicationType.toInt(CommunicationType.TURRET_SUPPORT),(int)Math.ceil(enemies[i].coreDelay),enemy.x, enemy.y});
-                    communicator.sendCommunication(type.sensorRadiusSquared*2, communication);
-                    sentMsg = true;
-                    msgsSent++;
-                }
-            }
-
             if (!sentMsg)
             {
                 for (int i = zombies.length; --i >= 0; )

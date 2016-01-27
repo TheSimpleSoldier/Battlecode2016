@@ -17,7 +17,7 @@ public class BaseGaurd extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicGuardMicro(enemies, nearByEnemies, allies);
+        return false;
     }
 
     public boolean fightZombies() throws GameActionException

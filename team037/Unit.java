@@ -18,14 +18,10 @@ public abstract class Unit
     public static RobotType type;
     public static int sightRange;
     public static Team us;
-    public static Team opponent;
-    public static RobotInfo[] nearByEnemies;
     public static RobotInfo[] nearByAllies;
-    public static RobotInfo[] enemies;
     public static RobotInfo[] allies;
     public static RobotInfo[] nearByZombies;
     public static RobotInfo[] zombies;
-    public static MapLocation[] enemyArchonStartLocs;
     public static MapLocation[] alliedArchonStartLocs;
     public static MapLocation target;
     public static Direction[] dirs;
@@ -44,7 +40,6 @@ public abstract class Unit
     public static boolean defendingArchon = false;
     public static int rubbleUpdate = 0;
 
-    public static boolean enemyComs = true;
     public static boolean archonComs = true;
     public static boolean archonDistressComs = true;
     public static boolean mapComs = true;
@@ -58,10 +53,7 @@ public abstract class Unit
     public static MapLocation rallyPoint;
     public static MapLocation distressedArchon;
     public static MapLocation turtlePoint;
-    public static MapLocation enemyArchonCenterOfMass;
     public static MapLocation alliedArchonCenterOfMass;
-    public static MapLocation enemyArchon;
-    public static int centerOfMassDifference;
     public static int myArchon;
     public static int turretSupportMsgRound;
 
@@ -78,7 +70,6 @@ public abstract class Unit
         range = type.attackRadiusSquared;
         sightRange = type.sensorRadiusSquared;
         us = rc.getTeam();
-        opponent = us.opponent();
         dirs = new Direction[]{Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST,
         Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
         fightMicro = new FightMicro(rc);
@@ -92,9 +83,6 @@ public abstract class Unit
         repaired = false;
         alliedArchonStartLocs = rc.getInitialArchonLocations(us);
         alliedArchonCenterOfMass = MapUtils.getCenterOfMass(alliedArchonStartLocs);
-        enemyArchonStartLocs = rc.getInitialArchonLocations(opponent);
-        enemyArchonCenterOfMass = MapUtils.getCenterOfMass(enemyArchonStartLocs);
-        centerOfMassDifference = alliedArchonCenterOfMass.distanceSquaredTo(enemyArchonCenterOfMass);
 
         myArchon = -1;
 
@@ -102,11 +90,9 @@ public abstract class Unit
         for(int k = alliedArchonStartLocs.length; --k >= 0;)
         {
             mapKnowledge.updateEdgesFromLocation(alliedArchonStartLocs[k]);
-            mapKnowledge.updateEdgesFromLocation(enemyArchonStartLocs[k]);
         }
 
         turretSupportMsgRound = 0;
-        enemyArchon = null;
     }
 
     public boolean act() throws GameActionException
@@ -153,7 +139,7 @@ public abstract class Unit
             }
 
             // condition for when we should stop rallying around an archon
-            if (rc.getLocation().distanceSquaredTo(distressedArchon) < 5 && enemies.length == 0)
+            if (rc.getLocation().distanceSquaredTo(distressedArchon) < 5 && zombies.length == 0)
             {
                 distressedArchon = null;
                 defendingArchon = false;
@@ -161,10 +147,9 @@ public abstract class Unit
             }
 
             // rush towards archon shooting anything in path
-            if (rc.isWeaponReady() && (nearByEnemies.length > 0 || nearByZombies.length > 0))
+            if (rc.isWeaponReady() && nearByZombies.length > 0)
             {
-                if (fightMicro.basicFightMicro(nearByEnemies));
-                else if (fightMicro.basicFightMicro(nearByZombies));
+                if (fightMicro.basicFightMicro(nearByZombies));
             }
             else if (rc.isCoreReady())
             {
@@ -216,13 +201,6 @@ public abstract class Unit
                         if(type == RobotType.SCOUT)
                         {
                             interpretScoutMapKnowledge(communications[k]);
-                        }
-                        break;
-                    case OENEMY:
-                    case ENEMY:
-                        if(enemyComs)
-                        {
-                            interpretEnemy(communications[k]);
                         }
                         break;
                     case CHANGEMISSION:
@@ -285,14 +263,12 @@ public abstract class Unit
 
     public void collectData() throws GameActionException
     {
-        enemies = rc.senseNearbyRobots(sightRange, opponent);
         allies = rc.senseNearbyRobots(sightRange, us);
         zombies = rc.senseNearbyRobots(sightRange, Team.ZOMBIE);
 
         if (type.attackRadiusSquared > 0) {
             nearByAllies = rc.senseNearbyRobots(range, us);
             nearByZombies = rc.senseNearbyRobots(range, Team.ZOMBIE);
-            nearByEnemies = rc.senseNearbyRobots(range, opponent);
         }
 
 
@@ -447,28 +423,6 @@ public abstract class Unit
         }
     }
 
-    public static void interpretEnemy(Communication communication)
-    {
-        switch(communication.opcode)
-        {
-            case OENEMY:
-                SimpleBotInfoCommunication com = (SimpleBotInfoCommunication) communication;
-                mapKnowledge.updateArchon(new SimpleRobotInfo(com.id,
-                        new MapLocation(com.x, com.y), RobotType.ARCHON, opponent), false);
-                mapKnowledge.updateEdgesFromLocation(new MapLocation(com.x, com.y));
-                break;
-            case ENEMY:
-                BotInfoCommunication botCom = (BotInfoCommunication) communication;
-                if(botCom.type == RobotType.ARCHON)
-                {
-                    mapKnowledge.addArchon(new SimpleRobotInfo(botCom.id,
-                            new MapLocation(botCom.x, botCom.y), RobotType.ARCHON,
-                            opponent), false);
-                }
-                break;
-        }
-    }
-
     public static void interpretMissionChange(Communication communication)
     {
         switch(communication.opcode)
@@ -553,13 +507,9 @@ public abstract class Unit
                             // if zombie has a weapon cool down less than or equal to 1
                             if (zombies[i].weaponDelay <= 1)
                             {
-                                // don't want to stop from becoming a zombie in enemy base
-                                if (enemies.length < allies.length)
-                                {
-                                    System.out.println("WE disintegrated to avoid turning into a zombie");
-                                    rc.setIndicatorDot(currentLocation, 1, 1, 1);
-                                    rc.disintegrate();
-                                }
+                                System.out.println("WE disintegrated to avoid turning into a zombie");
+                                rc.setIndicatorDot(currentLocation, 1, 1, 1);
+                                rc.disintegrate();
                             }
                         }
                     }

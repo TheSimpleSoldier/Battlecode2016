@@ -19,7 +19,7 @@ public class BaseViper extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicFightMicro(nearByEnemies);
+        return false;
     }
 
     public boolean fightZombies() throws GameActionException

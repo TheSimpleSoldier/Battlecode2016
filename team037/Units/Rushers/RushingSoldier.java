@@ -12,19 +12,13 @@ public class RushingSoldier extends BaseSoldier implements PacMan
 {
     private boolean rushing = false;
     private MapLocation lastTarget = null;
-    private MapLocation[] updatedLocs;
     private int currentIndex = -1;
     private int dist = Integer.MAX_VALUE;
 
     public RushingSoldier(RobotController rc)
     {
         super(rc);
-        updatedLocs = new MapLocation[enemyArchonStartLocs.length];
-
-        for (int i = updatedLocs.length; --i>=0; )
-        {
-            updatedLocs[i] = enemyArchonStartLocs[i];
-        }
+        rushTarget = mapKnowledge.getOppositeCorner(currentLocation);
 
         int minDist = 9999;
         for(int k = allies.length; --k >= 0;)
@@ -74,7 +68,7 @@ public class RushingSoldier extends BaseSoldier implements PacMan
     @Override
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicAttack(nearByEnemies, enemies);
+        return false;
     }
 
     @Override
@@ -100,14 +94,23 @@ public class RushingSoldier extends BaseSoldier implements PacMan
         if (myArchons == null) {
             myArchons = rc.getInitialArchonLocations(us);
         }
-        directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{16, 8, 4});
 
-        MapLocation[] badArchons = mapKnowledge.getArchonLocations(false);
-        if (badArchons == null) {
-            badArchons = rc.getInitialArchonLocations(us);
+        if (rc.isArmageddon()) {
+            directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{32, 16, 8});
+        } else {
+            directions = PacManUtils.applySimpleConstants(currentLocation, directions, myArchons, new int[]{-32, -16, -8});
         }
-        directions = PacManUtils.applySimpleConstants(currentLocation, directions, badArchons, new int[]{-8, -4, -2});
 
+        return directions;
+    }
+
+    public int[] applyAdditionalWeights(int[] directions) {
+
+        if (rc.isArmageddon()) {
+            directions = PacManUtils.applyWeights(currentLocation, directions, allies, DEFAULT_WEIGHTS[ENEMIES]);
+        } else {
+            directions = PacManUtils.applyWeights(currentLocation, directions, allies, DEFAULT_WEIGHTS[NEUTRALS_AND_PARTS]);
+        }
         return directions;
     }
 }

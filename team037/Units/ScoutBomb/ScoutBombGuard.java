@@ -54,14 +54,6 @@ public class ScoutBombGuard extends BaseGaurd {
         // enemy info
         closestEnemy = Integer.MAX_VALUE;
         closestEnemyLoc = null;
-        for (int i = enemies.length; --i>=0;) {
-            int distance =  enemies[i].location.distanceSquaredTo(currentLocation);
-            if (distance < closestEnemy && !enemies[i].type.equals(RobotType.SCOUT)) {
-                nonScoutEnemies = true;
-                closestEnemy = distance;
-                closestEnemyLoc = enemies[i].location;
-            }
-        }
     }
 
     @Override
@@ -111,7 +103,7 @@ public class ScoutBombGuard extends BaseGaurd {
         }
 
         if (archonLoc == null) {
-            Direction toMove = currentLocation.directionTo(enemyArchonCenterOfMass);
+            Direction toMove = currentLocation.directionTo(alliedArchonCenterOfMass).opposite();
             MoveUtils.tryMoveForwardOrSideways(toMove, true);
             return true;
         }

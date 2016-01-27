@@ -115,14 +115,13 @@ public class CastleSoldier extends BaseSoldier
         if (rc.getWeaponDelay() >= 1) {
             return false;
         }
-        if (nearByEnemies.length == 0 && nearByZombies.length == 0) {
+        if (nearByZombies.length == 0) {
             return false;
         }
 
         // try attacking enemies or zombies
-        if (nearByEnemies.length > 0 && tryAttack(nearByEnemies)) {
-            return true;
-        } else if (nearByZombies.length > 0 && tryAttack(nearByZombies)) {
+
+        if (nearByZombies.length > 0 && tryAttack(nearByZombies)) {
             return true;
         }
 
@@ -169,7 +168,7 @@ public class CastleSoldier extends BaseSoldier
 
     private boolean cleanUp() throws GameActionException {
         //prereqs
-        if (nearByEnemies.length > 0 || nearByZombies.length > 0) {
+        if (nearByZombies.length > 0) {
             return false;
         }
 

@@ -256,23 +256,6 @@ public class ScavengerScout extends ScoutBombScout implements PacMan {
                 }
             }
 
-            if (enemies != null) {
-                for (int i = enemies.length; --i >= 0; ) {
-
-                    if (!enemies[i].type.equals(RobotType.VIPER)) continue;
-
-                    MapLocation enemy = enemies[i].location;
-                    int myDistance = currentLocation.distanceSquaredTo(enemy);
-
-                    if (myDistance < 25) {
-                        target = enemy;
-                        navigator.setTarget(enemy);
-                        BOMB = true;
-                        break;
-                    }
-                }
-            }
-
             double[] rubble = new double[8];
             try {
                 double least = 9999999;

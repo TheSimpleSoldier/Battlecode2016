@@ -19,7 +19,7 @@ public class TurtleScout extends BaseScout
     public TurtleScout(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, alliedArchonStartLocs);
         rc.setIndicatorString(0, "Turtle scout x: " + turtlePoint.x + " y: " + turtlePoint.y);
     }
 
@@ -109,72 +109,6 @@ public class TurtleScout extends BaseScout
     @Override
     public boolean fight() throws GameActionException
     {
-        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
-
-        Direction dir = goToDirection();
-        MapLocation next = currentLocation.add(dir);
-
-        // if we can move in
-        if (rc.canMove(dir) && !fightMicro.EnemiesInRangeOfLoc(next, enemies))
-        {
-            rc.move(dir);
-            return true;
-        }
-        else if (rc.canMove(dir.opposite()) && !fightMicro.EnemiesInRangeOfLoc(currentLocation.add(dir.opposite()), enemies))
-        {
-            goingLeft = !goingLeft;
-            rc.move(dir.opposite());
-            return true;
-        }
-
-        int bestEnemiesInRangeDamage = Integer.MAX_VALUE;
-        Direction bestDir = null;
-
-        for (int i = dirs.length; --i>=0; )
-        {
-            if (!rc.canMove(dirs[i])) continue;
-
-            next = currentLocation.add(dirs[i]);
-            int enemiesInRangeDamage = 0;
-
-            for (int j = enemies.length; --j>=0; )
-            {
-                if (enemies[j].location.distanceSquaredTo(next) <= enemies[j].type.attackRadiusSquared)
-                {
-                    enemiesInRangeDamage += enemies[j].type.attackPower;
-
-                    if (enemies[j].type == RobotType.VIPER)
-                    {
-                        enemiesInRangeDamage += 40;
-                    }
-                }
-            }
-
-            if (enemiesInRangeDamage < bestEnemiesInRangeDamage)
-            {
-                bestEnemiesInRangeDamage = enemiesInRangeDamage;
-                bestDir = dirs[i];
-
-                if (enemiesInRangeDamage == 0)
-                {
-                    break;
-                }
-            }
-        }
-
-        if (bestDir != null && fightMicro.EnemiesInRangeOfLoc(currentLocation.add(bestDir), enemies) && !fightMicro.EnemiesInRangeOfLoc(currentLocation, enemies))
-        {
-            // stay put
-            return true;
-        }
-        else
-        {
-            if (bestDir != null)
-            {
-                rc.move(bestDir);
-                return true;
-            }
-        }
 
         return false;
     }

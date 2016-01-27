@@ -17,9 +17,9 @@ import team037.Utilites.Utilities;
 public class ScavengerArchon extends BaseArchon implements PacMan {
 
     public static double[] adjacentRubble;
-    public static MapLocation lastScan, lastTurret, archonSighted, enemyCenterOfMass, zombieCenterOfMass, myNeutral;
+    public static MapLocation lastScan, zombieCenterOfMass, myNeutral;
     public static RobotInfo scout1, scout2, scout3;
-    public static int offensiveEnemies, turretsSighted, myScouts, bigZombies;
+    public static int myScouts, bigZombies, offensiveEnemies;
     public static AppendOnlyMapLocationSet turretLocations;
     public static MessageBuffer messageBuffer;
     public static RobotType SCOUT = RobotType.SCOUT;
@@ -32,12 +32,9 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         scout2 = null;
         scout3 = null;
         myNeutral = null;
-        offensiveEnemies = 0;
-        turretsSighted = 0;
         bigZombies = 0;
         myScouts = 0;
         turretLocations = new AppendOnlyMapLocationSet();
-        lastTurret = null;
         messageBuffer = new MessageBuffer();
     }
 
@@ -49,9 +46,6 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
 //        if (offensiveEnemies == 0 || (offensiveEnemies == 1 && zombies.length == 1 && zombies[0].type.equals(RobotType.ZOMBIEDEN))) {
 //            return false;
 //        }
-        if (enemies.length == 0 || zombies.length > enemies.length) {
-            return false;
-        }
         return runAway(null,true,true);
     }
 
@@ -66,17 +60,6 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
     public int[] applyAdditionalWeights(int[] directions) {
         directions = PacManUtils.applySimpleWeights(currentLocation,directions, allies);
         return directions;
-    }
-
-
-    public boolean safeToCommunicate() {
-        return offensiveEnemies == 0 && turretsSighted == 0;
-    }
-
-    public void sendMessages() {
-        if (!safeToCommunicate()) {
-            return;
-        }
     }
 
     public void collectData() throws GameActionException {
@@ -98,47 +81,6 @@ public class ScavengerArchon extends BaseArchon implements PacMan {
         }
 
         // Reset offensiveEnemies and do a recount
-        offensiveEnemies = 0;
-        if (enemies.length > 0 && enemies.length < 8) {
-            // Check for significant enemies and find the enemy center of mass
-            int archons = 0;
-            int x = 0, y = 0;
-            for (int i = enemies.length; --i >= 0; ) {
-                MapLocation enemyLoc = enemies[i].location;
-                x += enemyLoc.x;
-                y += enemyLoc.y;
-                switch (enemies[i].type) {
-                    case TURRET:
-                        if (!enemyLoc.equals(lastTurret)) {
-                            lastTurret = enemyLoc;
-                            turretLocations.add(lastTurret);
-                            turretsSighted++;
-                        }
-                        offensiveEnemies++;
-                        break;
-                    case GUARD:
-                    case SOLDIER:
-                    case VIPER:
-                        offensiveEnemies++;
-                        break;
-                    case ARCHON:
-                        if (!enemyLoc.equals(archonSighted)) {
-                            archonSighted = enemyLoc;
-                            archons++;
-                        }
-                        break;
-                }
-            }
-            x /= enemies.length;
-            y /= enemies.length;
-            enemyCenterOfMass = new MapLocation(x, y);
-
-            if (archons == 0) {
-                archonSighted = null;
-            }
-        } else {
-            enemyCenterOfMass = null;
-        }
 
         offensiveEnemies += zombies.length;
 

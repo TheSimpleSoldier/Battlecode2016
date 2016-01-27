@@ -274,22 +274,14 @@ public class PacManUtils {
             scalars[0] = resetScalars;
             switch(unit.type) {
                 case ARCHON:
-                    if (unit.team.equals(Unit.opponent)) continue;
                     if (unit.team.equals(Team.NEUTRAL)) scalars[0] -= 10;
                     break;
-                case SCOUT:
                 case ZOMBIEDEN:
-                    if (!unit.team.equals(Unit.us)) continue;
-                    break;
-                case TURRET:
-                    if (unit.team.equals(Unit.opponent)) {
-                        TurretMemory.addTurretLocation(unit.location);
-                    }
-                    break;
+                    continue;
                 case FASTZOMBIE:
-                    scalars[0] += .1;
+                case RANGEDZOMBIE:
+                    scalars[0] += .2;
                     break;
-
             }
             MapLocation nextUnit = unit.location;
             double add = (38 - nextUnit.distanceSquaredTo(currentLocation)) * scalars[0];

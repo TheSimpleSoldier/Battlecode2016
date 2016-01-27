@@ -22,8 +22,7 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.VIPERS))
         {
             Bots[][] dynamicBuild = {
-                    {Bots.SCOUTINGSCOUT},
-                    {Bots.RUSHINGVIPER},
+                    {Bots.SCOUTINGSCOUT}
             };
 
             int[] times = {1, 10, 10000};
@@ -35,7 +34,7 @@ public class BuildOrderCreation
             Bots[][] dynamicBuild = {
                     {Bots.SCOUTINGSCOUT, Bots.TURTLESOLDIER},
                     {Bots.TURTLESOLDIER, Bots.TURTLESOLDIER},
-                    {Bots.TURTLESOLDIER, Bots.RUSHINGVIPER}
+                    {Bots.TURTLESOLDIER}
             };
 
             int[] times = {1, 10, 10000};
@@ -54,8 +53,8 @@ public class BuildOrderCreation
         if (RobotPlayer.strategy.equals(Strategies.RUSH))
         {
             Bots[][] buildOrderRush = {
-                    {Bots.RUSHINGSOLDIER, Bots.RUSHINGSOLDIER, Bots.RUSHSCOUT, Bots.RUSHINGVIPER},
-                    {Bots.RUSHGUARD, Bots.RUSHINGSOLDIER, Bots.RUSHINGVIPER, Bots.RUSHINGSOLDIER},
+                    {Bots.RUSHINGSOLDIER, Bots.RUSHINGSOLDIER, Bots.RUSHSCOUT},
+                    {Bots.RUSHGUARD, Bots.RUSHINGSOLDIER, Bots.RUSHINGSOLDIER},
             };
 
             int[] timesRush = {1,1000};
@@ -81,7 +80,7 @@ public class BuildOrderCreation
                     {Bots.TURTLETURRET, Bots.TURTLETURRET, Bots.SPOTTINGSCOUT},
                     {Bots.TURTLETURRET, Bots.TURTLESCOUT, Bots.TURTLETURRET},
                     {Bots.TURTLETURRET, Bots.TURTLESOLDIER, Bots.TURTLETURRET},
-                    {Bots.TURTLETURRET, Bots.RUSHINGVIPER, Bots.TURTLETURRET},
+                    {Bots.TURTLETURRET},
             };
 
             int[] timesTurtle = {1, 4/multiplier, 4/multiplier, 1, 4/multiplier, 4/multiplier, 1000};
@@ -99,10 +98,10 @@ public class BuildOrderCreation
 
         if (RobotPlayer.strategy.equals(Strategies.PACMAN)) {
             Bots[][] buildOrderPacMan = {
-                    {Bots.RUSHGUARD, Bots.SCOUTBOMBSCOUT},
+                    {Bots.RUSHGUARD,Bots.RUSHINGSOLDIER},
             };
 
-            int[] timesPacMan = {0};
+            int[] timesPacMan = {1,10000};
 
             return new BuildOrder(buildOrderPacMan,timesPacMan);
         }
@@ -115,7 +114,7 @@ public class BuildOrderCreation
                 {Bots.DENKILLERSOLDIER, Bots.HERDINGSCOUT},
                 {Bots.SCOUTINGSCOUT, Bots.DENKILLERSOLDIER},
                 {Bots.DENKILLERSOLDIER, Bots.CASTLESOLDIER},
-                {Bots.DENKILLERSOLDIER, Bots.RUSHINGVIPER},
+                {Bots.DENKILLERSOLDIER},
                 {Bots.DENKILLERSOLDIER, Bots.HERDINGSCOUT},
                 {Bots.PATROLSCOUT, Bots.BASETURRET},
                 {Bots.CASTLESOLDIER, Bots.BASETURRET},

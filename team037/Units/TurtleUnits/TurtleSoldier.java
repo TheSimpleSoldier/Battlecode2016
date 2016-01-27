@@ -38,7 +38,7 @@ public class TurtleSoldier extends BaseSoldier
     public TurtleSoldier(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, alliedArchonStartLocs);
     }
 
 
@@ -70,33 +70,6 @@ public class TurtleSoldier extends BaseSoldier
         nearestEnemyArchonInfo = null;
 
         nonScoutEnemies = false;
-        for (int i = enemies.length; --i >= 0; ) {
-            int dist = enemies[i].location.distanceSquaredTo(currentLocation);
-            switch (enemies[i].type) {
-                case SOLDIER:
-                case VIPER:
-                case GUARD:
-                case TTM:
-                case TURRET:
-                    nonScoutEnemies = true;
-                    if (dist < nearestCombatEnemy) {
-                        nearestCombatEnemy = dist;
-                        nearestCombatEnemyInfo = enemies[i];
-                    }
-                    break;
-
-                case ARCHON:
-                    if (dist < nearestEnemyArchon) {
-                        nearestEnemyArchon = dist;
-                        nearestEnemyArchonInfo = enemies[i];
-                    }
-                    nonScoutEnemies = true;
-                    break;
-                case SCOUT:
-                    break;
-
-            }
-        }
 
         nearestBigZombie = Integer.MAX_VALUE;
         nearestBigZombieInfo = null;
@@ -173,7 +146,7 @@ public class TurtleSoldier extends BaseSoldier
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.soldierMicro(nearByEnemies, nearByAllies, enemies, allies, target);
+        return false;
     }
 
     // additional methods with default behavior
@@ -499,12 +472,7 @@ public class TurtleSoldier extends BaseSoldier
        What should we do if we see an enemy in the open?
      */
     private boolean enemiesInOpen() throws GameActionException {
-        // precondition
-        if (!nonScoutEnemies) {
-            return false;
-        }
-
-        return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, turtlePoint);
+        return false;
     }
 
 }

@@ -17,7 +17,7 @@ public class BaseSoldier extends Unit
 
     public boolean fight() throws GameActionException
     {
-        return fightMicro.basicNetFightMicro(nearByEnemies, nearByAllies, enemies, allies, target);
+        return false;
     }
 
     public boolean fightZombies() throws GameActionException

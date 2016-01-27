@@ -16,12 +16,6 @@ public class SuperRushTurret extends BaseTurret
     public SuperRushTurret(RobotController rc)
     {
         super(rc);
-        updatedLocs = new MapLocation[enemyArchonStartLocs.length];
-
-        for (int i = updatedLocs.length; --i>=0; )
-        {
-            updatedLocs[i] = enemyArchonStartLocs[i];
-        }
 
         rushTarget.add(rushTarget.directionTo(currentLocation), 3);
         dist = (int) Math.sqrt(currentLocation.distanceSquaredTo(rushTarget));

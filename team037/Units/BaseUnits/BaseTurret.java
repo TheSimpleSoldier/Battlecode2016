@@ -62,7 +62,7 @@ public class BaseTurret extends Unit implements PacMan
     {
         if (rc.getType() == RobotType.TURRET)
         {
-            if (packIntoTTM() && navigator.getTarget() != null && !navigator.getTarget().equals(currentLocation) && (!FightMicroUtilites.offensiveEnemies(enemies) && zombies.length == 0))
+            if (packIntoTTM() && navigator.getTarget() != null && !navigator.getTarget().equals(currentLocation) && zombies.length == 0)
             {
                 arrived = false;
                 rc.pack();
@@ -83,9 +83,9 @@ public class BaseTurret extends Unit implements PacMan
     {
         if (rc.getType() == RobotType.TTM)
         {
-            if (zombies.length > 0 || enemies.length > 0)
+            if (zombies.length > 0)
             {
-                if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies))
+                if (fightMicro.enemiesInMinimumRange(zombies))
                 {
                     return runAway(null);
                 }
@@ -99,7 +99,7 @@ public class BaseTurret extends Unit implements PacMan
             return false;
         }
 
-        boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
+        boolean fought = fightMicro.turretFightMicro(nearByZombies, nearByZombies, zombies, allies, target, communications);
 
         if (pack(fought))
         {
@@ -113,10 +113,10 @@ public class BaseTurret extends Unit implements PacMan
 
     private boolean pack(boolean fought)
     {
-        if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies) && !fought && rc.isWeaponReady())
+        if (fightMicro.enemiesInMinimumRange(zombies) || !fought && rc.isWeaponReady())
         {
             if (!FightMicroUtilites.offensiveEnemies(allies)) return true;
-            if (!FightMicroUtilites.unitsEngaged(allies, enemies) && !FightMicroUtilites.unitsEngaged(allies, zombies)) return true;
+            if (!!FightMicroUtilites.unitsEngaged(allies, zombies)) return true;
         }
 
         return false;

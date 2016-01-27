@@ -46,7 +46,6 @@ public interface PacMan {
     default int[] applyAdditionalConstants(int[] directions) { return directions; }
     default int[] applyAllWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ENEMIES]);
-        directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
         directions = PacManUtils.applyTurretWeights(Unit.currentLocation, directions, TurretMemory.getBufferContents(),weights[TURRETS]);
         if (Unit.type.equals(RobotType.ARCHON)) {
             RobotInfo[] neutrals = Unit.rc.senseNearbyRobots(Unit.sightRange, Team.NEUTRAL);
@@ -60,7 +59,6 @@ public interface PacMan {
     }
     default int[] applyAllSimpleWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.zombies);
-        directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.enemies);
         directions = applyAdditionalWeights(directions);
 
         return directions;
@@ -75,7 +73,6 @@ public interface PacMan {
         }
         if (flags[0]) {
             directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.alliedArchonStartLocs,DEFAULT_CONSTANTS[ALLIED_ARCHONS]);
-            directions = PacManUtils.applySimpleConstants(Unit.currentLocation,directions,Unit.enemyArchonStartLocs,DEFAULT_CONSTANTS[BAD_ARCHONS]);
         }
         directions = applyAdditionalConstants(directions);
 
@@ -381,7 +378,6 @@ public interface PacMan {
      * @return
      */
     default boolean spawnCounterMeasure() throws GameActionException {
-        if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
         if (inCorner()) return true;
         if (nearTurrets()) return false;
         if (!fastZombie()) return false;

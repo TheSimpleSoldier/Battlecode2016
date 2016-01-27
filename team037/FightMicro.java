@@ -631,7 +631,7 @@ public class FightMicro
             RobotInfo target = FightMicroUtilites.pickViperTarget(Unit.allies, enemies);
 
             // don't shoot
-            if (target == null || (target.team == Unit.opponent && target.viperInfectedTurns > 10))
+            if (target == null)
             {
 
             }

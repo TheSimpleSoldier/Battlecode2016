@@ -27,7 +27,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
     private boolean hiding = false;
     private int updateRound = -100;
     private int index = 0;
-    private int ArchonDist;
     private boolean offensiveEnemies = false;
     private boolean offensiveAllies = false;
     private boolean underAttack = false;
@@ -46,7 +45,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     public TurtleArchon(RobotController rc)
     {
         super(rc);
-        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, enemyArchonStartLocs);
+        turtlePoint = MapUtils.getTurtleSpot2(alliedArchonStartLocs, alliedArchonStartLocs);
         origionalTurtleSpot = new MapLocation(turtlePoint.x, turtlePoint.y);
         rc.setIndicatorString(0, "Turtle archon");
 
@@ -71,11 +70,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
         }
 
         lastZombieSighting = rc.getRoundNum();
-
-        try
-        {
-            ArchonDist = MapUtils.getCenterOfMass(alliedArchonStartLocs).distanceSquaredTo(MapUtils.getCenterOfMass(enemyArchonStartLocs));
-        } catch (Exception e) {e.printStackTrace();}
     }
 
     @Override
@@ -84,7 +78,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         MapLocation target = navigator.getTarget();
 
         if (target == null) return true;
-        if (FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies)) return true;
+        if (FightMicroUtilites.offensiveEnemies(zombies)) return true;
         if (target.equals(turtlePoint) && currentLocation.distanceSquaredTo(target) <= 2) return true;
         if (currentLocation.equals(target)) return true;
         if (!target.equals(turtlePoint) && rc.canSenseLocation(target) && rc.senseParts(target) == 0 && (rc.senseRobotAtLocation(target) == null || rc.senseRobotAtLocation(target).team != Team.NEUTRAL)) return true;
@@ -116,7 +110,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
         rc.setIndicatorLine(currentLocation, turtlePoint, 0, 255, 0);
 
         boolean offensiveZombies = FightMicroUtilites.offensiveEnemies(zombies);
-        offensiveEnemies = FightMicroUtilites.offensiveEnemies(enemies);
 
         int round = rc.getRoundNum();
 
@@ -133,12 +126,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
             if (tooManyZombies())
             {
                 condition = "tooManyZombies";
-                scavenging = false;
-            }
-
-            if (FightMicroUtilites.offensiveEnemies(enemies))
-            {
-                condition = "offensiveEnemies";
                 scavenging = false;
             }
 
@@ -375,7 +362,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
         if (!offensiveEnemies) return false;
         if (allies.length == 0) return true;
         if (!offensiveAllies) return true;
-        if ((enemies.length + zombies.length + 2) > allies.length) return true;
+        if (zombies.length + 2 > allies.length) return true;
 
         return false;
     }
@@ -450,9 +437,6 @@ public class TurtleArchon extends BaseArchon implements PacMan
         {
             if (stayHome) return turtlePoint;
 
-            if (FightMicroUtilites.offensiveEnemies(enemies)) return turtlePoint;
-
-
             int round = rc.getRoundNum();
             int nextZombieRound = zombieTracker.getNextZombieRound();
             if (nextZombieRound - round <= 25) return turtlePoint;
@@ -489,18 +473,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
     @Override
     public boolean fight() throws GameActionException
     {
-        if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
-        if (turtlePoint != null) navigator.setTarget(turtlePoint);
-
-        rc.setIndicatorString(2, "runAwayFrom enemies" + round);
-        lastRoundRunAway = round;
-
-//        if (!stayHome && zombies.length > 10)
-//        {
-//            return runAway(null, true, true);
-//        }
-
-        return runAway(null);
+        return false;
     }
 
     @Override
@@ -565,8 +538,8 @@ public class TurtleArchon extends BaseArchon implements PacMan
             return buildNextUnit();
         }
 
-        boolean offensiveEnemies = (FightMicroUtilites.offensiveEnemies(enemies) || FightMicroUtilites.offensiveEnemies(zombies));
-        if (offensiveEnemies && ((enemies.length + zombies.length) > allies.length)) return false;
+        boolean offensiveEnemies = (FightMicroUtilites.offensiveEnemies(zombies));
+        if (offensiveEnemies && (zombies.length > allies.length)) return false;
         if (offensiveEnemies && allies.length == 0) return false;
         if (currentLocation.distanceSquaredTo(turtlePoint) >= 100 && rc.getTeamParts() < 500) return false;
         if (round - lastRoundRunAway < 25) return false;
@@ -592,7 +565,7 @@ public class TurtleArchon extends BaseArchon implements PacMan
 
 
         // if there are no visible zombies then we should move to collect parts
-        if (!FightMicroUtilites.offensiveEnemies(enemies) && !FightMicroUtilites.offensiveEnemies(zombies)) {
+        if (!FightMicroUtilites.offensiveEnemies(zombies)) {
             MapLocation navigatorTarget;
 
             // if we are trying to get to parts and the location has rubble on it we should clear it
@@ -698,11 +671,11 @@ public class TurtleArchon extends BaseArchon implements PacMan
                 nextType = RobotType.SCOUT;
                 return Bots.SCOUTBOMBSCOUT;
             }
-            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 80)
-            {
-                nextType = RobotType.SCOUT;
-                return Bots.SCOUTBOMBSCOUT;
-            }
+//            else if (ArchonDist > 2500 && zombieTracker.getNextZombieRound() - round < 80)
+//            {
+//                nextType = RobotType.SCOUT;
+//                return Bots.SCOUTBOMBSCOUT;
+//            }
         }
 
 

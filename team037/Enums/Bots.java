@@ -19,13 +19,11 @@ import team037.Units.Rushers.*;
 import team037.Units.ScoutBomb.ScoutBombArchon;
 import team037.Units.ScoutBomb.ScoutBombGuard;
 import team037.Units.ScoutBomb.ScoutBombScout;
-import team037.Units.ScoutBomb.ScoutBombViper;
 import team037.Units.Scouts.HerdingScout;
 import team037.Units.Scouts.PatrolScout;
 import team037.Units.Scouts.RegionScout;
 import team037.Units.Scouts.ScoutingScout;
 import team037.Units.SuperRush.SuperRushTurret;
-import team037.Units.SuperRush.SuperRushViper;
 import team037.Units.TurtleUnits.*;
 
 /**
@@ -326,8 +324,6 @@ public enum Bots
                 return new DenKillerSoldier(rc);
             case DENKILLERGUARD:
                 return new DenKillerGuard(rc);
-            case RUSHINGVIPER:
-                return new RushingViper(rc);
             case RUSHINGSOLDIER:
                 return new RushingSoldier(rc);
             case REGIONSCOUT:
@@ -360,8 +356,6 @@ public enum Bots
                 return new ScoutBombScout(rc);
             case SCOUTBOMBGUARD:
                 return new ScoutBombGuard(rc);
-            case SCOUTBOMBVIPER:
-                return new ScoutBombViper(rc);
             case RUSHSCOUT:
                 return new RushingScout(rc);
             case SCAVENGERARCHON:
@@ -376,8 +370,6 @@ public enum Bots
                 return new SpottingScout(rc);
             case SUPERRUSHTURRET:
                 return new SuperRushTurret(rc);
-            case SUPERRUSHVIPER:
-                return new SuperRushViper(rc);
             case SCOUTBOMBARCHON:
                 return new ScoutBombArchon(rc);
         }

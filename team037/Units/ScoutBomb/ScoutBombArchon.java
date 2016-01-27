@@ -143,12 +143,6 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
      */
     private boolean runAwayFromCrowd() {
         // preconditions
-        if (enemies.length > 0 || zombies.length > 3) {
-            return runAway(null);
-        }
-        if (rc.getHealth() < .2 * type.maxHealth && (enemies.length > 0 || zombies.length > 3)) {
-            return runAway(null);
-        }
         return false;
     }
 
@@ -269,7 +263,12 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
         int radius = (int)Math.floor(Math.sqrt(type.sensorRadiusSquared));
         int diagRadius = (int)Math.floor(Math.sqrt(type.sensorRadiusSquared) / 1.5);
 
-        Direction toMove = enemyArchonCenterOfMass.directionTo(currentLocation);
+        Direction toMove;
+        if (zombies != null && zombies.length > 0) {
+            toMove = MapUtils.getCenterOfRobotInfoMass(zombies).directionTo(currentLocation);
+        } else {
+            toMove = currentLocation.directionTo(MapUtils.getClosestUnoccupiedSquare(currentLocation,currentLocation));
+        }
 
         if (toMove.isDiagonal()) {
             target = currentLocation.add(toMove, diagRadius);
@@ -338,19 +337,19 @@ public class ScoutBombArchon extends BaseArchon implements PacMan {
                 numGuards++;
             }
         }
-        if (start.equals(alliedArchonStartLocs[0]) && centerOfMassDifference < 1000 && vipersSpawned < rc.getRoundNum() / 300 ) {
-            if (rc.hasBuildRequirements(RobotType.VIPER)) {
-                Direction toSpawn = MapUtils.getRCCanMoveDirection();
-                if (!toSpawn.equals(Direction.NONE)) {
-                    rc.build(toSpawn, RobotType.VIPER);
-                    sendInitialMessages(toSpawn, RobotType.VIPER, Bots.SCOUTBOMBVIPER, false);
-                    vipersSpawned++;
-                    rc.setIndicatorString(1, "spawning viper, distance is " + centerOfMassDifference);
-                }
-            }
-        }
+//        if (start.equals(alliedArchonStartLocs[0]) && vipersSpawned < rc.getRoundNum() / 300 ) {
+//            if (rc.hasBuildRequirements(RobotType.VIPER)) {
+//                Direction toSpawn = MapUtils.getRCCanMoveDirection();
+//                if (!toSpawn.equals(Direction.NONE)) {
+//                    rc.build(toSpawn, RobotType.VIPER);
+//                    sendInitialMessages(toSpawn, RobotType.VIPER, Bots.SCOUTBOMBVIPER, false);
+//                    vipersSpawned++;
+//                    rc.setIndicatorString(1, "spawning viper, distance is " + centerOfMassDifference);
+//                }
+//            }
+//        }
 
-        else if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
+        if (zombies.length > 0 || numGuards < Math.min(6, round / 300)) {
             if (rc.hasBuildRequirements(RobotType.GUARD)) {
                 Direction toSpawn = MapUtils.getRCCanMoveDirection();
                 if (!toSpawn.equals(Direction.NONE)) {
