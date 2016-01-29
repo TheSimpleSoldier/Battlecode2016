@@ -213,6 +213,7 @@ public class TurtleGuard extends BaseGaurd
     private static final String ENEMIES_NEAR_RALLY_POINT = "enemies near rally point";
     private static final String MOVE_TO_COMBAT = "move to combat";
     private static final String PATROL_TURTLE_POINT = "patrol turtle point";
+    private static final String MOVE_OUT_OF_CORNER = "move out of corner";
 
     @Override
     public boolean act() throws GameActionException {
@@ -223,17 +224,15 @@ public class TurtleGuard extends BaseGaurd
         if (nearRallyPoint()) {
             if (zombiesNearTurtlePoint()) {
                 lastAction = ZOMBIES_NEAR_RALLY_POINT;
-            } else if (enemiesNearTurtlePoint()) {
-                lastAction = ENEMIES_NEAR_RALLY_POINT;
             } else if (moveToCombat()) {
                 lastAction = MOVE_TO_COMBAT;
+            } else if (moveOutOfCorner()) {
+                lastAction = MOVE_OUT_OF_CORNER;
             } else if (patrolTurtlePoint()) {
                 lastAction = PATROL_TURTLE_POINT;
             }
         } else {
-            if (enemiesInOpen()) {
-                lastAction = ENEMIES_IN_OPEN;
-            } else if (zombiesInOpen()) {
+            if (zombiesInOpen()) {
                 lastAction = ZOMBIES_IN_OPEN;
             } else if (moveToTurtlePoint()) {
                 lastAction = MOVE_TO_TURTLE_POINT;
@@ -248,6 +247,38 @@ public class TurtleGuard extends BaseGaurd
 
     }
 
+    private boolean moveOutOfCorner() throws GameActionException {
+        //prereq
+        if (!coreReady) {
+            return false;
+        }
+        // detect in 4 cardinal directions, if 2 are off map, move diagonally away!
+        int num = 0;
+        Direction toMove = Direction.NONE;
+        if (!rc.onTheMap(currentLocation.add(Direction.NORTH, 4))) {
+            num += 1;
+            toMove = Direction.SOUTH;
+        }
+        if (!rc.onTheMap(currentLocation.add(Direction.SOUTH, 4))) {
+            num += 1;
+            toMove = Direction.NORTH;
+        }
+        if (num == 0) {
+            return false;
+        }
+        if (!rc.onTheMap(currentLocation.add(Direction.EAST, 4))) {
+            num += 1;
+            toMove = MapUtils.addDirections(toMove, Direction.WEST);
+        }
+        if (!rc.onTheMap(currentLocation.add(Direction.WEST, 4))) {
+            num += 1;
+            toMove = MapUtils.addDirections(toMove, Direction.EAST);
+        }
+        if (num == 2) {
+            return MoveUtils.tryMoveForwardOrLeftRight(toMove, true);
+        }
+        return false;
+    }
 
 
     private static boolean reverse = false;
@@ -259,21 +290,51 @@ public class TurtleGuard extends BaseGaurd
         if (!coreReady) {
             return false;
         }
-        if (nearestTurret == Integer.MAX_VALUE) {
-            Direction toMove = currentLocation.directionTo(turtlePoint);
-            return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+
+        if (zombies.length == 0 && nearestArchon <=2) {
+            rc.setIndicatorString(1, "making room for archon!");
+            return MoveUtils.tryMoveForwardOrSideways(nearestArchonInfo.location.directionTo(currentLocation), true);
         }
-        if (nearestTurret > 8)  {
+
+        if (nearestTurret <= 2) {
+            int turrets = 0;
+            int guards = 0;
+            for (int i = nearByAllies.length; --i >= 0;) {
+                switch (nearByAllies[i].type) {
+                    case GUARD:
+                        guards += 1;
+                        break;
+                    case TURRET:
+                    case TTM:
+                        turrets += 1;
+                        break;
+                }
+            }
+            if (turrets <= 2) {
+                Direction oppositeTurret = nearestTurretInfo.location.directionTo(currentLocation);
+                if (rc.onTheMap(currentLocation.add(oppositeTurret, 3)) ){
+                    rc.setIndicatorString(1, "chilling next to my turret!");
+                    return true;
+                }
+            }
+        }
+
+        if (nearestTurret == Integer.MAX_VALUE) {
+            rc.setIndicatorString(1, "can't find a turret!");
+            Direction toMove = currentLocation.directionTo(turtlePoint);
+            return MoveUtils.tryMoveForwardOrLeftRight(toMove, true);
+        }
+        if (nearestTurret > 4)  {
             if (reverse) {
+                rc.setIndicatorString(1, "moving to turret!");
                 return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateRight(), true);
             } else {
+                rc.setIndicatorString(1, "moving to turret!");
                 return MoveUtils.tryMoveForwardOrSideways(currentLocation.directionTo(nearestTurretInfo.location).rotateLeft(), true);
             }
         }
 
-        if (nearestArchon <=2) {
-            return MoveUtils.tryMoveForwardOrSideways(nearestArchonInfo.location.directionTo(currentLocation), true);
-        }
+
 
         Direction toMove = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft().rotateLeft();
         if (reverse) {
@@ -285,7 +346,8 @@ public class TurtleGuard extends BaseGaurd
             toMove = toMove.opposite().rotateRight();
         }
 
-        return MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
+        rc.setIndicatorString(1, "patrol move!");
+        return MoveUtils.tryMoveForwardOrLeftRight(toMove, true);
     }
 
     /*
@@ -295,49 +357,7 @@ public class TurtleGuard extends BaseGaurd
         return false;
     }
 
-    /*
-    ENEMIES NEAR TURTLE POINT
-     */
-    private boolean enemiesNearTurtlePoint() throws GameActionException {
-        // prereqs
-        if (nearestCombatEnemy == Integer.MAX_VALUE) {
-            return false;
-        }
-        if (weaponReady && nearestCombatEnemy <= type.attackRadiusSquared) {
-            rc.attackLocation(nearestCombatEnemyInfo.location);
-            return true;
-        }
-        if (!coreReady) {
-            return false;
-        }
-        if (nearestTurret > 8 && nearestTurret < Integer.MAX_VALUE) {
-            MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), false);
-            return true;
-        } else if (nearestTurret <= 8) {
-            Direction forward = currentLocation.directionTo(turtlePoint).rotateLeft().rotateLeft();
-            if (currentLocation.add(forward).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-                if (rc.canMove(forward)) {
-                    rc.move(forward);
-                    return true;
-                }
-            }
 
-            Direction back = forward.opposite();
-            if (currentLocation.add(back).distanceSquaredTo(nearestCombatEnemyInfo.location) < nearestCombatEnemy) {
-                if (rc.canMove(back)) {
-                    rc.move(back);
-                    return true;
-                }
-            }
-            // hold;
-            return true;
-        } else if (nearestTurret < 2 * nearestCombatEnemy) {
-            Direction toMove = currentLocation.directionTo(nearestCombatEnemyInfo.location);
-            MoveUtils.tryMoveForwardOrLeftRight(toMove, false);
-        }
-
-        return true;
-    }
 
     /*
     ZOMBIES NEAR TURTLE POINT
@@ -349,6 +369,7 @@ public class TurtleGuard extends BaseGaurd
         }
 
         if (justDen) {
+            rc.setIndicatorString(1, "just den!");
             return zombiesInOpen();
         }
         if (weaponReady) {
@@ -370,7 +391,8 @@ public class TurtleGuard extends BaseGaurd
         }
         if (coreReady) {
             if (nearestBigZombie == 1 || nearestMeleeZombie == 1 || nearestRangedZombie == 1) {
-
+                rc.setIndicatorString(1, "standing and fighting!");
+                return true;
             }
             else if (nearestBigZombie == 2) {
                 rc.setIndicatorString(1, "moving to 1");
@@ -385,30 +407,40 @@ public class TurtleGuard extends BaseGaurd
                 return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestRangedZombieInfo.location), false);
             }
 
-            if (nearestTurret <= 9 || nearestTurret == Integer.MAX_VALUE) {
+
+            if (nearestTurret > 2 && nearestTurret < Integer.MAX_VALUE) {
+                rc.setIndicatorString(1, "moving to turret");
+                return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestTurretInfo.location), true);
+            }
+
+            if (nearestTurret <= 2 || nearestTurret == Integer.MAX_VALUE) {
                 if (nearestBigZombie < Integer.MAX_VALUE) {
                     if (rc.senseNearbyRobots(nearestBigZombieInfo.location, 8, us).length > 0) {
-                        rc.setIndicatorString(1, "moving in");
-                        return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestBigZombieInfo.location), false);
+                        rc.setIndicatorString(1, "standing guard!");
+                        return true;
                     }
                 }
                 if (nearestMeleeZombie < Integer.MAX_VALUE) {
                     if (rc.senseNearbyRobots(nearestMeleeZombieInfo.location, 8, us).length > 0) {
-                        rc.setIndicatorString(1, "moving in");
-                        return MoveUtils.tryMoveForwardOrLeftRight(currentLocation.directionTo(nearestMeleeZombieInfo.location), false);
+                        rc.setIndicatorString(1, "standing guard!");
+                        return true;
                     }
                 }
             }
 
 
+
             if (nearestTurret <= 2 && nearestTurret < Integer.MAX_VALUE) {
+                rc.setIndicatorString(1, "moving away from turret");
                 return MoveUtils.tryMoveForwardOrLeftRight(nearestTurretInfo.location.directionTo(currentLocation), false);
             } else if (nearestScout <= 2 && nearestTurret < Integer.MAX_VALUE) {
+                rc.setIndicatorString(1, "moving away from turret");
                 return MoveUtils.tryMoveForwardOrLeftRight(nearestScoutInfo.location.directionTo(currentLocation), false);
             }
         }
 
-        return patrolTurtlePoint();
+        rc.setIndicatorString(1, "can't do anything!");
+        return true;
     }
 
     /*
@@ -511,15 +543,6 @@ public class TurtleGuard extends BaseGaurd
             return false;
         }
         return currentLocation.distanceSquaredTo(turtlePoint) < 100;
-    }
-
-    /*
-    ENEMIES_IN_OPEN
-       What should we do if we see an enemy in the open?
-     */
-    private boolean enemiesInOpen() throws GameActionException {
-        // precondition
-        return false;
     }
 
 }

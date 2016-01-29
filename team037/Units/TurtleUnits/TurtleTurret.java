@@ -3,6 +3,7 @@ package team037.Units.TurtleUnits;
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseTurret;
 import team037.Utilites.MapUtils;
+import team037.Utilites.MoveUtils;
 
 public class TurtleTurret extends BaseTurret
 {
@@ -13,7 +14,12 @@ public class TurtleTurret extends BaseTurret
 
         try
         {
-            setTargetLoc(MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, turtlePoint));
+            MapLocation target = MapUtils.getClosestUnoccupiedSquareCheckeredBoard(currentLocation, turtlePoint);
+            if (rc.senseParts(target) == 0) {
+                setTargetLoc(target);
+            } else {
+                setTargetLoc(turtlePoint);
+            }
         }
         catch (Exception e)
         {
