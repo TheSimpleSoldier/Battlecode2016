@@ -3,6 +3,9 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communication used to coordinate the fire of Turrets.
+ */
 public class TurretSupportCommunication extends Communication
 {
     private int x;

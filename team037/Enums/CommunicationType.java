@@ -2,6 +2,9 @@ package team037.Enums;
 
 import team037.Messages.*;
 
+/**
+ * Enum used to convert raw messages into useful data.
+ */
 public enum CommunicationType
 {
     DEN,

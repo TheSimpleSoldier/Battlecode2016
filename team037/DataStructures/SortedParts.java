@@ -4,6 +4,10 @@ import battlecode.common.*;
 import team037.Utilites.MapUtils;
 import team037.Utilites.RubbleUtilities;
 
+/**
+ * This class is for use of archons and it gives the Archon
+ * the best location to go to based on a ratio of parts to distance
+ */
 public class SortedParts
 {
     MapLocation[] locs;

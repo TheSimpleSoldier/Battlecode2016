@@ -3,6 +3,10 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communication for informing other bots when a bot of significance
+ * has been spotted or moved, e.g. friendly archon movement.
+ */
 public class SimpleBotInfoCommunication extends Communication
 {
     public int id;

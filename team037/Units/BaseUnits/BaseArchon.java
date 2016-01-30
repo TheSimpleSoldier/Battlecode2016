@@ -16,7 +16,11 @@ import team037.Utilites.BuildOrderCreation;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.ZombieTracker;
 
-
+/**
+ * BaseArchon is a base class designed to be extended by most or all
+ * other archons, containing basic data & logic to ensure archon-specific
+ * actions are taken every turn.
+ */
 public class BaseArchon extends Unit implements PacMan {
     public BuildOrder buildOrder;
     public static Bots nextBot;
@@ -49,10 +53,44 @@ public class BaseArchon extends Unit implements PacMan {
 
     }
 
+    @Override // precondition() in class Unit
+    /**
+     * If this archon cannot act, we need not waste bytecodes.
+     *
+     * Called by method act() in class Unit
+     * Order of method calls made by act() (short-circuits if a method returns true):
+     *
+     * precondition() ||
+     * aidDistressedArchon() ||
+     * fight() ||
+     * fightZombies() ||
+     * carryOutAbility() ||
+     * takeNextStep()
+     *
+     * @return Can act (true) or cannot act (false)
+     */
     public boolean precondition() {
         return !rc.isCoreReady();
     }
 
+    @Override // takeNextStep() required by the extension of class Unit
+    /**
+     * Method used to move the archon about the map.
+     *
+     * Called by method act() in class Unit
+     * Order of method calls made by act() (short-circuits if a method returns true):
+     *
+     * precondition() ||
+     * aidDistressedArchon() ||
+     * fight() ||
+     * fightZombies() ||
+     * carryOutAbility() ||
+     * takeNextStep()
+     *
+     * @return moved (true) or did not move (false)
+     * @throws GameActionException - ensure actions taken are
+     * valid under the Battlecode game engine.
+     */
     public boolean takeNextStep() throws GameActionException {
         if (currentLocation != null && navigator.getTarget() != null) {
             rc.setIndicatorLine(currentLocation, navigator.getTarget(), 255, 0, 0);
@@ -91,6 +129,15 @@ public class BaseArchon extends Unit implements PacMan {
         return navigator.takeNextStep();
     }
 
+    @Override // collectData() in class Unit
+    /**
+     * Collect any information needed prior to the execution of a turn.
+     *
+     * Executes once per turn by call in RobotPlayer prior to call of method act() in Unit.
+     *
+     * @throws GameActionException - ensure actions taken are
+     * valid under the Battlecode game engine.
+     */
     public void collectData() throws GameActionException {
         super.collectData();
 
@@ -142,6 +189,11 @@ public class BaseArchon extends Unit implements PacMan {
 
     }
 
+    /**
+     * Get the default extension for every RobotType archons can build.
+     * @param type RobotType enum used by the Battlecode engine
+     * @return Bots enum representing the default extension for the given RobotType
+     */
     public Bots getDefaultBotTypes(RobotType type) {
         switch (type) {
             case SOLDIER:
@@ -163,6 +215,24 @@ public class BaseArchon extends Unit implements PacMan {
         }
     }
 
+    @Override // fight() required by the extension of class Unit
+    /**
+     * Handle the presence of offensive non-zombie enemy units.
+     *
+     * Called by method act() in class Unit
+     * Order of method calls made by act() (short-circuits if a method returns true):
+     *
+     * precondition() ||
+     * aidDistressedArchon() ||
+     * fight() ||
+     * fightZombies() ||
+     * carryOutAbility() ||
+     * takeNextStep()
+     *
+     * @return true if we took action related to non-zombie enemies, false otherwise.
+     * @throws GameActionException - ensure actions taken are
+     * valid under the Battlecode game engine.
+     */
     public boolean fight() throws GameActionException {
         if (!FightMicroUtilites.offensiveEnemies(enemies)) return false;
 
@@ -171,6 +241,24 @@ public class BaseArchon extends Unit implements PacMan {
         return runAway(null);
     }
 
+    @Override // fightZombies() required by the extension of class Unit
+    /**
+     * Handle the presence of offensive zombie units.
+     *
+     * Called by method act() in class Unit
+     * Order of method calls made by act() (short-circuits if a method returns true):
+     * return
+     * precondition() ||
+     * aidDistressedArchon() ||
+     * fight() ||
+     * fightZombies() ||
+     * carryOutAbility() ||
+     * takeNextStep();
+     *
+     * @return true we took action related to zombies, false otherwise.
+     * @throws GameActionException - ensure actions taken are
+     * valid under the Battlecode game engine.
+     */
     public boolean fightZombies() throws GameActionException {
         if (!FightMicroUtilites.offensiveEnemies(zombies)) return false;
 
@@ -180,6 +268,14 @@ public class BaseArchon extends Unit implements PacMan {
     }
 
     @Override
+    /**
+     * Collects information from messages that have accrued since the previous round.
+     *
+     * Executes once per turn by call in RobotPlayer prior to call of method act() in Unit.
+     *
+     * @throws GameActionException - ensure actions taken are
+     * valid under the Battlecode game engine.
+     */
     public void sendMessages() throws GameActionException {
         int offensiveEnemies = 0;
 
@@ -218,6 +314,15 @@ public class BaseArchon extends Unit implements PacMan {
         }
     }
 
+    /**
+     * Selects the friendly unit with the lowest health and heals it.
+     *
+     * Does not affect the archon's delay beyond bytecode usage
+     *
+     * @return true if the archon has healed a a friendly unit.
+     * @throws GameActionException - ensure actions taken are
+     * valid under the Battlecode game engine.
+     */
     public boolean healNearbyAllies() throws GameActionException {
         // precondition
         if (nearByAllies.length == 0 || turnHealed == rc.getRoundNum()) {
@@ -253,7 +358,13 @@ public class BaseArchon extends Unit implements PacMan {
     }
 
     // maybe spawn a unit or repair a damaged unit
-    @Override
+    @Override // carryOutAbility() in class Unit
+    /**
+     * Attempt to build a unit.
+     *
+     * @return true if this unit used an ability affecting core delay.
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public boolean carryOutAbility() throws GameActionException {
         if (enemies.length > allies.length) {
             return false;
@@ -262,6 +373,11 @@ public class BaseArchon extends Unit implements PacMan {
         return buildNextUnit();
     }
 
+    /**
+     * Create a scout that will escort this archon, assist with digging, and lead zombies away.
+     *
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public void buildScavengerScout() throws GameActionException
     {
         Bots temp = Bots.SCAVENGERSCOUT;
@@ -284,6 +400,12 @@ public class BaseArchon extends Unit implements PacMan {
         }
     }
 
+    /**
+     * Find an empty location adjacent to the archon and build the Bot specified by the current value of nextBot.
+     *
+     * @return true if we built a unit, false otherwise.
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public boolean buildNextUnit() throws GameActionException {
         // if there are multiple archons and we have limited parts and we see
         // either parts or neutrals we should let the other archon's build while
@@ -328,6 +450,12 @@ public class BaseArchon extends Unit implements PacMan {
         return false;
     }
 
+    /**
+     * Sends messages to a unit to inform it of what it should do.
+     *
+     * @param dir Direction of the unit we just built
+     * @throws GameActionException
+     */
     public void sendInitialMessages(Direction dir) throws GameActionException {
         int id = rc.senseRobotAtLocation(rc.getLocation().add(dir)).ID;
         MissionCommunication communication = new MissionCommunication();

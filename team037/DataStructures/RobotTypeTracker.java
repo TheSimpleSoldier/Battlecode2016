@@ -12,7 +12,7 @@ public class RobotTypeTracker
     private static int count;
 
     /**
-     * This class if for keeping track of robots by id
+     * This class tracks robots by id
      *
      * @param rt
      * @param robotController

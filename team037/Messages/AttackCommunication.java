@@ -3,6 +3,9 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communication used to declare a target for attack.
+ */
 public class AttackCommunication extends Communication
 {
     public int x;

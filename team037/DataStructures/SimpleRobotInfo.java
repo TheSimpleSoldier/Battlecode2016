@@ -5,6 +5,7 @@ import battlecode.common.RobotType;
 import battlecode.common.Team;
 
 /**
+ * Container for essential RobotInfo used by the messaging system.
  * Created by joshua on 1/13/16.
  */
 public class SimpleRobotInfo

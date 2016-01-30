@@ -3,6 +3,10 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communication used to inform all units of the
+ * known boundaries of the map.
+ */
 public class MapBoundsCommunication extends Communication
 {
     public int edgeIndicator;

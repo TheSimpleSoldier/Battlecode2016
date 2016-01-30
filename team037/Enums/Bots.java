@@ -29,6 +29,7 @@ import team037.Units.SuperRush.SuperRushViper;
 import team037.Units.TurtleUnits.*;
 
 /**
+ * Enum for tracking extensions of each unit type.
  * Created by joshua on 1/5/16.
  * One of each type of unit
  */
