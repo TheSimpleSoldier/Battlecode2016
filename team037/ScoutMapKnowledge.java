@@ -3,6 +3,9 @@ package team037;
 import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationSet;
 
+/**
+ * Extension of MapKnowledge for scouts and archons to coordinate exploration of the map.
+ */
 public class ScoutMapKnowledge extends MapKnowledge
 {
 

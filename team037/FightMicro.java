@@ -7,6 +7,9 @@ import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 import team037.Utilites.PartsUtilities;
 
+/**
+ * FightMicro holds all of the logic related to decisions made while in combat against enemy and zombie units.
+ */
 public class FightMicro
 {
     public static RobotController rc;

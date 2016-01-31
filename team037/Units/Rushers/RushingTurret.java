@@ -6,6 +6,9 @@ import battlecode.common.RobotController;
 import team037.Units.BaseUnits.BaseTurret;
 import team037.Utilites.MapUtils;
 
+/**
+ * Extension of BaseTurret designed to rush the enemy.
+ */
 public class RushingTurret extends BaseTurret
 {
     private boolean rushing = false;

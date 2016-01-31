@@ -13,6 +13,9 @@ import team037.Utilites.MapUtils;
 
 import java.util.Random;
 
+/**
+ * Scout designed for discovery of map's properties, such as boundaries and zombie dens.
+ */
 public class ScoutingScout extends BaseScout
 {
     public static Direction scoutDirection;

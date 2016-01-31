@@ -2,6 +2,9 @@ package team037;
 
 import battlecode.common.*;
 
+/**
+ * Navigator for flying units specifically for keeping the units near the edges of the map.
+ */
 public class FlyingWallHuggerNavigator extends Navigator {
     private static RobotController rc;
     private static MapLocation target;

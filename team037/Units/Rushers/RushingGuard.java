@@ -8,6 +8,9 @@ import team037.Units.BaseUnits.BaseGuard;
 import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
 
+/**
+ * Unit extending BaseGuard designed to rush the enemy.
+ */
 public class RushingGuard extends BaseGuard implements PacMan
 {
     private boolean rushing = false;

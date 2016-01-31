@@ -2,6 +2,9 @@ package team037;
 
 import battlecode.common.*;
 
+/**
+ * Navigator specifically for the castle strategy, coordinating the movement of the castle.
+ */
 public class CastleNavigator extends Navigator {
     private static Unit unit;
     private static MapLocation target;

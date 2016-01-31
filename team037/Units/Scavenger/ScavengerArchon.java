@@ -14,6 +14,9 @@ import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
 import team037.Utilites.Utilities;
 
+/**
+ * Extension of BaseArchon specialized at acquiring resources with minimal escort units.
+ */
 public class ScavengerArchon extends BaseArchon implements PacMan {
 
     public static double[] adjacentRubble;

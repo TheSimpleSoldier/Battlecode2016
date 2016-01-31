@@ -7,6 +7,9 @@ import battlecode.common.RobotController;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseScout;
 
+/**
+ * Initial experimentation with having scouts herd zombies toward the enemy.
+ */
 public class HerdingScout extends BaseScout
 {
     private int minDist = 24;

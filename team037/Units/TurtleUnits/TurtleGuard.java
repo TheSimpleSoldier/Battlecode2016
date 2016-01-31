@@ -7,6 +7,9 @@ import team037.Units.BaseUnits.BaseGuard;
 import team037.Utilites.MoveUtils;
 import team037.Utilites.ZombieTracker;
 
+/**
+ * Guard designed to absorb damage for turrets, staying between turrets and the enemy.
+ */
 public class TurtleGuard extends BaseGuard
 {
     public static RobotTypeTracker robotTypeTracker;

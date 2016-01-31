@@ -8,6 +8,9 @@ import team037.Units.BaseUnits.BaseViper;
 import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
 
+/**
+ * Extension of BaseViper meant for extremely aggressive opening attacks on nearby archons.
+ */
 public class SuperRushViper extends BaseViper implements PacMan
 {
     private boolean rushing = false;

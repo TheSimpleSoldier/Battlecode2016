@@ -19,6 +19,9 @@ import battlecode.common.*;
 import team037.Enums.Bots;
 import team037.Units.BaseUnits.BaseArchon;
 
+/**
+ * Archon designed to maintain a mobile turtle.
+ */
 public class TurtleArchon extends BaseArchon implements PacMan
 {
     private boolean reachedTurtleSpot = false;

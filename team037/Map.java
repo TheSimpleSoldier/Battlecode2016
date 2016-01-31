@@ -1,7 +1,8 @@
 package team037;
 
 /**
- * Created by davej on 1/5/2016.
+ * Class stores and updates a two binary representations of map topography, which are transpositions of each other,
+ * for efficient path finding.
  */
 
 import battlecode.common.*;
@@ -32,11 +33,11 @@ public class Map {
     }
 
     /**
-     *
-     * @param currentLoc
-     * @param direction
-     * @param width
-     * @return
+     * Return the distances from a given location to the nearest non-walkable locations.
+     * @param currentLoc Unit's current location
+     * @param direction Direction of the ping
+     * @param width Width of the ping
+     * @return Array of size width containing distances to the nearest non-walkable locations.
      */
     public int[] ping(MapLocation currentLoc, int direction, int width) {
         int[] pingData = new int[width];

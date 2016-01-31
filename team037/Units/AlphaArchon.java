@@ -8,6 +8,9 @@ import team037.Messages.Communication;
 import team037.Units.BaseUnits.BaseArchon;
 import team037.Utilites.Utilities;
 
+/**
+ * Extension of BaseArchon that serves as the default archon in most strategy experimentation.
+ */
 public class AlphaArchon extends BaseArchon
 {
 

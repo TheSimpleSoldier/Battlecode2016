@@ -6,6 +6,9 @@ import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
 import team037.Utilites.MapUtils;
 
+/**
+ * Extension of BaseViper designed to rush the enemy.
+ */
 public class RushingViper extends BaseViper implements PacMan
 {
     private boolean rushing = false;

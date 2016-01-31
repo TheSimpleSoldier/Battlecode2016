@@ -6,6 +6,9 @@ import battlecode.common.Signal;
 import team037.Messages.Communication;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communicator sends, receives, and interprets signals sent between units.
+ */
 public class Communicator
 {
     RobotController rc;

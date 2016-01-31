@@ -232,10 +232,10 @@ public class PacManUtils {
 
     /**
      * Send initial messages to new units.
-     * @param dir
-     * @param nextType
-     * @param nextBot
-     * @param sendDenLocs
+     * @param dir direction the unit was built
+     * @param nextType RobotType of the new unit
+     * @param nextBot Bots enum dictating the new unit's class
+     * @param sendDenLocs pass true to message known zombie dens
      * @throws GameActionException
      */
     public static void sendInitialMessages(Direction dir, RobotType nextType, Bots nextBot, boolean sendDenLocs) throws GameActionException {
@@ -265,6 +265,11 @@ public class PacManUtils {
         }
     }
 
+    /**
+     * Send initial messages to new units.
+     * @param dir direction the unit was built
+     * @throws GameActionException
+     */
     public static void sendInitialMessages(Direction dir) throws GameActionException
     {
         int id = Unit.rc.senseRobotAtLocation(Unit.rc.getLocation().add(dir)).ID;
@@ -291,15 +296,15 @@ public class PacManUtils {
     }
 
     /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
+     * Adds values to an array of 8 integers (representing weights for each compass direction).
      * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Applies weights to the distance squared based on the direction from this unit to another unit.
+     * Specifically for the evasion of turrets.
      *
+     * @param currentLocation This unit's current location
      * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
-     * @param units      RobotInfo array whose locations will be used to find distances to the currentLocation variable
-     * @param scalars    values used to scale the distances, {currentLoc.directionTo(unit.location),
-     *                   directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     *                   Set to 0 to ignore a specific direction, negative to attract unit to units, & positive to
-     *                   repel unit from locations.
+     * @param units RobotInfo array whose locations will be used to find distances to the currentLocation variable
+     * @param scalars weights to be applied to distances before adding them to the distance array.
      * @return directions array with weights applied. Minimum value is the ideal direction of movement.
      */
     public static int[] applyWeights(MapLocation currentLocation, int[] directions, RobotInfo[] units, double[] scalars) {
@@ -424,6 +429,19 @@ public class PacManUtils {
 
         return directions;
     }
+
+    /**
+     * Adds values to an array of 8 integers (representing weights for each compass direction).
+     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Applies weights to the distance squared based on the direction from this unit to another unit.
+     * Specifically for the acquisition of parts.
+     *
+     * @param currentLocation This unit's current location
+     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
+     * @param locations  MapLocations to be used to find distance to the currentLocation variable.
+     * @param scalars weights to be applied to distances before adding them to the distance array.
+     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
+     */
     public static int[] applyPartsWeights(MapLocation currentLocation, int[] directions, MapLocation[] locations, double[] scalars) {
 
         int length = locations.length;
@@ -497,6 +515,19 @@ public class PacManUtils {
         return directions;
     }
 
+
+    /**
+     * Adds values to an array of 8 integers (representing weights for each compass direction).
+     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Applies weights to the distance squared based on the direction from this unit to another unit.
+     * Specifically for the evasion of turrets.
+     *
+     * @param currentLocation This unit's current location
+     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
+     * @param locations  MapLocations to be used to find distance to the currentLocation variable.
+     * @param scalars weights to be applied to distances before adding them to the distance array.
+     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
+     */
     public static int[] applyTurretWeights(MapLocation currentLocation, int[] directions, MapLocation[] locations, double[] scalars) {
 
         if (locations == null) {
@@ -579,9 +610,11 @@ public class PacManUtils {
     }
 
     /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
+     * Adds values to an array of 8 integers (representing weights for each compass direction).
      * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Applies weights to the distance squared based on the direction from this unit to another unit.
      *
+     * @param currentLocation This unit's current location.
      * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
      * @param units      RobotInfo array whose locations will be used to find distances to the currentLocation variable
      * @return directions array with weights applied. Minimum value is the ideal direction of movement.
@@ -664,14 +697,14 @@ public class PacManUtils {
     }
 
     /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
-     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Adds constant to an array of 8 integers.
      *
-     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
-     * @param location   MapLocation to be used to find distance to the currentLocation variable
+     * @param currentLocation This unit's current location.
+     * @param directions 8-integer array holding the weights for each direction {N, NE, E, SE, S, SW, W, NW}
+     * @param location  MapLocation to be used to find distance to the currentLocation variable
      * @param constants  values added to the directions array, {currentLoc.directionTo(unit.location),
      *                   directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
+     * @return directions array with constants applied. Minimum value is the ideal direction of movement.
      */
     public static int[] applyConstant(MapLocation currentLocation, int[] directions, MapLocation location, double[] constants) {
         if (location != null) {
@@ -763,14 +796,14 @@ public class PacManUtils {
     }
 
     /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
-     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Adds constant to an array of 8 integers.
      *
-     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
-     * @param location   MapLocation to be used to find distance to the currentLocation variable
+     * @param currentLocation This unit's current location.
+     * @param directions 8-integer array holding the weights for each direction {N, NE, E, SE, S, SW, W, NW}
+     * @param location  MapLocation to be used to find distance to the currentLocation variable
      * @param constants  values added to the directions array, {currentLoc.directionTo(unit.location),
      *                   directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
+     * @return directions array with constants applied. Minimum value is the ideal direction of movement.
      */
     public static int[] applySimpleConstant(MapLocation currentLocation, int[] directions, MapLocation location, int[] constants) {
         if (location != null) {
@@ -838,14 +871,14 @@ public class PacManUtils {
     }
 
     /**
-     * Applies weights to an array of 8 integers (representing weights for each compass direction).
-     * Uses the distance squared of each unit in the RobotInfo array to this bot's currentLocation variable.
+     * Adds constants to an array of 8 integers.
      *
-     * @param directions 8-integer array holding the weights for each direction {north, northeast, E, SE, S, SW, W, NW}
+     * @param currentLocation This unit's current location.
+     * @param directions 8-integer array holding the weights for each direction {N, NE, E, SE, S, SW, W, NW}
      * @param locations  MapLocations to be used to find distance to the currentLocation variable
      * @param constants  values added to the directions array, {currentLoc.directionTo(unit.location),
      *                   directionTo.rotateLeft&right, rotate 90 left&right, rotate 135 left&right, directionTo.opposite}.
-     * @return directions array with weights applied. Minimum value is the ideal direction of movement.
+     * @return directions array with constants applied. Minimum value is the ideal direction of movement.
      */
     public static int[] applySimpleConstants(MapLocation currentLocation, int[] directions, MapLocation[] locations, int[] constants) {
         if (locations == null) {

@@ -2,6 +2,9 @@ package team037;
 
 import battlecode.common.*;
 
+/**
+ * Class enables units to use Navigation with a single method call. Also updates targets.
+ */
 public class Navigator
 {
     private static RobotController rc;

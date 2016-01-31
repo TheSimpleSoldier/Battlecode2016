@@ -11,7 +11,7 @@ import team037.Units.PacMan.PacMan;
 import team037.Units.Scouts.ScoutingScout;
 
 /**
- * Created by davej on 1/19/2016.
+ * Extension of ScoutingScout designed to find and report enemy unit locations for rushing units.
  */
 public class RushingScout extends ScoutingScout implements PacMan {
 

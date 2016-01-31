@@ -14,6 +14,10 @@ import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 import team037.Utilites.MoveUtils;
 
+/**
+ * Bovard's baby. Extension of BaseScout designed to lead zombies away from us and toward the enemy. Attempts to
+ * get infected and kill itself near the enemy, turning into a powerful fast zombie.
+ */
 public class ScoutBombScout extends BaseScout
 {
     private static int closestEnemy;

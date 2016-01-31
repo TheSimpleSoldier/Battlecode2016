@@ -3,6 +3,9 @@ package team037.Units.ScoutBomb;
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseViper;
 
+/**
+ * Vipers spawned to turn our own scouts into zombies.
+ */
 public class ScoutBombViper extends BaseViper {
 
     private boolean rushing = false;
