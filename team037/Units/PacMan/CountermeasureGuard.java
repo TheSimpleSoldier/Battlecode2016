@@ -2,16 +2,22 @@ package team037.Units.PacMan;
 
 import battlecode.common.*;
 import team037.Navigation;
-import team037.Units.BaseUnits.BaseGaurd;
+import team037.Units.BaseUnits.BaseGuard;
 
-public class CountermeasureGuard extends BaseGaurd implements PacMan {
+/**
+ * Countermeasures designed to be built when archons are chased by zombies. significantly increases the archon's
+ * ability to survive against small and medium sized zombie hordes, especially small numbers of fast zombies.
+ */
+public class CountermeasureGuard extends BaseGuard implements PacMan {
 
-    public static MapLocation archonLastLoc;
-    public static RobotInfo myArchon;
+    // Additional variables used by countermeasure guards.
+    public static MapLocation archonLastLoc;    // Last known location of this archon
+    public static RobotInfo myArchon;           // RobotInfo of archon that spawned this guard. Updated last round.
     public static MapLocation zombieCenterOfMass, enemyCenterOfMass, lastScan;
-    public static int roundsSurvived;
-    public static boolean zombieAdjacentToArchon;
+    public static int roundsSurvived;           // Number of rounds this unit has survived since it spawned.
+    public static boolean zombieAdjacentToArchon;   // true if a zombie is adjacent to myArchon, false otherwise.
 
+    // Constructor
     public CountermeasureGuard(RobotController rc) {
         super(rc);
         roundsSurvived = 0;
@@ -41,6 +47,17 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
         }
     }
 
+    /**
+     * CountermeasureGuards require specific prioritization of abilities:
+     *  1) Become a normal guard if there are no archons within sight range.
+     *  2) Fight zombies if there are zombies adjacent to this unit's archon (myArchon)
+     *  3) Move away from this unit's archon
+     *  4) Fight zombies if they are present
+     *
+     * @return true if we moved, false otherwise.
+     * @throws GameActionException
+     */
+    @Override // method in class Unit.
     public boolean act() throws GameActionException {
         if (myArchon == null) {
             roundsSurvived++;
@@ -84,6 +101,7 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
         }
     }
 
+    @Override // method in interface PacMan. Adds additional constants to inform PacMan movement.
     public int[] applyAdditionalConstants(int[] directions) {
         if (myArchon != null) {
             directions = PacManUtils.applySimpleConstant(currentLocation, directions, myArchon.location, new int[]{999999,9999,0});
@@ -95,6 +113,11 @@ public class CountermeasureGuard extends BaseGaurd implements PacMan {
         return directions;
     }
 
+    /**
+     * Calls super.collectData(), searches for nearby archons, scans for rubble, checks for zombies adjacent to archons,,,
+     * @throws GameActionException
+     */
+    @Override // collectData() in class Unit.
     public void collectData() throws GameActionException {
         super.collectData();
         if (myArchon != null && !rc.canSenseRobot(myArchon.ID)) {

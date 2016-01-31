@@ -2,13 +2,12 @@ package team037.Units.TurtleUnits;
 
 import battlecode.common.*;
 import team037.DataStructures.RobotTypeTracker;
-import team037.FightMicro;
 import team037.Utilites.MapUtils;
-import team037.Units.BaseUnits.BaseGaurd;
+import team037.Units.BaseUnits.BaseGuard;
 import team037.Utilites.MoveUtils;
 import team037.Utilites.ZombieTracker;
 
-public class TurtleGuard extends BaseGaurd
+public class TurtleGuard extends BaseGuard
 {
     public static RobotTypeTracker robotTypeTracker;
     public static ZombieTracker zombieTracker;

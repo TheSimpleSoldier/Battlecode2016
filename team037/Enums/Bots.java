@@ -310,7 +310,7 @@ public enum Bots
             case BASEARCHON:
                 return new BaseArchon(rc);
             case BASEGAURD:
-                return new BaseGaurd(rc);
+                return new BaseGuard(rc);
             case BASESCOUT:
                 return new BaseScout(rc);
             case SCOUTINGSCOUT:

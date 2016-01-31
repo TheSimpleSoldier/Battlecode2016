@@ -9,8 +9,7 @@ import team037.Units.Scouts.ScoutingScout;
 import team037.Utilites.MapUtils;
 
 /**
- * PacManArchon runs away. PacManScout escorts PacManArchon.
- * Created by davej on 1/13/2016.
+ * Prototype archon extending Unit used to test PacMan.
  */
 public class PacManScout extends Unit implements PacMan {
 //    RobotInfo myArchon;

@@ -4,7 +4,7 @@ import battlecode.common.*;
 import team037.Units.Rushers.RushingViper;
 
 /**
- * Created by davej on 1/13/2016.
+ * Prototype unit extending Rushing Viper. Toys with using PacMan to rush Vipers past enemies.
  */
 public class PacManViper extends RushingViper implements PacMan {
 
