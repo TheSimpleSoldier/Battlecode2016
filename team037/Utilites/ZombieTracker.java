@@ -4,6 +4,9 @@ import battlecode.common.RobotController;
 import battlecode.common.ZombieCount;
 import battlecode.common.ZombieSpawnSchedule;
 
+/**
+ * ZombieTracker keeps track of the spawn schedule and current strength of zombies.
+ */
 public class ZombieTracker
 {
     private static final int BIG_ZOMBIE_SCORE = 8;

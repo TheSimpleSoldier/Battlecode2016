@@ -1,9 +1,10 @@
 package team037.Utilites;
 
-import battlecode.common.*;
 import battlecode.common.GameConstants;
 
-
+/**
+ * Methods for calculating the number of turns it will take to dig through a pile of rubble.
+ */
 public class RubbleUtilities
 {
     public static final int OBSTR_TO_ZERO = calculateClearActionsToReduceToZero(GameConstants.RUBBLE_OBSTRUCTION_THRESH);

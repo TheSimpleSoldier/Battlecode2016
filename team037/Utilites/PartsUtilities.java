@@ -5,7 +5,9 @@ import battlecode.common.GameConstants;
 import battlecode.common.RobotController;
 import team037.DataStructures.AppendOnlyMapLocationArray;
 
-
+/**
+ * Utilities for finding parts and neutral units.
+ */
 public class PartsUtilities
 {
 

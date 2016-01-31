@@ -5,6 +5,9 @@ import team037.Enums.CommunicationType;
 import team037.Messages.Communication;
 import team037.Unit;
 
+/**
+ * Utilities related to combat.
+ */
 public class FightMicroUtilites
 {
     /**
