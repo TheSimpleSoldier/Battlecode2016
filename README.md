@@ -11,5 +11,5 @@ We will keep a list of repositories for teams we played or watched, adding to it
 foundation - won the newbie tournament and took 4th place in the final tournament. Had a beautiful and effective scout-only strategy:
 https://github.com/bshimanuki/battlecode2016
 
-cubecow <3 canmoo - 
+cubecow <3 canmoo - Soldier-heavy team with some vipers mixed in. Finished in the top-32 of the qualifying tournament. 
 https://github.com/alwayswimmin/battlecode-2016
