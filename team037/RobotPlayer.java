@@ -24,8 +24,7 @@ public class RobotPlayer
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
      **/
-    public static void run(RobotController rc)
-    {
+    public static void run(RobotController rc) {
         try
         {
             // this will check your ./bc.conf file for a line like this:
@@ -108,7 +107,7 @@ public class RobotPlayer
             }
             else if(type == RobotType.GUARD)
             {
-                unit = new BaseGaurd(rc);
+                unit = new BaseGuard(rc);
                 Unit.thisBot = Bots.BASEGAURD;
             }
             else if(type == RobotType.SCOUT)

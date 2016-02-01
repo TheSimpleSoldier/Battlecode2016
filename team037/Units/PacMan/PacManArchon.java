@@ -14,8 +14,7 @@ import team037.Utilites.MapUtils;
 import team037.Utilites.Utilities;
 
 /**
- * PacMan bot runs away. That's it.
- * Created by davej on 1/13/2016.
+ * PacMan bot runs away. Used only in testing of the PacMan interface.
  */
 public class PacManArchon extends Unit implements PacMan {
 

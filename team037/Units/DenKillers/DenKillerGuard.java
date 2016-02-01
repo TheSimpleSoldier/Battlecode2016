@@ -5,9 +5,12 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
 import team037.Utilites.MapUtils;
-import team037.Units.BaseUnits.BaseGaurd;
+import team037.Units.BaseUnits.BaseGuard;
 
-public class DenKillerGuard extends BaseGaurd
+/**
+ * Guard extending BaseGuard designed to seek and destroy zombie dens.
+ */
+public class DenKillerGuard extends BaseGuard
 {
     public DenKillerGuard(RobotController rc)
     {

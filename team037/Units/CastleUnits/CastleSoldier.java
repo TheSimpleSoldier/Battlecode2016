@@ -7,6 +7,9 @@ import team037.SlugNavigator;
 import team037.Units.BaseUnits.BaseSoldier;
 import team037.Utilites.MapUtils;
 
+/**
+ * Soldier extending BaseSoldier experimented with fixed formations and uniform movement.
+ */
 public class CastleSoldier extends BaseSoldier
 {
     private static final String MOVE_TO_MOM = "move to mom";

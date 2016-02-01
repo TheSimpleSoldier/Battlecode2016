@@ -5,6 +5,9 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import team037.Units.BaseUnits.BaseScout;
 
+/**
+ * Scout designed to patrol a fixed region of the map.
+ */
 public class RegionScout extends BaseScout
 {
     private int region = -1;

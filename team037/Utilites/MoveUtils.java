@@ -3,7 +3,9 @@ package team037.Utilites;
 import battlecode.common.*;
 import static team037.Unit.*;
 
-
+/**
+ * Utilities attempt to move or clear rubble in various directions.
+ */
 public class MoveUtils {
 
     public static boolean tryMove(Direction toMove) throws GameActionException {

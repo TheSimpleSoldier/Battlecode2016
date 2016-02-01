@@ -3,6 +3,7 @@ package team037.Utilites;
 import battlecode.common.MapLocation;
 
 /**
+ * Utilities used to determine what strategy our team should run.
  * Created by joshua on 1/18/16.
  */
 public class StrategyUtilities

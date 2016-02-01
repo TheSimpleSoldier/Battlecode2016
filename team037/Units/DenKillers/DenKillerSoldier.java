@@ -7,6 +7,9 @@ import battlecode.common.Team;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseSoldier;
 
+/**
+ * Soldier extending BaseSoldier designed to seek and destroy dens.
+ */
 public class DenKillerSoldier extends BaseSoldier
 {
     public DenKillerSoldier(RobotController rc)

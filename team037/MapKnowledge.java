@@ -9,6 +9,7 @@ import team037.Messages.MapBoundsCommunication;
 import team037.Utilites.MapUtils;
 
 /**
+ * MapKnowledge stores essential information related to map bounds and size.
  * Created by joshua on 1/13/16.
  */
 public class MapKnowledge

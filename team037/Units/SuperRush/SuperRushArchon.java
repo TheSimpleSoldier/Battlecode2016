@@ -14,6 +14,7 @@ import team037.Unit;
 import java.util.Random;
 
 /**
+ * Extension of Unit meant for extremely aggressive opening attacks on nearby archons.
  * Created by joshua on 1/22/16.
  */
 public class SuperRushArchon extends Unit

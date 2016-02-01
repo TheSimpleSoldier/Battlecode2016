@@ -3,6 +3,7 @@ package team037.DataStructures;
 import battlecode.common.RobotType;
 
 /**
+ * Container for estimating army compositions.
  * Created by joshua on 1/22/16.
  */
 public class UnitProportion

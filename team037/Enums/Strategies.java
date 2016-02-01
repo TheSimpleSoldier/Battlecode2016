@@ -1,6 +1,8 @@
 package team037.Enums;
 
-
+/**
+ * Class used to differentiate when various strategies are in play.
+ */
 public class Strategies {
 
     public static final String CASTLE = "castle";

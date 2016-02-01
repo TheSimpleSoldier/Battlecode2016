@@ -10,6 +10,9 @@ import team037.Units.BaseUnits.BaseArchon;
 import team037.Utilites.MapUtils;
 import team037.Utilites.PartsUtilities;
 
+/**
+ * Archon extending BaseArchon experimented with fixed formations and uniform movement.
+ */
 public class CastleArchon extends BaseArchon {
 
     private SlugNavigator move;

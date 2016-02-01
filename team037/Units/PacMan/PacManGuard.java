@@ -1,12 +1,12 @@
 package team037.Units.PacMan;
 
 import battlecode.common.*;
-import team037.Units.BaseUnits.BaseGaurd;
+import team037.Units.BaseUnits.BaseGuard;
 
 /**
- * Created by davej on 1/15/2016.
+ * Prototype guard extending BaseGuard used to test new features of PacMan.
  */
-public class PacManGuard extends BaseGaurd implements PacMan {
+public class PacManGuard extends BaseGuard implements PacMan {
 
     // These are the weights.
     static final double[][] PACMAN_WEIGHTS = new double[][]

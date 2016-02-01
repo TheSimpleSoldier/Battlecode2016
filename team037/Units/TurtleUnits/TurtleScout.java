@@ -5,6 +5,9 @@ import team037.Units.BaseUnits.BaseScout;
 import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
+/**
+ * Scout designed to 'kite' zombies around our turtle, preventing the zombies from closing in on turrets.
+ */
 public class TurtleScout extends BaseScout
 {
     // This determines if the scout is going left or right around the turtle location

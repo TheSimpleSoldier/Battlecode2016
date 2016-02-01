@@ -5,6 +5,9 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import team037.Units.BaseUnits.BaseTurret;
 
+/**
+ * Extension of BaseTurret meant for extremely aggressive opening attacks on nearby archons.
+ */
 public class SuperRushTurret extends BaseTurret
 {
     private boolean rushing = false;

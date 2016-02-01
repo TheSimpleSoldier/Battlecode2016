@@ -2,6 +2,9 @@ package team037;
 
 import battlecode.common.*;
 
+/**
+ * Simple navigator for when standard navigator is not needed.
+ */
 public class SlugNavigator extends Navigator
 {
     private RobotController rc;

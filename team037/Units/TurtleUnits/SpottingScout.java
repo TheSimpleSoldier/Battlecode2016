@@ -4,6 +4,9 @@ import battlecode.common.*;
 import team037.Utilites.MapUtils;
 import team037.Units.BaseUnits.BaseScout;
 
+/**
+ * Scout specialized at teaming with Turrets and assisting with long range targeting.
+ */
 public class SpottingScout extends BaseScout
 {
     public MapLocation nxtTarget;

@@ -4,6 +4,9 @@ import battlecode.common.*;
 import team037.Units.BaseUnits.BaseTurret;
 import team037.Utilites.MapUtils;
 
+/**
+ * Turret serves as the bread and butter of turtles. Moves and maintains a checkerboard pattern.
+ */
 public class TurtleTurret extends BaseTurret
 {
     public TurtleTurret(RobotController rc)

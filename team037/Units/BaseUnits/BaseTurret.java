@@ -7,15 +7,12 @@ import team037.Utilites.FightMicroUtilites;
 import team037.Utilites.MapUtils;
 
 /**
- * Base Turret is the foundation of all turret units
+ * Base extension of the Unit class for units of RobotType TURRET and RobotType TTM (turret travel mode).
  *
- * To move all that needs to happen is for targetLoc to be set
- * using setTargetLoc()
+ * To move all that needs to happen is for targetLoc to be set using setTargetLoc().
  *
- * If you want control over when the Turret turns into a ttm or when a ttm turns into
- * a turret then implement the packIntoTTM() and unpackTTM() methods
- *
- * Otherwise you shouldn't need to implement any code
+ * If you want control over when the Turret turns into a ttm or when a ttm turns into a turret then implement
+ * the packIntoTTM() and unpackTTM() methods. Otherwise you shouldn't need to implement any code.
  */
 public class BaseTurret extends Unit implements PacMan
 {
@@ -23,17 +20,15 @@ public class BaseTurret extends Unit implements PacMan
     private int turnsAtLoc = 0;
     private boolean arrived = false;
 
+    // Constructor
     public BaseTurret(RobotController rc)
     {
         super(rc);
-//        targetLoc = MapUtils.getCenterOfMass(enemyArchonStartLocs);
-//        targetLoc = targetLoc.add(targetLoc.directionTo(currentLocation), 5);
         type = RobotType.TURRET;
     }
 
     /**
-     * This method is a check to make sure that we should pack up
-     * it defaults to true
+     * This method is a check to make sure we need to pack up. It defaults to true.
      * @return
      */
     public boolean packIntoTTM()
@@ -42,8 +37,7 @@ public class BaseTurret extends Unit implements PacMan
     }
 
     /**
-     * This method is for determining if we should unpack form a ttm into a turret
-     *
+     * This method is for determining if we should unpack from a TTM into a Turret. It defaults to false.
      * @return
      */
     public boolean unpackTTM()
@@ -56,8 +50,7 @@ public class BaseTurret extends Unit implements PacMan
         this.targetLoc = targetLoc;
     }
 
-    // Turrets don't move except if they are ttms
-    @Override
+    @Override // takeNextStep() in class Unit by contract of extension. If Turret needs to move it becomes a TTM first.
     public boolean takeNextStep() throws GameActionException
     {
         if (rc.getType() == RobotType.TURRET)
@@ -78,7 +71,7 @@ public class BaseTurret extends Unit implements PacMan
         return returnVal;
     }
 
-    @Override
+    @Override // fight() in class Unit by contract of extension. Uses Turret-specific fight micro.
     public boolean fight() throws GameActionException
     {
         if (rc.getType() == RobotType.TTM)
@@ -99,11 +92,11 @@ public class BaseTurret extends Unit implements PacMan
             return false;
         }
 
-        boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies, enemies, allies, target, communications);
+        boolean fought = fightMicro.turretFightMicro(nearByEnemies, nearByZombies,
+                enemies, allies, target, communications);
 
         if (pack(fought))
         {
-//            System.out.println("Flee from enemies: Offensive allies: " + FightMicroUtilites.offensiveEnemies(allies) + " allies engaged: " + FightMicroUtilites.unitsEngaged(allies, enemies) + " allies.length: " + allies.length + " enemies.length: " + enemies.length);
             rc.pack();
             return false;
         }
@@ -111,31 +104,37 @@ public class BaseTurret extends Unit implements PacMan
         return fought;
     }
 
+    /**
+     * Checks whether the Turret can pack into a TTM.
+     * @param fought set to true if this turret engaged in combat this turn, false otherwise.
+     * @return true if it can pack, false otherwise.
+     */
     private boolean pack(boolean fought)
     {
-        if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies) && !fought && rc.isWeaponReady())
+        if (fightMicro.enemiesInMinimumRange(zombies) || fightMicro.enemiesInMinimumRange(enemies) &&
+                !fought && rc.isWeaponReady())
         {
             if (!FightMicroUtilites.offensiveEnemies(allies)) return true;
-            if (!FightMicroUtilites.unitsEngaged(allies, enemies) && !FightMicroUtilites.unitsEngaged(allies, zombies)) return true;
+            if (!FightMicroUtilites.unitsEngaged(allies, enemies) &&
+                    !FightMicroUtilites.unitsEngaged(allies, zombies)) return true;
         }
 
         return false;
     }
 
-    // zombie fight micro happens in fight()
-    @Override
+    @Override // fightZombies() in class Unit by contract of extension. Returns false, already handled in fight()
     public boolean fightZombies() throws GameActionException
     {
         return false;
     }
 
-    @Override
+    @Override // precondition() in class Unit. Return true if we cannot move and cannot shoot.
     public boolean precondition()
     {
         return !rc.isCoreReady() && !rc.isWeaponReady();
     }
 
-    @Override
+    @Override // updateTarget() in class Unit. Target acquisition is different due to the small sight range of Turrets.
     public boolean updateTarget() throws GameActionException
     {
         if (targetLoc == null) return true;
@@ -148,7 +147,7 @@ public class BaseTurret extends Unit implements PacMan
         return false;
     }
 
-    @Override
+    @Override // getNextSpot in class Unit. Target acquisition is different due to the small sight range of Turrets.
     public MapLocation getNextSpot() throws GameActionException
     {
         if (targetLoc == null || !rc.canSense(targetLoc))
@@ -161,11 +160,9 @@ public class BaseTurret extends Unit implements PacMan
             rc.setIndicatorLine(currentLocation, target, 255, 0, 255);
             return target;
         }
-
-            //return MapUtils.getClosestUnoccupiedSquare(currentLocation, targetLoc);
     }
 
-    @Override
+    @Override // carryOutAbility() in class Unit. Unpacks Turrets from TTMs if they arrive at their deploy location.
     public boolean carryOutAbility() throws GameActionException
     {
         if (rc.getType() == RobotType.TTM)

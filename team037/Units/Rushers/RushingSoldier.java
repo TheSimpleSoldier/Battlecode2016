@@ -8,6 +8,9 @@ import team037.Units.BaseUnits.BaseSoldier;
 import team037.Units.PacMan.PacMan;
 import team037.Units.PacMan.PacManUtils;
 
+/**
+ * Extension of BaseSoldier designed to rush the enemy.
+ */
 public class RushingSoldier extends BaseSoldier implements PacMan
 {
     private boolean rushing = false;

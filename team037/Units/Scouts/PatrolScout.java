@@ -3,6 +3,9 @@ package team037.Units.Scouts;
 import battlecode.common.*;
 import team037.Units.BaseUnits.BaseScout;
 
+/**
+ * Scout designed to stay near allied units.
+ */
 public class PatrolScout extends BaseScout
 {
     public PatrolScout(RobotController rc)

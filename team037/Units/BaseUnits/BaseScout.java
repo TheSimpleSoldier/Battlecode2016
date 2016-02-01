@@ -10,6 +10,9 @@ import team037.Unit;
 import team037.Utilites.PartsUtilities;
 import team037.Utilites.RubbleUtilities;
 
+/**
+ * Base extension of the Unit class for units of RobotType Scout.
+ */
 public class BaseScout extends Unit
 {
     public static ScoutMapKnowledge mKnowledge = new ScoutMapKnowledge();
@@ -21,27 +24,42 @@ public class BaseScout extends Unit
         navigator = new FlyingNavigator(rc);
     }
 
+    /**
+     * Scout-specific implementations of abstract methods required by extension of class Unit.
+     */
+    @Override // takeNextStep() in class Unit by contract of extension
     public boolean takeNextStep() throws GameActionException
     {
         return navigator.takeNextStep();
     }
-
+    @Override // fight() in class Unit by contract of extension
     public boolean fight() throws GameActionException
     {
         return fightMicro.avoidEnemiesInRoute(enemies, navigator.getTarget());
     }
-
+    @Override // fightZombies() in class Unit by contract of extension
     public boolean fightZombies() throws GameActionException
     {
         return fightMicro.avoidEnemiesInRoute(zombies, navigator.getTarget());
     }
-
+    @Override // precondition() in class Unit by contract of extension
     public boolean precondition()
     {
         return !rc.isCoreReady();
     }
 
-    @Override
+    /**
+     * Send messages to units regarding the following information:
+     *  1) Discovery of a boundary of this map
+     *  2) Changes to known bounds of the map
+     *  3) Locations of archon sightings
+     *  4) Targets for turrets
+     *  5) Locations of parts and neutral units sighted
+     *  6) Locations of dens sighted or missing (destroyed)
+     *  7) Rubble topography in a 7x7 grid surrounding this scout
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
+    @Override // sendMessages() in class Unit
     public void sendMessages() throws GameActionException
     {
         if(mKnowledge.firstFoundEdge && msgsSent < 20)
@@ -66,6 +84,10 @@ public class BaseScout extends Unit
         msgRubble();
     }
 
+    /**
+     * Send messages to units regarding locations of archon sightings.
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public void msgArchons() throws GameActionException
     {
         for(int k = 0; k < enemies.length; k++)
@@ -84,7 +106,10 @@ public class BaseScout extends Unit
             }
         }
     }
-
+    /**
+     * Send messages to units regarding the locations of dens sighted or missing (destroyed).
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public void msgDens() throws GameActionException
     {
         for (int i = zombies.length; --i>=0; )
@@ -119,6 +144,10 @@ public class BaseScout extends Unit
         }
     }
 
+    /**
+     * Send messages to units regarding the locations of parts and neutral units sighted.
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public void msgParts() throws GameActionException
     {
         MapLocation[] partsArray = PartsUtilities.findPartsAndNeutrals(rc);
@@ -176,6 +205,10 @@ public class BaseScout extends Unit
         }
     }
 
+    /**
+     * Send messages to units regarding targets for turrets.
+     * @throws GameActionException - ensure actions taken are valid under the Battlecode game engine.
+     */
     public void msgTurrets() throws GameActionException
     {
         for (int i = allies.length; --i >= 0; )
@@ -263,6 +296,9 @@ public class BaseScout extends Unit
         }
     }
 
+    /**
+     * Send messages to units regarding the rubble topography in a 7x7 grid surrounding this scout.
+     */
     public void msgRubble() {
 
         if (msgsSent > 19 || rc.getRoundNum() % 5 != id % 5) {

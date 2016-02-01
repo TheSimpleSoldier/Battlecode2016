@@ -3,6 +3,10 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communication enables archons to update other archon's memory
+ * of parts located about the map.
+ */
 public class PartsCommunication extends Communication
 {
     public int parts;

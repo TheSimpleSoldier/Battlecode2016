@@ -4,6 +4,9 @@ import battlecode.common.*;
 import team037.DataStructures.AppendOnlyMapLocationArray;
 import team037.Units.BaseUnits.BaseTurret;
 
+/**
+ * Turret extending BaseTurret experimented with fixed formations and uniform movement.
+ */
 public class CastleTurret extends BaseTurret
 {
     AppendOnlyMapLocationArray enemyBroadcasingLocations;

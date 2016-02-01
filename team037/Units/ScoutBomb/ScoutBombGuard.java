@@ -2,10 +2,13 @@ package team037.Units.ScoutBomb;
 
 import battlecode.common.*;
 import team037.Utilites.MapUtils;
-import team037.Units.BaseUnits.BaseGaurd;
+import team037.Units.BaseUnits.BaseGuard;
 import team037.Utilites.MoveUtils;
 
-public class ScoutBombGuard extends BaseGaurd {
+/**
+ * Extension of BaseGuard meant to conservatively protect archons.
+ */
+public class ScoutBombGuard extends BaseGuard {
 
     private static int closestEnemy;
     private static boolean nonScoutEnemies = false;

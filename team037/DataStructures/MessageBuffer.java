@@ -2,6 +2,9 @@ package team037.DataStructures;
 
 import team037.Messages.Communication;
 
+/**
+ * Buffer for Communication objects.
+ */
 public class MessageBuffer {
     public Communication[] buffer;
     private int index, oldest;

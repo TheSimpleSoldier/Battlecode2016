@@ -4,6 +4,9 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 import team037.DataStructures.MapLocationBuffer;
 
+/**
+ * Keeps track of the last 12 locations of enemy turrets this unit encountered.
+ */
 public class TurretMemory {
 
     public static final int RADIUS = RobotType.TURRET.attackRadiusSquared;

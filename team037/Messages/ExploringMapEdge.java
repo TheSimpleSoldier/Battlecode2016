@@ -3,6 +3,9 @@ package team037.Messages;
 import team037.Enums.CommunicationType;
 import team037.Utilites.CommunicationUtilities;
 
+/**
+ * Communication for managing the movement of scouting scouts.
+ */
 public class ExploringMapEdge extends Communication
 {
     public int id;

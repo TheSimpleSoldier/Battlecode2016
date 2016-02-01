@@ -29,6 +29,7 @@ import team037.Units.SuperRush.SuperRushViper;
 import team037.Units.TurtleUnits.*;
 
 /**
+ * Enum for tracking extensions of each unit type.
  * Created by joshua on 1/5/16.
  * One of each type of unit
  */
@@ -309,7 +310,7 @@ public enum Bots
             case BASEARCHON:
                 return new BaseArchon(rc);
             case BASEGAURD:
-                return new BaseGaurd(rc);
+                return new BaseGuard(rc);
             case BASESCOUT:
                 return new BaseScout(rc);
             case SCOUTINGSCOUT:

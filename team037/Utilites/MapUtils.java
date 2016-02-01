@@ -4,7 +4,9 @@ import battlecode.common.*;
 import battlecode.common.GameConstants;
 import team037.Unit;
 
-
+/**
+ * Utilities to make MapKnowledge more useful.
+ */
 public class MapUtils
 {
     /**

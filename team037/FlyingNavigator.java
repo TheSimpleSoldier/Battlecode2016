@@ -2,6 +2,9 @@ package team037;
 
 import battlecode.common.*;
 
+/**
+ * Navigator used for flying units, which can ignore map topography entirely.
+ */
 public class FlyingNavigator extends Navigator
 {
     private RobotController rc;

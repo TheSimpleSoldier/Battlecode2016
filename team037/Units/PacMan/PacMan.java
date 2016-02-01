@@ -7,14 +7,41 @@ import team037.Unit;
 import team037.Utilites.TurretMemory;
 import team037.Utilites.FightMicroUtilites;
 
+/**
+ * PacMan is an interface for using an algorithm inspired by the little yellow guy who runs away from ghosts and eats
+ * everything on the map. It is used for running away from units in a variety of situations while simultaneously
+ * gravitating towards target locations.
+ *
+ * It starts with an array of 8 integers initialized to 0. Each integer represents a direction of movement: north (0),
+ * northeast (1), east (2), southeast(3), south(4), southwest(5), west(6), and northwest(7).
+ *
+ * The array, which is called directions, is passed through two methods multiple times. The first method takes an array
+ * of RobotInfo, finds the distance squared from this unit to each unit in the array, and adds value to every integer
+ * in the directions array based on the distance. Weights are applied to the distance, usually making the value added
+ * decay as directions moves away from the immediate direction from this unit to the unit in the array.
+ *
+ * The second method adds constants to the directions. This serves to force this unit to gravitate towards or away from
+ * a specified location while prioritizing movement away from significant locations in immediate sight.
+ *
+ * After calling the methods mentioned above, the distances between this unit and the nearest rubble in the north,
+ * south, east, and west are used to scale every value, giving non-walkable rubble significant weight based on
+ * present dangers.
+ *
+ * Finally, the minimum value is found and its index is used to determine an ideal direction of movement. The result is
+ * a style of movement that rarely gets trapped by zombies and enemies when used properly.
+ */
 public interface PacMan {
-    /**
-     * These are the array indices of the zombies weights, enemies weights, and target constants.
-     * Unless you override applyAllWeights and applyAllConstants, keep this in mind if you add additional
-     * weights or constants to the weights array you pass the runAway method.
-     */
-    int ENEMIES = 0, TARGET = 1, NEUTRALS_AND_PARTS = 2, TURRETS = 3,
-            COUNTERMEASURES = 0, ALLIED_ARCHONS = 1, BAD_ARCHONS = 2;
+
+    // DEFAULT_WEIGHTS indices
+    int ENEMIES = 0,                // Avoid enemies and zombies
+            TARGET = 1,             // Move towards target
+            NEUTRALS_AND_PARTS = 2, // Move towards neutrals and parts
+            TURRETS = 3;            // Avoid turrets
+
+    // DEFAULT_CONSTANTS indices
+    int COUNTERMEASURES = 0,        // Move away from CountermeasureGuards
+            ALLIED_ARCHONS = 1,     // Move away from allied archons
+            BAD_ARCHONS = 2;        // Move toward enemy archons
 
 
     double RUBBLE_OBSTRUCT = GameConstants.RUBBLE_OBSTRUCTION_THRESH;
@@ -37,13 +64,21 @@ public interface PacMan {
     boolean[] flags = new boolean[1];
 
     /**
-     * If you want to use PacMan navigation, you should use the default runAway() method. If you need to incorporate
-     * additional factors, implement them in the applyAdditionalWeights and applyAdditionalConstants methods.
-     *
-     * Check out PacManArchon for its set of weights, and the comments above applyUnitWeights for a basic description.
+     * Incorporate additional factors in the applyAdditionalWeights and applyAdditionalConstants methods.
      */
     default int[] applyAdditionalWeights(int[] directions) { return directions; }
     default int[] applyAdditionalConstants(int[] directions) { return directions; }
+
+    /**
+     * Apply weights to locations of enemies, zombies, and turrets. Archons also apply weights to locations of parts
+     * and neutral units. Calls applyAdditionalWeights, which does nothing by default. Implement applyAdditionalWeights
+     * to incorporate additional factors.
+     *
+     * @param directions int array for storing the sums of the distances from this unit to all significant locations
+     *                   and units weighed based on their directions relative to this unit.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return directions array storing the sum of the factors described above.
+     */
     default int[] applyAllWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.zombies, weights[ENEMIES]);
         directions = PacManUtils.applyWeights(Unit.currentLocation, directions, Unit.enemies, weights[ENEMIES]);
@@ -58,6 +93,16 @@ public interface PacMan {
 
         return directions;
     }
+
+    /**
+     * Lightweight version of applyAllWeights. Does not apply weights to opposite direction, or opposite direction
+     * rotated right or left.
+     *
+     * @param directions int array for storing the sums of the distances from this unit to all significant locations
+     *                   and units weighed based on their directions relative to this unit.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return directions array storing the sum of the factors described above.
+     */
     default int[] applyAllSimpleWeights(int[] directions, double[][] weights) {
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.zombies);
         directions = PacManUtils.applySimpleWeights(Unit.currentLocation, directions, Unit.enemies);
@@ -65,6 +110,19 @@ public interface PacMan {
 
         return directions;
     }
+
+    /**
+     * Apply constants to the target location. Archons apply another constant to CountermeasureGuards. Optionally
+     * have units tend towards the enemy archon starting locations and away from allied archon starting locations by
+     * calling the function runAway(double[][] weights, boolean spawnGuards, boolean tendTowardsEnemy) with
+     * tendTowardsEnemy set to true. Calls applyAdditionalConstants, which does nothing by default. Implement
+     * applyAdditionalConstants to incorporate additional factors.
+     *
+     * @param directions int array for storing the sums of the distances from this unit to all significant locations
+     *                   and units weighed based on their directions relative to this unit.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return directions array storing the sum of the factors described above.
+     */
     default int[] applyAllConstants(int[] directions, double[][] weights) {
         MapLocation loc = Unit.navigator.getTarget();
         if (loc != null) {
@@ -85,8 +143,8 @@ public interface PacMan {
     /**
      * This method assumes you have determined that we need to run away.
      *
-     * @param weights
-     * @return
+     * @param weights weights to apply to the distances between this unit and significant locations and units.
+     * @return Direction enum representing the advised direction of movement.
      */
     default Direction getRunAwayDirection(double[][] weights) {
         try {
@@ -103,23 +161,25 @@ public interface PacMan {
         The direction with the smallest weight will be taken. */
             int[] directions = new int[8];
 
+            // Get the distances from this unit to the nearest rubble in the North (0), East (2), South (4) and West (6)
             int[] ping0 = Navigation.map.ping(currentLocation, 0, 3);
             int[] ping2 = Navigation.map.ping(currentLocation, 2, 3);
             int[] ping4 = Navigation.map.ping(currentLocation, 4, 3);
             int[] ping6 = Navigation.map.ping(currentLocation, 6, 3);
 
-            // Third: apply constant modifiers to the weights
+            // First: apply constant modifiers to the weights
             directions = applyAllConstants(directions, weights);
 
-//            // First: apply weights of nearby units
+            // Second: apply weights of nearby units
             directions = applyAllWeights(directions, weights);
 
+            // Third: ensure values are greater than or equal to by finding the smallest value in the directions array
+            //        and adding its absolute value to all 8 integers stored in the array.
             int minValue = 99999999;
             for (int i = 8; --i >= 0;) {
                 if (directions[i] < minValue)
                     minValue = directions[i];
             }
-
             if (minValue < 1) {
                 minValue = Math.abs(minValue);
                 for (int i = 8; --i >= 0; ) {
@@ -127,7 +187,7 @@ public interface PacMan {
                 }
             }
 
-            // Second: scale weights based on nearby rubble
+            // Fourth: scale weights based on nearby rubble
 //            rc.setIndicatorString(0, "ping[0]:" + ping0[0] + ", ping[1]:" + ping0[1] + ", ping[2]:" + ping0[2] + ", (" + currentLocation.x + "," + currentLocation.y + ")");
             int divide = 17;
             int left = divide / ++ping0[0], mid = divide / ++ping0[1], right = divide / ++ping0[2];
@@ -159,7 +219,8 @@ public interface PacMan {
             directions[5] *= 1 + left / 2;
             directions[6] *= 1 + mid;
             directions[7] *= 1 + right / 2;
-//
+
+//            // Fifth: add a fraction of the value of each direction based on adjacent walkable rubble.
 //            double[] rubble = PacManUtils.rubble;
 //            if (rubble != null) {
 //
@@ -228,7 +289,7 @@ public interface PacMan {
 //                }
 //            }
             
-            // Last: find the smallest value whose direction leads to a valid location.
+            // Last: find the smallest value whose direction leads to a valid direction of movement.
             MapLocation nextLoc;
             int min, minDir, firstDir = -1;
             do {
@@ -297,10 +358,15 @@ public interface PacMan {
             }
             return Unit.dirs[minDir];
         } catch (Exception e) {
-//            e.printStackTrace();
             return Direction.NONE;
         }
     }
+
+    /**
+     * Run away and deploy countermeasures if conditions for deploying countermeasures are good.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return true if we moved, false otherwise.
+     */
     default boolean runAwayWithCountermeasures(double[][] weights)  {
         Navigator navigator = Unit.navigator;
 
@@ -331,7 +397,7 @@ public interface PacMan {
     /**
      * This method returns true if we see an allied turret in which case we shouldn't deploy counter measures
      *
-     * @return
+     * @return true of near turret, false otherwise
      */
     default boolean nearTurrets() {
         if (Unit.allies == null || Unit.allies.length == 0) return false;
@@ -346,7 +412,7 @@ public interface PacMan {
     /**
      * This method checks to see if there are any fast zombies chasing us
      *
-     * @return
+     * @return true if fast zombies are present, false otherwise
      */
     default boolean fastZombie() {
         for (int i = Unit.zombies.length; --i>=0; ) {
@@ -358,7 +424,7 @@ public interface PacMan {
     /**
      * This checks if we are blocked in a lot of places
      *
-     * @return
+     * @ true if we are, false otherwise
      * @throws GameActionException
      */
     default boolean inCorner() throws GameActionException {
@@ -378,7 +444,7 @@ public interface PacMan {
     /**
      * This method determines if we should spawn counter measures or not
      *
-     * @return
+     * @return true if we should, false otherwise
      */
     default boolean spawnCounterMeasure() throws GameActionException {
         if (FightMicroUtilites.offensiveEnemies(Unit.enemies)) return false;
@@ -389,6 +455,12 @@ public interface PacMan {
         return true;
     }
 
+    /**
+     * Run away and deploy countermeasures if conditions for deploying countermeasures are good. Perform a scan of the
+     * area surrounding this unit for rubble topography.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return true if we moved, false otherwise.
+     */
     default boolean runAway(double[][] weights)  {
         if (!Navigation.lastScan.equals(Unit.currentLocation)) {
             try {
@@ -425,6 +497,14 @@ public interface PacMan {
         }
     }
 
+    /**
+     * Run away and deploy countermeasures if conditions for deploying countermeasures are good.
+     * @param spawnGuards set to true to spawn countermeasure guards. Still performs check on standard conditions.
+     * @param tendTowardsEnemy set to true if you wish to have the unit tend towards the enemy archon starting
+     *                         locations and away from allied archon starting locations.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return true if we moved, false otherwise.
+     */
     default boolean runAway(double[][] weights, boolean spawnGuards, boolean tendTowardsEnemy) {
 
         flags[0] = tendTowardsEnemy;
@@ -464,6 +544,12 @@ public interface PacMan {
         }
     }
 
+
+    /**
+     * Run away. Do not deploy countermeasures. Do not tend towards anything except this unit's current target.
+     * @param weights weights to apply to the distance squared from this unit to all significant locations and units.
+     * @return true if we moved, false otherwise.
+     */
     default boolean runAwayPure(double[][] weights)  {
         if (!Navigation.lastScan.equals(Unit.currentLocation)) {
             try {

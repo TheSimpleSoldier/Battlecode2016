@@ -7,6 +7,9 @@ import team037.RobotPlayer;
 import team037.Unit;
 import team037.Units.TurtleUnits.TurtleTurret;
 
+/**
+ * Build orders for various strategies are specified here.
+ */
 public class BuildOrderCreation
 {
     private static final int multiplier = Unit.alliedArchonStartLocs.length;

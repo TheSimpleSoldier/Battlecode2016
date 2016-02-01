@@ -9,7 +9,8 @@ import team037.Utilites.MapUtils;
 import team037.Utilites.MoveUtils;
 
 /**
- * Created by davej on 1/20/2016.
+ * Extension of ScoutBombScout designed to escort Scavenging archons, attracting zombies that might pose a threat to
+ * the archon and digging for the archon when rubble is in its way.
  */
 public class ScavengerScout extends ScoutBombScout implements PacMan {
 
