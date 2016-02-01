@@ -8,8 +8,8 @@ You will also see a terrible lack of encapsulation, a design tradeoff that has b
 
 We will keep a list of repositories for teams we played or watched, adding to it as they become public:
 
-foundation - won the newbie tournament and took 4th place in the final tournament. Had a beautiful and effective scout-only strategy:
+foundation - Won the newbie tournament and took 4th place in the final tournament. Had a beautiful and effective scout-only strategy:
 https://github.com/bshimanuki/battlecode2016
 
-cubecow <3 canmoo - Soldier-heavy team with some vipers mixed in. Finished in the top-32 of the qualifying tournament. 
+cubecow <3 canmoo - Finished in the top-32 of the qualifying tournament. Final submission was a soldier-heavy team with some vipers mixed in:
 https://github.com/alwayswimmin/battlecode-2016
