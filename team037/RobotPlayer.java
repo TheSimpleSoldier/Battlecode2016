@@ -35,7 +35,7 @@ public class RobotPlayer
             // BUT THEY ARE FIXING IT!
 
             // hardcode disabled for now
-            strategy = Strategies.TURTLE;
+            strategy = Strategies.VIPERS;
 
             /*MapLocation[] us = rc.getInitialArchonLocations(rc.getTeam());
             MapLocation[] them = rc.getInitialArchonLocations(rc.getTeam().opponent());
@@ -74,6 +74,8 @@ public class RobotPlayer
                         strategy = Strategies.RUSH;
                     }
                 }
+
+
                 if(strategy.equals(Strategies.CASTLE))
                 {
                     unit = new CastleArchon(rc);
